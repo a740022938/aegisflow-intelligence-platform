@@ -90,6 +90,10 @@ AGI-Model-Factory/
 - 公开发布说明：`docs/public-release/PUBLIC_RELEASE_NOTES.md`
 - 清洗与安全说明：`docs/public-release/SANITIZATION_AND_SECURITY.md`
 - 保留/剥离清单：`docs/public-release/KEEP_EXCLUDE_MANIFEST.md`
+- Phase F.0 官网同步清单：`docs/public-release/F0_WEBSITE_SYNC_CHECKLIST.md`
+- Phase F.0 新用户上手闭环：`docs/public-release/F0_NEW_USER_ONBOARDING.md`
+- Phase F.0 首发后巡检报告：`docs/public-release/F0_POST_LAUNCH_INSPECTION.md`
+- 社区协作说明：`CONTRIBUTING.md`
 
 ## 架构概览
 
