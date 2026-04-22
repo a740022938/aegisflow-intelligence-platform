@@ -30,3 +30,9 @@
 - Web UI 可打开
 - Local API `/api/health` 返回 `ok: true`
 - 能看到至少一次任务状态变化并有结果面板数据
+
+## 遇到问题去哪里看
+1. 先看 `Workflow Jobs` 中对应 job 的状态与错误摘要
+2. 再看日志页（按 job_id 追踪）
+3. 若仍无法解决，去 GitHub 提 issue：
+   - https://github.com/a740022938/aegisflow-intelligence-platform/issues/new/choose

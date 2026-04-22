@@ -29,7 +29,7 @@
 
 ```bash
 git clone <your-public-repo-url>
-cd AGI-Model-Factory
+cd aegisflow-intelligence-platform
 pnpm install
 ```
 
@@ -64,7 +64,7 @@ pnpm run dev
 ## 目录结构（公开版）
 
 ```text
-AGI-Model-Factory/
+aegisflow-intelligence-platform/
 ├─ apps/
 │  ├─ web-ui/
 │  └─ local-api/
@@ -93,7 +93,9 @@ AGI-Model-Factory/
 - Phase F.0 官网同步清单：`docs/public-release/F0_WEBSITE_SYNC_CHECKLIST.md`
 - Phase F.0 新用户上手闭环：`docs/public-release/F0_NEW_USER_ONBOARDING.md`
 - Phase F.0 首发后巡检报告：`docs/public-release/F0_POST_LAUNCH_INSPECTION.md`
+- Phase F.1 社区反馈归档：`docs/public-release/F1_COMMUNITY_FEEDBACK_ARCHIVE.md`
 - 社区协作说明：`CONTRIBUTING.md`
+- 问题反馈入口：`https://github.com/a740022938/aegisflow-intelligence-platform/issues/new/choose`
 
 ## 架构概览
 
