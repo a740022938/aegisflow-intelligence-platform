@@ -112,6 +112,9 @@ function AppShell() {
     apiStatusBad: lang === 'zh' ? 'API 异常' : 'API Offline',
   };
   const displayVersion = apiVersion && apiVersion !== '…' ? apiVersion : APP_VERSION;
+  const openExternal = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
 
   useEffect(() => {
     saveSidebarWidth(sidebarWidth);
@@ -333,6 +336,7 @@ function AppShell() {
               {panel === 'about' && (
                 <div className="topbar-modal-grid">
                   <div className="topbar-kv"><span>{lang === 'zh' ? '界面版本' : 'UI Version'}</span><strong>v{displayVersion}</strong></div>
+                  <div className="topbar-kv"><span>{lang === 'zh' ? '版本形态' : 'Edition'}</span><strong>{APP_META.edition}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? 'API状态' : 'API Status'}</span><strong>{apiOk ? (lang === 'zh' ? '正常' : 'Online') : (lang === 'zh' ? '异常' : 'Offline')}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? '服务版本' : 'Service Version'}</span><strong>{healthData?.version || '—'}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? '数据库' : 'Database'}</span><strong>{healthData?.database || '—'}</strong></div>
@@ -357,7 +361,15 @@ function AppShell() {
                     <button className="topbar-help-btn" onClick={() => { setPanel(null); navigate('/factory-status'); }}>{lang === 'zh' ? '工厂状态' : 'Factory Status'}</button>
                     <button className="topbar-help-btn" onClick={() => { setPanel(null); navigate('/audit'); }}>{lang === 'zh' ? '审计日志' : 'Audit Logs'}</button>
                     <button className="topbar-help-btn" onClick={() => { setPanel(null); navigate('/outputs'); }}>{lang === 'zh' ? '标准输出' : 'Outputs'}</button>
+                    <button className="topbar-help-btn" onClick={() => openExternal(APP_META.githubRepoUrl)}>GitHub</button>
+                    <button className="topbar-help-btn" onClick={() => openExternal(APP_META.releaseUrl)}>Release</button>
+                    <button className="topbar-help-btn" onClick={() => openExternal(APP_META.onboardingDocUrl)}>{lang === 'zh' ? '新手上手' : 'Onboarding'}</button>
                   </div>
+                  <p style={{ marginTop: 12, color: 'var(--text-muted)', fontSize: 12 }}>
+                    {lang === 'zh'
+                      ? '社区版不包含私有资产、私有验证材料和真实凭据；高级集成需自行配置。'
+                      : 'Community Edition excludes private assets, private validation artifacts, and real credentials; advanced integrations require your own setup.'}
+                  </p>
                 </div>
               )}
             </div>

@@ -145,6 +145,9 @@ export default function Dashboard() {
 
   const t = translations[lang];
   const td = t.dashboard;
+  const openExternal = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
 
   const fetchAll = async () => {
     setLoading(true);
@@ -461,6 +464,32 @@ export default function Dashboard() {
         content: (
           <div className={`dash-modules-panel-inner role-card ${roleClass('gov')}`}>
             <h3 className={`dash-section-title role-title ${roleClass('gov')}`}>{td.quickAccess}</h3>
+            <div className="dash-community-onboarding">
+              <div className="dash-community-onboarding-head">
+                <div className="dash-community-onboarding-title">
+                  {APP_META.appNameZh} · {APP_META.appAbbr} · {APP_META.edition}
+                </div>
+                <div className="dash-community-onboarding-version">v{displayVersion}</div>
+              </div>
+              <div className="dash-community-onboarding-actions">
+                <button className="ui-btn ui-btn-outline ui-btn-sm" onClick={() => openExternal(APP_META.githubRepoUrl)}>GitHub</button>
+                <button className="ui-btn ui-btn-outline ui-btn-sm" onClick={() => openExternal(APP_META.releaseUrl)}>Release</button>
+                <button className="ui-btn ui-btn-outline ui-btn-sm" onClick={() => openExternal(APP_META.onboardingDocUrl)}>{lang === 'zh' ? '第一次如何开始' : 'First Run Guide'}</button>
+                <button className="ui-btn ui-btn-outline ui-btn-sm" onClick={() => navigate('/workflow-composer')}>{lang === 'zh' ? '打开编排器' : 'Open Composer'}</button>
+              </div>
+              <div className="dash-community-onboarding-grid">
+                <div className="dash-community-card">
+                  <div className="dash-community-card-title">{lang === 'zh' ? '推荐首跑模板' : 'Recommended First Templates'}</div>
+                  <div className="dash-community-card-item">`front-chain-light.json`</div>
+                  <div className="dash-community-card-item">`minimal-full-chain-flywheel.json`</div>
+                </div>
+                <div className="dash-community-card">
+                  <div className="dash-community-card-title">{lang === 'zh' ? '社区版边界' : 'Community Boundary'}</div>
+                  <div className="dash-community-card-item">{lang === 'zh' ? '包含：工作流编排、治理中枢、API+Web 最小基线' : 'Includes: composer, governance hub, API+Web baseline'}</div>
+                  <div className="dash-community-card-item">{lang === 'zh' ? '不包含：私有资产/私有验证材料/真实凭据' : 'Excludes: private assets, private validation artifacts, real secrets'}</div>
+                </div>
+              </div>
+            </div>
             <div className="dash-module-groups">
               <div className="dash-module-group">
                 <h4 className={`dash-module-group-title role-title ${roleClass('exec')}`}>{td.execution}</h4>

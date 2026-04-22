@@ -1,6 +1,6 @@
 {
   "name": "agi-model-factory",
-  "version": "6.8.0",
+  "version": "6.8.0-community.1",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "engines": {
