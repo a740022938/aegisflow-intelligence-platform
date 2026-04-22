@@ -1,0 +1,38 @@
+{
+  "name": "agi-model-factory",
+  "version": "6.8.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.js",
+    "dev": "concurrently -n api,web -c cyan,green \"pnpm dev:api\" \"pnpm dev:web\"",
+    "dev:web": "pnpm --dir apps/web-ui dev",
+    "dev:api": "pnpm --dir apps/local-api dev",
+    "build": "pnpm --dir apps/web-ui build",
+    "db:init": "node scripts/init-db.js",
+    "lint": "eslint \"apps/**/*.{ts,tsx}\" --max-warnings 50",
+    "lint:fix": "eslint \"apps/**/*.{ts,tsx}\" --fix",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,css,json}\"",
+    "format:check": "prettier --check \"apps/**/*.{ts,tsx,css,json}\"",
+    "test": "echo Add tests in P3",
+    "api:test": "httpyac api-tests/all-endpoints.http",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop agi-factory-api",
+    "pm2:logs": "pm2 logs agi-factory-api",
+    "pm2:restart": "pm2 restart agi-factory-api"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.5.1",
+    "tsx": "^4.19.4"
+  }
+}
+

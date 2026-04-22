@@ -1,0 +1,107 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-04-17T00:00:00Z",
+  "defaults": {
+    "always_run_scripts": [
+      "discover_capabilities"
+    ],
+    "fallback_readme": true
+  },
+  "rules": [
+    {
+      "id": "dataset-check",
+      "keywords_any": ["dataset", "数据集", "版本", "version"],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "check_dataset_version",
+          "use_dataset_version_id_from_action": true
+        }
+      ]
+    },
+    {
+      "id": "health-audit-plugin-workflow",
+      "keywords_any": ["health", "健康", "体检", "巡检", "check", "audit", "审计", "日志", "log", "plugin", "插件", "workflow", "工作流", "画布", "pipeline", "model", "模型", "分类", "classifier", "yolo", "sam"],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "discover_capabilities"
+        },
+        {
+          "type": "run_script",
+          "script_key": "health_patrol"
+        },
+        {
+          "type": "run_script",
+          "script_key": "plugin_pool_scan"
+        },
+        {
+          "type": "run_script",
+          "script_key": "run_queue_scan"
+        },
+        {
+          "type": "run_script",
+          "script_key": "dashboard_snapshot"
+        },
+        {
+          "type": "run_script",
+          "script_key": "build_ops_report"
+        }
+      ]
+    },
+    {
+      "id": "ops-report",
+      "keywords_any": ["report", "报告", "汇总", "总结", "概览", "overview"],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "health_patrol"
+        },
+        {
+          "type": "run_script",
+          "script_key": "plugin_pool_scan"
+        },
+        {
+          "type": "run_script",
+          "script_key": "run_queue_scan"
+        },
+        {
+          "type": "run_script",
+          "script_key": "dashboard_snapshot"
+        },
+        {
+          "type": "run_script",
+          "script_key": "build_ops_report"
+        }
+      ]
+    },
+    {
+      "id": "yolo-flywheel",
+      "keywords_any": ["yolo", "飞轮", "flywheel", "训练", "评估", "模型", "数据集"],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "yolo_flywheel_scan"
+        },
+        {
+          "type": "run_script",
+          "script_key": "build_ops_report"
+        }
+      ]
+    },
+    {
+      "id": "self-evolve",
+      "keywords_any": ["升级", "新功能", "自学习", "无师自通", "learn", "evolve", "auto rule"],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "auto_generate_intent_rules"
+        },
+        {
+          "type": "run_script",
+          "script_key": "discover_capabilities"
+        }
+      ]
+    }
+  ]
+}

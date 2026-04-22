@@ -1,0 +1,53 @@
+.node-ctx-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+}
+
+.node-ctx-menu {
+  position: absolute;
+  width: 220px;
+  background: #171717;
+  border: 1px solid #2d2d2d;
+  border-radius: 10px;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.node-ctx-title {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #9ca3af;
+  border-bottom: 1px solid #2d2d2d;
+  background: #111;
+}
+
+.node-ctx-list {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 4px;
+}
+
+.node-ctx-item {
+  border: 0;
+  background: transparent;
+  color: #e5e7eb;
+  padding: 8px 10px;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.node-ctx-item:hover {
+  background: rgba(56, 189, 248, 0.14);
+}
+
+.node-ctx-item.danger {
+  color: #fca5a5;
+}
+
+.node-ctx-item.danger:hover {
+  background: rgba(220, 38, 38, 0.2);
+}

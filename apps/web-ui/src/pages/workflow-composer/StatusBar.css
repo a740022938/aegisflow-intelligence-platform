@@ -1,0 +1,234 @@
+/* ============================================================
+   StatusBar.css — 底部状态栏样式
+   ============================================================ */
+
+.comfy-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px;
+  background: #0F0F0F;
+  border-top: 1px solid #2A2A2A;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.statusbar-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.statusbar-center {
+  flex: 1;
+  justify-content: center;
+}
+
+/* 统计项 */
+.statusbar-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #9CA3AF;
+}
+
+.statusbar-stat.has-error {
+  color: #EF4444;
+}
+
+.statusbar-stat.has-warning {
+  color: #F59E0B;
+}
+
+.stat-icon {
+  font-size: 12px;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #E5E7EB;
+}
+
+.stat-label {
+  font-size: 11px;
+}
+
+.statusbar-divider {
+  width: 1px;
+  height: 16px;
+  background: #333;
+}
+
+/* dry-run 状态 */
+.dryrun-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.dryrun-status.ready {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+.dryrun-status.blocked {
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+}
+
+.dryrun-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.dryrun-hint {
+  margin-left: 8px;
+  font-size: 11px;
+  color: #6B7280;
+}
+
+/* 坐标 */
+.statusbar-coords {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.coord-label {
+  color: #6B7280;
+}
+
+.coord-value {
+  color: #9CA3AF;
+  min-width: 40px;
+}
+
+/* 缩放控制 */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zoom-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  background: #1A1A1A;
+  color: #9CA3AF;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.zoom-btn:hover {
+  background: #252525;
+  color: #E5E7EB;
+}
+
+.zoom-value {
+  min-width: 50px;
+  text-align: center;
+  font-size: 11px;
+  color: #9CA3AF;
+}
+
+.zoom-fit {
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+
+/* ── P5: 运行状态 ── */
+.statusbar-job {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 6px;
+  margin-right: 12px;
+}
+
+.job-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.job-indicator.running {
+  background: #60a5fa;
+  animation: pulse 1s infinite;
+}
+
+.job-indicator.active {
+  background: #22d3ee;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.job-text {
+  font-size: 12px;
+  color: #93c5fd;
+  font-family: monospace;
+}
+
+.job-message {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.job-message.ok {
+  color: #86efac;
+}
+
+.job-message.error {
+  color: #fca5a5;
+}
+
+.job-controls {
+  display: flex;
+  gap: 4px;
+  margin-left: 4px;
+}
+
+.job-ctrl-btn {
+  padding: 2px 6px;
+  font-size: 11px;
+  background: rgba(100, 116, 139, 0.3);
+  border: 1px solid rgba(100, 116, 139, 0.4);
+  border-radius: 4px;
+  color: #d1d5db;
+  cursor: pointer;
+}
+
+.job-ctrl-btn:hover {
+  background: rgba(100, 116, 139, 0.5);
+}
+
+.job-ctrl-btn--danger:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}

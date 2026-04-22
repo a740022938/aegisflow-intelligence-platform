@@ -1,0 +1,223 @@
+.workspace-grid {
+  width: 100%;
+}
+
+.workspace-grid-item {
+  overflow: visible !important;
+}
+
+.workspace-grid-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background:
+    linear-gradient(var(--bg-surface), var(--bg-surface)) padding-box,
+    linear-gradient(120deg, rgba(45, 212, 191, 0.28), rgba(96, 165, 250, 0.24), rgba(167, 139, 250, 0.2)) border-box;
+  overflow: hidden;
+}
+
+.workspace-grid-card.editing {
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.5);
+  animation: editing-pulse 2s ease-in-out infinite;
+}
+
+@keyframes editing-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.5); }
+  50% { box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.25); }
+}
+
+.workspace-drag-handle {
+  cursor: grab;
+  user-select: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-light);
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(96, 165, 250, 0.1));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease;
+}
+
+.workspace-drag-handle:hover {
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.2), rgba(96, 165, 250, 0.2));
+}
+
+.workspace-drag-handle:active {
+  cursor: grabbing;
+}
+
+.workspace-drag-handle .drag-icon {
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+.workspace-drag-handle .drag-text {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.workspace-grid-body {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+}
+
+/* 拖拽和缩放时的视觉反馈 */
+.workspace-grid-wrap.is-dragging .workspace-grid-card.editing {
+  opacity: 0.9;
+  transform: scale(1.02);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.workspace-grid-wrap.is-resizing .workspace-grid-card.editing {
+  opacity: 0.95;
+}
+
+/* 缩放提示 */
+.workspace-resize-hint {
+  position: absolute;
+  bottom: 4px;
+  right: 28px;
+  font-size: 10px;
+  color: rgba(34, 211, 238, 0.6);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.workspace-grid-card.editing:hover .workspace-resize-hint {
+  opacity: 1;
+}
+
+.workspace-grid .react-grid-placeholder {
+  background: rgba(34, 211, 238, 0.15);
+  border: 2px dashed rgba(34, 211, 238, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+}
+
+.workspace-grid .react-resizable-handle {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.workspace-grid .react-resizable-handle:hover {
+  opacity: 1;
+}
+
+/* 编辑模式下增强缩放手柄可见性 */
+.workspace-grid:has(.workspace-grid-card.editing) .react-resizable-handle {
+  opacity: 1;
+  background: linear-gradient(135deg, transparent 50%, rgba(34, 211, 238, 0.5) 50%);
+}
+
+/* 缩放手柄样式增强 */
+.workspace-grid .react-resizable-handle {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.workspace-grid .react-resizable-handle::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, transparent 50%, rgba(34, 211, 238, 0.15) 50%);
+  border-radius: 0 0 12px 0;
+  transition: background 0.2s ease;
+}
+
+.workspace-grid .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid rgba(34, 211, 238, 0.8);
+  border-bottom: 2px solid rgba(34, 211, 238, 0.8);
+  transition: all 0.2s ease;
+}
+
+/* 编辑模式下进一步增强 */
+.workspace-grid:has(.workspace-grid-card.editing) .react-resizable-handle::before {
+  background: linear-gradient(135deg, transparent 50%, rgba(34, 211, 238, 0.3) 50%);
+}
+
+.workspace-grid:has(.workspace-grid-card.editing) .react-resizable-handle::after {
+  border-right-color: rgba(34, 211, 238, 1);
+  border-bottom-color: rgba(34, 211, 238, 1);
+  width: 12px;
+  height: 12px;
+}
+
+/* 缩放手柄悬停效果 */
+.workspace-grid .react-resizable-handle:hover::before {
+  background: linear-gradient(135deg, transparent 50%, rgba(34, 211, 238, 0.4) 50%);
+}
+
+.workspace-grid .react-resizable-handle:hover::after {
+  border-right-color: rgba(34, 211, 238, 1);
+  border-bottom-color: rgba(34, 211, 238, 1);
+  width: 12px;
+  height: 12px;
+}
+
+/* Mobile / sm breakpoint optimizations */
+@media (max-width: 768px) {
+  .workspace-grid-wrap {
+    padding: 4px;
+  }
+
+  .workspace-grid-card {
+    border-radius: 8px;
+  }
+
+  .workspace-drag-handle {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+
+  .workspace-grid-body {
+    overflow: auto;
+  }
+
+  /* Disable editing features on mobile for better UX */
+  .workspace-grid-card.editing {
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.5);
+    animation: none;
+  }
+
+  /* Smaller resize handle on mobile */
+  .workspace-grid .react-resizable-handle {
+    width: 20px;
+    height: 20px;
+  }
+
+  .workspace-grid .react-resizable-handle::before {
+    width: 20px;
+    height: 20px;
+  }
+
+  .workspace-grid .react-resizable-handle::after {
+    right: 4px;
+    bottom: 4px;
+    width: 8px;
+    height: 8px;
+  }
+}

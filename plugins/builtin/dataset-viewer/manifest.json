@@ -1,0 +1,41 @@
+{
+  "plugin_id": "dataset-viewer",
+  "name": "Dataset Viewer",
+  "version": "1.0.0",
+  "category": "data/view",
+  "status": "active",
+  "execution_mode": "readonly",
+  "risk_level": "LOW",
+  "enabled": true,
+  "requires_approval": false,
+  "dry_run_supported": true,
+  "ui_node_type": "transform",
+  "capabilities": ["read", "report"],
+  "permissions": ["read:datasets"],
+  "description": "数据集预览插件，返回数据集摘要和样本记录",
+  "author": "AGI Factory Team",
+  "tags": ["dataset", "view", "builtin"],
+  "icon": "database",
+  "color": "#10b981",
+  "entry": "./index.js",
+  "allowed_upstream": ["system-info"],
+  "allowed_downstream": ["export-csv"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "dataset_id": { "type": "string" },
+      "sample_count": { "type": "number", "default": 10, "maximum": 100 }
+    },
+    "required": ["dataset_id"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "dataset_id": { "type": "string" },
+      "dataset_name": { "type": "string" },
+      "total_records": { "type": "number" },
+      "sample_records": { "type": "array" },
+      "columns": { "type": "array" }
+    }
+  }
+}

@@ -1,0 +1,96 @@
+/* Feedback.css — 反馈中心页面（OpenAI Dark 主题） */
+
+.feedback-page {
+  padding: var(--space-5);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.feedback-page input,
+.feedback-page select,
+.feedback-page textarea {
+  background: var(--bg-elevated) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-light) !important;
+}
+
+.feedback-page input::placeholder,
+.feedback-page textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.feedback-batch-item {
+  text-align: left;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.feedback-batch-item:hover {
+  border-color: var(--primary);
+}
+
+.feedback-batch-item.selected {
+  border-color: var(--primary);
+  background: rgba(16, 163, 127, 0.08);
+}
+
+.feedback-batch-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.feedback-batch-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.feedback-detail-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.feedback-detail-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.feedback-detail-notes {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.feedback-items-header {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.feedback-table th {
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.feedback-table td {
+  padding: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.feedback-alert-error {
+  color: var(--danger);
+}
+
+.feedback-alert-success {
+  color: var(--success);
+}
+
+.feedback-export-path {
+  color: var(--text-secondary);
+  font-size: 12px;
+}

@@ -1,0 +1,190 @@
+/* Evaluations.css — OpenAI Console Dark + Phase 2 Layout */
+
+.eval-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-app);
+}
+
+.eval-body {
+  flex: 1;
+  overflow: hidden;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 两栏布局 */
+.eval-split {
+  display: flex;
+  gap: var(--space-4);
+  flex: 1;
+  overflow: hidden;
+}
+
+.eval-sidebar {
+  flex: 0 0 360px;
+  min-width: 360px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.eval-content {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 列表项 */
+.eval-list-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background var(--t-fast);
+}
+
+.eval-list-item:hover {
+  background: var(--bg-hover);
+}
+
+.eval-list-item.selected {
+  background: var(--bg-active);
+  border-left-color: var(--primary);
+}
+
+.eval-list-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eval-list-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* 详情头部 */
+.eval-detail-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.eval-detail-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.eval-detail-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.eval-detail-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* Tabs */
+.eval-tabs {
+  display: flex;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.eval-tab {
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: var(--font-sans);
+}
+
+.eval-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.eval-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* 内容区 */
+.eval-content-inner {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+/* 指标卡片 */
+.eval-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.eval-metric-card {
+  padding: var(--space-4);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.eval-metric-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.eval-metric-value {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.eval-metric-delta {
+  font-size: var(--text-xs);
+  margin-top: 4px;
+}
+
+.eval-metric-delta.positive {
+  color: var(--success);
+}
+
+.eval-metric-delta.negative {
+  color: var(--danger);
+}

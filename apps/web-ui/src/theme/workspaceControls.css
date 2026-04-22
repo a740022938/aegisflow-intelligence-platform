@@ -1,0 +1,40 @@
+/* Global fallback theme for workspace pages.
+   It targets native controls under `.page-root`
+   so legacy pages with inline styles won't fall back to white controls. */
+
+.page-root input:not([type='checkbox']):not([type='radio']),
+.page-root select,
+.page-root textarea {
+  background: var(--bg-elevated) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 8px 12px !important;
+  outline: none !important;
+}
+
+.page-root input:not([type='checkbox']):not([type='radio'])::placeholder,
+.page-root textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+.page-root input:not([type='checkbox']):not([type='radio']):focus,
+.page-root select:focus,
+.page-root textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--primary-light) !important;
+}
+
+.page-root button:not(.ui-btn):not(.ui-btn-primary):not(.ui-btn-secondary):not(.ui-btn-danger):not(.ui-btn-success):not(.ui-btn-warning):not(.ui-btn-ghost):not(.ui-btn-icon) {
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 8px 12px !important;
+  background: var(--bg-elevated) !important;
+  color: var(--text-main) !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+}
+
+.page-root button:not(.ui-btn):not(.ui-btn-primary):not(.ui-btn-secondary):not(.ui-btn-danger):not(.ui-btn-success):not(.ui-btn-warning):not(.ui-btn-ghost):not(.ui-btn-icon):hover {
+  background: var(--bg-hover) !important;
+}

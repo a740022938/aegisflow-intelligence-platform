@@ -1,0 +1,9 @@
+torch
+torchvision
+ultralytics
+scikit-learn
+onnx
+onnxruntime
+matplotlib
+pandas
+pyyaml

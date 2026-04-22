@@ -1,0 +1,80 @@
+/* Legacy bridge: global safeguards for old pages before full migration */
+
+.page-root {
+  color: var(--text-main);
+}
+
+.page-root .ui-card,
+.page-root .section-card,
+.page-root .card,
+.page-root [class*='panel'] {
+  background-color: var(--bg-surface);
+}
+
+.page-root h1,
+.page-root h2,
+.page-root h3,
+.page-root h4 {
+  color: var(--text-primary);
+}
+
+.page-root p,
+.page-root span,
+.page-root label,
+.page-root small {
+  color: var(--text-secondary);
+}
+
+.page-root a {
+  color: var(--primary);
+}
+
+.page-root a:hover {
+  color: var(--primary-hover);
+}
+
+.page-root hr {
+  border-color: var(--border-subtle);
+}
+
+.page-root table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  color: var(--text-main);
+}
+
+.page-root th,
+.page-root td {
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-main);
+}
+
+.page-root th {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.page-root pre,
+.page-root code {
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
+.page-root pre {
+  padding: 8px 10px;
+}
+
+.page-root .modal,
+.page-root .modal-content,
+.page-root [class*='modal-content'] {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-light) !important;
+  color: var(--text-main) !important;
+}
+
+.page-root [style*='display: grid'][style*='gridTemplateColumns'] {
+  min-width: 0;
+}

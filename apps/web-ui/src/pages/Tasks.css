@@ -1,0 +1,362 @@
+/* Tasks.css — OpenAI Console Dark + Phase 2 Layout */
+
+/* ── 页面根 ── */
+.tsk-root {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* ── 左侧边栏 ── */
+.tsk-left {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 右侧内容 ── */
+.tsk-right {
+  min-width: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 列表项 ── */
+.tsk-list-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background var(--t-fast);
+}
+
+.tsk-list-item:hover {
+  background: var(--bg-hover);
+}
+
+.tsk-list-item.selected {
+  background: var(--bg-active);
+  border-left-color: var(--primary);
+}
+
+.tsk-list-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tsk-list-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── 模板选择 ── */
+.tsk-pills {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.tsk-pill {
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  transition: all var(--t-fast);
+  color: var(--text-secondary);
+}
+
+.tsk-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tsk-pill.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* ── 日志查看器 ── */
+.tsk-log-viewer {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.tsk-log-line {
+  margin-bottom: 2px;
+}
+
+.tsk-log-time {
+  color: var(--text-muted);
+  margin-right: 8px;
+}
+
+.tsk-log-level {
+  font-weight: 600;
+  margin-right: 8px;
+  min-width: 50px;
+  display: inline-block;
+}
+
+.tsk-log-level.info {
+  color: var(--info);
+}
+
+.tsk-log-level.warn {
+  color: var(--warning);
+}
+
+.tsk-log-level.error {
+  color: var(--danger);
+}
+
+.tsk-log-level.debug {
+  color: var(--text-muted);
+}
+
+.tsk-log-msg {
+  color: var(--text-main);
+}
+
+/* ── 模板选择 ── */
+.tsk-template-pills {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.tsk-template-pill {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  transition: all var(--t-fast);
+  color: var(--text-secondary);
+}
+
+.tsk-template-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tsk-template-pill.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ── Modal ── */
+.tsk-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(4px);
+}
+
+.tsk-modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  width: 500px;
+  max-width: 95vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.tsk-modal-title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.tsk-modal-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.tsk-modal-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ── 详情头部 ── */
+.tsk-detail-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.tsk-detail-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tsk-detail-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.tsk-detail-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* ── Tabs ── */
+.tsk-tabs {
+  display: flex;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.tsk-tab {
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--t-fast);
+  font-family: var(--font-sans);
+}
+
+.tsk-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.tsk-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ── 内容区 ── */
+.tsk-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+/* ── 步骤列表 ── */
+.tsk-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tsk-step {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.tsk-step-index {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.tsk-step-content {
+  flex: 1;
+}
+
+.tsk-step-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.tsk-step-desc {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── 原始数据 ── */
+.tsk-raw {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ── 响应式 ── */
+@media (max-width: 900px) {
+  .tsk-root {
+    flex-direction: column;
+  }
+  
+  .tsk-left {
+    flex: none;
+    max-height: 300px;
+  }
+}

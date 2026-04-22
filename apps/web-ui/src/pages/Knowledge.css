@@ -1,0 +1,7 @@
+/* Knowledge.css — 知识中心页面（OpenAI Dark 主题） */
+
+.knowledge-page {
+  padding: var(--space-5);
+  max-width: 1400px;
+  margin: 0 auto;
+}

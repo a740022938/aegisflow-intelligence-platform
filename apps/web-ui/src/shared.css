@@ -1,0 +1,122 @@
+/* ============================================================
+   shared.css — OpenAI Console Dark 适配 (遗留兼容层)
+   ============================================================
+   版本: 跟随 APP_META.version
+   说明: 旧版页面兼容层，逐步迁移至 components/ui/shared.css
+   ============================================================ */
+
+/* ── v1.8.1: Workflow UI (Dark适配) ── */
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; border-bottom: 1px solid var(--border); margin-bottom: 0;
+  background: var(--bg-surface);
+}
+.page-header-left { display: flex; align-items: center; gap: 12px; }
+.page-header-right { display: flex; align-items: center; gap: 8px; }
+.page-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-primary); }
+.td-name { color: var(--text-main); font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-mono { font-family: var(--font-mono); color: var(--text-secondary); }
+.td-xs { font-size: 11px; }
+.td-sm { font-size: 12px; }
+.td-center { text-align: center; }
+.tr-active td { background: var(--primary-light); }
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 500; white-space: nowrap;
+}
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+/* Detail Drawer (Dark适配) */
+.detail-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 100; display: flex; justify-content: flex-end;
+  backdrop-filter: blur(4px);
+}
+.detail-panel {
+  width: 680px; height: 100vh; background: var(--bg-surface);
+  border-left: 1px solid var(--border); overflow-y: auto;
+  display: flex; flex-direction: column;
+  box-shadow: -8px 0 32px rgba(0,0,0,0.5);
+}
+.detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--bg-surface); z-index: 1;
+  flex-shrink: 0;
+}
+.detail-header-left { display: flex; align-items: center; gap: 10px; }
+.detail-title { margin: 0; font-size: 16px; font-weight: 600; color: var(--text-primary); }
+.detail-meta {
+  display: flex; flex-wrap: wrap; gap: 8px 20px;
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--text-secondary);
+}
+.detail-actions {
+  display: flex; gap: 8px; padding: 12px 20px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.detail-section {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+}
+.detail-section:last-child { border-bottom: none; }
+.section-title {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .06em; margin: 0 0 10px;
+}
+.code-block {
+  margin: 0; padding: 8px 12px; background: var(--bg-base);
+  border-radius: var(--radius-md); font-size: 12px; color: var(--success);
+  overflow-x: auto; font-family: var(--font-mono); white-space: pre;
+  border: 1px solid var(--border);
+}
+.btn-close {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  font-size: 16px; padding: 4px 8px; border-radius: var(--radius-sm);
+  transition: all var(--t-fast);
+}
+.btn-close:hover { background: var(--bg-hover); color: var(--text-main); }
+
+/* Logs (Dark适配) */
+.log-block {
+  background: var(--bg-base); border-radius: var(--radius-md);
+  padding: 8px 0; max-height: 300px; overflow-y: auto;
+  border: 1px solid var(--border);
+}
+.log-line { display: flex; gap: 8px; padding: 3px 12px; font-size: 12px; font-family: var(--font-mono); line-height: 1.6; }
+.log-ts { color: var(--text-muted); flex-shrink: 0; white-space: nowrap; }
+.log-level { flex-shrink: 0; width: 52px; font-weight: 600; text-align: center; }
+.log-level-info  { color: var(--info); }
+.log-level-warn   { color: var(--warning); }
+.log-level-error  { color: var(--danger); }
+.log-msg { color: var(--text-secondary); word-break: break-all; }
+.log-info  { color: var(--text-secondary); }
+.log-warn  { color: var(--warning); }
+.log-error { color: var(--danger); }
+
+/* Alert (Dark适配) */
+.alert {
+  padding: 10px 14px; border-radius: var(--radius-md);
+  font-size: 13px; margin-bottom: 12px;
+}
+.alert-info { background: var(--info-light); color: var(--info); border: 1px solid var(--info); }
+.alert-warn { background: var(--warning-light); color: var(--warning); border: 1px solid var(--warning); }
+.alert-error { background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger); }
+.alert-success { background: var(--success-light); color: var(--success); border: 1px solid var(--success); }
+
+/* Status colors (Dark适配) */
+.status-success { color: var(--success); }
+.status-warning { color: var(--warning); }
+.status-error { color: var(--danger); }
+.status-info { color: var(--info); }
+.status-muted { color: var(--text-muted); }
+
+/* Loading spinner (Dark适配) */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

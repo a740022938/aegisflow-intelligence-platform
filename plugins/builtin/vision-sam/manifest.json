@@ -1,0 +1,52 @@
+{
+  "plugin_id": "vision-sam",
+  "name": "Official Vision SAM Plugin Shell",
+  "version": "1.0.0",
+  "entry": "dist/index.js",
+  "capabilities": ["vision"],
+  "permissions": ["db:read"],
+  "risk_level": "MEDIUM",
+  "enabled": true,
+  "source_type": "official_plugin_shell",
+  "managed_by": "local-api-core",
+  "description": "Official Vision SAM bridge plugin. Provides read-only planning/status actions and hands off execution to local-api workflow.",
+  "author": "AGI Factory Team",
+  "allowed_upstream": ["vision/detect"],
+  "allowed_downstream": ["vision/classify", "vision/track"],
+  "icon": "scissors",
+  "color": "#8b5cf6",
+  "tags": [
+    "active",
+    "builtin",
+    "step:sam_handoff",
+    "step:sam_segment",
+    "artifact:sam_handoff",
+    "artifact:sam_segmentation"
+  ],
+  "_comment": "=== V1 字段 ===",
+  "category": "vision/segment",
+  "status": "active",
+  "execution_mode": "readonly",
+  "requires_approval": false,
+  "dry_run_supported": true,
+  "ui_node_type": "transform",
+  "allowed_upstream": ["vision/detect"],
+  "allowed_downstream": ["vision/classify", "vision/track"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "image_id": { "type": "string" },
+      "detection_boxes": { "type": "array" }
+    },
+    "required": ["image_id"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "segmentation_masks": { "type": "array" },
+      "metadata": { "type": "object" }
+    }
+  },
+  "icon": "scissors",
+  "color": "#8b5cf6"
+}

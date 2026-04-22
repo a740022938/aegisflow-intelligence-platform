@@ -1,0 +1,138 @@
+{
+  "category": "yolo_flywheel",
+  "version": "1.0.0",
+  "input_schema_json": {
+    "type": "object",
+    "required": [
+      "dataset_id",
+      "experiment_id",
+      "template_version"
+    ],
+    "properties": {
+      "dataset_id": {
+        "type": "string",
+        "title": "数据集 ID"
+      },
+      "dataset_name": {
+        "type": "string",
+        "title": "数据集名称"
+      },
+      "experiment_id": {
+        "type": "string",
+        "title": "实验 ID"
+      },
+      "template_version": {
+        "type": "string",
+        "title": "模板版本",
+        "default": "1.0.0"
+      },
+      "framework": {
+        "type": "string",
+        "title": "训练框架",
+        "default": "yolov8"
+      },
+      "model_variant": {
+        "type": "string",
+        "title": "模型变体",
+        "default": "yolov8n"
+      },
+      "epochs": {
+        "type": "number",
+        "title": "训练轮数",
+        "default": 1
+      },
+      "allow_fallback": {
+        "type": "boolean",
+        "title": "允许 Fallback",
+        "default": true
+      },
+      "preset_code": {
+        "type": "string",
+        "title": "训练预设",
+        "default": "yolo-detect-debug"
+      },
+      "model_id": {
+        "type": "string",
+        "title": "模型 ID（自动注入）",
+        "default": ""
+      }
+    }
+  },
+  "status": "active",
+  "description": "从已有数据集直接进入训练评估归档链路（快捷训练入口）",
+  "default_input_json": {
+    "dataset_id": "",
+    "dataset_name": "",
+    "experiment_id": "",
+    "template_version": "1.0.0",
+    "framework": "yolov8",
+    "model_variant": "yolov8n",
+    "epochs": 1,
+    "allow_fallback": true,
+    "preset_code": "yolo-detect-debug",
+    "model_id": "auto_from_train_output"
+  },
+  "id": "tpl-existing-dataset-flywheel",
+  "name": "已有数据集训练闭环",
+  "code": "existing_dataset_flywheel",
+  "workflow_steps_json": [
+    {
+      "step_key": "dataset_loader",
+      "step_name": "加载数据集",
+      "step_order": 1,
+      "require_approval": false,
+      "params": {
+        "dataset_id": ""
+      }
+    },
+    {
+      "step_key": "dataset_split",
+      "step_name": "数据集切分",
+      "step_order": 2,
+      "require_approval": false
+    },
+    {
+      "step_key": "train_config_builder",
+      "step_name": "训练配置",
+      "step_order": 3,
+      "require_approval": false,
+      "params": {
+        "dataset_id": "",
+        "framework": "yolov8"
+      }
+    },
+    {
+      "step_key": "train_model",
+      "step_name": "训练",
+      "step_order": 4,
+      "require_approval": false,
+      "params": {
+        "experiment_id": "",
+        "dataset_id": "",
+        "template_version": "1.0.0",
+        "allow_fallback": true,
+        "preset_code": "yolo-detect-debug"
+      }
+    },
+    {
+      "step_key": "evaluate_model",
+      "step_name": "评估",
+      "step_order": 5,
+      "require_approval": false,
+      "params": {
+        "experiment_id": "",
+        "dataset_id": "",
+        "model_id": "auto_from_train_output"
+      }
+    },
+    {
+      "step_key": "archive_model",
+      "step_name": "归档",
+      "step_order": 6,
+      "require_approval": false,
+      "params": {
+        "model_id": "auto_from_train_output"
+      }
+    }
+  ]
+}

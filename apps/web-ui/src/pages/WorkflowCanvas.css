@@ -1,0 +1,51 @@
+.workflow-canvas-page {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.workflow-canvas-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr 360px;
+  gap: 12px;
+  align-items: start;
+}
+
+.workflow-job-list {
+  max-height: 680px;
+  overflow-y: auto;
+}
+
+.workflow-canvas-flow-shell {
+  width: 100%;
+  height: 680px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-app);
+}
+
+@media (max-width: 1480px) {
+  .workflow-canvas-layout {
+    grid-template-columns: 280px 1fr;
+  }
+
+  .workflow-canvas-layout > :nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 980px) {
+  .workflow-canvas-page {
+    padding: 12px;
+  }
+
+  .workflow-canvas-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-canvas-flow-shell {
+    height: 60vh;
+    min-height: 420px;
+  }
+}

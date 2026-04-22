@@ -1,0 +1,10 @@
+pydantic
+typer
+rich
+loguru
+pyyaml
+watchdog
+pandas
+pillow
+opencv-python
+tqdm

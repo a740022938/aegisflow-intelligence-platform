@@ -1,0 +1,38 @@
+{
+  "plugin_id": "system-info",
+  "name": "System Info",
+  "version": "1.0.0",
+  "category": "system/info",
+  "status": "active",
+  "execution_mode": "readonly",
+  "risk_level": "LOW",
+  "enabled": true,
+  "requires_approval": false,
+  "dry_run_supported": true,
+  "ui_node_type": "source",
+  "capabilities": ["read", "report"],
+  "permissions": ["read:system", "read:config"],
+  "description": "系统信息查询插件，返回运行时环境、版本、配置摘要",
+  "author": "AGI Factory Team",
+  "tags": ["system", "info", "builtin"],
+  "icon": "info",
+  "color": "#3b82f6",
+  "entry": "./index.js",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "include_env": { "type": "boolean", "default": false },
+      "include_config": { "type": "boolean", "default": true }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "version": { "type": "string" },
+      "node_version": { "type": "string" },
+      "platform": { "type": "string" },
+      "uptime_seconds": { "type": "number" },
+      "config_summary": { "type": "object" }
+    }
+  }
+}

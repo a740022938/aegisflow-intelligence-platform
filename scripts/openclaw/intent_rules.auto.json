@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-04-17T10:55:27.626Z",
+  "source": "auto_generate_intent_rules.mjs",
+  "rules": [
+    {
+      "id": "auto-build_ops_report",
+      "keywords_any": [
+        "build",
+        "ops",
+        "report"
+      ],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "build_ops_report"
+        }
+      ]
+    },
+    {
+      "id": "auto-check_dataset_version",
+      "keywords_any": [
+        "check",
+        "dataset",
+        "version"
+      ],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "check_dataset_version"
+        }
+      ]
+    },
+    {
+      "id": "auto-dashboard_snapshot",
+      "keywords_any": [
+        "dashboard",
+        "snapshot"
+      ],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "dashboard_snapshot"
+        }
+      ]
+    },
+    {
+      "id": "auto-discover_capabilities",
+      "keywords_any": [
+        "discover",
+        "capabilities"
+      ],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "discover_capabilities"
+        }
+      ]
+    },
+    {
+      "id": "auto-health_patrol",
+      "keywords_any": [
+        "health",
+        "patrol"
+      ],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "health_patrol"
+        }
+      ]
+    },
+    {
+      "id": "auto-plugin_pool_scan",
+      "keywords_any": [
+        "plugin",
+        "pool",
+        "scan"
+      ],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "plugin_pool_scan"
+        }
+      ]
+    },
+    {
+      "id": "auto-run_queue_scan",
+      "keywords_any": [
+        "run",
+        "queue",
+        "scan"
+      ],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "run_queue_scan"
+        }
+      ]
+    },
+    {
+      "id": "auto-yolo_flywheel_scan",
+      "keywords_any": [
+        "yolo",
+        "flywheel",
+        "scan"
+      ],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "yolo_flywheel_scan"
+        }
+      ]
+    }
+  ]
+}

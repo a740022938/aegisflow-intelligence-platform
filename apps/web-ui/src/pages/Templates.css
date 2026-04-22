@@ -1,0 +1,147 @@
+/* Templates.css — OpenAI Console Dark + Phase 2 Layout */
+
+.tpl-root {
+  display: flex;
+  gap: var(--space-4);
+  flex: 1;
+  overflow: hidden;
+  padding: var(--space-4);
+}
+
+.tpl-left {
+  flex: 0 0 360px;
+  min-width: 360px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tpl-right {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tpl-list-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background var(--t-fast);
+}
+
+.tpl-list-item:hover {
+  background: var(--bg-hover);
+}
+
+.tpl-list-item.selected {
+  background: var(--bg-active);
+  border-left-color: var(--primary);
+}
+
+.tpl-list-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.tpl-list-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.tpl-builtin-note {
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--warning-light);
+  border: 1px solid var(--warning);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  color: var(--warning);
+}
+
+/* 详情头部 */
+.tpl-detail-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.tpl-detail-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tpl-detail-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.tpl-detail-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* 内容区 */
+.tpl-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+/* 模板字段 */
+.tpl-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tpl-field {
+  padding: var(--space-4);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.tpl-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.tpl-field-name {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tpl-field-type {
+  font-size: var(--text-xs);
+  padding: 2px 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.tpl-field-desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}

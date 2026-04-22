@@ -1,0 +1,628 @@
+/* ============================================================
+   ComfyNode.css — ComfyUI 风格节点样式
+   类型配色 + 端口视觉 + 折叠动画
+   ============================================================ */
+
+/* ── 基础节点 ── */
+.comfy-node {
+  min-width: 180px;
+  max-width: 280px;
+  border-radius: 8px;
+  border: 2px solid;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.comfy-node:hover {
+  transform: translateY(-1px);
+}
+
+.comfy-node--selected {
+  z-index: 10;
+}
+
+.comfy-node--collapsed {
+  min-width: 140px;
+}
+
+.comfy-node--frozen {
+  opacity: 0.95;
+}
+
+/* ── 头部 ── */
+.comfy-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  cursor: grab;
+}
+
+.comfy-node-header:active {
+  cursor: grabbing;
+}
+
+.comfy-node-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.comfy-node-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.comfy-node-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #E5E7EB;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comfy-issue-badge {
+  margin-left: 8px;
+  font-size: 10px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 999px;
+  border: 1px solid;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+}
+
+.comfy-issue-badge--error {
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.45);
+  border-color: rgba(239, 68, 68, 0.7);
+}
+
+.comfy-issue-badge--warning {
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.45);
+  border-color: rgba(245, 158, 11, 0.7);
+}
+
+.comfy-issue-trend {
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  margin-left: 2px;
+}
+
+.comfy-issue-trend--up { color: #f87171; }
+.comfy-issue-trend--down { color: #4ade80; }
+.comfy-issue-trend--same { color: #cbd5e1; }
+
+.comfy-issue-panel {
+  margin: 8px 10px 0;
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 6px;
+  background: rgba(2, 6, 23, 0.86);
+}
+
+.comfy-issue-panel--error {
+  border-color: rgba(239, 68, 68, 0.65);
+  background: rgba(127, 29, 29, 0.24);
+}
+
+.comfy-issue-panel--warning {
+  border-color: rgba(245, 158, 11, 0.65);
+  background: rgba(120, 53, 15, 0.24);
+}
+
+.comfy-issue-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.comfy-issue-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.comfy-issue-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.comfy-issue-nav-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.8);
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.comfy-issue-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.comfy-issue-nav-text {
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.comfy-issue-list {
+  margin: 0;
+  padding-left: 16px;
+  color: #e2e8f0;
+  font-size: 11px;
+}
+
+.comfy-issue-list li {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.comfy-issue-list-item--link {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(147, 197, 253, 0.8);
+}
+
+.comfy-issue-list-item--link:hover {
+  color: #bfdbfe;
+}
+
+.comfy-issue-inline-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.comfy-issue-inline-tag--error {
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.5);
+  border: 1px solid rgba(239, 68, 68, 0.65);
+}
+
+.comfy-issue-inline-tag--warning {
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.5);
+  border: 1px solid rgba(245, 158, 11, 0.65);
+}
+
+.comfy-issue-empty {
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.comfy-issue-runmsg {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #93c5fd;
+}
+
+.comfy-issue-jump-btn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  background: rgba(30, 58, 138, 0.28);
+  color: #bae6fd;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.comfy-issue-jump-btn:hover {
+  background: rgba(30, 58, 138, 0.42);
+}
+
+.comfy-node-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.comfy-action-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #9CA3AF;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.comfy-action-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: #E5E7EB;
+}
+
+.comfy-frozen-badge {
+  font-size: 12px;
+  cursor: help;
+  opacity: 0.8;
+}
+
+/* ── 运行状态 ── */
+.comfy-run-status {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(2,6,23,0.55);
+}
+
+.comfy-run-status-badge {
+  font-size: 10px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.35);
+  color: #cbd5e1;
+  background: rgba(15,23,42,0.65);
+}
+
+.comfy-run-progress {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(100,116,139,0.25);
+  overflow: hidden;
+}
+
+.comfy-run-progress-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #38bdf8, #22d3ee);
+  transition: width .2s ease;
+}
+
+.comfy-run-progress-text {
+  font-size: 10px;
+  color: #cbd5e1;
+  min-width: 34px;
+  text-align: right;
+}
+
+.comfy-run-status--running .comfy-run-status-badge { color: #7dd3fc; border-color: rgba(56,189,248,.55); }
+.comfy-run-status--success .comfy-run-status-badge { color: #86efac; border-color: rgba(34,197,94,.55); }
+.comfy-run-status--success .comfy-run-progress-fill { background: linear-gradient(90deg, #22c55e, #34d399); }
+.comfy-run-status--failed .comfy-run-status-badge { color: #fca5a5; border-color: rgba(239,68,68,.55); }
+.comfy-run-status--failed .comfy-run-progress-fill { background: linear-gradient(90deg, #ef4444, #fb7185); }
+.comfy-run-status--blocked .comfy-run-status-badge { color: #fcd34d; border-color: rgba(245,158,11,.55); }
+.comfy-run-status--blocked .comfy-run-progress-fill { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.comfy-run-status--skipped .comfy-run-status-badge { color: #d1d5db; border-color: rgba(156,163,175,.55); }
+.comfy-run-status--skipped .comfy-run-progress-fill { background: linear-gradient(90deg, #94a3b8, #cbd5e1); }
+
+/* ── 帮助面板 ── */
+.comfy-help-panel {
+  padding: 12px;
+  background: rgba(15, 15, 15, 0.98);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.comfy-help-section {
+  margin-bottom: 12px;
+}
+
+.comfy-help-section:last-child {
+  margin-bottom: 0;
+}
+
+.comfy-help-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.comfy-help-empty {
+  margin: 0;
+  font-size: 12px;
+  color: #6B7280;
+  font-style: italic;
+}
+
+.comfy-help-item {
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px;
+}
+
+.comfy-help-item code {
+  font-size: 11px;
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.comfy-help-type {
+  margin-left: 6px;
+  font-size: 10px;
+  color: #6B7280;
+  text-transform: uppercase;
+}
+
+.comfy-help-item p {
+  margin: 4px 0 0 0;
+  font-size: 11px;
+  color: #9CA3AF;
+}
+
+.comfy-help-frozen {
+  margin-top: 12px;
+  padding: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 4px;
+}
+
+.comfy-help-frozen strong {
+  display: block;
+  font-size: 11px;
+  color: #F59E0B;
+  margin-bottom: 4px;
+}
+
+.comfy-help-frozen p {
+  margin: 0;
+  font-size: 11px;
+  color: #D97706;
+}
+
+/* ── 端口区 ── */
+.comfy-ports {
+  padding: 8px 0;
+}
+
+.comfy-ports--inputs {
+  padding-right: 12px;
+}
+
+.comfy-ports--outputs {
+  padding-left: 12px;
+}
+
+/* ── 单个端口 ── */
+.comfy-port {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  position: relative;
+  min-height: 24px;
+}
+
+.comfy-port--input {
+  justify-content: flex-start;
+}
+
+.comfy-port--output {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+
+.comfy-handle {
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  border: 2px solid !important;
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 1;
+  transition: all 0.15s;
+}
+
+.comfy-port--input .comfy-handle {
+  left: -6px !important;
+}
+
+.comfy-port--output .comfy-handle {
+  right: -6px !important;
+}
+
+.comfy-handle:hover {
+  transform: translateY(-50%) scale(1.2) !important;
+}
+
+.comfy-port-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.comfy-port-label {
+  font-size: 12px;
+  color: #E5E7EB;
+}
+
+.comfy-port-type {
+  font-size: 9px;
+  color: #6B7280;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* ── 参数预览（折叠时） ── */
+.comfy-param-preview {
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.comfy-param-preview-item {
+  display: flex;
+  gap: 6px;
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.comfy-param-key {
+  color: #6B7280;
+}
+
+.comfy-param-value {
+  color: #9CA3AF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+/* ── 冻结遮罩 ── */
+.comfy-frozen-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px;
+  background: linear-gradient(transparent, rgba(245, 158, 11, 0.2));
+  text-align: center;
+  pointer-events: none;
+}
+
+.comfy-frozen-overlay span {
+  font-size: 9px;
+  color: #F59E0B;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── Group/Frame 节点 ── */
+.comfy-group {
+  width: 100%;
+  height: 100%;
+  border: 2px dashed;
+  border-radius: 12px;
+  min-width: 200px;
+  min-height: 150px;
+}
+
+.comfy-group-header {
+  padding: 8px 12px;
+  border-radius: 10px 10px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #E5E7EB;
+}
+
+/* ── 选中状态动画 ── */
+@keyframes comfy-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px currentColor; }
+  50% { box-shadow: 0 0 0 4px currentColor, 0 0 20px currentColor; }
+}
+
+.comfy-node--selected {
+  animation: comfy-pulse 2s ease-in-out infinite;
+}
+
+/* ── 连接动画 ── */
+.react-flow__edge-path {
+  stroke-width: 2;
+  transition: stroke 0.2s;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 3;
+}
+
+/* ── 连线样式 ── */
+.react-flow__connection-line {
+  stroke: #38BDF8;
+  stroke-width: 2;
+}
+
+/* ── ComfyUI化 v1: F4 节点就绪状态徽章 ── */
+.comfy-readiness-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: 4px;
+  flex-shrink: 0;
+  cursor: help;
+  transition: all 0.15s;
+}
+
+.comfy-readiness-badge:hover {
+  transform: scale(1.15);
+}
+
+/* ── ComfyUI化 v1: F2 未连接输入端口警告 ── */
+.comfy-port-disconnected {
+  font-size: 9px;
+  color: #f97316;
+  margin-left: 2px;
+  animation: port-warn-pulse 2s ease-in-out infinite;
+}
+
+@keyframes port-warn-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.comfy-resize-handle {
+  font-size: 10px;
+  line-height: 1;
+  color: #93c5fd;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── ComfyUI化 v1: F4 节点就绪状态边框颜色 ── */
+.comfy-node--missing_input {
+  border-color: #F59E0B !important;
+}
+.comfy-node--missing_param {
+  border-color: #F97316 !important;
+}
+.comfy-node--invalid_link {
+  border-color: #EF4444 !important;
+}
+
+/* ── ComfyUI化 v1: F2 端口类型标签宽度 ── */
+.comfy-port-type {
+  min-width: 42px;
+  text-align: center;
+}

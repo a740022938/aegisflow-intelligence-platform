@@ -1,0 +1,173 @@
+/* ============================================================
+   ContextMenu.css — 右键上下文菜单样式
+   ComfyUI 风格深色主题
+   ============================================================ */
+
+.ctx-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  /* 不加背景遮罩 — 右键菜单是轻量浮层 */
+  pointer-events: none;
+}
+
+.ctx-menu {
+  position: absolute;
+  pointer-events: auto;
+  width: 260px;
+  max-height: 380px;
+  background: #1A1A1A;
+  border: 1px solid #333;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: ctxFadeIn 0.12s ease;
+}
+
+@keyframes ctxFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ── 搜索框 ── */
+.ctx-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #252525;
+  background: #141414;
+}
+
+.ctx-search-icon {
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+.ctx-search-input {
+  flex: 1;
+  padding: 6px 8px;
+  background: #0F0F0F;
+  border: 1px solid #2A2A2A;
+  border-radius: 5px;
+  color: #E5E7EB;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.ctx-search-input:focus {
+  border-color: #38BDF8;
+}
+
+.ctx-search-input::placeholder {
+  color: #555;
+}
+
+.ctx-search-esc {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #252525;
+  color: #6B7280;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ── 节点列表 ── */
+.ctx-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.ctx-empty {
+  padding: 20px;
+  text-align: center;
+  color: #6B7280;
+  font-size: 12px;
+}
+
+.ctx-category {
+  margin-bottom: 2px;
+}
+
+.ctx-cat-label {
+  padding: 5px 10px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.ctx-item:hover,
+.ctx-item--selected {
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.ctx-item--selected {
+  background: rgba(56, 189, 248, 0.12);
+  border-left-color: #38BDF8 !important;
+}
+
+.ctx-item-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+}
+
+.ctx-item-label {
+  flex: 1;
+  font-size: 12px;
+  color: #D1D5DB;
+  font-weight: 500;
+}
+
+.ctx-item-frozen {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* ── 底部 ── */
+.ctx-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 12px;
+  border-top: 1px solid #252525;
+  background: #141414;
+  font-size: 10px;
+  color: #6B7280;
+}
+
+.ctx-footer-hint {
+  color: #555;
+}
+
+/* ── 滚动条 ── */
+.ctx-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.ctx-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ctx-list::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}

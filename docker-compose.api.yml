@@ -1,0 +1,15 @@
+name: agi-model-factory
+
+services:
+  local-api:
+    image: ghcr.io/a740022938/agi-model-factory-api:v6.7.0
+    container_name: agi-local-api
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      - NODE_ENV=production
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./packages/db:/app/packages/db
+      - ./outputs:/app/outputs

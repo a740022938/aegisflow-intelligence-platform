@@ -1,0 +1,256 @@
+// i18n.ts - 双语字典
+export type Lang = 'zh' | 'en';
+
+export const translations = {
+  zh: {
+    // 导航
+    nav: {
+      // ── 分组标题 ──
+      overview: '概览',
+      dataAndTraining: '数据与训练',
+      modelAndRelease: '模型与发布',
+      workflowAndComposer: '流程与编排',
+      capabilities: '能力与模块',
+      governance: '治理与回流',
+      knowledge: '知识',
+      output: '输出',
+      // ── 菜单项 ──
+      dashboard: '仪表板',
+      factoryStatus: '工厂状态',
+      datasets: '数据集',
+      trainingCenter: '训练中心',
+      runCenter: '运行中心',
+      templates: '模板中心',
+      modelMgmt: '模型管理',
+      artifacts: '模型产物',
+      evalCenter: '评估中心',
+      deployCenter: '部署中心',
+      workflow: '工作流',
+      workflowComposer: '工作流编排器',
+      workflowCanvas: '流程运行画布',
+      moduleCenter: '模块中心',
+      pluginPool: '插件池',
+      taskOrchestration: '任务编排',
+      costRouting: '成本路由',
+      approvals: '审批',
+      governanceHub: '治理中枢',
+      audit: '审计',
+      feedback: '回流池',
+      knowledgeCenter: '知识中心',
+      standardOutput: '标准输出',
+    },
+    // 通用
+    common: {
+      loading: '加载中...',
+      empty: '暂无数据',
+      error: '出错了',
+      retry: '重试',
+      cancel: '取消',
+      confirm: '确认',
+      save: '保存',
+      delete: '删除',
+      edit: '编辑',
+      create: '创建',
+      search: '搜索',
+      filter: '筛选',
+      refresh: '刷新',
+      close: '关闭',
+      more: '更多',
+      all: '全部',
+      none: '无',
+      yes: '是',
+      no: '否',
+      status: '状态',
+      name: '名称',
+      type: '类型',
+      time: '时间',
+      action: '操作',
+      detail: '详情',
+      overview: '概览',
+      settings: '设置',
+    },
+    // Dashboard
+    dashboard: {
+      title: '天枢驾驶舱',
+      subtitle: '天枢智治平台（AGI Model Factory）总览',
+      factoryStatus: '工厂状态',
+      runningTasks: '运行中任务',
+      activeWorkflows: '活跃工作流',
+      pendingApprovals: '待审批',
+      pluginStatus: '插件状态',
+      routeHealth: '路由健康',
+      recentErrors: '近期异常',
+      recentActivity: '近期活动',
+      systemStats: '系统统计',
+      quickAccess: '快速入口',
+      execution: '执行类',
+      dataTraining: '数据训练类',
+      governance: '治理类',
+      intelligence: '智能增强类',
+      registered: '已注册',
+      enabled: '已启用',
+      online: '在线',
+      offline: '离线',
+      abnormal: '异常',
+      recentlyActive: '最近活跃',
+      viewAll: '查看全部',
+      live: '实时',
+    },
+    // 状态
+    status: {
+      healthy: '健康',
+      unhealthy: '异常',
+      running: '运行中',
+      pending: '待处理',
+      completed: '已完成',
+      failed: '失败',
+      cancelled: '已取消',
+      draft: '草稿',
+      ready: '就绪',
+      deploying: '部署中',
+      archived: '已归档',
+    },
+    // 时间
+    time: {
+      justNow: '刚刚',
+      minutesAgo: '分钟前',
+      hoursAgo: '小时前',
+      daysAgo: '天前',
+    },
+  },
+  en: {
+    // Navigation
+    nav: {
+      // ── Group labels ──
+      overview: 'Overview',
+      dataAndTraining: 'Data & Training',
+      modelAndRelease: 'Model & Release',
+      workflowAndComposer: 'Workflow & Orchestration',
+      capabilities: 'Capabilities & Modules',
+      governance: 'Governance & Feedback',
+      knowledge: 'Knowledge',
+      output: 'Output',
+      // ── Nav items ──
+      dashboard: 'Dashboard',
+      factoryStatus: 'Factory Status',
+      datasets: 'Datasets',
+      trainingCenter: 'Training Center',
+      runCenter: 'Run Center',
+      templates: 'Templates',
+      modelMgmt: 'Model Management',
+      artifacts: 'Artifacts',
+      evalCenter: 'Evaluation Center',
+      deployCenter: 'Deployment Center',
+      workflow: 'Workflow',
+      workflowComposer: 'Workflow Composer',
+      workflowCanvas: 'Workflow Run Canvas',
+      moduleCenter: 'Module Center',
+      pluginPool: 'Plugin Pool',
+      taskOrchestration: 'Task Orchestration',
+      costRouting: 'Cost Routing',
+      approvals: 'Approvals',
+      governanceHub: 'Governance Hub',
+      audit: 'Audit',
+      feedback: 'Feedback Pool',
+      knowledgeCenter: 'Knowledge Center',
+      standardOutput: 'Standard Output',
+    },
+    // Common
+    common: {
+      loading: 'Loading...',
+      empty: 'No Data',
+      error: 'Error',
+      retry: 'Retry',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
+      save: 'Save',
+      delete: 'Delete',
+      edit: 'Edit',
+      create: 'Create',
+      search: 'Search',
+      filter: 'Filter',
+      refresh: 'Refresh',
+      close: 'Close',
+      more: 'More',
+      all: 'All',
+      none: 'None',
+      yes: 'Yes',
+      no: 'No',
+      status: 'Status',
+      name: 'Name',
+      type: 'Type',
+      time: 'Time',
+      action: 'Action',
+      detail: 'Detail',
+      overview: 'Overview',
+      settings: 'Settings',
+    },
+    // Dashboard
+    dashboard: {
+      title: 'AegisFlow Flight Deck',
+      subtitle: 'AegisFlow Intelligence Platform (formerly AGI Model Factory) Overview',
+      factoryStatus: 'Factory Status',
+      runningTasks: 'Running Tasks',
+      activeWorkflows: 'Active Workflows',
+      pendingApprovals: 'Pending Approvals',
+      pluginStatus: 'Plugin Status',
+      routeHealth: 'Route Health',
+      recentErrors: 'Recent Errors',
+      recentActivity: 'Recent Activity',
+      systemStats: 'System Stats',
+      quickAccess: 'Quick Access',
+      execution: 'Execution',
+      dataTraining: 'Data & Training',
+      governance: 'Governance',
+      intelligence: 'Intelligence',
+      registered: 'Registered',
+      enabled: 'Enabled',
+      online: 'Online',
+      offline: 'Offline',
+      abnormal: 'Abnormal',
+      recentlyActive: 'Recently Active',
+      viewAll: 'View All',
+      live: 'LIVE',
+    },
+    // Status
+    status: {
+      healthy: 'Healthy',
+      unhealthy: 'Unhealthy',
+      running: 'Running',
+      pending: 'Pending',
+      completed: 'Completed',
+      failed: 'Failed',
+      cancelled: 'Cancelled',
+      draft: 'Draft',
+      ready: 'Ready',
+      deploying: 'Deploying',
+      archived: 'Archived',
+    },
+    // Time
+    time: {
+      justNow: 'Just now',
+      minutesAgo: 'min ago',
+      hoursAgo: 'hr ago',
+      daysAgo: 'days ago',
+    },
+  },
+};
+
+// Hook 使用帮助函数
+export function useI18n(lang: Lang) {
+  const t = translations[lang];
+  return { t, lang };
+}
+
+// 从 localStorage 获取语言
+export function getStoredLang(): Lang {
+  if (typeof window === 'undefined') return 'zh';
+  const saved = localStorage.getItem('agi_factory_site_lang');
+  return saved === 'en' ? 'en' : 'zh';
+}
+
+// 保存语言到 localStorage
+export function setStoredLang(lang: Lang) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('agi_factory_site_lang', lang);
+}

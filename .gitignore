@@ -1,0 +1,80 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+*.tsbuildinfo
+.vite/
+
+# Database files (keep schema.sql, ignore data)
+packages/db/*.db
+packages/db/*.db-shm
+packages/db/*.db-wal
+
+# Environment
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+_logs/
+
+# Temp / debug
+*.bak
+*.bak_*
+*.backup
+*.pre-restore*
+_*.js
+_*.ts
+_*.py
+temp_*.py
+tmp_*.spec.ts
+__pycache__/
+*.pyc
+
+# Test coverage
+coverage/
+
+# Archives
+*.7z
+*.zip
+backups/
+
+outputs/feedback_exports/
+outputs/
+audit/
+reports/
+runs/
+test-results/
+checkpoints/
+releases/
+data/
+datasets/
+models/
+desktop_migrated/
+archives/
+
+# Local env secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Runtime database snapshots
+packages/db/*.db.bak*
+packages/db/*.pre-restore*
+
+apps/local-api/packages/storage/releases/

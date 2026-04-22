@@ -1,0 +1,68 @@
+:root {
+  --role-exec: #2dd4bf;
+  --role-train: #60a5fa;
+  --role-data: #22d3ee;
+  --role-gov: #f59e0b;
+  --role-risk: #ef4444;
+  --role-knowledge: #a78bfa;
+}
+
+.role-exec {
+  --role-accent: var(--role-exec);
+  --role-border: rgba(45, 212, 191, 0.55);
+  --role-glow: rgba(45, 212, 191, 0.2);
+}
+
+.role-train {
+  --role-accent: var(--role-train);
+  --role-border: rgba(96, 165, 250, 0.55);
+  --role-glow: rgba(96, 165, 250, 0.2);
+}
+
+.role-data {
+  --role-accent: var(--role-data);
+  --role-border: rgba(34, 211, 238, 0.55);
+  --role-glow: rgba(34, 211, 238, 0.2);
+}
+
+.role-gov {
+  --role-accent: var(--role-gov);
+  --role-border: rgba(245, 158, 11, 0.55);
+  --role-glow: rgba(245, 158, 11, 0.18);
+}
+
+.role-risk {
+  --role-accent: var(--role-risk);
+  --role-border: rgba(239, 68, 68, 0.6);
+  --role-glow: rgba(239, 68, 68, 0.22);
+}
+
+.role-knowledge {
+  --role-accent: var(--role-knowledge);
+  --role-border: rgba(167, 139, 250, 0.56);
+  --role-glow: rgba(167, 139, 250, 0.2);
+}
+
+.role-card {
+  border-color: var(--role-border, var(--border-light)) !important;
+  box-shadow: 0 0 0 1px var(--role-glow, transparent);
+}
+
+.role-card:hover {
+  box-shadow: 0 0 0 1px var(--role-glow, transparent), 0 10px 28px rgba(0, 0, 0, 0.32);
+}
+
+.role-title {
+  color: var(--role-accent, var(--text-primary)) !important;
+}
+
+.role-text {
+  color: var(--role-accent, var(--text-main)) !important;
+}
+
+.role-border-gradient {
+  border: 1px solid transparent !important;
+  background:
+    linear-gradient(var(--bg-surface), var(--bg-surface)) padding-box,
+    linear-gradient(120deg, rgba(16, 163, 127, 0.55), rgba(59, 130, 246, 0.48), rgba(236, 72, 153, 0.44)) border-box;
+}

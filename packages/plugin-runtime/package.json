@@ -1,0 +1,25 @@
+{
+  "name": "@agi-factory/plugin-runtime",
+  "version": "1.0.0",
+  "description": "AGI Model Factory Plugin Runtime",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "agi-factory",
+    "plugin",
+    "runtime"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@agi-factory/plugin-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.3.0"
+  }
+}

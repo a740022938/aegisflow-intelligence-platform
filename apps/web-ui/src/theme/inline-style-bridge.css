@@ -1,0 +1,76 @@
+/* Inline Style Bridge v2
+   Normalize legacy pages that still carry heavy inline styles. */
+
+.page-root > div[style*='overflowY: auto'] {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.page-root > div > div[style*='display: grid'][style*='gridTemplateColumns'] {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+.page-root div[style*='background: var(--bg-surface)'][style*='border: 1px solid var(--border)'] {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.page-root div[style*='background: var(--bg-app)'][style*='borderRadius'] {
+  background: var(--bg-elevated) !important;
+}
+
+.page-root a[style*='textDecoration: none'] {
+  text-decoration: none !important;
+}
+
+.page-root div[style*='fontSize: 10'],
+.page-root span[style*='fontSize: 10'] {
+  color: var(--text-secondary);
+}
+
+.page-root div[style*='fontSize: 11'],
+.page-root span[style*='fontSize: 11'] {
+  color: var(--text-secondary);
+}
+
+.page-root code[style*='fontFamily: \"var(--font-mono)\"'],
+.page-root code[style*="fontFamily: 'var(--font-mono)'"] {
+  font-family: var(--font-mono) !important;
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 6px !important;
+  padding: 1px 4px !important;
+}
+
+.page-root pre[style*='background'] {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 8px !important;
+  color: var(--text-main) !important;
+}
+
+.page-root button[style*='background: var(--primary)'] {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary) !important;
+}
+
+.page-root button[style*='background: var(--bg-surface)'] {
+  background: var(--bg-elevated) !important;
+  color: var(--text-main) !important;
+}
+
+.page-root [style*='display: flex'][style*='justifyContent: space-between'] {
+  min-width: 0;
+}
+
+@media (max-width: 1280px) {
+  .page-root > div > div[style*='display: grid'][style*='gridTemplateColumns'] {
+    grid-template-columns: 1fr !important;
+  }
+}

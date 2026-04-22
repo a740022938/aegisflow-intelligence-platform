@@ -1,0 +1,275 @@
+/* CostRouting.css — 成本路由页面（OpenAI Dark 主题） */
+
+.cost-routing-page {
+  padding: var(--space-5);
+  padding-top: calc(var(--space-5) + 8px);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* 顶部安全区：避免标题贴边/裁切 */
+.cost-routing-page .ui-page-header-wrap {
+  padding-top: 10px;
+  margin-bottom: 14px;
+}
+
+.cost-routing-page .ui-page-header {
+  padding-left: 2px;
+}
+
+.cost-routing-page .ui-page-title {
+  line-height: 1.25;
+}
+
+.cr-summary-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  width: 100%;
+}
+
+.cr-summary-panel {
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  padding: 14px 16px;
+  background: var(--bg-surface);
+}
+
+.cr-summary-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+.cr-summary-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-weight: 600;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cr-summary-item b {
+  color: var(--text-main);
+}
+
+.cr-summary-key {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.cr-summary-val {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-main);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.cr-top-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cr-main-grid {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(560px, 2fr);
+  align-items: start;
+}
+
+.cr-form-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.cr-card-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.cr-card-grid-lg {
+  display: grid;
+  gap: 12px;
+}
+
+.cr-subtitle {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.cr-policy-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(120px, 1fr) minmax(160px, 0.8fr) 120px;
+}
+
+.cr-dual-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.cr-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cr-decisions-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(260px, 1fr) minmax(320px, 1fr);
+  align-items: start;
+}
+
+.cr-decisions-list {
+  display: grid;
+  gap: 8px;
+  max-height: 380px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.cr-decision-detail-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--bg-surface);
+  min-height: 220px;
+}
+
+.cr-json-box {
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  font-size: 12px;
+  line-height: 1.35;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.cost-routing-policy-item {
+  text-align: left;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  padding: 8px;
+  cursor: pointer;
+}
+
+.cost-routing-policy-item:hover {
+  border-color: var(--primary);
+}
+
+.cost-routing-policy-item.selected {
+  border-color: var(--primary);
+  background: rgba(16, 163, 127, 0.08);
+}
+
+.cost-routing-policy-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cost-routing-policy-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cost-routing-section-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.cost-routing-detail-grid {
+  font-size: 14px;
+  display: grid;
+  gap: 4px;
+  color: var(--text-primary);
+}
+
+.cost-routing-decision-item {
+  text-align: left;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  padding: 8px;
+  cursor: pointer;
+}
+
+.cost-routing-decision-item:hover {
+  border-color: var(--primary);
+}
+
+.cost-routing-decision-item.selected {
+  border-color: var(--primary);
+  background: rgba(16, 163, 127, 0.08);
+}
+
+.cost-routing-decision-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cost-routing-alert-error {
+  color: var(--danger);
+}
+
+.cost-routing-alert-success {
+  color: var(--success);
+}
+
+@media (max-width: 1180px) {
+  .cr-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cr-top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-decisions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .cost-routing-page {
+    padding: 14px;
+  }
+
+  .cr-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-policy-row,
+  .cr-dual-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-head-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

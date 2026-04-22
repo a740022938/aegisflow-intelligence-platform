@@ -1,0 +1,77 @@
+### AGI Model Factory API Tests
+### Usage: cd api-tests && httpyac run *.http
+### Or:   httpyac api-tests/health.http
+
+###############################
+### Health & Status
+###############################
+
+### Health Check
+GET http://127.0.0.1:8787/api/health
+
+### DB Ping
+GET http://127.0.0.1:8787/api/db/ping
+
+### Dashboard Summary
+GET http://127.0.0.1:8787/api/dashboard/summary
+
+###############################
+### Evaluations
+###############################
+
+### List Evaluations
+GET http://127.0.0.1:8787/api/evaluations?limit=10
+
+### Get Single Evaluation
+GET http://127.0.0.1:8787/api/evaluations/1f31dfe7-51a9-4048-b53d-642407626ee3
+
+### Evaluation Lineage
+GET http://127.0.0.1:8787/api/evaluations/1f31dfe7-51a9-4048-b53d-642407626ee3/lineage
+
+### Evaluation Metrics
+GET http://127.0.0.1:8787/api/evaluations/1f31dfe7-51a9-4048-b53d-642407626ee3/metrics
+
+###############################
+### Experiments
+###############################
+
+### List Experiments
+GET http://127.0.0.1:8787/api/experiments?limit=10
+
+### Get Single Experiment
+GET http://127.0.0.1:8787/api/experiments/520dfb17-16aa-430d-a948-199ec5dfdb52
+
+###############################
+### Artifacts
+###############################
+
+### List Artifacts
+GET http://127.0.0.1:8787/api/artifacts?limit=10
+
+###############################
+### Runs
+###############################
+
+### List Runs
+GET http://127.0.0.1:8787/api/runs?limit=10
+
+###############################
+### Deployments
+###############################
+
+### List Deployments
+GET http://127.0.0.1:8787/api/deployments?limit=10
+
+###############################
+### Datasets
+###############################
+
+### List Datasets
+GET http://127.0.0.1:8787/api/datasets?limit=10
+
+###############################
+### Training Configs
+###############################
+
+### List Training Configs
+GET http://127.0.0.1:8787/api/training-configs?limit=10
