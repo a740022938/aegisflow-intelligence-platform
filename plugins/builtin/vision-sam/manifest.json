@@ -2,7 +2,7 @@
   "plugin_id": "vision-sam",
   "name": "Official Vision SAM Plugin Shell",
   "version": "1.0.0",
-  "entry": "dist/index.js",
+  "entry": "./index.js",
   "capabilities": ["vision"],
   "permissions": ["db:read"],
   "risk_level": "MEDIUM",

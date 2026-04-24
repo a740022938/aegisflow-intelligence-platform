@@ -1,0 +1,42 @@
+{
+  "plugin_id": "report-pack",
+  "name": "Report Pack",
+  "version": "1.0.0",
+  "entry": "./index.js",
+  "capabilities": ["read", "report", "export", "transform"],
+  "permissions": ["read:workflow", "read:tasks", "read:evaluations", "read:feedback", "read:artifacts"],
+  "risk_level": "LOW",
+  "enabled": true,
+  "author": "AGI Factory Team",
+  "description": "Generates structured Markdown and JSON reports for workflows, feedback mining, routing decisions, and release seals.",
+  "tags": ["builtin", "report", "release", "seal"],
+  "category": "reporting/pack",
+  "status": "active",
+  "execution_mode": "readonly",
+  "requires_approval": false,
+  "dry_run_supported": true,
+  "ui_node_type": "sink",
+  "allowed_upstream": ["workflow/doctor", "feedback/miner", "rules/engine"],
+  "allowed_downstream": [],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "title": { "type": "string" },
+      "summary": { "type": "object" },
+      "sections": { "type": "array" },
+      "evidence": { "type": "array" },
+      "risks": { "type": "array" },
+      "next_steps": { "type": "array" }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "markdown": { "type": "string" },
+      "json": { "type": "object" },
+      "generated_at": { "type": "string" }
+    }
+  },
+  "icon": "file-text",
+  "color": "#6366f1"
+}

@@ -1,0 +1,41 @@
+{
+  "plugin_id": "rule-engine",
+  "name": "Rule Engine",
+  "version": "1.0.0",
+  "entry": "./index.js",
+  "capabilities": ["read", "compute", "transform", "report"],
+  "permissions": ["read:workflow", "read:evaluations", "read:feedback"],
+  "risk_level": "LOW",
+  "enabled": true,
+  "author": "AGI Factory Team",
+  "description": "Evaluates declarative rule packs against facts and returns explainable decisions without writing to core tables.",
+  "tags": ["builtin", "rules", "decision", "explainable"],
+  "category": "rules/engine",
+  "status": "active",
+  "execution_mode": "readonly",
+  "requires_approval": false,
+  "dry_run_supported": true,
+  "ui_node_type": "control",
+  "allowed_upstream": ["workflow/doctor", "feedback/miner", "vision/detect"],
+  "allowed_downstream": ["feedback/miner", "reporting/pack"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "facts": { "type": "object" },
+      "rules": { "type": "array" },
+      "default_decision": { "type": "string" }
+    },
+    "required": ["facts", "rules"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "decision": { "type": "string" },
+      "matched_rules": { "type": "array" },
+      "trace": { "type": "array" },
+      "valid": { "type": "boolean" }
+    }
+  },
+  "icon": "scale",
+  "color": "#22c55e"
+}

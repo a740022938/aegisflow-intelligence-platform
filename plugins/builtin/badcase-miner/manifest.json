@@ -1,0 +1,39 @@
+{
+  "plugin_id": "badcase-miner",
+  "name": "Badcase Miner",
+  "version": "1.0.0",
+  "entry": "./index.js",
+  "capabilities": ["read", "compute", "transform", "report"],
+  "permissions": ["read:feedback", "read:evaluations", "read:tasks", "read:artifacts"],
+  "risk_level": "LOW",
+  "enabled": true,
+  "author": "AGI Factory Team",
+  "description": "Mines failed, low-confidence, low-quality, slow, or mismatched samples into structured feedback candidates.",
+  "tags": ["builtin", "feedback", "badcase", "backflow"],
+  "category": "feedback/miner",
+  "status": "active",
+  "execution_mode": "readonly",
+  "requires_approval": false,
+  "dry_run_supported": true,
+  "ui_node_type": "transform",
+  "allowed_upstream": ["workflow/doctor", "vision/detect", "rules/engine"],
+  "allowed_downstream": ["reporting/pack"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "records": { "type": "array" },
+      "thresholds": { "type": "object" },
+      "source": { "type": "string" }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "feedback_items": { "type": "array" },
+      "summary": { "type": "object" },
+      "recommended_actions": { "type": "array" }
+    }
+  },
+  "icon": "filter",
+  "color": "#f97316"
+}

@@ -1,0 +1,43 @@
+{
+  "plugin_id": "workflow-doctor",
+  "name": "Workflow Doctor",
+  "version": "1.0.0",
+  "entry": "./index.js",
+  "capabilities": ["read", "compute", "report"],
+  "permissions": ["read:workflow", "read:tasks", "read:routing", "read:feedback"],
+  "risk_level": "LOW",
+  "enabled": true,
+  "author": "AGI Factory Team",
+  "description": "Inspects workflow graphs for missing params, dangling edges, cycles, orphan nodes, cost-routing gaps, and feedback backflow gaps.",
+  "tags": ["builtin", "workflow", "doctor", "quality-gate"],
+  "category": "workflow/doctor",
+  "status": "active",
+  "execution_mode": "readonly",
+  "requires_approval": false,
+  "dry_run_supported": true,
+  "ui_node_type": "control",
+  "allowed_upstream": [],
+  "allowed_downstream": ["feedback/miner", "reporting/pack"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "workflow": { "type": "object" },
+      "nodes": { "type": "array" },
+      "edges": { "type": "array" },
+      "require_cost_routing": { "type": "boolean", "default": true },
+      "require_feedback_backflow": { "type": "boolean", "default": true }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "status": { "type": "string" },
+      "score": { "type": "number" },
+      "issues": { "type": "array" },
+      "summary": { "type": "object" },
+      "suggestions": { "type": "array" }
+    }
+  },
+  "icon": "stethoscope",
+  "color": "#0ea5e9"
+}

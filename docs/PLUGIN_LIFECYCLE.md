@@ -69,19 +69,25 @@
 
 ## 5. 当前已注册的插件
 
-根据代码扫描，当前有以下内置插件:
-- vision-yolo-prelabel: YOLO 预标注
-- vision-classifier-filter: 分类器过滤
-- vision-sam-refine: SAM 精修
+根据 `plugins/builtin` 代码扫描，当前有以下内置插件:
+- builtin-demo-plugin: 只读示例报表插件
+- system-info: 系统信息查询插件
+- dataset-viewer: 数据集预览插件
+- vision-sam: 官方 Vision SAM 只读壳插件
+- workflow-doctor: 工作流节点、连线、参数、成本路由、回流链路诊断插件
+- badcase-miner: 失败样本、低置信度、低质量、慢样本回流挖掘插件
+- rule-engine: 声明式规则包决策与解释插件
+- report-pack: 工作流、回流、规则、封板报告生成插件
 
 ## 6. 后续完善项
 
-- [ ] 补充详细的 manifest.json 规范
+- [x] 补充详细的 manifest.json 规范
 - [ ] 增加插件市场/安装机制
 - [ ] 完善插件版本管理
 - [ ] 添加插件间通信机制
+- [ ] 将插件执行结果与工作流节点输出契约打通
 
 ---
 
 *本文档为初稿，将根据实际施工过程持续更新*
-*最后更新: 2026-04-16*
+*最后更新: 2026-04-24*
