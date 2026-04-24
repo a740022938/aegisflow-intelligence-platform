@@ -385,7 +385,8 @@ function evaluatePolicyConstraints(policy: any, context: RoutingContext, profile
   const budgetIn = normalizeStringArray(constraints.budget_tier_in).map((item) => item.toLowerCase());
   const maxEstimatedCost = asOptionalNumber(constraints.max_estimated_cost);
   const minCapabilityIndex = asOptionalNumber(constraints.min_capability_index);
-  const maxRiskLevel = normalizeRiskLevel(constraints.max_risk_level);
+  const rawMaxRiskLevel = String(constraints.max_risk_level || '').trim();
+  const maxRiskLevel = rawMaxRiskLevel ? normalizeRiskLevel(rawMaxRiskLevel) : null;
   const maxLatencyMs = asOptionalNumber(constraints.max_latency_ms);
   const requireGpu = asBoolean(constraints.require_gpu, false);
 
@@ -398,7 +399,7 @@ function evaluatePolicyConstraints(policy: any, context: RoutingContext, profile
   if (minCapabilityIndex !== null && profile.capability_index < minCapabilityIndex) blockedReasons.push('capability_below_min');
   if (requireGpu && !profile.gpu_capacity) blockedReasons.push('gpu_required_by_policy');
   if (context.gpu_needed && !profile.gpu_capacity) blockedReasons.push('gpu_needed_but_unavailable');
-  if (RISK_RANK[context.risk_level] > RISK_RANK[maxRiskLevel]) blockedReasons.push('risk_level_exceeds_policy');
+  if (maxRiskLevel && RISK_RANK[context.risk_level] > RISK_RANK[maxRiskLevel]) blockedReasons.push('risk_level_exceeds_policy');
   if (maxLatencyMs !== null && profile.latency_ms > maxLatencyMs) blockedReasons.push('latency_exceeds_policy');
 
   return { blocked: blockedReasons.length > 0, reasons: blockedReasons };
