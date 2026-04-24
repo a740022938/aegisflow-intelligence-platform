@@ -1,14 +1,57 @@
-import {
-  Deployment,
-  DeploymentLog,
-  DeploymentHealth,
-  DeploymentStatus,
-  DeploymentType,
-  RuntimeType,
-  GetDeploymentsParams,
-} from '../pages/Deployments';
-
 const BASE = '';
+
+export type DeploymentStatus =
+  | 'created'
+  | 'deploying'
+  | 'running'
+  | 'stopped'
+  | 'failed'
+  | 'archived'
+  | 'deleted'
+  | string;
+
+export type DeploymentType =
+  | 'local_api'
+  | 'model_service'
+  | 'batch_worker'
+  | 'evaluation_runner'
+  | 'custom'
+  | string;
+
+export type RuntimeType = 'mock' | 'python' | 'fastapi' | 'node' | 'custom' | string;
+
+export interface GetDeploymentsParams {
+  q?: string;
+  status?: DeploymentStatus;
+  deployment_type?: DeploymentType;
+  runtime?: RuntimeType;
+  artifact_id?: string;
+}
+
+export interface Deployment {
+  id: string;
+  name?: string;
+  status?: DeploymentStatus;
+  deployment_type?: DeploymentType;
+  runtime?: RuntimeType;
+  artifact_id?: string | null;
+  [key: string]: any;
+}
+
+export interface DeploymentLog {
+  id?: string;
+  level?: string;
+  message?: string;
+  created_at?: string;
+  [key: string]: any;
+}
+
+export interface DeploymentHealth {
+  status?: string;
+  latency_ms?: number;
+  checked_at?: string;
+  [key: string]: any;
+}
 
 export const getDeployments = async (params?: GetDeploymentsParams) => {
   const qs = new URLSearchParams();

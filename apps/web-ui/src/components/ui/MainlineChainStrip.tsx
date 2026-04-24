@@ -4,11 +4,22 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 export interface ChainNode {
-  type: 'task' | 'workflow_job' | 'evaluation' | 'model' | 'artifact' | 'approval' | 'audit';
+  type:
+    | 'task'
+    | 'workflow_job'
+    | 'evaluation'
+    | 'model'
+    | 'artifact'
+    | 'approval'
+    | 'audit'
+    | 'dataset'
+    | 'run'
+    | 'deployment';
   id: string;
   label: string;
   status?: string;
   url?: string;
+  active?: boolean;
 }
 
 interface Props {
@@ -26,6 +37,8 @@ const NODE_ICONS: Record<string, string> = {
   approval: '👍',
   audit: '📊',
   dataset: '📁',
+  run: '▶',
+  deployment: '🚀',
 };
 
 const NODE_COLORS: Record<string, string> = {
@@ -37,6 +50,8 @@ const NODE_COLORS: Record<string, string> = {
   approval: '#EF4444',
   audit: '#6B7280',
   dataset: '#14B8A6',
+  run: '#2563EB',
+  deployment: '#F97316',
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -48,6 +63,8 @@ const TYPE_LABELS: Record<string, string> = {
   approval: 'Approval',
   audit: 'Audit',
   dataset: 'Dataset',
+  run: 'Run',
+  deployment: 'Deployment',
 };
 
 function NodeItem({ node, isActive, compact }: { node: ChainNode; isActive: boolean; compact: boolean }) {

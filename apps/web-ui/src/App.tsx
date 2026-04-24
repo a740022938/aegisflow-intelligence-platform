@@ -1,30 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-import Dashboard from './pages/Dashboard';
-import Tasks from './pages/Tasks';
-import Templates from './pages/Templates';
-import Datasets from './pages/Datasets';
-import Training from './pages/Training';
-import Evaluations from './pages/Evaluations';
-import Artifacts from './pages/Artifacts';
-import Deployments from './pages/Deployments';
-import Runs from './pages/Runs';
-import Models from './pages/Models';
-import WorkflowJobs from './pages/WorkflowJobs';
-import WorkflowCanvas from './pages/WorkflowCanvas';
-import Approvals from './pages/Approvals';
-import Audit from './pages/Audit';
-import FactoryStatus from './pages/FactoryStatus';
-import Knowledge from './pages/Knowledge';
-import Outputs from './pages/Outputs';
-import Feedback from './pages/Feedback';
-import CostRouting from './pages/CostRouting';
-import GovernanceHub from './pages/GovernanceHub';
-import PluginPool from './pages/PluginPool';
-import PluginCanvas from './pages/PluginCanvas';
-import ModuleCenter from './pages/ModuleCenter';
-import WorkflowComposer from './pages/workflow-composer/WorkflowComposer';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Tasks = lazy(() => import('./pages/Tasks'));
+const Templates = lazy(() => import('./pages/Templates'));
+const Datasets = lazy(() => import('./pages/Datasets'));
+const Training = lazy(() => import('./pages/Training'));
+const Evaluations = lazy(() => import('./pages/Evaluations'));
+const Artifacts = lazy(() => import('./pages/Artifacts'));
+const Deployments = lazy(() => import('./pages/Deployments'));
+const Runs = lazy(() => import('./pages/Runs'));
+const Models = lazy(() => import('./pages/Models'));
+const WorkflowJobs = lazy(() => import('./pages/WorkflowJobs'));
+const WorkflowCanvas = lazy(() => import('./pages/WorkflowCanvas'));
+const Approvals = lazy(() => import('./pages/Approvals'));
+const Audit = lazy(() => import('./pages/Audit'));
+const FactoryStatus = lazy(() => import('./pages/FactoryStatus'));
+const Knowledge = lazy(() => import('./pages/Knowledge'));
+const Outputs = lazy(() => import('./pages/Outputs'));
+const Feedback = lazy(() => import('./pages/Feedback'));
+const CostRouting = lazy(() => import('./pages/CostRouting'));
+const GovernanceHub = lazy(() => import('./pages/GovernanceHub'));
+const PluginPool = lazy(() => import('./pages/PluginPool'));
+const PluginCanvas = lazy(() => import('./pages/PluginCanvas'));
+const ModuleCenter = lazy(() => import('./pages/ModuleCenter'));
+const WorkflowComposer = lazy(() => import('./pages/workflow-composer/WorkflowComposer'));
+
+function RouteFallback() {
+  return (
+    <div style={{ padding: 24, color: 'var(--text-secondary)', fontSize: 14 }}>
+      正在加载页面...
+    </div>
+  );
+}
 
 const App: React.FC = () => {
   // 更新API状态指示器
@@ -61,36 +70,38 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="factory-status" element={<FactoryStatus />} />
-          <Route path="dashboard" element={<Navigate to="/" replace />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="templates" element={<Templates />} />
-          <Route path="datasets" element={<Datasets />} />
-          <Route path="training" element={<Training />} />
-          <Route path="artifacts" element={<Artifacts />} />
-          <Route path="evaluations" element={<Evaluations />} />
-          <Route path="deployments" element={<Deployments />} />
-          <Route path="runs" element={<Runs />} />
-          <Route path="models" element={<Models />} />
-          <Route path="workflow-jobs" element={<WorkflowJobs />} />
-          <Route path="workflow-canvas" element={<WorkflowCanvas />} />
-          <Route path="approvals" element={<Approvals />} />
-          <Route path="knowledge" element={<Knowledge />} />
-          <Route path="outputs" element={<Outputs />} />
-          <Route path="feedback" element={<Feedback />} />
-          <Route path="governance-hub" element={<GovernanceHub />} />
-          <Route path="cost-routing" element={<CostRouting />} />
-          <Route path="module-center" element={<ModuleCenter />} />
-          <Route path="plugin-pool" element={<PluginPool />} />
-          <Route path="plugin-canvas" element={<PluginCanvas />} />
-          <Route path="workflow-composer" element={<WorkflowComposer />} />
-          <Route path="audit" element={<Audit />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="factory-status" element={<FactoryStatus />} />
+            <Route path="dashboard" element={<Navigate to="/" replace />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="templates" element={<Templates />} />
+            <Route path="datasets" element={<Datasets />} />
+            <Route path="training" element={<Training />} />
+            <Route path="artifacts" element={<Artifacts />} />
+            <Route path="evaluations" element={<Evaluations />} />
+            <Route path="deployments" element={<Deployments />} />
+            <Route path="runs" element={<Runs />} />
+            <Route path="models" element={<Models />} />
+            <Route path="workflow-jobs" element={<WorkflowJobs />} />
+            <Route path="workflow-canvas" element={<WorkflowCanvas />} />
+            <Route path="approvals" element={<Approvals />} />
+            <Route path="knowledge" element={<Knowledge />} />
+            <Route path="outputs" element={<Outputs />} />
+            <Route path="feedback" element={<Feedback />} />
+            <Route path="governance-hub" element={<GovernanceHub />} />
+            <Route path="cost-routing" element={<CostRouting />} />
+            <Route path="module-center" element={<ModuleCenter />} />
+            <Route path="plugin-pool" element={<PluginPool />} />
+            <Route path="plugin-canvas" element={<PluginCanvas />} />
+            <Route path="workflow-composer" element={<WorkflowComposer />} />
+            <Route path="audit" element={<Audit />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </Suspense>
     </Router>
   );
 };

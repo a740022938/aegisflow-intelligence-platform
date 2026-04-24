@@ -67,6 +67,7 @@ export interface TasksResponse {
   total: number;
   page: number;
   limit: number;
+  error?: string;
 }
 
 export interface TaskStep {
@@ -76,6 +77,8 @@ export interface TaskStep {
   step_type?: string;
   step_index: number;
   status: string;
+  started_at?: string | null;
+  finished_at?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -113,6 +116,7 @@ export interface TaskDetailResponse {
   summary: TaskSummary;
   steps: TaskStep[];
   logs: TaskLog[];
+  error?: string;
 }
 
 export interface Template {
@@ -121,7 +125,7 @@ export interface Template {
   name: string;
   category: string;
   version: string;
-  status: 'active' | 'disabled' | 'draft';
+  status: 'active' | 'disabled' | 'draft' | string;
   description?: string | null;
   definition_json: any;
   input_schema_json: any;
@@ -156,7 +160,7 @@ export interface Dataset {
 export interface CreateDatasetRequest {
   dataset_code: string;
   version: string;
-  status?: 'draft' | 'active' | 'archived';
+  status?: 'draft' | 'active' | 'archived' | string;
   dataset_type: string;
   name: string;
   storage_path?: string;
@@ -175,7 +179,7 @@ export interface CreateDatasetRequest {
 export interface UpdateDatasetRequest {
   dataset_code?: string;
   version?: string;
-  status?: 'draft' | 'active' | 'archived';
+  status?: 'draft' | 'active' | 'archived' | string;
   dataset_type?: string;
   name?: string;
   storage_path?: string;
@@ -197,6 +201,7 @@ export interface DatasetsResponse {
   total: number;
   page: number;
   limit: number;
+  error?: string;
 }
 
 export interface DatasetResponse {
@@ -384,10 +389,15 @@ export interface Artifact {
   format: string;
   version: string;
   path: string;
+  storage_path?: string;
   file_size_bytes: number | null;
   metadata_json: any;
   metrics_snapshot_json: any;
   notes: string;
+  description?: string;
+  source_task_id?: string | null;
+  checkpoint_id?: string | null;
+  tags?: string[] | string | null;
   created_at: string;
   updated_at: string;
   // v4.8.0 promotion fields
@@ -446,10 +456,14 @@ export interface ArtifactsResponse {
   ok: boolean;
   artifacts: Artifact[];
   total: number;
+  error?: string;
 }
 export interface ArtifactResponse {
   ok: boolean;
   artifact: Artifact;
+  related_evaluations?: any[];
+  related_deployments?: any[];
+  source_training?: any;
   error?: string;
 }
 export interface CreateEvaluationFromArtifactResponse {
@@ -478,6 +492,7 @@ export interface Run {
   config_json: any;
   summary_json: any;
   error_message: string;
+  notes?: string;
   started_at: string | null;
   finished_at: string | null;
   created_at: string;
@@ -506,6 +521,7 @@ export interface RunLog {
   run_id: string;
   step_id: string;
   log_level: 'info' | 'warn' | 'error' | 'debug';
+  level?: string;
   message: string;
   created_at: string;
 }
@@ -521,6 +537,7 @@ export interface RunsResponse {
   ok: boolean;
   runs: Run[];
   total: number;
+  error?: string;
 }
 export interface RunResponse {
   ok: boolean;

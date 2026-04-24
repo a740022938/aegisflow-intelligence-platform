@@ -1,11 +1,24 @@
 import React from 'react';
 import { MainlineChainStrip, EntityLinkChips } from '../components/ui';
+import type { ChainNode, EntityChip } from '../components/ui';
 
 interface ArtExtraProps {
   art: any;
 }
 
 export default function ArtifactOverviewExtras({ art }: ArtExtraProps) {
+  const chain: ChainNode[] = [
+    ...(art.source_task_id ? [{ type: 'task' as const, id: art.source_task_id, label: 'Source Task' }] : []),
+    ...(art.evaluation_id ? [{ type: 'evaluation' as const, id: art.evaluation_id, label: 'Source Eval' }] : []),
+    ...(art.training_job_id ? [{ type: 'workflow_job' as const, id: art.training_job_id, label: 'Training' }] : []),
+    { type: 'artifact', id: art.id, label: art.name || 'Current', status: art.status },
+  ];
+  const sourceEntities: EntityChip[] = [
+    ...(art.source_task_id ? [{ type: 'task' as const, id: art.source_task_id, label: 'Task: ' + art.source_task_id.slice(0, 8) }] : []),
+    ...(art.evaluation_id ? [{ type: 'evaluation' as const, id: art.evaluation_id, label: 'Eval: ' + art.evaluation_id.slice(0, 8) }] : []),
+    ...(art.training_job_id ? [{ type: 'workflow_job' as const, id: art.training_job_id, label: 'Train: ' + art.training_job_id.slice(0, 8) }] : []),
+  ];
+
   return (
     <>
       <div className="ui-section-card" style={{ marginTop: 8 }}>
@@ -16,12 +29,7 @@ export default function ArtifactOverviewExtras({ art }: ArtExtraProps) {
           <MainlineChainStrip
             compact
             current={art.id}
-            chain={[
-              ...(art.source_task_id ? [{ type: 'task', id: art.source_task_id, label: 'Source Task' }] : []),
-              ...(art.evaluation_id ? [{ type: 'evaluation', id: art.evaluation_id, label: 'Source Eval' }] : []),
-              ...(art.training_job_id ? [{ type: 'workflow_job', id: art.training_job_id, label: 'Training' }] : []),
-              { type: 'artifact', id: art.id, label: art.name || 'Current', status: art.status },
-            ]}
+            chain={chain}
           />
         </div>
       </div>
@@ -32,11 +40,7 @@ export default function ArtifactOverviewExtras({ art }: ArtExtraProps) {
         <div className="ui-section-body">
           <EntityLinkChips
             label="Source objects"
-            entities={[
-              ...(art.source_task_id ? [{ type: 'task', id: art.source_task_id, label: 'Task: ' + art.source_task_id.slice(0, 8) }] : []),
-              ...(art.evaluation_id ? [{ type: 'evaluation', id: art.evaluation_id, label: 'Eval: ' + art.evaluation_id.slice(0, 8) }] : []),
-              ...(art.training_job_id ? [{ type: 'workflow_job', id: art.training_job_id, label: 'Train: ' + art.training_job_id.slice(0, 8) }] : []),
-            ]}
+            entities={sourceEntities}
           />
         </div>
       </div>

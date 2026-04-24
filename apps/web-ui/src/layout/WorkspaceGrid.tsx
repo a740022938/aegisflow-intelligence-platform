@@ -3,6 +3,8 @@ import { ReactGridLayout } from 'react-grid-layout';
 import { type LayoutConfig, type LayoutBreakpoint } from './layoutStorage';
 import './workspace-grid.css';
 
+const GridLayout = ReactGridLayout as React.ComponentType<any>;
+
 type GridCard = {
   id: string;
   content: React.ReactNode;
@@ -78,7 +80,7 @@ export default function WorkspaceGrid({ editable, layouts, cards, onChange }: Pr
       className={`workspace-grid-wrap ${isDragging ? 'is-dragging' : ''} ${isResizing ? 'is-resizing' : ''}`}
     >
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <ReactGridLayout
+      <GridLayout
         className="workspace-grid"
         width={width}
         cols={cols}
@@ -115,7 +117,7 @@ export default function WorkspaceGrid({ editable, layouts, cards, onChange }: Pr
             </div>
           </div>
         ))}
-      </ReactGridLayout>
+      </GridLayout>
     </div>
   );
 }

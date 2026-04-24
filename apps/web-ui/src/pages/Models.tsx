@@ -42,6 +42,9 @@ interface ModelDetail extends Model {
   artifacts?: any[];
   deployments?: any[];
   evaluations?: any[];
+  execution_metadata?: Record<string, any>;
+  metrics?: Record<string, any>;
+  report_paths?: Record<string, any>;
   stats?: {
     artifact_count: number;
     deployment_count: number;
