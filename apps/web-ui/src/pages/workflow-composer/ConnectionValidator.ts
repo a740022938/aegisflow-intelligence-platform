@@ -5,7 +5,7 @@
 
 import type { Node, Edge } from '@xyflow/react';
 import { NODE_TYPE_CONFIGS, isDataTypeCompatible, resolveInputPort, resolveOutputPort } from './NodeTypes';
-import type { NodeType } from './workflowSchema';
+import { isLayoutOnlyNodeType, type NodeType } from './workflowSchema';
 
 export interface ConnectionCheckResult {
   valid: boolean;
@@ -136,6 +136,9 @@ export function validateConnection(
 
   const sourceNodeType = sourceNode.data?.nodeType as NodeType;
   const targetNodeType = targetNode.data?.nodeType as NodeType;
+  if (isLayoutOnlyNodeType(sourceNodeType) || isLayoutOnlyNodeType(targetNodeType)) {
+    return { valid: false, reason: '工作区节点不参与连线', severity: 'error' };
+  }
 
   const portResult = isPortCompatible(sourceNodeType, sourceHandle, targetNodeType, targetHandle);
   if (!portResult.valid) return portResult;

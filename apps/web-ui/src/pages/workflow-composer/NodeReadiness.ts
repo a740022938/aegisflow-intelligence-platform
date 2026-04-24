@@ -4,7 +4,7 @@
 // ============================================================
 
 import type { Node, Edge } from '@xyflow/react';
-import { NODE_REGISTRY } from './workflowSchema';
+import { NODE_REGISTRY, isLayoutOnlyNodeType } from './workflowSchema';
 import type { NodeType } from './workflowSchema';
 import { NODE_TYPE_CONFIGS, isDataTypeCompatible } from './NodeTypes';
 
@@ -62,6 +62,14 @@ export function computeNodeReadiness(
   edges: Edge[]
 ): NodeReadinessResult {
   const nodeType = (node.data?.nodeType || node.type) as NodeType;
+  if (isLayoutOnlyNodeType(nodeType)) {
+    return {
+      state: 'idle',
+      missingInputs: [],
+      missingParams: [],
+      invalidLinks: [],
+    };
+  }
   const config = NODE_REGISTRY[nodeType];
 
   if (!config) {

@@ -2,7 +2,7 @@
 // workflowCompiler.ts — Workflow Draft → 编译预览 + Dry-run 校验
 // ============================================================
 import type { ComposerNode, ComposerEdge, WorkflowDraft, NodeType } from './workflowSchema';
-import { NODE_REGISTRY } from './workflowSchema';
+import { NODE_REGISTRY, isLayoutOnlyNodeType } from './workflowSchema';
 import { isDataTypeCompatible, resolveInputPort, resolveOutputPort } from './NodeTypes';
 
 export interface CompiledStep {
@@ -179,6 +179,7 @@ function checkInputClosure(nodes: ComposerNode[], edges: ComposerEdge[]): InputC
   
   for (const node of nodes) {
     const config = NODE_REGISTRY[node.type];
+    if (!config) continue;
     const incoming = incomingMap.get(node.id) ?? [];
     
     for (const input of config.inputs) {
@@ -216,18 +217,26 @@ function checkInputClosure(nodes: ComposerNode[], edges: ComposerEdge[]): InputC
 
 // 编译工作流
 export function compileWorkflow(draft: WorkflowDraft): CompiledWorkflow {
-  const { nodes, edges } = draft;
-  const order = topologicalSort(nodes, edges);
-  const depths = computeDepths(nodes, edges);
-  const typeLinks = buildTypeLinks(nodes, edges);
-  const inputClosure = checkInputClosure(nodes, edges);
+  const flowNodes = draft.nodes.filter((n) => !isLayoutOnlyNodeType(n.type));
+  const flowNodeIdSet = new Set(flowNodes.map((n) => n.id));
+  const flowEdges = draft.edges.filter((e) => flowNodeIdSet.has(e.source) && flowNodeIdSet.has(e.target));
+
+  const order = topologicalSort(flowNodes, flowEdges);
+  const depths = computeDepths(flowNodes, flowEdges);
+  const typeLinks = buildTypeLinks(flowNodes, flowEdges);
+  const inputClosure = checkInputClosure(flowNodes, flowEdges);
   
   const steps: CompiledStep[] = order.map((nodeId, idx) => {
-    const node = nodes.find(n => n.id === nodeId)!;
-    const config = NODE_REGISTRY[node.type];
+    const node = flowNodes.find(n => n.id === nodeId)!;
+    const config = NODE_REGISTRY[node.type] || {
+      inputs: [],
+      outputs: [],
+      params: [],
+      frozenHint: '未知节点类型，已按兼容模式处理',
+    };
     
     // 获取依赖（直接上游节点）
-    const dependencies = edges
+    const dependencies = flowEdges
       .filter(e => e.target === nodeId)
       .map(e => e.source);
     
@@ -264,9 +273,11 @@ export function compileWorkflow(draft: WorkflowDraft): CompiledWorkflow {
   // 收集最终输出
   const allOutputs = new Set<string>();
   steps.forEach(s => s.outputs.forEach(o => allOutputs.add(o)));
-  const consumedOutputs = new Set(edges.map(e => {
-    const src = nodes.find(n => n.id === e.source);
-    return src ? NODE_REGISTRY[src.type].outputs[0] : null;
+  const consumedOutputs = new Set(flowEdges.map(e => {
+    const src = flowNodes.find(n => n.id === e.source);
+    if (!src) return null;
+    const srcCfg = NODE_REGISTRY[src.type];
+    return srcCfg?.outputs?.[0] || null;
   }).filter(Boolean));
   const estimatedOutputs = Array.from(allOutputs).filter(o => !consumedOutputs.has(o));
   
@@ -277,8 +288,8 @@ export function compileWorkflow(draft: WorkflowDraft): CompiledWorkflow {
     typeLinks,
     inputClosure,
     summary: {
-      totalNodes: nodes.length,
-      totalEdges: edges.length,
+      totalNodes: flowNodes.length,
+      totalEdges: flowEdges.length,
       executableNodes: executableCount,
       frozenNodes: frozenCount,
       maxDepth,

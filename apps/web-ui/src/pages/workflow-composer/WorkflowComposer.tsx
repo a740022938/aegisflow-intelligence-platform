@@ -29,7 +29,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import type { ComposerNode, ComposerEdge, NodeType, WorkflowDraft } from './workflowSchema';
-import { NODE_REGISTRY, buildRuntimePayloadFromDraft } from './workflowSchema';
+import { NODE_REGISTRY, buildRuntimePayloadFromDraft, isLayoutOnlyNodeType } from './workflowSchema';
 import { validateWorkflow, type ValidationResult } from './workflowValidator';
 import { saveDraft, listDrafts, loadDraft, deleteDraft, newDraft, saveRecoveryDraft, loadRecoveryDraft, clearRecoveryDraft } from './draftStorage';
 import { compileWorkflow, dryRunValidate, type CompiledWorkflow, type DryRunValidation } from './workflowCompiler';
@@ -64,6 +64,73 @@ const NODE_TYPES: Record<string, React.ComponentType<any>> = {
 let nodeCounter = 0;
 const genId = (prefix = 'node') => `${prefix}_${Date.now()}_${++nodeCounter}`;
 const resetCounter = (val: number) => { nodeCounter = val; };
+const WORKSPACE_NODE_TYPE: NodeType = 'workspace-group';
+
+const isWorkspaceNodeType = (type?: string | null) => String(type || '').trim() === WORKSPACE_NODE_TYPE;
+
+const isWorkspaceNode = (node?: Node | null) => {
+  if (!node) return false;
+  return isWorkspaceNodeType(String(node.data?.nodeType || node.type || ''));
+};
+
+const getNodeSize = (node: Node) => ({
+  width: Number(node.width || (node.style as any)?.width || 260),
+  height: Number(node.height || (node.style as any)?.height || (node.data?.collapsed ? 74 : 180)),
+});
+
+const buildNodeIndex = (nodes: Node[]) => {
+  const map = new Map<string, Node>();
+  for (const n of nodes) map.set(n.id, n);
+  return map;
+};
+
+const getAbsoluteNodePosition = (node: Node, nodeMap: Map<string, Node>) => {
+  let x = Number(node.position.x || 0);
+  let y = Number(node.position.y || 0);
+  const seen = new Set<string>();
+  let current: Node | undefined = node;
+
+  while (current?.parentId) {
+    const pid = String(current.parentId);
+    if (seen.has(pid)) break;
+    seen.add(pid);
+    const parent = nodeMap.get(pid);
+    if (!parent) break;
+    x += Number(parent.position.x || 0);
+    y += Number(parent.position.y || 0);
+    current = parent;
+  }
+
+  return { x, y };
+};
+
+const getWorkspaceBounds = (workspaceNode: Node, nodeMap: Map<string, Node>) => {
+  const abs = getAbsoluteNodePosition(workspaceNode, nodeMap);
+  const size = getNodeSize(workspaceNode);
+  return {
+    x: abs.x,
+    y: abs.y,
+    width: size.width,
+    height: size.height,
+    area: Math.max(1, size.width * size.height),
+  };
+};
+
+const findWorkspaceAtPosition = (nodes: Node[], pos: { x: number; y: number }) => {
+  const nodeMap = buildNodeIndex(nodes);
+  const candidates = nodes
+    .filter((n) => isWorkspaceNode(n))
+    .map((n) => ({ node: n, bounds: getWorkspaceBounds(n, nodeMap) }))
+    .filter(({ bounds }) =>
+      pos.x >= bounds.x &&
+      pos.x <= bounds.x + bounds.width &&
+      pos.y >= bounds.y &&
+      pos.y <= bounds.y + bounds.height
+    )
+    .sort((a, b) => a.bounds.area - b.bounds.area);
+
+  return candidates[0]?.node;
+};
 
 type QuickTemplateId =
   | 'vision_6step'        // 视觉6步完整流水线
@@ -302,15 +369,42 @@ function WorkflowComposerInner() {
   // 同步 draft 到 ReactFlow
   const syncToReactFlow = useCallback((draft: WorkflowDraft) => {
     const rfNodes: Node[] = draft.nodes.map(n => {
-      const config = getNodeConfig(n.type);
+      const nodeTypeRaw = String(n.type || '').trim();
+      const isLegacyGroup = nodeTypeRaw === 'group' || nodeTypeRaw === 'comfyGroup';
+      const nodeType = (isLegacyGroup ? WORKSPACE_NODE_TYPE : nodeTypeRaw) as NodeType;
+      if (isWorkspaceNodeType(nodeType)) {
+        const workspaceColor = String((n.params?.workspace_color || '#38BDF8'));
+        return {
+          id: n.id,
+          type: 'comfyGroup',
+          position: n.position,
+          data: {
+            label: n.label || String(n.params?.workspace_name || '工作区'),
+            nodeType: WORKSPACE_NODE_TYPE,
+            color: workspaceColor,
+            params: n.params || {},
+          },
+          style: {
+            width: Math.max(300, Number(n.size?.width || 520)),
+            height: Math.max(220, Number(n.size?.height || 320)),
+            zIndex: -1,
+          },
+          draggable: true,
+          selectable: true,
+        };
+      }
+
+      const config = getNodeConfig(nodeType);
       const collapsed = !!(n as any).collapsed;
       return {
         id: n.id,
         type: 'comfyNode',
         position: n.position,
+        parentId: n.parentId,
+        extent: n.extent,
         data: {
           label: n.label,
-          nodeType: n.type,
+          nodeType,
           params: n.params,
           executable: n.executable,
           frozenHint: n.frozenHint,
@@ -322,7 +416,7 @@ function WorkflowComposerInner() {
               : node));
           },
         },
-        style: { width: n.size?.width || 260, height: n.size?.height || (collapsed ? 74 : 180) },
+        style: { width: n.size?.width || 260, height: n.size?.height || (collapsed ? 74 : 180), zIndex: 1 },
       };
     });
 
@@ -384,15 +478,19 @@ function WorkflowComposerInner() {
   const syncToDraft = useCallback((): WorkflowDraft => {
     const composerNodes: ComposerNode[] = nodes.map(n => ({
       id: n.id,
-      type: n.data.nodeType as NodeType,
-      label: n.data.label as string,
+      type: (isWorkspaceNode(n)
+        ? WORKSPACE_NODE_TYPE
+        : (n.data?.nodeType as NodeType)) || 'reroute',
+      label: String(n.data?.label || ''),
       position: n.position,
       size: {
-        width: Number(n.width || (n.style as any)?.width || 260),
-        height: Number(n.height || (n.style as any)?.height || (n.data?.collapsed ? 74 : 180)),
+        width: getNodeSize(n).width,
+        height: getNodeSize(n).height,
       },
+      ...(n.parentId ? { parentId: n.parentId } : {}),
+      ...(n.extent === 'parent' ? { extent: 'parent' as const } : {}),
       ...(n.data?.collapsed ? { collapsed: true } : {}),
-      params: n.data.params as Record<string, unknown>,
+      params: (n.data?.params || {}) as Record<string, unknown>,
       executable: n.data.executable as boolean,
       frozenHint: n.data.frozenHint as string | undefined,
     }));
@@ -438,15 +536,17 @@ function WorkflowComposerInner() {
     setNodes((nds) => {
       const changed = applyNodeChanges(changes, nds);
       return changed.map((n) => {
-        const widthRaw = Number(n.width || (n.style as any)?.width || 260);
-        const heightRaw = Number(n.height || (n.style as any)?.height || (n.data?.collapsed ? 74 : 180));
-        const minHeight = n.data?.collapsed ? 74 : 120;
+        const { width: widthRaw, height: heightRaw } = getNodeSize(n);
+        const isWorkspace = isWorkspaceNode(n);
+        const minWidth = isWorkspace ? 300 : 220;
+        const minHeight = isWorkspace ? 220 : (n.data?.collapsed ? 74 : 120);
         return {
           ...n,
           style: {
             ...(n.style || {}),
-            width: Math.max(220, snap(widthRaw)),
+            width: Math.max(minWidth, snap(widthRaw)),
             height: Math.max(minHeight, snap(heightRaw)),
+            zIndex: isWorkspace ? -1 : 1,
           },
         };
       });
@@ -457,6 +557,37 @@ function WorkflowComposerInner() {
   const addNode = useCallback((type: NodeType, position: { x: number; y: number }) => {
     const config = getNodeConfig(type);
     const id = genId(type);
+    if (isWorkspaceNodeType(type)) {
+      const workspaceName = `工作区 ${id.slice(-4)}`;
+      const workspaceColor = '#38BDF8';
+      const workspaceNode: Node = {
+        id,
+        type: 'comfyGroup',
+        position,
+        draggable: true,
+        selectable: true,
+        data: {
+          label: workspaceName,
+          nodeType: WORKSPACE_NODE_TYPE,
+          color: workspaceColor,
+          params: {
+            workspace_name: workspaceName,
+            workspace_desc: '',
+            workspace_color: workspaceColor,
+          },
+        },
+        style: {
+          width: 520,
+          height: 320,
+          zIndex: -1,
+        },
+      };
+      setNodes((nds) => [...nds, workspaceNode]);
+      setSelectedNodes([id]);
+      setSelectedEdges([]);
+      return;
+    }
+
     const paramDefaults = Object.fromEntries(
       (NODE_REGISTRY[type]?.params || []).map((p) => {
         let v: unknown = p.default;
@@ -487,11 +618,28 @@ function WorkflowComposerInner() {
         onFocusDryRunStep: focusDryRunStepSafe,
         collapsed: false,
       },
-      style: { width: 260, height: 180 },
+      style: { width: 260, height: 180, zIndex: 1 },
     };
 
-    setNodes(nds => [...nds, newNode]);
-  }, [setNodes]);
+    setNodes((nds) => {
+      const targetWorkspace = findWorkspaceAtPosition(nds, position);
+      if (!targetWorkspace) {
+        return [...nds, newNode];
+      }
+
+      const workspaceAbs = getAbsoluteNodePosition(targetWorkspace, buildNodeIndex(nds));
+      const relativeNode: Node = {
+        ...newNode,
+        parentId: targetWorkspace.id,
+        extent: 'parent',
+        position: {
+          x: snap(position.x - workspaceAbs.x),
+          y: snap(position.y - workspaceAbs.y),
+        },
+      };
+      return [...nds, relativeNode];
+    });
+  }, [setNodes, snap]);
 
   // 从搜索添加节点
   const onNodeSelectFromSearch = useCallback((type: NodeType, screenPos: { x: number; y: number }) => {
@@ -613,9 +761,30 @@ function WorkflowComposerInner() {
   }, []);
 
   const deleteNodeById = useCallback((nodeId: string) => {
-    setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+    setNodes((nds) => {
+      const target = nds.find((n) => n.id === nodeId);
+      if (!target) return nds;
+      if (!isWorkspaceNode(target)) return nds.filter((n) => n.id !== nodeId);
+
+      const nodeMap = buildNodeIndex(nds);
+      const workspaceAbs = getAbsoluteNodePosition(target, nodeMap);
+      return nds.flatMap((n) => {
+        if (n.id === nodeId) return [];
+        if (n.parentId !== nodeId) return [n];
+        return [{
+          ...n,
+          parentId: undefined,
+          extent: undefined,
+          style: { ...(n.style || {}), zIndex: 1 },
+          position: {
+            x: snap(workspaceAbs.x + n.position.x),
+            y: snap(workspaceAbs.y + n.position.y),
+          },
+        }];
+      });
+    });
     setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
-  }, [setEdges, setNodes]);
+  }, [setEdges, setNodes, snap]);
 
   const clearNodeEdges = useCallback((nodeId: string) => {
     setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
@@ -652,11 +821,38 @@ function WorkflowComposerInner() {
 
   const deleteSelectedNodes = useCallback(() => {
     if (!selectedNodes.length) return;
-    setNodes((nds) => nds.filter((n) => !selectedNodes.includes(n.id)));
+    const selectedSet = new Set(selectedNodes);
+    setNodes((nds) => {
+      const nodeMap = buildNodeIndex(nds);
+      const releasedWorkspacePos = new Map<string, { x: number; y: number }>();
+      for (const n of nds) {
+        if (selectedSet.has(n.id) && isWorkspaceNode(n)) {
+          releasedWorkspacePos.set(n.id, getAbsoluteNodePosition(n, nodeMap));
+        }
+      }
+
+      return nds.flatMap((n) => {
+        if (selectedSet.has(n.id)) return [];
+        if (n.parentId && releasedWorkspacePos.has(String(n.parentId))) {
+          const p = releasedWorkspacePos.get(String(n.parentId))!;
+          return [{
+            ...n,
+            parentId: undefined,
+            extent: undefined,
+            style: { ...(n.style || {}), zIndex: 1 },
+            position: {
+              x: snap(p.x + n.position.x),
+              y: snap(p.y + n.position.y),
+            },
+          }];
+        }
+        return [n];
+      });
+    });
     setEdges((eds) => eds.filter((e) => !selectedNodes.includes(e.source) && !selectedNodes.includes(e.target)));
     setSelectedNodes([]);
     setSelectedEdges([]);
-  }, [selectedNodes, setEdges, setNodes]);
+  }, [selectedNodes, setEdges, setNodes, snap]);
 
   const alignSelectedLeft = useCallback(() => {
     if (selectedNodes.length < 2) return;
@@ -729,35 +925,80 @@ function WorkflowComposerInner() {
     }));
   }, [nodes, selectedNodes, setNodes, snap]);
 
-  // P6: 添加分组（将选中节点包裹为一个组）
+  // P6: 圈选创建工作区（ComfyUI 风格）
   const handleAddGroup = useCallback((groupName?: string) => {
     if (selectedNodes.length < 1) return;
-    const selected = nodes.filter(n => selectedNodes.includes(n.id));
+    const selectedSet = new Set(selectedNodes);
+    const selected = nodes.filter((n) => selectedSet.has(n.id) && !isWorkspaceNode(n));
     if (!selected.length) return;
 
-    const minX = Math.min(...selected.map(n => n.position.x));
-    const minY = Math.min(...selected.map(n => n.position.y));
-    const maxX = Math.max(...selected.map(n => n.position.x + 260));
-    const maxY = Math.max(...selected.map(n => n.position.y + 180));
-    const pad = 24;
-    const name = groupName || `分组 ${selected.length} 节点`;
+    const nodeMap = buildNodeIndex(nodes);
+    const selectedBounds = selected.map((n) => {
+      const abs = getAbsoluteNodePosition(n, nodeMap);
+      const size = getNodeSize(n);
+      return { node: n, abs, size };
+    });
 
-    const groupNode: ComposerNode = {
-      id: `group_${Date.now()}`,
-      type: 'group' as NodeType,
-      position: { x: minX - pad, y: minY - pad },
-      label: name,
-      params: {},
-      collapsed: false,
-    };
-    groupNode.size = {
-      width: maxX - minX + pad * 2,
-      height: maxY - minY + pad * 2,
+    const minX = Math.min(...selectedBounds.map((x) => x.abs.x));
+    const minY = Math.min(...selectedBounds.map((x) => x.abs.y));
+    const maxX = Math.max(...selectedBounds.map((x) => x.abs.x + x.size.width));
+    const maxY = Math.max(...selectedBounds.map((x) => x.abs.y + x.size.height));
+
+    const padX = 36;
+    const padTop = 44;
+    const padBottom = 28;
+    const groupX = snap(minX - padX);
+    const groupY = snap(minY - padTop);
+    const groupW = Math.max(300, snap(maxX - minX + padX * 2));
+    const groupH = Math.max(220, snap(maxY - minY + padTop + padBottom));
+    const workspaceName = groupName || `工作区 ${selected.length} 节点`;
+    const workspaceId = genId('workspace');
+    const workspaceColor = '#38BDF8';
+
+    const workspaceNode: Node = {
+      id: workspaceId,
+      type: 'comfyGroup',
+      position: { x: groupX, y: groupY },
+      draggable: true,
+      selectable: true,
+      data: {
+        label: workspaceName,
+        nodeType: WORKSPACE_NODE_TYPE,
+        color: workspaceColor,
+        params: {
+          workspace_name: workspaceName,
+          workspace_desc: '',
+          workspace_color: workspaceColor,
+        },
+      },
+      style: {
+        width: groupW,
+        height: groupH,
+        zIndex: -1,
+      },
     };
 
-    setNodes(nds => [...nds, groupNode as any]);
-    setSelectedNodes([]);
-  }, [nodes, selectedNodes, setNodes]);
+    setNodes((nds) => {
+      const latestMap = buildNodeIndex(nds);
+      const remapped = nds.map((n) => {
+        if (!selectedSet.has(n.id) || isWorkspaceNode(n)) return n;
+        const abs = getAbsoluteNodePosition(n, latestMap);
+        return {
+          ...n,
+          parentId: workspaceId,
+          extent: 'parent' as const,
+          style: { ...(n.style || {}), zIndex: 1 },
+          position: {
+            x: snap(abs.x - groupX),
+            y: snap(abs.y - groupY),
+          },
+        };
+      });
+      return [...remapped, workspaceNode];
+    });
+    setSelectedNodes([workspaceId]);
+    setSelectedEdges([]);
+  }, [nodes, selectedNodes, setNodes, snap]);
 
   const applyQuickTemplate = useCallback((templateId: QuickTemplateId) => {
     const baseX = 120;
@@ -1127,13 +1368,23 @@ function WorkflowComposerInner() {
 
     for (const n of nodes) {
       if (!selectedSet.has(n.id)) continue;
-      const newId = genId(String(n.data?.nodeType || 'node'));
-      idMap.set(n.id, newId);
+      idMap.set(n.id, genId(String(n.data?.nodeType || 'node')));
+    }
+
+    for (const n of nodes) {
+      if (!selectedSet.has(n.id)) continue;
+      const newId = idMap.get(n.id) || genId(String(n.data?.nodeType || 'node'));
+      const copiedParentId = n.parentId ? (idMap.get(String(n.parentId)) || String(n.parentId)) : undefined;
+      const parentAlsoCopied = !!(n.parentId && selectedSet.has(String(n.parentId)));
       nodeCopies.push({
         ...n,
         id: newId,
         selected: false,
-        position: { x: n.position.x + shift.x, y: n.position.y + shift.y },
+        parentId: copiedParentId,
+        extent: copiedParentId ? 'parent' : undefined,
+        position: parentAlsoCopied
+          ? { x: n.position.x, y: n.position.y }
+          : { x: n.position.x + shift.x, y: n.position.y + shift.y },
         data: { ...n.data, label: `${String(n.data?.label || '节点')} Copy` },
       });
     }
@@ -1171,13 +1422,22 @@ function WorkflowComposerInner() {
     const nodeCopies: Node[] = [];
 
     for (const n of clipboard.nodes) {
-      const newId = genId(String(n.data?.nodeType || 'node'));
-      idMap.set(n.id, newId);
+      idMap.set(n.id, genId(String(n.data?.nodeType || 'node')));
+    }
+
+    for (const n of clipboard.nodes) {
+      const newId = idMap.get(n.id) || genId(String(n.data?.nodeType || 'node'));
+      const copiedParentId = n.parentId ? (idMap.get(String(n.parentId)) || String(n.parentId)) : undefined;
+      const parentAlsoCopied = !!(n.parentId && clipboard.nodes.some((x) => x.id === n.parentId));
       nodeCopies.push({
         ...n,
         id: newId,
         selected: false,
-        position: { x: n.position.x + shift.x, y: n.position.y + shift.y },
+        parentId: copiedParentId,
+        extent: copiedParentId ? 'parent' : undefined,
+        position: parentAlsoCopied
+          ? { x: n.position.x, y: n.position.y }
+          : { x: n.position.x + shift.x, y: n.position.y + shift.y },
         data: { ...n.data, label: `${String(n.data?.label || '节点')} Copy` },
       });
     }
@@ -1197,28 +1457,8 @@ function WorkflowComposerInner() {
   }, [clipboard, setNodes, setEdges]);
 
   const groupSelectedNodes = useCallback(() => {
-    if (selectedNodes.length < 2) return;
-    const selected = nodes.filter((n) => selectedNodes.includes(n.id));
-    if (!selected.length) return;
-    const minX = Math.min(...selected.map((n) => n.position.x));
-    const minY = Math.min(...selected.map((n) => n.position.y));
-    const maxX = Math.max(...selected.map((n) => n.position.x + Number(n.width || (n.style as any)?.width || 260)));
-    const maxY = Math.max(...selected.map((n) => n.position.y + Number(n.height || (n.style as any)?.height || 180)));
-
-    const groupId = genId('group');
-    const groupNode: Node = {
-      id: groupId,
-      type: 'comfyGroup',
-      position: { x: minX - 30, y: minY - 40 },
-      draggable: true,
-      selectable: true,
-      data: { label: `Group ${selectedNodes.length}`, color: '#22d3ee' },
-      style: { width: snap(maxX - minX + 60), height: snap(maxY - minY + 80), zIndex: -1 },
-    };
-    setNodes((nds) => [...nds, groupNode]);
-    setSelectedNodes([groupId]);
-    setSelectedEdges([]);
-  }, [selectedNodes, nodes, setNodes, snap]);
+    handleAddGroup();
+  }, [handleAddGroup]);
 
   const nudgeSelected = useCallback((dx: number, dy: number) => {
     if (!selectedNodes.length) return;
@@ -1229,18 +1469,20 @@ function WorkflowComposerInner() {
 
   // P2: 自动布局 — 简单分层拓扑布局
   const autoLayout = useCallback(() => {
-    if (!nodes.length) return;
+    const layoutNodes = nodes.filter((n) => !isLayoutOnlyNodeType(String(n.data?.nodeType || n.type || '')) && !n.parentId);
+    if (!layoutNodes.length) return;
     const NODE_W = 260;
     const NODE_H = 180;
     const GAP_X = 80;
     const GAP_Y = 60;
-    const LANE_H = NODE_H + GAP_Y;
+    const layoutNodeSet = new Set(layoutNodes.map((n) => n.id));
+    const layoutEdges = edges.filter((e) => layoutNodeSet.has(e.source) && layoutNodeSet.has(e.target));
 
     // 计算每个节点的入度
     const inDegree = new Map<string, number>();
     const outEdges = new Map<string, Edge[]>();
-    for (const n of nodes) inDegree.set(n.id, 0);
-    for (const e of edges) {
+    for (const n of layoutNodes) inDegree.set(n.id, 0);
+    for (const e of layoutEdges) {
       inDegree.set(e.target, (inDegree.get(e.target) || 0) + 1);
       const arr = outEdges.get(e.source) || [];
       arr.push(e);
@@ -1249,7 +1491,7 @@ function WorkflowComposerInner() {
 
     // 拓扑分层
     const layers: string[][] = [];
-    const remaining = new Set(nodes.map(n => n.id));
+    const remaining = new Set(layoutNodes.map(n => n.id));
     const deg = new Map(inDegree);
     while (remaining.size > 0) {
       const layer: string[] = [];
@@ -1276,7 +1518,6 @@ function WorkflowComposerInner() {
     for (let li = 0; li < layers.length; li++) {
       const layer = layers[li];
       const y0 = 100;
-      const totalH = layer.length * NODE_H + (layer.length - 1) * GAP_Y;
       let y = y0;
       for (let ni = 0; ni < layer.length; ni++) {
         newPositions.set(layer[ni], { x: snap(x), y: snap(y) });
@@ -1286,6 +1527,7 @@ function WorkflowComposerInner() {
     }
 
     setNodes((nds) => nds.map((n) => {
+      if (!layoutNodeSet.has(n.id)) return n;
       const pos = newPositions.get(n.id);
       return pos ? { ...n, position: pos } : n;
     }));
@@ -2508,7 +2750,19 @@ function WorkflowComposerInner() {
               dryRunResult={dryRunSubmitResult}
               onParamChange={(nodeId, params) => {
                 setNodes((nds) => nds.map((n) =>
-                  n.id === nodeId ? { ...n, data: { ...n.data, params } } : n
+                  n.id === nodeId
+                    ? {
+                        ...n,
+                        data: {
+                          ...n.data,
+                          params,
+                          ...(isWorkspaceNode(n) ? {
+                            label: String((params as any)?.workspace_name || n.data?.label || '工作区'),
+                            color: String((params as any)?.workspace_color || n.data?.color || '#38BDF8'),
+                          } : {}),
+                        },
+                      }
+                    : n
                 ));
                 // F4: 参数变化后立即重新计算就绪状态（用 setNodes 回调保证读取最新 nodes）
                 setNodes((nds) => {
@@ -2747,49 +3001,68 @@ function WorkflowComposerInner() {
           return n ? String(n.data?.label || n.id) : '节点菜单';
         })()}
         onClose={() => setNodeContextOpen(false)}
-        actions={nodeContextTargetId ? [
-          {
-            key: 'duplicate',
-            label: '复制节点',
-            onClick: () => duplicateNodeById(nodeContextTargetId),
-          },
-          {
-            key: 'toggle',
-            label: nodes.find((n) => n.id === nodeContextTargetId)?.data?.collapsed ? '展开节点' : '折叠节点',
-            onClick: () => toggleNodeCollapsed(nodeContextTargetId),
-          },
-          {
-            key: 'disconnect',
-            label: '清空该节点连线',
-            onClick: () => clearNodeEdges(nodeContextTargetId),
-          },
-          {
-            key: 'delete',
-            label: '删除节点',
-            danger: true,
-            onClick: () => deleteNodeById(nodeContextTargetId),
-          },
-          {
-            key: 'divider-p3',
-            label: '───',
-            onClick: () => {},
-          },
-          {
-            key: 'dryrun-single',
-            label: 'Dry-Run 此节点',
-            onClick: () => handleDryRunSingleNode(nodeContextTargetId),
-          },
-          {
-            key: 'run-from',
-            label: '从此节点开始运行',
-            onClick: () => handleRunFromNode(nodeContextTargetId),
-          },
-          {
-            key: 'retry-node',
-            label: '重试此节点',
-            onClick: () => handleRetryFailedNode(nodeContextTargetId),
-          },
-        ] : []}
+        actions={nodeContextTargetId ? (() => {
+          const targetNode = nodes.find((n) => n.id === nodeContextTargetId);
+          const workspace = isWorkspaceNode(targetNode);
+          if (workspace) {
+            return [
+              {
+                key: 'duplicate',
+                label: '复制工作区',
+                onClick: () => duplicateNodeById(nodeContextTargetId),
+              },
+              {
+                key: 'dissolve-workspace',
+                label: '解散工作区（保留节点）',
+                onClick: () => deleteNodeById(nodeContextTargetId),
+              },
+            ];
+          }
+
+          return [
+            {
+              key: 'duplicate',
+              label: '复制节点',
+              onClick: () => duplicateNodeById(nodeContextTargetId),
+            },
+            {
+              key: 'toggle',
+              label: nodes.find((n) => n.id === nodeContextTargetId)?.data?.collapsed ? '展开节点' : '折叠节点',
+              onClick: () => toggleNodeCollapsed(nodeContextTargetId),
+            },
+            {
+              key: 'disconnect',
+              label: '清空该节点连线',
+              onClick: () => clearNodeEdges(nodeContextTargetId),
+            },
+            {
+              key: 'delete',
+              label: '删除节点',
+              danger: true,
+              onClick: () => deleteNodeById(nodeContextTargetId),
+            },
+            {
+              key: 'divider-p3',
+              label: '───',
+              onClick: () => {},
+            },
+            {
+              key: 'dryrun-single',
+              label: 'Dry-Run 此节点',
+              onClick: () => handleDryRunSingleNode(nodeContextTargetId),
+            },
+            {
+              key: 'run-from',
+              label: '从此节点开始运行',
+              onClick: () => handleRunFromNode(nodeContextTargetId),
+            },
+            {
+              key: 'retry-node',
+              label: '重试此节点',
+              onClick: () => handleRetryFailedNode(nodeContextTargetId),
+            },
+          ];
+        })() : []}
       />
 
       <NodeContextMenu
@@ -2808,7 +3081,7 @@ function WorkflowComposerInner() {
           { key: 'dist-h', label: '水平等距', onClick: distributeSelectedHoriz },
           { key: 'dist-v', label: '垂直等距', onClick: distributeSelectedVert },
           { key: 'divider2', label: '───', onClick: () => {} },
-          { key: 'add-group', label: '🗂 添加分组', onClick: () => handleAddGroup() },
+          { key: 'add-group', label: '🗂 圈为工作区', onClick: () => handleAddGroup() },
           { key: 'auto-layout', label: '自动布局', onClick: autoLayout },
           { key: 'run-subchain', label: '运行选中子链', onClick: handleRunSelectedSubchain },
           { key: 'focus-failed', label: '定位失败节点', onClick: focusFirstFailedNode },

@@ -21,6 +21,8 @@ export interface ComposerNode {
   type: NodeType;
   position: { x: number; y: number };
   size?: { width: number; height: number };
+  parentId?: string;
+  extent?: 'parent';
   collapsed?: boolean;
   label: string;
   params: Record<string, unknown>;
@@ -64,7 +66,10 @@ export type NodeType =
   | 'tracker'
   | 'eval-report'
   | 'output-archive'
-| 'reroute';
+  | 'universal-node'
+  | 'metadata-node'
+  | 'workspace-group'
+  | 'reroute';
 
 export type PortType =
   | 'video'
@@ -149,6 +154,7 @@ export interface NodeConfig {
   execution?: NodeExecution;
   outputSchema?: OutputSchema;
   frozenHint?: string;
+  layoutOnly?: boolean;
 }
 
 export const NODE_REGISTRY: Record<NodeType, NodeConfig> = {
@@ -639,6 +645,100 @@ execution: { stepKey: 'dataset_split', enabled: true, dryRunSupported: true, run
     },
   },
 
+  'universal-node': {
+    type: 'universal-node',
+    label: 'Universal Node',
+    labelZh: '万能节点',
+    icon: '🧰',
+    color: '#A78BFA',
+    bgColor: 'rgba(167, 139, 250, 0.08)',
+    description: '万能中枢节点：任意输入/输出，可用于适配、转发和挂载自定义参数',
+    inputs: ['any'],
+    outputs: ['any'],
+    params: [
+      {
+        key: 'mode',
+        label: 'Mode',
+        labelZh: '工作模式',
+        type: 'select',
+        required: false,
+        default: 'passthrough',
+        options: [
+          { value: 'passthrough', label: 'Pass Through' },
+          { value: 'router', label: 'Router' },
+          { value: 'transform', label: 'Transform' },
+        ],
+      },
+      {
+        key: 'memo',
+        label: 'Memo',
+        labelZh: '说明',
+        type: 'text',
+        required: false,
+        default: '',
+        placeholder: '记录该万能节点的用途或约定',
+      },
+      {
+        key: 'config_json',
+        label: 'Config JSON',
+        labelZh: '自定义配置 JSON',
+        type: 'text',
+        required: false,
+        default: '{}',
+        placeholder: '{"key":"value"}',
+      },
+    ],
+    execution: {
+      enabled: false,
+    },
+    frozenHint: '万能节点属于编排层能力，默认不参与真实执行。',
+  },
+
+  'metadata-node': {
+    type: 'metadata-node',
+    label: 'Metadata Node',
+    labelZh: '元数据节点',
+    icon: '🏷️',
+    color: '#2DD4BF',
+    bgColor: 'rgba(45, 212, 191, 0.08)',
+    description: '附加流程元数据（标签、负责人、备注），支持在流程中透传',
+    inputs: ['any'],
+    outputs: ['any'],
+    params: [
+      { key: 'title', label: 'Title', labelZh: '标题', type: 'string', required: false, default: '' },
+      { key: 'tags', label: 'Tags', labelZh: '标签', type: 'string', required: false, default: '', placeholder: 'prod,vision,v2' },
+      { key: 'owner', label: 'Owner', labelZh: '负责人', type: 'string', required: false, default: '' },
+      { key: 'notes', label: 'Notes', labelZh: '备注', type: 'text', required: false, default: '' },
+      { key: 'metadata_json', label: 'Metadata JSON', labelZh: '元数据 JSON', type: 'text', required: false, default: '{}' },
+    ],
+    execution: {
+      enabled: false,
+    },
+    frozenHint: '元数据节点用于编排标注与治理，不参与真实执行。',
+  },
+
+  'workspace-group': {
+    type: 'workspace-group',
+    label: 'Workspace Group',
+    labelZh: '工作区',
+    icon: '🗂️',
+    color: '#38BDF8',
+    bgColor: 'rgba(56, 189, 248, 0.08)',
+    description: '工作区容器：用于圈选并管理一组节点（仅布局，不参与编译/执行）',
+    inputs: [],
+    outputs: [],
+    params: [
+      { key: 'workspace_name', label: 'Workspace Name', labelZh: '工作区名称', type: 'string', required: false, default: '' },
+      { key: 'workspace_desc', label: 'Description', labelZh: '描述', type: 'text', required: false, default: '' },
+      { key: 'workspace_color', label: 'Color', labelZh: '颜色', type: 'string', required: false, default: '#38BDF8', placeholder: '#38BDF8' },
+    ],
+    execution: {
+      enabled: false,
+    },
+    frozenHint: '工作区节点仅用于画布组织，不参与编译和运行。',
+    layoutOnly: true,
+  },
+
   'reroute': {
     type: 'reroute',
     label: 'Reroute',
@@ -655,6 +755,12 @@ execution: { stepKey: 'dataset_split', enabled: true, dryRunSupported: true, run
     },
   },
 };
+
+const LAYOUT_ONLY_NODE_TYPES = new Set<string>(['workspace-group', 'group', 'comfyGroup']);
+
+export function isLayoutOnlyNodeType(type: NodeType | string): boolean {
+  return LAYOUT_ONLY_NODE_TYPES.has(String(type || '').trim());
+}
 
 export interface WorkflowRuntimeStep {
   step_key: string;
@@ -692,6 +798,7 @@ export function buildRuntimePayloadFromDraft(args: {
   const runtimeInput: Record<string, unknown> = {};
 
   for (const s of args.steps) {
+    if (isLayoutOnlyNodeType(s.nodeType)) continue;
     const exec = getNodeExecution(s.nodeType);
     if (!exec?.enabled || !exec?.stepKey) {
       unsupported.push(`${s.label} (${s.nodeType})`);

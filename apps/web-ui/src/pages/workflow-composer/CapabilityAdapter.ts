@@ -119,6 +119,9 @@ function inferCategoryFromHardcoded(type: NodeType): ComposerNodeEntry['category
     tracker: 'process',
     'eval-report': 'output',
     'output-archive': 'output',
+    'universal-node': 'utility',
+    'metadata-node': 'utility',
+    'workspace-group': 'utility',
     reroute: 'utility',
   };
   return map[type] || 'process';

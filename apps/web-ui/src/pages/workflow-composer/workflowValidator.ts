@@ -2,7 +2,7 @@
 // workflowValidator.ts — Workflow Composer 校验逻辑
 // ============================================================
 import type { ComposerNode, ComposerEdge, WorkflowDraft } from './workflowSchema';
-import { NODE_REGISTRY } from './workflowSchema';
+import { NODE_REGISTRY, isLayoutOnlyNodeType } from './workflowSchema';
 import { isDataTypeCompatible, resolveInputPort, resolveOutputPort } from './NodeTypes';
 
 export interface ValidationResult {
@@ -86,21 +86,23 @@ function canConnect(sourceNode: ComposerNode, targetNode: ComposerNode, edge: Co
 export function validateWorkflow(draft: WorkflowDraft): ValidationResult {
   const errors: ValidationError[] = [];
   const warnings: ValidationError[] = [];
-  const { nodes, edges } = draft;
+  const flowNodes = draft.nodes.filter((n) => !isLayoutOnlyNodeType(n.type));
+  const flowNodeIdSet = new Set(flowNodes.map((n) => n.id));
+  const flowEdges = draft.edges.filter((e) => flowNodeIdSet.has(e.source) && flowNodeIdSet.has(e.target));
 
-  if (nodes.length === 0) {
+  if (flowNodes.length === 0) {
     errors.push({ type: 'error', code: 'EMPTY_CANVAS', message: '画布为空，请至少添加一个节点' });
     return { ok: false, errors, warnings };
   }
 
-  const { inDegree, outDegree } = buildDegreeMap(edges);
-  const hasDatasetLoader = nodes.some(n => n.type === 'dataset-loader');
+  const { inDegree, outDegree } = buildDegreeMap(flowEdges);
+  const hasDatasetLoader = flowNodes.some(n => n.type === 'dataset-loader');
 
-  if (!hasDatasetLoader && edges.length === 0) {
+  if (!hasDatasetLoader && flowEdges.length === 0) {
     errors.push({ type: 'error', code: 'NO_START_NODE', message: '缺少起点，数据流必须从 Dataset Loader 开始' });
   }
 
-  for (const node of nodes) {
+  for (const node of flowNodes) {
     const inDeg = inDegree[node.id] ?? 0;
     const outDeg = outDegree[node.id] ?? 0;
     if (inDeg === 0 && outDeg === 0 && node.type !== 'dataset-loader') {
@@ -108,23 +110,27 @@ export function validateWorkflow(draft: WorkflowDraft): ValidationResult {
     }
   }
 
-  for (const edge of edges) {
-    const sourceNode = nodes.find(n => n.id === edge.source);
-    const targetNode = nodes.find(n => n.id === edge.target);
+  for (const edge of flowEdges) {
+    const sourceNode = flowNodes.find(n => n.id === edge.source);
+    const targetNode = flowNodes.find(n => n.id === edge.target);
     if (!sourceNode || !targetNode) continue;
     if (!canConnect(sourceNode, targetNode, edge)) {
       errors.push({ type: 'error', code: 'INVALID_CONNECTION', message: `节点 [${sourceNode.label}] 不能连接到 [${targetNode.label}]（类型不兼容）`, edgeId: edge.id, nodeId: edge.target });
     }
   }
 
-  const cycleResult = hasCycle(nodes, edges);
+  const cycleResult = hasCycle(flowNodes, flowEdges);
   if (cycleResult.hasCycle) {
-    const pathLabel = (cycleResult.cyclePath ?? []).map(id => nodes.find(n => n.id === id)?.label ?? id).join(' → ');
+    const pathLabel = (cycleResult.cyclePath ?? []).map(id => flowNodes.find(n => n.id === id)?.label ?? id).join(' → ');
     errors.push({ type: 'error', code: 'CYCLE_DETECTED', message: `检测到循环依赖，画布不支持环状结构：${pathLabel}` });
   }
 
-  for (const node of nodes) {
+  for (const node of flowNodes) {
     const config = NODE_REGISTRY[node.type];
+    if (!config) {
+      warnings.push({ type: 'warning', code: 'UNKNOWN_NODE', message: `节点 [${node.label}] 类型未知，已跳过参数校验`, nodeId: node.id });
+      continue;
+    }
     for (const param of config.params) {
       if (param.required) {
         const val = node.params[param.key];

@@ -452,20 +452,44 @@ export function ComfyNode({ id, data, selected }: any) {
 }
 
 // Group/Frame 节点
-export function ComfyGroupNode({ data }: any) {
+export function ComfyGroupNode({ data, selected }: any) {
+  const color = data.color || '#38BDF8';
+  const label = data.label || data?.params?.workspace_name || '工作区';
   return (
     <div 
-      className="comfy-group"
+      className={`comfy-group ${selected ? 'comfy-group--selected' : ''}`}
       style={{ 
-        borderColor: data.color || '#6B7280',
-        background: `${data.color || '#6B7280'}10`,
+        borderColor: color,
+        background: `${color}12`,
       }}
     >
+      <NodeResizeControl
+        position="bottom-right"
+        minWidth={300}
+        minHeight={220}
+        maxWidth={1800}
+        maxHeight={1400}
+        style={{
+          width: 14,
+          height: 14,
+          borderRadius: 4,
+          border: selected ? '1px solid #38BDF8' : '1px solid #334155',
+          background: selected ? '#0b1220' : '#0b0f1a',
+          display: selected ? 'flex' : 'none',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'nwse-resize',
+          boxShadow: selected ? '0 0 0 1px rgba(56,189,248,0.25)' : 'none',
+        }}
+      >
+        <span className="comfy-resize-handle">⋰</span>
+      </NodeResizeControl>
       <div 
         className="comfy-group-header"
-        style={{ background: `${data.color || '#6B7280'}30` }}
+        style={{ background: `${color}28` }}
       >
-        <span>📦 {data.label}</span>
+        <span>🗂 {label}</span>
+        <small>Workspace</small>
       </div>
     </div>
   );

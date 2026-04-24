@@ -530,8 +530,14 @@
   height: 100%;
   border: 2px dashed;
   border-radius: 12px;
-  min-width: 200px;
-  min-height: 150px;
+  min-width: 300px;
+  min-height: 220px;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.14);
+}
+
+.comfy-group--selected {
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.35), 0 0 0 1px rgba(56, 189, 248, 0.25);
 }
 
 .comfy-group-header {
@@ -540,6 +546,17 @@
   font-size: 12px;
   font-weight: 600;
   color: #E5E7EB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.comfy-group-header small {
+  font-size: 10px;
+  font-weight: 600;
+  color: #bae6fd;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 /* ── 选中状态动画 ── */

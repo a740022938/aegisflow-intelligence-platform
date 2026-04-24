@@ -68,7 +68,7 @@ const TYPE_ALIAS: Record<string, string> = {
 const categoryOf = (type: NodeType): NodeTypeConfig['category'] => {
   if (type === 'dataset-loader' || type === 'video-source') return 'input';
   if (type === 'output-archive' || type === 'eval-report' || type === 'archive-model') return 'output';
-  if (type === 'reroute') return 'utility';
+  if (type === 'reroute' || type === 'universal-node' || type === 'metadata-node' || type === 'workspace-group') return 'utility';
   return 'process';
 };
 
