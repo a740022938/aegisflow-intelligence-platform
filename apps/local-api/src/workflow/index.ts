@@ -10,6 +10,37 @@ import { logAudit } from '../audit/index.js';
 import { resolveRoute } from '../cost-routing/index.js';
 import { autoCreateFromExperiment } from '../experiments/patch_sets.js';
 
+function resolveRepoRoot(pathMod: any, fsMod: any): string {
+  const candidates = [
+    process.env.AIP_REPO_ROOT,
+    process.cwd(),
+    pathMod.resolve(process.cwd(), '..'),
+    pathMod.resolve(process.cwd(), '../..'),
+    pathMod.resolve(process.cwd(), '../../..'),
+    pathMod.resolve(__dirname, '../../..'),
+    pathMod.resolve(__dirname, '../../../..'),
+  ].filter(Boolean);
+  for (const candidate of candidates) {
+    if (
+      fsMod.existsSync(pathMod.join(candidate, 'package.json')) &&
+      fsMod.existsSync(pathMod.join(candidate, 'workers', 'python-worker'))
+    ) {
+      return candidate;
+    }
+  }
+  return pathMod.resolve(process.cwd(), '../..');
+}
+
+function resolvePythonWorkerPath(pathMod: any, fsMod: any, scriptName: string): string {
+  const repoRoot = resolveRepoRoot(pathMod, fsMod);
+  return pathMod.join(repoRoot, 'workers', 'python-worker', scriptName);
+}
+
+function resolveRunRoot(pathMod: any, fsMod: any, kind: 'train' | 'val'): string {
+  const repoRoot = resolveRepoRoot(pathMod, fsMod);
+  return pathMod.join(repoRoot, 'runs', kind);
+}
+
 // ── State Machine ─────────────────────────────────────────────────────────────
 
 const JOB_STATES = ['pending', 'running', 'paused', 'completed', 'failed', 'cancelled'] as const;
@@ -1229,7 +1260,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
       const fs = await import('fs');
       
       // Build training config
-      const projectDir = path.join('E:', 'AGI_Factory', 'runs', 'train');
+      const projectDir = resolveRunRoot(path, fs, 'train');
       const runName = `exp_${experiment_id.slice(0, 8)}`;
       const outputJson = path.join(projectDir, runName, 'train_output.json');
       
@@ -1284,7 +1315,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
         // Build Python command
         const pythonCmd = [
           'python',
-          path.join('E:', 'AGI_Factory', 'repo', 'workers', 'python-worker', 'trainer_runner.py'),
+          resolvePythonWorkerPath(path, fs, 'trainer_runner.py'),
           '--dataset-yaml', datasetYaml,
           '--model', resolvedInput.model || 'yolov8n.pt',
           '--epochs', String(epochCount),
@@ -1317,7 +1348,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
           const result = execSync(pythonCmd.join(' '), {
             encoding: 'utf-8',
             timeout: epochCount * 300 * 1000, // 5 min per epoch
-            cwd: 'E:\\AGI_Factory\\repo\\workers\\python-worker',
+            cwd: path.dirname(resolvePythonWorkerPath(path, fs, 'trainer_runner.py')),
           });
           
           const elapsed = Date.now() - startTime;
@@ -1697,7 +1728,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
       }
       
       // Build eval command
-      const projectDir = path.join('E:', 'AGI_Factory', 'runs', 'val');
+      const projectDir = resolveRunRoot(path, fs, 'val');
       const runName = `eval_${evaluationId.slice(0, 8)}`;
       const outputJson = path.join(projectDir, runName, 'eval_output.json');
       
@@ -1707,7 +1738,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
       
       const pythonCmd = [
         'python',
-        path.join('E:', 'AGI_Factory', 'repo', 'workers', 'python-worker', 'eval_runner.py'),
+        resolvePythonWorkerPath(path, fs, 'eval_runner.py'),
         '--weights', weightsPath,
         '--data', datasetYaml,
         '--imgsz', String(rawInput.imgsz || 640),
@@ -1724,7 +1755,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
         const result = execSync(pythonCmd.join(' '), {
           encoding: 'utf-8',
           timeout: 3600 * 1000, // 1 hour
-          cwd: 'E:\\AGI_Factory\\repo\\workers\\python-worker',
+          cwd: path.dirname(resolvePythonWorkerPath(path, fs, 'eval_runner.py')),
         });
         
         const elapsed = Date.now() - startTime;
@@ -4697,11 +4728,13 @@ async function executeSamHandoff(step: StepRecord): Promise<{ ok: boolean; outpu
   // ── Build metrics temp file (same as autoCreateFromExperiment API) ───────────
   const { execSync } = require('child_process');
   const { mkdirSync, existsSync, writeFileSync } = require('fs');
+  const pathMod = require('path');
+  const fsMod = require('fs');
 
   const handoffId  = `handoff-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  const shDir      = `E:\AGI_Factory\runs\handoff_${experiment_id.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const shManifest  = `${shDir}\sam_handoff_manifest.json`;
-  const metricsFile = `${shDir}\_metrics_tmp.json`;
+  const shDir      = pathMod.join(resolveRepoRoot(pathMod, fsMod), 'runs', `handoff_${experiment_id.replace(/[^a-zA-Z0-9]/g, '')}`);
+  const shManifest  = pathMod.join(shDir, 'sam_handoff_manifest.json');
+  const metricsFile = pathMod.join(shDir, '_metrics_tmp.json');
 
   mkdirSync(shDir, { recursive: true });
   writeFileSync(metricsFile, JSON.stringify({
@@ -4716,7 +4749,7 @@ async function executeSamHandoff(step: StepRecord): Promise<{ ok: boolean; outpu
   try {
     const pythonCmd = [
       'python',
-      'E:\AGI_Factory\repo\workers\python-worker\sam_handoff_builder.py',
+      resolvePythonWorkerPath(pathMod, fsMod, 'sam_handoff_builder.py'),
       '--metrics-file', metricsFile,
       '--output-dir', shDir,
       '--source-experiment-id', experiment_id,
@@ -4819,9 +4852,11 @@ async function executeSamSegment(step: StepRecord): Promise<{ ok: boolean; outpu
   // ── Run sam_runner.py ──────────────────────────────────────────────────
   const { execSync } = require('child_process');
   const { mkdirSync, existsSync } = require('fs');
+  const pathMod = require('path');
+  const fsMod = require('fs');
 
   const segId = `seg-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  const segDir = `E:\AGI_Factory\runs\segmentations\seg_${handoff_id.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const segDir = pathMod.join(resolveRepoRoot(pathMod, fsMod), 'runs', 'segmentations', `seg_${handoff_id.replace(/[^a-zA-Z0-9]/g, '')}`);
   mkdirSync(segDir, { recursive: true });
 
   const shManifest = sh.manifest_path || '';
@@ -4831,7 +4866,8 @@ async function executeSamSegment(step: StepRecord): Promise<{ ok: boolean; outpu
 
   let runnerOk = false;
   try {
-    const pythonCmd = `python "E:\AGI_Factory\repo\workers\python-worker\sam_runner.py" --checkpoint "${checkpoint}" --manifest "${shManifest}" --output-dir "${segDir}" --model-type ${modelType} --device ${device}`;
+    const runnerPath = resolvePythonWorkerPath(pathMod, fsMod, 'sam_runner.py');
+    const pythonCmd = `python "${runnerPath}" --checkpoint "${checkpoint}" --manifest "${shManifest}" --output-dir "${segDir}" --model-type ${modelType} --device ${device}`;
 
     await logJob(db, step.job_id, step.id, "info", "[sam_segment] Running: " + pythonCmd.slice(0, 100) + "...");
 
@@ -5188,18 +5224,21 @@ async function executeTrackerRun(step: StepRecord): Promise<{ ok: boolean; outpu
 
   const { execSync } = require('child_process');
   const { mkdirSync } = require('fs');
+  const pathMod = require('path');
+  const fsMod = require('fs');
 
   const trackId = `track-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  const trackDir = `E:\\AGI_Factory\\runs\\tracker_${trackId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const trackDir = pathMod.join(resolveRepoRoot(pathMod, fsMod), 'runs', `tracker_${trackId.replace(/[^a-zA-Z0-9]/g, '')}`);
   mkdirSync(trackDir, { recursive: true });
 
   try {
-    execSync(`python "E:\\AGI_Factory\\repo\\workers\\python-worker\\tracker_runner.py" --manifest "${verif.manifest_path || ''}" --output-dir "${trackDir}"`, { encoding: 'utf-8', timeout: 120000 });
+    const runnerPath = resolvePythonWorkerPath(pathMod, fsMod, 'tracker_runner.py');
+    execSync(`python "${runnerPath}" --manifest "${verif.manifest_path || ''}" --output-dir "${trackDir}"`, { encoding: 'utf-8', timeout: 120000 });
   } catch (e: any) {
     await logJob(db, step.job_id, step.id, 'warn', `[tracker_run] Python script failed: ${e.message}`);
   }
 
-  const trackManifest = `${trackDir}\\tracker_manifest.json`;
+  const trackManifest = pathMod.join(trackDir, 'tracker_manifest.json');
   db.prepare(`INSERT INTO tracker_runs (tracker_run_id, name, status, source_verification_id, source_segmentation_id, source_handoff_id, source_experiment_id, source_model_id, source_dataset_id, manifest_path, total_tracks, total_frames, avg_track_length, active_count, ended_count, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(trackId, `track-${trackId.slice(0, 8)}`, 'completed', verification_id, verif.source_segmentation_id || '', verif.source_handoff_id || '', experiment_id || '', model_id || '', dataset_id || '', trackManifest, 0, 0, 0.0, 0, 0, now(), now());
 
@@ -5233,18 +5272,21 @@ async function executeRuleEngine(step: StepRecord): Promise<{ ok: boolean; outpu
 
   const { execSync } = require('child_process');
   const { mkdirSync } = require('fs');
+  const pathMod = require('path');
+  const fsMod = require('fs');
 
   const ruleId = `rule-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  const ruleDir = `E:\\AGI_Factory\\runs\\rule_engine_${ruleId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const ruleDir = pathMod.join(resolveRepoRoot(pathMod, fsMod), 'runs', `rule_engine_${ruleId.replace(/[^a-zA-Z0-9]/g, '')}`);
   mkdirSync(ruleDir, { recursive: true });
 
   try {
-    execSync(`python "E:\\AGI_Factory\\repo\\workers\\python-worker\\rule_engine_runner.py" --tracker-manifest "${tr.manifest_path || ''}" --output-dir "${ruleDir}"`, { encoding: 'utf-8', timeout: 120000 });
+    const runnerPath = resolvePythonWorkerPath(pathMod, fsMod, 'rule_engine_runner.py');
+    execSync(`python "${runnerPath}" --tracker-manifest "${tr.manifest_path || ''}" --output-dir "${ruleDir}"`, { encoding: 'utf-8', timeout: 120000 });
   } catch (e: any) {
     await logJob(db, step.job_id, step.id, 'warn', `[rule_engine] Python script failed: ${e.message}`);
   }
 
-  const ruleManifest = `${ruleDir}\\rule_engine_manifest.json`;
+  const ruleManifest = pathMod.join(ruleDir, 'rule_engine_manifest.json');
   db.prepare(`INSERT INTO rule_engine_runs (rule_run_id, name, status, source_tracker_run_id, source_verification_id, source_segmentation_id, source_handoff_id, source_experiment_id, source_model_id, source_dataset_id, manifest_path, total_decisions, affected_tracks, unstable_class_count, low_confidence_count, transient_count, conflict_count, ended_resolved_count, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(ruleId, `rule-${ruleId.slice(0, 8)}`, 'completed', tracker_run_id, tr.source_verification_id || '', tr.source_segmentation_id || '', tr.source_handoff_id || '', experiment_id || '', model_id || '', dataset_id || '', ruleManifest, 0, 0, 0, 0, 0, 0, 0, now(), now());
 

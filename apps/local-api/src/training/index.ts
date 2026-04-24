@@ -5,6 +5,8 @@
  */
 import { z } from 'zod';
 import { getDatabase } from '../db/builtin-sqlite.js';
+import fs from 'node:fs';
+import path from 'node:path';
 
 function generateId() { return crypto.randomUUID(); }
 function now() { return new Date().toISOString(); }
@@ -16,6 +18,31 @@ function firstValidationError(validation: any) {
   return validation?.error?.issues?.[0]?.message
     || validation?.error?.errors?.[0]?.message
     || 'Invalid request body';
+}
+
+function resolveRepoRoot(): string {
+  const candidates = [
+    process.env.AIP_REPO_ROOT,
+    process.cwd(),
+    path.resolve(process.cwd(), '..'),
+    path.resolve(process.cwd(), '../..'),
+    path.resolve(process.cwd(), '../../..'),
+    path.resolve(__dirname, '../../..'),
+    path.resolve(__dirname, '../../../..'),
+  ].filter(Boolean) as string[];
+  for (const candidate of candidates) {
+    if (
+      fs.existsSync(path.join(candidate, 'package.json')) &&
+      fs.existsSync(path.join(candidate, 'workers', 'python-worker'))
+    ) {
+      return candidate;
+    }
+  }
+  return path.resolve(process.cwd(), '../..');
+}
+
+function resolvePythonWorker(scriptName: string): string {
+  return path.join(resolveRepoRoot(), 'workers', 'python-worker', scriptName);
 }
 
 // ── Schemas ──────────────────────────────────────────────────────────────────
@@ -247,11 +274,11 @@ async function _executeYoloTraining(runId: string, configStr: string, modelName:
     .run(generateId(), runId, '', 'info', `[YOLO] Dataset: ${datasetYamlPath}`, now());
 
   // Prepare output directory
-  const projectDir = `E:/AGI_Factory/repo/runs/train`;
+  const projectDir = path.join(resolveRepoRoot(), 'runs', 'train');
   const runName = runId;
   
   // Build trainer_runner.py command
-  const runnerPath = `E:/AGI_Factory/repo/workers/python-worker/trainer_runner.py`;
+  const runnerPath = resolvePythonWorker('trainer_runner.py');
   const cmd = [
     'python', runnerPath,
     '--dataset-yaml', datasetYamlPath,
