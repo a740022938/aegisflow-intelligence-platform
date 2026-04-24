@@ -142,6 +142,14 @@
   margin-bottom: 8px;
 }
 
+.cr-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .cr-decisions-grid {
   display: grid;
   gap: 12px;
@@ -302,6 +310,21 @@
 
 .cr-rec-item.level-low {
   border-color: color-mix(in srgb, var(--success) 35%, var(--border-subtle));
+}
+
+.cr-optimization-box {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.cr-opt-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--bg-surface);
+  display: grid;
+  gap: 4px;
 }
 
 @media (max-width: 1180px) {

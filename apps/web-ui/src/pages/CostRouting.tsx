@@ -67,6 +67,31 @@ interface CostRoutingInsights {
   recommendations: RouteInsightRec[];
 }
 
+interface OptimizationProposal {
+  policy_id: string;
+  policy_name: string;
+  task_type: string;
+  route_type: RouteType;
+  feedback_count: number;
+  changed: boolean;
+  reasons: string[];
+  current_weights: Record<string, number>;
+  suggested_weights: Record<string, number>;
+  metrics: {
+    outcome_score: number | null;
+    avg_actual_cost: number | null;
+    avg_latency_ms: number | null;
+    avg_quality_score: number | null;
+  };
+}
+
+interface RoutingOptimization {
+  mode: 'preview' | 'apply';
+  proposal_count: number;
+  applied_count: number;
+  proposals: OptimizationProposal[];
+}
+
 function fmt(v?: string) {
   if (!v) return '暂无记录';
   try {
@@ -87,12 +112,14 @@ export default function CostRoutingPage() {
   const [resolving, setResolving] = useState(false);
   const [savingFeedback, setSavingFeedback] = useState(false);
   const [loadingInsights, setLoadingInsights] = useState(false);
+  const [optimizing, setOptimizing] = useState(false);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
 
   const [policies, setPolicies] = useState<RoutePolicy[]>([]);
   const [decisions, setDecisions] = useState<RouteDecision[]>([]);
   const [insights, setInsights] = useState<CostRoutingInsights | null>(null);
+  const [optimization, setOptimization] = useState<RoutingOptimization | null>(null);
 
   const [selectedPolicyId, setSelectedPolicyId] = useState('');
   const [selectedPolicy, setSelectedPolicy] = useState<RoutePolicy | null>(null);
@@ -309,6 +336,34 @@ export default function CostRoutingPage() {
     }
   }
 
+  async function runOptimization(mode: 'preview' | 'apply') {
+    setOptimizing(true);
+    setError('');
+    setMsg('');
+    try {
+      const res = await api('/api/cost-routing/optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode,
+          since_hours: 336,
+          min_feedback: 1,
+          max_shift: 0.12,
+        }),
+      });
+      if (!res.ok) throw new Error(res.error || '策略优化失败');
+      setOptimization(res.optimization || null);
+      setMsg(mode === 'apply'
+        ? `策略优化已应用: ${res.optimization?.applied_count || 0} 条`
+        : `策略优化建议: ${res.optimization?.proposal_count || 0} 条`);
+      await Promise.all([loadPolicies(), loadInsights()]);
+    } catch (e: any) {
+      setError(e.message || '策略优化失败');
+    } finally {
+      setOptimizing(false);
+    }
+  }
+
   useEffect(() => {
     loadAll();
   }, []);
@@ -509,7 +564,17 @@ export default function CostRoutingPage() {
               </div>
 
               <div className="cr-insight-block">
-                <div className="cr-subtitle">优化建议</div>
+                <div className="cr-head-row">
+                  <div className="cr-subtitle">优化建议</div>
+                  <div className="cr-action-row">
+                    <button className="ui-btn" type="button" onClick={() => runOptimization('preview')} disabled={optimizing}>
+                      {optimizing ? '计算中...' : '生成建议'}
+                    </button>
+                    <button className="ui-btn ui-btn-primary" type="button" onClick={() => runOptimization('apply')} disabled={optimizing}>
+                      应用优化
+                    </button>
+                  </div>
+                </div>
                 {(insights.recommendations || []).length === 0 ? <div className="cost-routing-policy-meta">暂无建议</div> : (
                   <div className="cr-rec-list">
                     {(insights.recommendations || []).map((rec, i) => (
@@ -520,6 +585,28 @@ export default function CostRoutingPage() {
                     ))}
                   </div>
                 )}
+                {optimization ? (
+                  <div className="cr-optimization-box">
+                    <div className="cost-routing-policy-meta">
+                      mode={optimization.mode} · proposals={optimization.proposal_count} · applied={optimization.applied_count}
+                    </div>
+                    {(optimization.proposals || []).slice(0, 6).map((proposal) => (
+                      <div className="cr-opt-item" key={proposal.policy_id}>
+                        <div>
+                          <b>{proposal.policy_name}</b> · {proposal.task_type} · feedback={proposal.feedback_count}
+                        </div>
+                        <div className="cost-routing-policy-meta">
+                          reasons: {(proposal.reasons || []).join(', ') || 'stable'}
+                        </div>
+                        <pre className="cr-json-box">{JSON.stringify({
+                          from: proposal.current_weights,
+                          to: proposal.suggested_weights,
+                          metrics: proposal.metrics,
+                        }, null, 2)}</pre>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </div>
           )}

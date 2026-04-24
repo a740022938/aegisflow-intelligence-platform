@@ -14,6 +14,7 @@ type BudgetTier = 'low' | 'medium' | 'high' | 'unlimited';
 type PriorityTier = 'low' | 'medium' | 'high' | 'critical';
 type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 type DataSensitivity = 'public' | 'internal' | 'restricted';
+type OptimizeMode = 'preview' | 'apply';
 
 interface RouteProfile {
   route_type: RouteType;
@@ -859,6 +860,11 @@ function average(total: number, count: number): number | null {
   return Number((total / count).toFixed(6));
 }
 
+function weightedAverage(total: number, weight: number): number | null {
+  if (!Number.isFinite(total) || !Number.isFinite(weight) || weight <= 0) return null;
+  return Number((total / weight).toFixed(6));
+}
+
 function buildInsights(query: any) {
   try {
     const db = getDatabase();
@@ -1059,6 +1065,312 @@ function buildInsights(query: any) {
   }
 }
 
+function normalizeOptimizeMode(v: any): OptimizeMode {
+  return String(v || '').trim().toLowerCase() === 'apply' ? 'apply' : 'preview';
+}
+
+function feedbackOutcomeScore(outcome: any): number {
+  const value = normalizeFeedbackOutcome(outcome);
+  if (value === 'success') return 1;
+  if (value === 'partial') return 0.62;
+  if (value === 'timeout') return 0.25;
+  return 0;
+}
+
+function plainWeights(weights: RouteWeightSet): RouteWeightSet {
+  return {
+    cost: Number(weights.cost.toFixed(4)),
+    capability: Number(weights.capability.toFixed(4)),
+    latency: Number(weights.latency.toFixed(4)),
+    risk: Number(weights.risk.toFixed(4)),
+    reliability: Number(weights.reliability.toFixed(4)),
+    load: Number(weights.load.toFixed(4)),
+  };
+}
+
+function shiftWeight(weights: RouteWeightSet, key: WeightKey, delta: number, maxShift: number): RouteWeightSet {
+  const next: RouteWeightSet = { ...weights };
+  next[key] = clamp(next[key] + clamp(delta, -maxShift, maxShift), 0.02, 0.72);
+  return normalizeWeights(next, DEFAULT_WEIGHTS);
+}
+
+function buildOptimizerProposal(policy: any, decisions: any[], maxShift: number) {
+  const metadata = parseJson(policy.metadata_json);
+  const currentWeights = normalizeWeights(metadata?.weights, DEFAULT_WEIGHTS);
+  let suggestedWeights = { ...currentWeights };
+  const reasons: string[] = [];
+
+  let outcomeTotal = 0;
+  let outcomeCount = 0;
+  let estimatedCostTotal = 0;
+  let estimatedCostCount = 0;
+  let actualCostTotal = 0;
+  let actualCostCount = 0;
+  let latencyTotal = 0;
+  let latencyCount = 0;
+  let qualityTotal = 0;
+  let qualityCount = 0;
+  let latencySlaTotal = 0;
+  let latencySlaCount = 0;
+  let highRiskCount = 0;
+  let lowBudgetCount = 0;
+  let gpuCount = 0;
+
+  for (const decision of decisions) {
+    const input = parseJson(decision.input_json);
+    const context = input?.__routing?.context || {};
+    const feedback = input?.__feedback?.latest;
+    if (!feedback) continue;
+
+    outcomeTotal += feedbackOutcomeScore(feedback.outcome);
+    outcomeCount += 1;
+
+    const estimatedCost = asOptionalNumber(context.estimated_cost);
+    if (estimatedCost !== null && estimatedCost >= 0) {
+      estimatedCostTotal += estimatedCost;
+      estimatedCostCount += 1;
+    }
+
+    const actualCost = asOptionalNumber(feedback.actual_cost);
+    if (actualCost !== null && actualCost >= 0) {
+      actualCostTotal += actualCost;
+      actualCostCount += 1;
+    }
+
+    const latency = asOptionalNumber(feedback.latency_ms);
+    if (latency !== null && latency >= 0) {
+      latencyTotal += latency;
+      latencyCount += 1;
+    }
+
+    const quality = asOptionalNumber(feedback.quality_score);
+    if (quality !== null && quality >= 0) {
+      qualityTotal += quality;
+      qualityCount += 1;
+    }
+
+    const latencySla = asOptionalNumber(context.latency_sla_ms);
+    if (latencySla !== null && latencySla > 0) {
+      latencySlaTotal += latencySla;
+      latencySlaCount += 1;
+    }
+
+    if (RISK_RANK[normalizeRiskLevel(context.risk_level)] >= RISK_RANK.high) highRiskCount += 1;
+    if (normalizeBudgetTier(context.budget_tier) === 'low') lowBudgetCount += 1;
+    if (asBoolean(context.gpu_needed, false)) gpuCount += 1;
+  }
+
+  const successScore = weightedAverage(outcomeTotal, outcomeCount);
+  const avgEstimatedCost = average(estimatedCostTotal, estimatedCostCount);
+  const avgActualCost = average(actualCostTotal, actualCostCount);
+  const avgLatency = average(latencyTotal, latencyCount);
+  const avgQuality = average(qualityTotal, qualityCount);
+  const avgLatencySla = average(latencySlaTotal, latencySlaCount);
+  const highRiskRate = outcomeCount > 0 ? highRiskCount / outcomeCount : 0;
+  const lowBudgetRate = outcomeCount > 0 ? lowBudgetCount / outcomeCount : 0;
+  const gpuRate = outcomeCount > 0 ? gpuCount / outcomeCount : 0;
+
+  if (successScore !== null && successScore < 0.72) {
+    suggestedWeights = shiftWeight(suggestedWeights, 'reliability', 0.1, maxShift);
+    suggestedWeights = shiftWeight(suggestedWeights, 'capability', 0.08, maxShift);
+    reasons.push('recent_outcome_score_low');
+  }
+
+  if (avgQuality !== null && avgQuality < 0.78) {
+    suggestedWeights = shiftWeight(suggestedWeights, 'capability', 0.12, maxShift);
+    suggestedWeights = shiftWeight(suggestedWeights, 'reliability', 0.04, maxShift);
+    reasons.push('quality_score_below_target');
+  }
+
+  if (
+    avgEstimatedCost !== null &&
+    avgActualCost !== null &&
+    avgEstimatedCost > 0 &&
+    avgActualCost > avgEstimatedCost * 1.18
+  ) {
+    suggestedWeights = shiftWeight(suggestedWeights, 'cost', 0.12, maxShift);
+    reasons.push('actual_cost_exceeds_estimate');
+  }
+
+  if (
+    avgLatency !== null &&
+    avgLatencySla !== null &&
+    avgLatencySla > 0 &&
+    avgLatency > avgLatencySla * 1.12
+  ) {
+    suggestedWeights = shiftWeight(suggestedWeights, 'latency', 0.12, maxShift);
+    suggestedWeights = shiftWeight(suggestedWeights, 'load', 0.04, maxShift);
+    reasons.push('latency_sla_missed');
+  }
+
+  if (highRiskRate >= 0.45) {
+    suggestedWeights = shiftWeight(suggestedWeights, 'risk', 0.1, maxShift);
+    reasons.push('high_risk_workload_dominant');
+  }
+
+  if (lowBudgetRate >= 0.45) {
+    suggestedWeights = shiftWeight(suggestedWeights, 'cost', 0.1, maxShift);
+    reasons.push('low_budget_workload_dominant');
+  }
+
+  if (gpuRate >= 0.6) {
+    suggestedWeights = shiftWeight(suggestedWeights, 'capability', 0.06, maxShift);
+    suggestedWeights = shiftWeight(suggestedWeights, 'load', 0.04, maxShift);
+    reasons.push('gpu_workload_dominant');
+  }
+
+  const currentPlain = plainWeights(currentWeights);
+  const suggestedPlain = plainWeights(suggestedWeights);
+  const changed = (Object.keys(currentPlain) as WeightKey[])
+    .some((key) => Math.abs(currentPlain[key] - suggestedPlain[key]) >= 0.005);
+
+  if (!changed && reasons.length === 0) {
+    reasons.push('policy_weights_stable');
+  }
+
+  return {
+    policy_id: policy.id,
+    policy_name: policy.name,
+    task_type: policy.task_type,
+    route_type: normalizeRouteType(policy.route_type),
+    feedback_count: outcomeCount,
+    current_weights: currentPlain,
+    suggested_weights: suggestedPlain,
+    changed,
+    reasons,
+    metrics: {
+      outcome_score: successScore,
+      avg_estimated_cost: avgEstimatedCost,
+      avg_actual_cost: avgActualCost,
+      avg_latency_ms: avgLatency,
+      avg_latency_sla_ms: avgLatencySla,
+      avg_quality_score: avgQuality,
+      high_risk_rate: Number(highRiskRate.toFixed(4)),
+      low_budget_rate: Number(lowBudgetRate.toFixed(4)),
+      gpu_rate: Number(gpuRate.toFixed(4)),
+    },
+  };
+}
+
+function optimizeRouting(body: any) {
+  try {
+    const db = getDatabase();
+    const mode = normalizeOptimizeMode(body.mode);
+    const limit = Math.min(Math.max(asNumber(body.limit, 1500), 1), 5000);
+    const sinceHours = Math.min(Math.max(asNumber(body.since_hours, 24 * 14), 1), 24 * 120);
+    const minFeedback = Math.min(Math.max(asNumber(body.min_feedback, 3), 1), 100);
+    const maxShift = clamp(asNumber(body.max_shift, 0.12), 0.02, 0.25);
+    const policyIdFilter = String(body.policy_id || '').trim();
+    const taskTypeFilter = String(body.task_type || '').trim();
+    const sinceAt = new Date(Date.now() - (sinceHours * 3600 * 1000)).toISOString();
+
+    const where: string[] = [`created_at >= ?`];
+    const params: any[] = [sinceAt];
+    if (policyIdFilter) {
+      where.push('policy_id = ?');
+      params.push(policyIdFilter);
+    }
+    if (taskTypeFilter) {
+      where.push('task_type = ?');
+      params.push(taskTypeFilter);
+    }
+
+    const decisions = db.prepare(`
+      SELECT *
+      FROM route_decisions
+      WHERE ${where.join(' AND ')}
+      ORDER BY created_at DESC
+      LIMIT ?
+    `).all(...params, limit) as any[];
+
+    const byPolicy = new Map<string, any[]>();
+    for (const decision of decisions) {
+      const input = parseJson(decision.input_json);
+      if (!input?.__feedback?.latest) continue;
+      const policyId = String(decision.policy_id || '').trim();
+      if (!policyId) continue;
+      const list = byPolicy.get(policyId) || [];
+      list.push(decision);
+      byPolicy.set(policyId, list);
+    }
+
+    const proposals: any[] = [];
+    for (const [policyId, policyDecisions] of byPolicy.entries()) {
+      if (policyDecisions.length < minFeedback) continue;
+      const policy = db.prepare('SELECT * FROM route_policies WHERE id = ?').get(policyId) as any;
+      if (!policy || policy.status !== 'active') continue;
+      proposals.push(buildOptimizerProposal(policy, policyDecisions, maxShift));
+    }
+
+    const applied: any[] = [];
+    if (mode === 'apply') {
+      const ts = now();
+      const update = db.prepare('UPDATE route_policies SET metadata_json = ?, updated_at = ? WHERE id = ?');
+      for (const proposal of proposals) {
+        if (!proposal.changed) continue;
+        const policy = db.prepare('SELECT * FROM route_policies WHERE id = ?').get(proposal.policy_id) as any;
+        if (!policy) continue;
+        const metadata = parseJson(policy.metadata_json);
+        const history = Array.isArray(metadata.optimization_history) ? metadata.optimization_history : [];
+        const nextMetadata = {
+          ...metadata,
+          weights: proposal.suggested_weights,
+          optimization: {
+            last_applied_at: ts,
+            engine_version: 'v2',
+            feedback_count: proposal.feedback_count,
+            reasons: proposal.reasons,
+            metrics: proposal.metrics,
+          },
+          optimization_history: [
+            {
+              applied_at: ts,
+              from: proposal.current_weights,
+              to: proposal.suggested_weights,
+              reasons: proposal.reasons,
+              metrics: proposal.metrics,
+            },
+            ...history,
+          ].slice(0, 20),
+        };
+        update.run(stringifyJson(nextMetadata), ts, proposal.policy_id);
+        applied.push(proposal.policy_id);
+      }
+    }
+
+    auditLog('route_optimizer_run', 'route-optimizer', 'success', {
+      mode,
+      since_hours: sinceHours,
+      decision_count: decisions.length,
+      proposal_count: proposals.length,
+      applied_count: applied.length,
+      policy_id: policyIdFilter,
+      task_type: taskTypeFilter,
+    });
+
+    return {
+      ok: true,
+      optimization: {
+        engine_version: 'v2',
+        mode,
+        window: {
+          since_at: sinceAt,
+          since_hours: sinceHours,
+          sampled_decisions: decisions.length,
+          min_feedback: minFeedback,
+          max_shift: maxShift,
+        },
+        proposal_count: proposals.length,
+        applied_count: applied.length,
+        applied_policy_ids: applied,
+        proposals,
+      },
+    };
+  } catch (e: any) {
+    return fail('route_optimizer', 'route-optimizer', e.message || 'optimize routing failed');
+  }
+}
+
 export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/route-policies', async (request: any) => listPolicies(request.query || {}));
   app.get('/api/route-policies/:id', async (request: any) => getPolicyById(request.params.id));
@@ -1070,6 +1382,7 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
   app.get('/api/cost-routing/decisions/:id', async (request: any) => getDecisionById(request.params.id));
   app.post('/api/cost-routing/feedback', async (request: any) => attachDecisionFeedback(request.body || {}));
   app.get('/api/cost-routing/insights', async (request: any) => buildInsights(request.query || {}));
+  app.post('/api/cost-routing/optimize', async (request: any) => optimizeRouting(request.body || {}));
 
   app.get('/api/cost-routing/route-types', async () => ({
     ok: true,
