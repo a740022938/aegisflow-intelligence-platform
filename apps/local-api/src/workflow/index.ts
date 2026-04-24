@@ -3047,9 +3047,220 @@ async function executeReleaseValidate(step: StepRecord): Promise<{ ok: boolean; 
   };
 }
 
+type BackflowSeverity = 'low' | 'medium' | 'high' | 'critical';
+
+const BACKFLOW_SEVERITY_SCORE: Record<BackflowSeverity, number> = {
+  low: 6,
+  medium: 12,
+  high: 20,
+  critical: 34,
+};
+
+const BACKFLOW_SEVERITY_RANK: Record<BackflowSeverity, number> = {
+  low: 1,
+  medium: 2,
+  high: 3,
+  critical: 4,
+};
+
+function backflowNum(v: any, fallback = 0): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function backflowBool(v: any, fallback = false): boolean {
+  if (typeof v === 'boolean') return v;
+  if (typeof v === 'string') {
+    const text = v.trim().toLowerCase();
+    if (['1', 'true', 'yes', 'y', 'on'].includes(text)) return true;
+    if (['0', 'false', 'no', 'n', 'off'].includes(text)) return false;
+  }
+  if (typeof v === 'number') return v !== 0;
+  return fallback;
+}
+
+function backflowClamp(v: number, min: number, max: number): number {
+  if (!Number.isFinite(v)) return min;
+  return Math.max(min, Math.min(max, v));
+}
+
+function normalizeBackflowSeverity(v: any, fallback: BackflowSeverity = 'medium'): BackflowSeverity {
+  const text = String(v || '').trim().toLowerCase();
+  if (text === 'low') return 'low';
+  if (text === 'high') return 'high';
+  if (text === 'critical' || text === 'blocker' || text === 'fatal') return 'critical';
+  if (text === 'medium') return 'medium';
+  return fallback;
+}
+
+function inferBackflowSeverity(text: string): BackflowSeverity {
+  const value = String(text || '').toLowerCase();
+  if (/(critical|fatal|security|leak|crash|panic|corrupt|safety)/.test(value)) return 'critical';
+  if (/(high|timeout|oom|exception|failed|error|broken)/.test(value)) return 'high';
+  if (/(warn|warning|unstable|drift|regression)/.test(value)) return 'medium';
+  return 'low';
+}
+
+function maxBackflowSeverity(a: BackflowSeverity, b: BackflowSeverity): BackflowSeverity {
+  return BACKFLOW_SEVERITY_RANK[a] >= BACKFLOW_SEVERITY_RANK[b] ? a : b;
+}
+
+function computeBackflowRisk(failedChecks: any[], warnings: any[], missingValidation: boolean, overallPassed: boolean): {
+  risk_score: number;
+  highest_severity: BackflowSeverity;
+  failed_breakdown: Record<BackflowSeverity, number>;
+} {
+  const failedBreakdown: Record<BackflowSeverity, number> = { low: 0, medium: 0, high: 0, critical: 0 };
+  let score = 0;
+  let highest: BackflowSeverity = 'low';
+
+  for (const fc of failedChecks) {
+    const name = String(fc?.name || '');
+    const message = String(fc?.message || '');
+    const severity = normalizeBackflowSeverity(fc?.severity, inferBackflowSeverity(`${name} ${message}`));
+    failedBreakdown[severity] += 1;
+    highest = maxBackflowSeverity(highest, severity);
+    score += BACKFLOW_SEVERITY_SCORE[severity];
+    if (/(security|safety|privacy|license)/i.test(`${name} ${message}`)) score += 8;
+  }
+
+  for (const warning of warnings) {
+    const text = typeof warning === 'string' ? warning : `${warning?.name || ''} ${warning?.message || ''}`;
+    const severity = normalizeBackflowSeverity((warning as any)?.severity, inferBackflowSeverity(String(text)));
+    highest = maxBackflowSeverity(highest, severity === 'critical' ? 'high' : severity);
+    score += Math.max(4, Math.round(BACKFLOW_SEVERITY_SCORE[severity] * 0.45));
+  }
+
+  if (missingValidation) {
+    highest = maxBackflowSeverity(highest, 'high');
+    score += 22;
+  }
+  if (!overallPassed) {
+    highest = maxBackflowSeverity(highest, 'high');
+    score += 12;
+  }
+
+  return {
+    risk_score: backflowClamp(score, 0, 100),
+    highest_severity: highest,
+    failed_breakdown: failedBreakdown,
+  };
+}
+
+function mapFeedbackTypes(failedChecks: any[], warnings: any[], backflowType: string): {
+  source_type: 'failed_case' | 'low_confidence' | 'manual_flag';
+  trigger_type: 'failed_case' | 'low_confidence' | 'manual_flag';
+} {
+  if (failedChecks.length > 0 || backflowType === 'missing_validation') {
+    return { source_type: 'failed_case', trigger_type: 'failed_case' };
+  }
+  if (warnings.length > 0) {
+    return { source_type: 'low_confidence', trigger_type: 'low_confidence' };
+  }
+  return { source_type: 'manual_flag', trigger_type: 'manual_flag' };
+}
+
+function buildBackflowItems(args: {
+  failedChecks: any[];
+  warnings: any[];
+  validationId: string;
+  jobId: string;
+  modelId: string;
+  datasetId: string;
+  overallPassed: boolean;
+  riskSummary: string;
+}): Array<{
+  file_path: string;
+  reason: string;
+  confidence: number;
+  label_json: any;
+  source_task_id: string;
+  source_model_id: string;
+  source_dataset_id: string;
+  predicted_label: string;
+  ground_truth: string;
+}> {
+  const items: Array<{
+    file_path: string;
+    reason: string;
+    confidence: number;
+    label_json: any;
+    source_task_id: string;
+    source_model_id: string;
+    source_dataset_id: string;
+    predicted_label: string;
+    ground_truth: string;
+  }> = [];
+  const sourceTaskId = args.validationId || args.jobId;
+
+  for (let i = 0; i < args.failedChecks.length; i++) {
+    const fc = args.failedChecks[i] || {};
+    const name = String(fc.name || `failed_check_${i + 1}`);
+    const message = String(fc.message || 'validation check failed');
+    const severity = normalizeBackflowSeverity(fc.severity, inferBackflowSeverity(`${name} ${message}`));
+    const filePath = String(fc.file_path || fc.path || fc.artifact_path || '');
+    const confidence = backflowClamp(0.35 - (BACKFLOW_SEVERITY_RANK[severity] * 0.06), 0.01, 0.5);
+    items.push({
+      file_path: filePath,
+      reason: `[${severity}] ${name}: ${message}`,
+      confidence,
+      label_json: {
+        item_type: 'failed_check',
+        check_name: name,
+        severity,
+        payload: fc,
+      },
+      source_task_id: sourceTaskId,
+      source_model_id: args.modelId,
+      source_dataset_id: args.datasetId,
+      predicted_label: String(fc.predicted_label || ''),
+      ground_truth: String(fc.ground_truth || fc.expected || ''),
+    });
+  }
+
+  for (let i = 0; i < args.warnings.length; i++) {
+    const warning = args.warnings[i];
+    const asObj = warning && typeof warning === 'object' ? warning : null;
+    const text = asObj ? String(asObj.message || asObj.name || 'warning') : String(warning || 'warning');
+    const severity = normalizeBackflowSeverity(asObj?.severity, inferBackflowSeverity(text));
+    const filePath = asObj ? String(asObj.file_path || asObj.path || '') : '';
+    items.push({
+      file_path: filePath,
+      reason: `[warning:${severity}] ${text}`,
+      confidence: backflowClamp(0.55 - (BACKFLOW_SEVERITY_RANK[severity] * 0.04), 0.1, 0.75),
+      label_json: {
+        item_type: 'warning',
+        severity,
+        payload: warning,
+      },
+      source_task_id: sourceTaskId,
+      source_model_id: args.modelId,
+      source_dataset_id: args.datasetId,
+      predicted_label: '',
+      ground_truth: '',
+    });
+  }
+
+  if (items.length === 0 && !args.overallPassed) {
+    items.push({
+      file_path: '',
+      reason: `overall validation marked failed${args.riskSummary ? ` (${args.riskSummary})` : ''}`,
+      confidence: 0.4,
+      label_json: { item_type: 'overall_failed' },
+      source_task_id: sourceTaskId,
+      source_model_id: args.modelId,
+      source_dataset_id: args.datasetId,
+      predicted_label: '',
+      ground_truth: '',
+    });
+  }
+
+  return items;
+}
+
 async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean; output: any; error?: string }> {
   const db = getDatabase();
-  const { existsSync, statSync, mkdirSync, readFileSync, writeFileSync } = require('fs');
+  const { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs');
   const { join: pathJoin } = require('path');
   const rawInput = parseJsonField(step.input_json, 'input_json') || {};
 
@@ -3068,7 +3279,6 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
   const feedbackId = `fb-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   await logJob(db, step.job_id, step.id, 'info', `[feedback_backflow] Starting feedback backflow: ${feedbackId} for model ${modelId}`);
 
-  // ─── Resolve release info if not provided ───
   let resolvedReleaseId = releaseId;
   let resolvedVersion = version;
   let resolvedReleasePath = releasePath;
@@ -3076,9 +3286,9 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
   if (!resolvedReleaseId) {
     const releaseRow = db.prepare(`SELECT id, release_version, release_path FROM releases WHERE model_id = ? ORDER BY created_at DESC LIMIT 1`).get(modelId) as any;
     if (releaseRow) {
-      resolvedReleaseId = releaseRow.id;
-      resolvedVersion = releaseRow.release_version;
-      resolvedReleasePath = releaseRow.release_path;
+      resolvedReleaseId = String(releaseRow.id || '');
+      resolvedVersion = String(releaseRow.release_version || '');
+      resolvedReleasePath = String(releaseRow.release_path || '');
     }
   }
 
@@ -3086,59 +3296,53 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
     resolvedReleasePath = pathJoin('E:', 'AGI_Factory', 'releases', modelId, resolvedVersion);
   }
 
-  // ─── Resolve validation_report.json path ───
   let resolvedValidationReportPath = validationReportPath;
   if (!resolvedValidationReportPath && resolvedReleasePath) {
     resolvedValidationReportPath = pathJoin(resolvedReleasePath, 'validation', 'validation_report.json');
   }
 
-  // ─── Read validation_report.json if exists ───
   let validationReport: any = null;
   let failedChecks: any[] = [];
   let warnings: any[] = [];
-  let riskSummary: string = '';
+  let riskSummary = '';
   let overallPassed = true;
   let resolvedDatasetId = datasetId;
+  const hasValidationPath = Boolean(resolvedValidationReportPath);
+  const validationFileExists = hasValidationPath ? existsSync(resolvedValidationReportPath) : false;
 
-  if (resolvedValidationReportPath && existsSync(resolvedValidationReportPath)) {
+  if (validationFileExists) {
     try {
       const reportRaw = readFileSync(resolvedValidationReportPath, 'utf-8');
       validationReport = JSON.parse(reportRaw);
       failedChecks = (validationReport.checks || []).filter((c: any) => !c.passed);
-      warnings = (validationReport.warnings || []);
+      warnings = validationReport.warnings || [];
       overallPassed = validationReport.overall_passed !== false;
       riskSummary = validationReport.summary ? `${validationReport.summary.passed}/${validationReport.summary.total} checks passed` : '';
       if (validationReport.dataset_id && !resolvedDatasetId) {
-        resolvedDatasetId = validationReport.dataset_id;
+        resolvedDatasetId = String(validationReport.dataset_id);
       }
-      await logJob(db, step.job_id, step.id, 'info', `[feedback_backflow] Loaded validation report: ${failedChecks.length} failed, overall_passed=${overallPassed}`);
+      await logJob(db, step.job_id, step.id, 'info', `[feedback_backflow] Loaded validation report: ${failedChecks.length} failed, warnings=${warnings.length}`);
     } catch (err: any) {
-      await logJob(db, step.job_id, step.id, 'warn', `[feedback_backflow] Failed to read validation report: ${err.message}`);
+      await logJob(db, step.job_id, step.id, 'warn', `[feedback_backflow] Failed to parse validation report: ${err.message}`);
     }
   }
 
-  // ─── Determine backflow_type and priority ───
-  let backflowType: string;
-  let priority: string;
-
-  if (!validationReport && !existsSync(resolvedValidationReportPath || '')) {
+  let backflowType: 'missing_validation' | 'issue_feedback' | 'pass_summary' = 'pass_summary';
+  let priority: 'low' | 'medium' | 'high' = 'low';
+  if (!validationReport && !validationFileExists) {
     backflowType = 'missing_validation';
     priority = 'high';
-  } else if (failedChecks.length > 0) {
+  } else if (failedChecks.length > 0 || !overallPassed) {
     backflowType = 'issue_feedback';
     priority = 'high';
   } else if (warnings.length > 0) {
     backflowType = 'issue_feedback';
     priority = 'medium';
-  } else if (!overallPassed) {
-    backflowType = 'issue_feedback';
-    priority = 'high';
-  } else {
-    backflowType = 'pass_summary';
-    priority = 'low';
   }
 
-  // ─── Create feedback directory ───
+  const risk = computeBackflowRisk(failedChecks, warnings, !validationFileExists, overallPassed);
+  if (risk.risk_score >= 80) priority = 'high';
+
   const feedbackDir = pathJoin('E:', 'AGI_Factory', 'feedback', modelId, resolvedVersion || 'unknown', feedbackId);
   try {
     mkdirSync(feedbackDir, { recursive: true });
@@ -3147,12 +3351,90 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
     return { ok: false, output: null, error: `Failed to create feedback directory: ${err.message}` };
   }
 
-  // ─── Build feedback_record.json ───
+  const feedbackTypes = mapFeedbackTypes(failedChecks, warnings, backflowType);
+  const feedbackItems = buildBackflowItems({
+    failedChecks,
+    warnings,
+    validationId: validationId || String(validationReport?.validation_id || ''),
+    jobId: step.job_id,
+    modelId,
+    datasetId: resolvedDatasetId,
+    overallPassed,
+    riskSummary,
+  });
+
+  const retrainPolicy = {
+    auto_retrain: backflowBool(rawInput.auto_retrain, true),
+    force_retrain: backflowBool(rawInput.force_retrain, false),
+    min_failed_checks: Math.max(1, backflowNum(rawInput.retrain_min_failed_checks, 1)),
+    min_risk_score: backflowClamp(backflowNum(rawInput.retrain_min_risk_score, 70), 1, 100),
+    allow_warning_only: backflowBool(rawInput.retrain_allow_warning_only, false),
+    route_task_type: String(rawInput.retrain_route_task_type || 'retrain_trigger').trim() || 'retrain_trigger',
+  };
+
+  const hasRetrainContext = Boolean(experimentId && resolvedDatasetId);
+  const shouldAutoRetrain = retrainPolicy.force_retrain || (
+    retrainPolicy.auto_retrain &&
+    hasRetrainContext &&
+    backflowType !== 'pass_summary' &&
+    (
+      failedChecks.length >= retrainPolicy.min_failed_checks ||
+      risk.risk_score >= retrainPolicy.min_risk_score ||
+      (retrainPolicy.allow_warning_only && warnings.length > 0)
+    )
+  );
+
+  let retrainRouteBinding: any = null;
+  if (shouldAutoRetrain) {
+    const routeResult = resolveRoute({
+      task_type: retrainPolicy.route_task_type,
+      task_id: `${feedbackId}:retrain`,
+      input_json: {
+        budget_tier: rawInput.retrain_budget_tier || rawInput.budget_tier || 'medium',
+        estimated_cost: backflowNum(rawInput.retrain_estimated_cost, 0),
+        estimated_runtime_ms: backflowNum(rawInput.retrain_estimated_runtime_ms, 0),
+        estimated_tokens: backflowNum(rawInput.retrain_estimated_tokens, 0),
+        gpu_needed: backflowBool(rawInput.retrain_gpu_needed, true),
+        quality_priority: rawInput.retrain_quality_priority || 'high',
+        risk_level: risk.highest_severity,
+        data_sensitivity: rawInput.data_sensitivity || 'internal',
+        require_reliability: true,
+        model_id: modelId,
+        dataset_id: resolvedDatasetId,
+        experiment_id: experimentId,
+        feedback_id: feedbackId,
+      },
+    });
+    if (routeResult && routeResult.ok && 'decision' in routeResult) {
+      retrainRouteBinding = routeResult.decision;
+    } else {
+      const routeErr = routeResult && 'error' in routeResult ? routeResult.error : 'unknown error';
+      await logJob(db, step.job_id, step.id, 'warn', `[feedback_backflow] Auto-retrain route resolve failed: ${routeErr}`);
+    }
+  }
+
+  const retrainRecommendation = {
+    should_trigger: shouldAutoRetrain,
+    has_context: hasRetrainContext,
+    experiment_id: experimentId,
+    dataset_id: resolvedDatasetId,
+    policy: retrainPolicy,
+    route_binding: retrainRouteBinding ? {
+      decision_id: retrainRouteBinding.id,
+      route_type: retrainRouteBinding.route_type,
+      policy_id: retrainRouteBinding.policy_id,
+      route_reason: retrainRouteBinding.route_reason,
+    } : null,
+    reason: shouldAutoRetrain
+      ? 'risk threshold reached'
+      : (hasRetrainContext ? 'threshold not reached' : 'missing experiment_id/dataset_id'),
+  };
+
   const feedbackRecord = {
     feedback_id: feedbackId,
-    created_at: new Date().toISOString(),
+    created_at: now(),
     source: {
-      validation_id: validationId || (validationReport?.validation_id || ''),
+      validation_id: validationId || String(validationReport?.validation_id || ''),
       release_id: resolvedReleaseId,
       model_id: modelId,
       version: resolvedVersion,
@@ -3169,14 +3451,16 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
       failed_checks: validationReport.summary?.failed || 0,
     } : null,
     failed_checks: failedChecks,
-    warnings: warnings,
+    warnings,
     backflow_type: backflowType,
-    priority: priority,
+    priority,
+    risk,
+    feedback_items_count: feedbackItems.length,
+    retrain_recommendation: retrainRecommendation,
     job_id: step.job_id,
     step_id: step.id,
   };
 
-  // ─── Build feedback_summary.md ───
   const summaryLines: string[] = [
     `# Feedback Backflow Summary`,
     ``,
@@ -3184,31 +3468,55 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
     `**Model:** ${modelId}`,
     `**Version:** ${resolvedVersion || 'N/A'}`,
     `**Release ID:** ${resolvedReleaseId || 'N/A'}`,
-    `**Created:** ${new Date().toISOString()}`,
+    `**Created:** ${now()}`,
     ``,
     `## Status`,
     ``,
     `- **Backflow Type:** ${backflowType}`,
     `- **Priority:** ${priority}`,
     `- **Overall Passed:** ${overallPassed ? 'Yes' : 'No'}`,
+    `- **Risk Score:** ${risk.risk_score}`,
+    `- **Highest Severity:** ${risk.highest_severity}`,
+    `- **Feedback Items:** ${feedbackItems.length}`,
   ];
 
   if (validationReport) {
-    summaryLines.push(``, `## Validation Summary`, ``, `- Total Checks: ${validationReport.summary?.total || 0}`, `- Passed: ${validationReport.summary?.passed || 0}`, `- Failed: ${validationReport.summary?.failed || 0}`);
+    summaryLines.push(
+      ``,
+      `## Validation Summary`,
+      ``,
+      `- Total Checks: ${validationReport.summary?.total || 0}`,
+      `- Passed: ${validationReport.summary?.passed || 0}`,
+      `- Failed: ${validationReport.summary?.failed || 0}`,
+    );
   }
 
   if (failedChecks.length > 0) {
     summaryLines.push(``, `## Failed Checks`, ``);
-    for (const fc of failedChecks) {
-      summaryLines.push(`- **${fc.name}**: ${fc.message}`);
+    for (const fc of failedChecks.slice(0, 20)) {
+      summaryLines.push(`- **${fc.name || 'check'}**: ${fc.message || 'failed'}`);
     }
   }
 
   if (warnings.length > 0) {
     summaryLines.push(``, `## Warnings`, ``);
-    for (const w of warnings) {
-      summaryLines.push(`- ${w}`);
+    for (const warning of warnings.slice(0, 20)) {
+      if (typeof warning === 'string') summaryLines.push(`- ${warning}`);
+      else summaryLines.push(`- ${(warning as any)?.message || (warning as any)?.name || 'warning'}`);
     }
+  }
+
+  summaryLines.push(
+    ``,
+    `## Auto Retrain`,
+    ``,
+    `- Should Trigger: ${retrainRecommendation.should_trigger ? 'Yes' : 'No'}`,
+    `- Context Ready: ${retrainRecommendation.has_context ? 'Yes' : 'No'}`,
+    `- Reason: ${retrainRecommendation.reason}`,
+  );
+
+  if (retrainRecommendation.route_binding) {
+    summaryLines.push(`- Route: ${retrainRecommendation.route_binding.route_type} (${retrainRecommendation.route_binding.decision_id})`);
   }
 
   if (resolvedDatasetId) {
@@ -3216,24 +3524,29 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
   }
 
   const feedbackSummaryMd = summaryLines.join('\n');
+  const manifestStatus = backflowType === 'pass_summary' ? 'closed' : 'open';
+  const nextActions = retrainRecommendation.should_trigger
+    ? ['review_failed_checks', 'auto_retrain_trigger']
+    : (backflowType === 'issue_feedback' ? ['review_failed_checks', 'decide_retrain'] : ['archive']);
 
-  // ─── Build backflow_manifest.json ───
   const backflowManifest = {
     feedback_id: feedbackId,
     backflow_type: backflowType,
-    priority: priority,
+    priority,
     model_id: modelId,
     version: resolvedVersion,
     release_id: resolvedReleaseId,
-    validation_id: validationId || (validationReport?.validation_id || ''),
+    validation_id: validationId || String(validationReport?.validation_id || ''),
     dataset_id: resolvedDatasetId,
-    status: 'open',
-    created_at: new Date().toISOString(),
+    status: manifestStatus,
+    created_at: now(),
+    risk,
+    feedback_items_count: feedbackItems.length,
+    retrain_recommendation: retrainRecommendation,
     files: ['feedback_record.json', 'feedback_summary.md', 'backflow_manifest.json'],
-    next_actions: backflowType === 'issue_feedback' ? ['review_failed_checks', 'decide_retrain'] : ['archive'],
+    next_actions: nextActions,
   };
 
-  // ─── Write files ───
   try {
     writeFileSync(pathJoin(feedbackDir, 'feedback_record.json'), JSON.stringify(feedbackRecord, null, 2));
     writeFileSync(pathJoin(feedbackDir, 'feedback_summary.md'), feedbackSummaryMd);
@@ -3244,56 +3557,114 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
     return { ok: false, output: null, error: `Failed to write feedback files: ${err.message}` };
   }
 
-  // ─── Write to feedback_batches table ───
   try {
-    const notes = resolvedDatasetId ? `dataset_id=${resolvedDatasetId}` : '';
+    const notes = [
+      resolvedDatasetId ? `dataset_id=${resolvedDatasetId}` : '',
+      `risk_score=${risk.risk_score}`,
+      `severity=${risk.highest_severity}`,
+      retrainRecommendation.should_trigger ? `auto_retrain=1` : `auto_retrain=0`,
+    ].filter(Boolean).join('; ');
     db.prepare(`INSERT INTO feedback_batches (id, title, source_type, source_id, trigger_type, status, item_count, notes, created_at, updated_at)
-                VALUES (?, ?, 'validation', ?, 'auto', 'open', ?, ?, ?, ?)`).run(
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
       feedbackId,
       `Feedback for model ${modelId} v${resolvedVersion || 'unknown'}`,
-      validationId || (validationReport?.validation_id || ''),
-      failedChecks.length + warnings.length,
+      feedbackTypes.source_type,
+      validationId || String(validationReport?.validation_id || ''),
+      feedbackTypes.trigger_type,
+      manifestStatus,
+      feedbackItems.length,
       notes,
-      now(), now()
+      now(),
+      now(),
     );
     await logJob(db, step.job_id, step.id, 'info', `[feedback_backflow] Inserted feedback_batches record: ${feedbackId}`);
+
+    const insertItem = db.prepare(`
+      INSERT INTO feedback_items (
+        id, batch_id, file_path, label_json, reason, confidence,
+        source_task_id, source_model_id, source_dataset_id,
+        predicted_label, ground_truth, status, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+    `);
+    for (const item of feedbackItems) {
+      insertItem.run(
+        `fi-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        feedbackId,
+        item.file_path || '',
+        JSON.stringify(item.label_json || {}),
+        item.reason || '',
+        item.confidence || 0,
+        item.source_task_id || '',
+        item.source_model_id || '',
+        item.source_dataset_id || '',
+        item.predicted_label || '',
+        item.ground_truth || '',
+        now(),
+      );
+    }
+    if (feedbackItems.length > 0) {
+      await logJob(db, step.job_id, step.id, 'info', `[feedback_backflow] Inserted feedback_items: ${feedbackItems.length}`);
+    }
   } catch (err: any) {
-    await logJob(db, step.job_id, step.id, 'warn', `[feedback_backflow] Failed to insert feedback_batches: ${err.message}`);
+    await logJob(db, step.job_id, step.id, 'warn', `[feedback_backflow] Failed to persist feedback batch/items: ${err.message}`);
   }
 
-  // ─── Write to audit_logs ───
   try {
     db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
                 VALUES (?, 'workflow', 'feedback_backflow', ?, 'success', ?, ?)`).run(
       uuid(),
       modelId,
-      JSON.stringify({ feedback_id: feedbackId, backflow_type: backflowType, priority, release_id: resolvedReleaseId, version: resolvedVersion, dataset_id: resolvedDatasetId }),
-      now()
+      JSON.stringify({
+        feedback_id: feedbackId,
+        backflow_type: backflowType,
+        priority,
+        risk_score: risk.risk_score,
+        highest_severity: risk.highest_severity,
+        feedback_items: feedbackItems.length,
+        release_id: resolvedReleaseId,
+        version: resolvedVersion,
+        dataset_id: resolvedDatasetId,
+        retrain_recommendation: {
+          should_trigger: retrainRecommendation.should_trigger,
+          route_type: retrainRecommendation.route_binding?.route_type || '',
+          route_decision_id: retrainRecommendation.route_binding?.decision_id || '',
+        },
+      }),
+      now(),
     );
-    await logJob(db, step.job_id, step.id, 'info', `[feedback_backflow] Inserted audit_logs record`);
   } catch (err: any) {
     await logJob(db, step.job_id, step.id, 'warn', `[feedback_backflow] Failed to insert audit_logs: ${err.message}`);
   }
 
-  // ─── Return structured result ───
-  await logJob(db, step.job_id, step.id, 'info', `[feedback_backflow] Completed: ${feedbackId} (type=${backflowType}, priority=${priority})`);
+  await logJob(
+    db,
+    step.job_id,
+    step.id,
+    'info',
+    `[feedback_backflow] Completed: ${feedbackId} (type=${backflowType}, priority=${priority}, risk=${risk.risk_score})`,
+  );
 
   return {
     ok: true,
     output: {
       feedback_id: feedbackId,
       backflow_type: backflowType,
-      priority: priority,
+      priority,
+      risk_score: risk.risk_score,
+      highest_severity: risk.highest_severity,
       model_id: modelId,
       version: resolvedVersion,
       release_id: resolvedReleaseId,
-      validation_id: validationId || (validationReport?.validation_id || ''),
+      validation_id: validationId || String(validationReport?.validation_id || ''),
       dataset_id: resolvedDatasetId,
+      experiment_id: experimentId,
       feedback_dir: feedbackDir,
       files: ['feedback_record.json', 'feedback_summary.md', 'backflow_manifest.json'],
+      feedback_items_count: feedbackItems.length,
       failed_checks_count: failedChecks.length,
       warnings_count: warnings.length,
       overall_passed: overallPassed,
+      retrain_recommendation: retrainRecommendation,
     },
   };
 }
@@ -3314,13 +3685,77 @@ async function executeRetrainTrigger(step: StepRecord): Promise<{ ok: boolean; o
   const experimentId = String(rawInput.experiment_id || '').trim();
   const datasetId = String(rawInput.dataset_id || '').trim();
   if (!experimentId || !datasetId) return { ok: false, output: null, error: 'retrain_trigger requires experiment_id and dataset_id' };
+
   const triggerId = `retrain-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const reason = String(rawInput.reason || rawInput.trigger_reason || 'manual').trim() || 'manual';
+  const routeTaskType = String(rawInput.route_task_type || rawInput.cost_route_task_type || 'retrain_trigger').trim() || 'retrain_trigger';
+  const routeInput = rawInput.route_input_json && typeof rawInput.route_input_json === 'object'
+    ? rawInput.route_input_json
+    : {};
+
+  let routeBinding: any = null;
+  try {
+    const routeResult = resolveRoute({
+      task_type: routeTaskType,
+      task_id: triggerId,
+      input_json: {
+        ...routeInput,
+        budget_tier: rawInput.budget_tier || routeInput.budget_tier || 'medium',
+        estimated_cost: backflowNum(rawInput.estimated_cost ?? routeInput.estimated_cost, 0),
+        estimated_runtime_ms: backflowNum(rawInput.estimated_runtime_ms ?? routeInput.estimated_runtime_ms, 0),
+        estimated_tokens: backflowNum(rawInput.estimated_tokens ?? routeInput.estimated_tokens, 0),
+        gpu_needed: backflowBool(rawInput.gpu_needed ?? routeInput.gpu_needed, true),
+        quality_priority: rawInput.quality_priority || routeInput.quality_priority || 'high',
+        risk_level: normalizeBackflowSeverity(rawInput.risk_level || routeInput.risk_level || 'high'),
+        data_sensitivity: rawInput.data_sensitivity || routeInput.data_sensitivity || 'internal',
+        require_reliability: true,
+        experiment_id: experimentId,
+        dataset_id: datasetId,
+        trigger_source: String(rawInput.trigger_source || 'workflow'),
+      },
+    });
+    if (routeResult && routeResult.ok && 'decision' in routeResult) routeBinding = routeResult.decision;
+  } catch {}
+
+  const queuePriority = routeBinding?.route_type === 'cloud_high_capability'
+    ? 'high'
+    : (routeBinding?.route_type === 'local_low_cost' ? 'low' : 'medium');
+
   try {
     db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
                 VALUES (?, 'workflow', 'retrain_trigger', ?, 'success', ?, ?)`)
-      .run(uuid(), experimentId, JSON.stringify({ trigger_id: triggerId, dataset_id: datasetId, reason: rawInput.reason || 'manual' }), now());
+      .run(
+        uuid(),
+        experimentId,
+        JSON.stringify({
+          trigger_id: triggerId,
+          dataset_id: datasetId,
+          reason,
+          route_task_type: routeTaskType,
+          route_binding: routeBinding ? {
+            decision_id: routeBinding.id,
+            route_type: routeBinding.route_type,
+            policy_id: routeBinding.policy_id,
+          } : null,
+          queue_priority: queuePriority,
+        }),
+        now(),
+      );
   } catch {}
-return { ok: true, output: { trigger_id: triggerId, experiment_id: experimentId, dataset_id: datasetId, status: 'queued' } };
+
+  return {
+    ok: true,
+    output: {
+      trigger_id: triggerId,
+      experiment_id: experimentId,
+      dataset_id: datasetId,
+      reason,
+      status: 'queued',
+      queue_priority: queuePriority,
+      route_task_type: routeTaskType,
+      route_binding: routeBinding,
+    },
+  };
 }
 
 async function executeVideoSource(step: StepRecord): Promise<{ ok: boolean; output: any; error?: string }> {
@@ -4985,13 +5420,23 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
       feedback_id: `fb_${Date.now()}`,
       backflow_type: 'pass_summary',
       model_id: p.model_id,
+      risk_score: 8,
+      highest_severity: 'low',
+      retrain_recommendation: { should_trigger: false, reason: 'threshold not reached' },
     }),
     hardcase_feedback: (p) => ({
       feedback_count: 10,
       dataset_id: p.dataset_id,
     }),
     retrain_trigger: (p) => ({
-      new_experiment_id: `retrain_${Date.now()}`,
+      trigger_id: `retrain_${Date.now()}`,
+      experiment_id: p.experiment_id,
+      dataset_id: p.dataset_id,
+      status: 'queued',
+      route_binding: {
+        route_type: 'local_balanced',
+        policy_id: 'mock_policy',
+      },
     }),
   };
 
@@ -5270,10 +5715,51 @@ const STEP_DRYRUN_CHECKERS: Record<string, (input: Record<string, unknown>) => P
   feedback_backflow: async (input) => {
     const db = getDatabase();
     const modelId = String((input as any).model_id || '');
+    const items: DryRunCheckItem[] = [];
     if (!modelId) return { status: 'error', checkedItems: [{ code: 'MISSING_PARAM', item: 'model_id', status: 'error', message: 'Missing required param: model_id' }], blockedReason: 'model_id missing' };
     const model = db.prepare('SELECT model_id, status FROM models WHERE model_id = ?').get(modelId) as any;
     if (!model) return { status: 'error', checkedItems: [{ code: 'RESOURCE_NOT_FOUND', item: 'model', status: 'error', message: `model "${modelId}" not found in DB` }], blockedReason: 'model not found' };
-    return { status: 'ok', checkedItems: [{ code: 'RESOURCE_OK', item: 'model', status: 'ok', message: 'model exists' }], mockResult: 'feedback_backflow dry-run: all checks passed' };
+    items.push({ code: 'RESOURCE_OK', item: 'model', status: 'ok', message: 'model exists' });
+
+    const reportPath = String((input as any).validation_report_path || '');
+    if (reportPath) {
+      try {
+        const { existsSync } = require('fs');
+        if (existsSync(reportPath)) items.push({ code: 'FILE_OK', item: 'validation_report_path', status: 'ok', message: 'validation report file exists' });
+        else items.push({ code: 'FILE_NOT_FOUND', item: 'validation_report_path', status: 'warning', message: `validation report path not found: ${reportPath}` });
+      } catch {
+        items.push({ code: 'FILE_CHECK_SKIP', item: 'validation_report_path', status: 'warning', message: 'unable to check validation report path in dry-run' });
+      }
+    } else {
+      items.push({ code: 'PARAM_MISSING_OPTIONAL', item: 'validation_report_path', status: 'warning', message: 'validation_report_path not provided; runtime will attempt release-based resolution' });
+    }
+
+    const autoRetrain = backflowBool((input as any).auto_retrain, true);
+    if (autoRetrain) {
+      const experimentId = String((input as any).experiment_id || '');
+      const datasetId = String((input as any).dataset_id || '');
+      if (!experimentId || !datasetId) {
+        items.push({ code: 'PARAM_INCOMPLETE', item: 'auto_retrain_context', status: 'warning', message: 'auto_retrain enabled but experiment_id/dataset_id missing' });
+      } else {
+        if (!db.prepare('SELECT id FROM experiments WHERE id = ?').get(experimentId)) items.push({ code: 'RESOURCE_NOT_FOUND', item: 'experiment', status: 'error', message: `experiment "${experimentId}" not found` });
+        else items.push({ code: 'RESOURCE_OK', item: 'experiment', status: 'ok', message: 'experiment exists' });
+        if (!db.prepare('SELECT id FROM datasets WHERE id = ?').get(datasetId)) items.push({ code: 'RESOURCE_NOT_FOUND', item: 'dataset', status: 'error', message: `dataset "${datasetId}" not found` });
+        else items.push({ code: 'RESOURCE_OK', item: 'dataset', status: 'ok', message: 'dataset exists' });
+      }
+
+      const routeTaskType = String((input as any).retrain_route_task_type || 'retrain_trigger');
+      const policyCount = Number((db.prepare(`SELECT COUNT(*) as c FROM route_policies WHERE status = 'active' AND (task_type = ? OR task_type = '*')`).get(routeTaskType) as any)?.c || 0);
+      if (policyCount <= 0) items.push({ code: 'POLICY_MISSING', item: 'cost_routing', status: 'warning', message: `no active route policy for retrain task_type="${routeTaskType}" (will fallback)` });
+      else items.push({ code: 'POLICY_OK', item: 'cost_routing', status: 'ok', message: `${policyCount} active route policies available` });
+    } else {
+      items.push({ code: 'AUTO_RETRAIN_OFF', item: 'auto_retrain', status: 'ok', message: 'auto_retrain disabled by input' });
+    }
+
+    const hasError = items.some(i => i.status === 'error');
+    const hasWarning = items.some(i => i.status === 'warning');
+    if (hasError) return { status: 'error', checkedItems: items, blockedReason: items.filter(i => i.status === 'error').map(i => i.message).join('; ') };
+    if (hasWarning) return { status: 'warning', checkedItems: items, mockResult: 'feedback_backflow dry-run: warnings detected but executable' };
+    return { status: 'ok', checkedItems: items, mockResult: 'feedback_backflow dry-run: all checks passed' };
   },
   hardcase_feedback: async (input) => {
     const db = getDatabase();
@@ -5293,8 +5779,18 @@ const STEP_DRYRUN_CHECKERS: Record<string, (input: Record<string, unknown>) => P
     else items.push({ code: 'RESOURCE_OK', item: 'experiment', status: 'ok', message: 'experiment exists' });
     if (!db.prepare('SELECT id FROM datasets WHERE id = ?').get(datasetId)) items.push({ code: 'RESOURCE_NOT_FOUND', item: 'dataset', status: 'error', message: `dataset "${datasetId}" not found` });
     else items.push({ code: 'RESOURCE_OK', item: 'dataset', status: 'ok', message: 'dataset exists' });
+    const routeTaskType = String((input as any).route_task_type || (input as any).cost_route_task_type || 'retrain_trigger');
+    const routePolicyCount = Number((db.prepare(`SELECT COUNT(*) as c FROM route_policies WHERE status = 'active' AND (task_type = ? OR task_type = '*')`).get(routeTaskType) as any)?.c || 0);
+    if (routePolicyCount <= 0) items.push({ code: 'POLICY_MISSING', item: 'cost_routing', status: 'warning', message: `no active route policy for task_type="${routeTaskType}", runtime will fallback local_balanced` });
+    else items.push({ code: 'POLICY_OK', item: 'cost_routing', status: 'ok', message: `${routePolicyCount} route policies available` });
+    const routeInput = (input as any).route_input_json;
+    if (routeInput !== undefined && routeInput !== null && typeof routeInput !== 'object') {
+      items.push({ code: 'PARAM_FORMAT', item: 'route_input_json', status: 'warning', message: 'route_input_json should be an object' });
+    }
     const hasError = items.some(i => i.status === 'error');
-return hasError ? { status: 'error', checkedItems: items, blockedReason: items.filter(i => i.status === 'error').map(i => i.message).join('; ') } : { status: 'ok', checkedItems: items, mockResult: 'retrain_trigger dry-run: all checks passed' };
+    if (hasError) return { status: 'error', checkedItems: items, blockedReason: items.filter(i => i.status === 'error').map(i => i.message).join('; ') };
+    if (items.some(i => i.status === 'warning')) return { status: 'warning', checkedItems: items, mockResult: 'retrain_trigger dry-run: warnings detected but executable' };
+    return { status: 'ok', checkedItems: items, mockResult: 'retrain_trigger dry-run: all checks passed' };
   },
   video_source: async (input) => {
     const sourcePath = String((input as any).source_path || '');

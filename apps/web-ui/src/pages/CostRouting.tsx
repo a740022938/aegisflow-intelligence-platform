@@ -30,6 +30,43 @@ interface RouteDecision {
   created_at: string;
 }
 
+interface RouteStat {
+  route_type: RouteType;
+  decisions: number;
+  feedback_count: number;
+  success_rate: number | null;
+  avg_estimated_cost: number | null;
+  avg_actual_cost: number | null;
+  avg_latency_ms: number | null;
+  avg_quality_score: number | null;
+}
+
+interface RoutePolicyStat {
+  policy_id: string;
+  policy_name: string;
+  hits: number;
+  avg_score: number | null;
+}
+
+interface RouteInsightRec {
+  level: 'low' | 'medium' | 'high';
+  message: string;
+  suggestion: string;
+}
+
+interface CostRoutingInsights {
+  engine_version: string;
+  window: {
+    since_at: string;
+    since_hours: number;
+    sampled_decisions: number;
+  };
+  route_stats: RouteStat[];
+  policy_stats: RoutePolicyStat[];
+  top_task_types: Array<{ task_type: string; count: number }>;
+  recommendations: RouteInsightRec[];
+}
+
 function fmt(v?: string) {
   if (!v) return '暂无记录';
   try {
@@ -48,11 +85,14 @@ export default function CostRoutingPage() {
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [resolving, setResolving] = useState(false);
+  const [savingFeedback, setSavingFeedback] = useState(false);
+  const [loadingInsights, setLoadingInsights] = useState(false);
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
 
   const [policies, setPolicies] = useState<RoutePolicy[]>([]);
   const [decisions, setDecisions] = useState<RouteDecision[]>([]);
+  const [insights, setInsights] = useState<CostRoutingInsights | null>(null);
 
   const [selectedPolicyId, setSelectedPolicyId] = useState('');
   const [selectedPolicy, setSelectedPolicy] = useState<RoutePolicy | null>(null);
@@ -71,18 +111,39 @@ export default function CostRoutingPage() {
   const [simulateInputJson, setSimulateInputJson] = useState('{"budget":"low","gpu_needed":true}');
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
+  const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
+  const [feedbackCost, setFeedbackCost] = useState('');
+  const [feedbackLatency, setFeedbackLatency] = useState('');
+  const [feedbackQuality, setFeedbackQuality] = useState('');
+  const [feedbackNotes, setFeedbackNotes] = useState('');
 
   const stats = useMemo(() => {
-    const byRoute: Record<string, number> = {
+    const byRoutePolicy: Record<string, number> = {
       local_low_cost: 0,
       local_balanced: 0,
       cloud_high_capability: 0,
     };
     for (const p of policies) {
-      byRoute[p.route_type] = (byRoute[p.route_type] || 0) + 1;
+      byRoutePolicy[p.route_type] = (byRoutePolicy[p.route_type] || 0) + 1;
     }
-    return { total: policies.length, byRoute };
-  }, [policies]);
+    const byRouteDecision: Record<string, number> = {
+      local_low_cost: 0,
+      local_balanced: 0,
+      cloud_high_capability: 0,
+    };
+    for (const stat of insights?.route_stats || []) {
+      byRouteDecision[stat.route_type] = stat.decisions || 0;
+    }
+    const feedbackCount = (insights?.route_stats || []).reduce((acc, item) => acc + Number(item.feedback_count || 0), 0);
+    return {
+      policyTotal: policies.length,
+      decisionTotal: (insights?.window?.sampled_decisions || 0),
+      recommendationCount: insights?.recommendations?.length || 0,
+      feedbackCount,
+      byRoutePolicy,
+      byRouteDecision,
+    };
+  }, [policies, insights]);
 
   async function loadPolicies() {
     const res = await api('/api/route-policies?limit=200');
@@ -128,11 +189,24 @@ export default function CostRoutingPage() {
     setLoading(true);
     setError('');
     try {
-      await Promise.all([loadPolicies(), loadDecisions()]);
+      await Promise.all([loadPolicies(), loadDecisions(), loadInsights()]);
     } catch (e: any) {
       setError(e.message || '加载失败');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadInsights() {
+    setLoadingInsights(true);
+    try {
+      const res = await api('/api/cost-routing/insights?since_hours=168&limit=800');
+      if (!res.ok) throw new Error(res.error || '加载洞察失败');
+      setInsights(res.insights || null);
+    } catch (e: any) {
+      setError(e.message || '加载洞察失败');
+    } finally {
+      setLoadingInsights(false);
     }
   }
 
@@ -193,12 +267,45 @@ export default function CostRoutingPage() {
       const d = res.decision;
       setMsg(`路由命中: ${d.route_type} | reason: ${d.route_reason}`);
       setSelectedDecisionId(d.id);
-      await loadDecisions();
-      await loadDecisionDetail(d.id);
+      await Promise.all([loadDecisions(), loadDecisionDetail(d.id), loadInsights()]);
     } catch (e: any) {
       setError(e.message || '决策失败');
     } finally {
       setResolving(false);
+    }
+  }
+
+  async function handleAttachFeedback(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedDecisionId) {
+      setError('请先选择一条决策记录');
+      return;
+    }
+    setSavingFeedback(true);
+    setError('');
+    setMsg('');
+    try {
+      const payload: any = {
+        decision_id: selectedDecisionId,
+        outcome: feedbackOutcome,
+        notes: feedbackNotes,
+      };
+      if (feedbackCost.trim()) payload.actual_cost = Number(feedbackCost);
+      if (feedbackLatency.trim()) payload.latency_ms = Number(feedbackLatency);
+      if (feedbackQuality.trim()) payload.quality_score = Number(feedbackQuality);
+      const res = await api('/api/cost-routing/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(res.error || '反馈回填失败');
+      setMsg(`反馈回填成功: ${selectedDecisionId}`);
+      await Promise.all([loadDecisionDetail(selectedDecisionId), loadInsights()]);
+      setFeedbackNotes('');
+    } catch (e: any) {
+      setError(e.message || '反馈回填失败');
+    } finally {
+      setSavingFeedback(false);
     }
   }
 
@@ -225,8 +332,8 @@ export default function CostRoutingPage() {
   return (
     <div className="cost-routing-page page-root">
       <PageHeader
-        title="成本路由 v1（v6.4.0）"
-        subtitle="最小闭环：route policy 管理、任务类型命中、route_reason 留痕、最近命中记录"
+        title="成本路由 v2（强闭环）"
+        subtitle="多维打分路由 + 决策反馈回填 + 近7天策略洞察"
       />
 
       <div className={`cr-summary-panel role-card ${roleClass('gov')}`}>
@@ -234,19 +341,19 @@ export default function CostRoutingPage() {
         <div className="cr-summary-grid">
           <div className="cr-summary-item">
             <span className="cr-summary-key">策略总数</span>
-            <span className="cr-summary-val">{stats.total}</span>
+            <span className="cr-summary-val">{stats.policyTotal}</span>
           </div>
           <div className="cr-summary-item">
-            <span className="cr-summary-key">local_low_cost</span>
-            <span className="cr-summary-val">{stats.byRoute.local_low_cost}</span>
+            <span className="cr-summary-key">近7天决策</span>
+            <span className="cr-summary-val">{stats.decisionTotal}</span>
           </div>
           <div className="cr-summary-item">
-            <span className="cr-summary-key">local_balanced</span>
-            <span className="cr-summary-val">{stats.byRoute.local_balanced}</span>
+            <span className="cr-summary-key">回填反馈数</span>
+            <span className="cr-summary-val">{stats.feedbackCount}</span>
           </div>
           <div className="cr-summary-item">
-            <span className="cr-summary-key">cloud_high_capability</span>
-            <span className="cr-summary-val">{stats.byRoute.cloud_high_capability}</span>
+            <span className="cr-summary-key">建议条数</span>
+            <span className="cr-summary-val">{stats.recommendationCount}</span>
           </div>
         </div>
       </div>
@@ -349,12 +456,97 @@ export default function CostRoutingPage() {
                     <div><b>路由:</b> <StatusBadge s={selectedDecision.route_type} size="xs" /></div>
                     <div><b>原因:</b> {selectedDecision.route_reason}</div>
                     <div><b>创建时间:</b> {fmt(selectedDecision.created_at)}</div>
+                    <div><b>引擎:</b> {selectedDecision.input_json?.__routing?.engine_version || 'v1'}</div>
+                    <div><b>评分:</b> {selectedDecision.input_json?.__routing?.selected?.score_total ?? 'N/A'}</div>
+                    <div><b>主因子:</b> {(selectedDecision.input_json?.__routing?.selected?.dominant_factors || []).join(', ') || 'N/A'}</div>
+                    {selectedDecision.input_json?.__feedback?.latest ? (
+                      <div><b>最近反馈:</b> {selectedDecision.input_json.__feedback.latest.outcome} · cost={selectedDecision.input_json.__feedback.latest.actual_cost ?? 'N/A'} · latency={selectedDecision.input_json.__feedback.latest.latency_ms ?? 'N/A'}ms</div>
+                    ) : (
+                      <div><b>最近反馈:</b> 暂无</div>
+                    )}
                     <pre className="cr-json-box">{JSON.stringify(selectedDecision.input_json || {}, null, 2)}</pre>
                   </div>
                 )}
               </div>
             </div>
           </div>
+        </SectionCard>
+      </div>
+
+      <div className="cr-bottom-grid">
+        <SectionCard className={`role-card ${roleClass('gov')}`} title="路由洞察（近7天）">
+          {loadingInsights ? <EmptyState title="加载中" description="正在分析路由决策..." icon="⏳" /> : !insights ? <EmptyState title="暂无洞察" description="执行决策后可生成洞察。" icon="📉" /> : (
+            <div className="cr-insights-grid">
+              <div className="cr-insight-block">
+                <div className="cr-subtitle">按 route_type</div>
+                {(insights.route_stats || []).length === 0 ? <div className="cost-routing-policy-meta">暂无记录</div> : (
+                  <div className="cr-mini-table">
+                    {(insights.route_stats || []).map((item) => (
+                      <div className="cr-mini-row" key={item.route_type}>
+                        <span>{item.route_type}</span>
+                        <span>决策 {item.decisions}</span>
+                        <span>反馈 {item.feedback_count}</span>
+                        <span>成功率 {item.success_rate === null ? 'N/A' : `${Math.round(item.success_rate * 100)}%`}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="cr-insight-block">
+                <div className="cr-subtitle">策略命中 Top</div>
+                {(insights.policy_stats || []).length === 0 ? <div className="cost-routing-policy-meta">暂无记录</div> : (
+                  <div className="cr-mini-table">
+                    {(insights.policy_stats || []).slice(0, 8).map((item) => (
+                      <div className="cr-mini-row" key={item.policy_id}>
+                        <span>{item.policy_name}</span>
+                        <span>命中 {item.hits}</span>
+                        <span>均分 {item.avg_score === null ? 'N/A' : item.avg_score.toFixed(3)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="cr-insight-block">
+                <div className="cr-subtitle">优化建议</div>
+                {(insights.recommendations || []).length === 0 ? <div className="cost-routing-policy-meta">暂无建议</div> : (
+                  <div className="cr-rec-list">
+                    {(insights.recommendations || []).map((rec, i) => (
+                      <div className={`cr-rec-item level-${rec.level}`} key={`${rec.level}-${i}`}>
+                        <div><b>[{rec.level}]</b> {rec.message}</div>
+                        <div className="cost-routing-policy-meta">{rec.suggestion}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </SectionCard>
+
+        <SectionCard className={`role-card ${roleClass('exec')}`} title="决策反馈回填">
+          <form onSubmit={handleAttachFeedback} className="cr-form-grid">
+            <div className="cr-subtitle">对选中决策回填真实结果</div>
+            <div className="cr-dual-row">
+              <input className="ui-input" value={selectedDecisionId} disabled placeholder="请选择决策" />
+              <select className="ui-select" value={feedbackOutcome} onChange={(e) => setFeedbackOutcome(e.target.value as any)}>
+                <option value="success">success</option>
+                <option value="partial">partial</option>
+                <option value="failed">failed</option>
+                <option value="timeout">timeout</option>
+              </select>
+            </div>
+            <div className="cr-triple-row">
+              <input className="ui-input" value={feedbackCost} onChange={(e) => setFeedbackCost(e.target.value)} placeholder="actual_cost（可选）" />
+              <input className="ui-input" value={feedbackLatency} onChange={(e) => setFeedbackLatency(e.target.value)} placeholder="latency_ms（可选）" />
+              <input className="ui-input" value={feedbackQuality} onChange={(e) => setFeedbackQuality(e.target.value)} placeholder="quality_score 0~1（可选）" />
+            </div>
+            <textarea className="ui-textarea" rows={3} value={feedbackNotes} onChange={(e) => setFeedbackNotes(e.target.value)} placeholder="备注（可选）" />
+            <button className="ui-btn ui-btn-primary" type="submit" disabled={savingFeedback || !selectedDecisionId}>
+              {savingFeedback ? '回填中...' : '提交反馈回填'}
+            </button>
+          </form>
         </SectionCard>
       </div>
 
