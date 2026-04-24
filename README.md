@@ -61,6 +61,22 @@ pnpm run dev
 - Local API: `http://127.0.0.1:8787`
 - Health: `http://127.0.0.1:8787/api/health`
 
+## 数据库运维（新增）
+
+- 数据库采用 `migration-first` 启动策略，迁移目录默认：`packages/db/migrations-core`
+- 核心迁移已拆分为分层文件：`schema_tables` / `schema_indexes` / `schema_views`
+- 可通过环境变量覆盖迁移目录：`AIP_DB_MIGRATIONS_DIR`
+- 迁移执行包含 checksum 校验，防止同名迁移文件被静默篡改
+- 查看迁移状态：`pnpm run db:migrate:status`
+- 创建新迁移文件：`pnpm run db:migrate:new -- your_change_name`
+- 本地诊断：`pnpm run db:doctor`
+- 严格诊断（存在缺失索引即失败）：`pnpm run db:doctor:strict`
+- 运行时诊断接口：`GET /api/system/database/diagnostics`
+- Schema 漂移接口：`GET /api/system/database/schema-drift`
+- 迁移状态接口：`GET /api/system/database/migrations`
+- 维护接口：`POST /api/system/database/maintenance`（body: `{ "mode": "checkpoint|optimize|full" }`）
+- CI 质量门禁：`.github/workflows/quality-gate.yml`（typecheck/lint/db:init/db:doctor:strict）
+
 ## 目录结构（公开版）
 
 ```text

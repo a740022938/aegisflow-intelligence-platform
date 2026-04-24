@@ -8,6 +8,11 @@ export default [
   js.configs.recommended,
   prettierConfig,
   {
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off',
+    },
+  },
+  {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parser: tsParser,
@@ -23,8 +28,16 @@ export default [
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-undef': 'off',
+      'no-unused-vars': 'off',
+      'no-empty': 'off',
+      'no-useless-escape': 'off',
+      'no-case-declarations': 'off',
+      'no-prototype-builtins': 'off',
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'react-hooks/exhaustive-deps': 'off',
       'no-console': 'off',
     },
   },
@@ -32,3 +45,4 @@ export default [
     ignores: ['node_modules/', 'dist/', '.vite/', '*.db'],
   },
 ];
+

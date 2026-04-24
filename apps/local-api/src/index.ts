@@ -37,6 +37,7 @@ import { registerFeedbackRoutes } from './feedback/index.js';
 import { registerCostRoutingRoutes } from './cost-routing/index.js';
 import { registerOpsRoutes } from './ops/index.js';
 import { registerBrainRouterRoutes } from './brain-router/index.js';
+import { registerSystemRoutes } from './system/index.js';
 import * as visionBus from './vision-bus/index.js';
 import { registerClassifierRoutes } from './classifier/index.js';
 import { registerExperimentsRoutes } from './experiments/index.js';
@@ -3225,6 +3226,7 @@ registerCostRoutingRoutes(app);
 registerClassifierRoutes(app);   // v3.9.x: Classifier Verification CRUD
 registerOpsRoutes(app);
 registerBrainRouterRoutes(app); // Brain router V1
+registerSystemRoutes(app);
   experiments.registerExperimentsRoutes(app);
   models.registerModelsRoutes(app);
 
