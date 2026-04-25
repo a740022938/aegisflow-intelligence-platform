@@ -522,7 +522,7 @@ export function getEvaluationLineage(evaluationId: string) {
       if (cfg.config_id) {
         trainingConfig = db.prepare('SELECT * FROM training_configs WHERE id = ?').get(cfg.config_id) as any;
       }
-    } catch {}
+    } catch { /* safe */ }
   }
 
   // 6. Dataset

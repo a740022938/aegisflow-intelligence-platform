@@ -287,7 +287,7 @@ export async function getPromotionReadiness(id: string) {
       try {
         const summary = JSON.parse(evalRow.result_summary_json);
         hasReport = !!(summary.report_path || summary.eval_manifest_path);
-      } catch {}
+      } catch { /* safe */ }
     }
   }
 
@@ -348,7 +348,7 @@ export async function promoteArtifact(id: string, body: any = {}) {
       dbInstance.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
         VALUES (?, 'promotion', 'promote_to_candidate', ?, 'approval_required', ?, ?)`)
         .run(generateId(), id, JSON.stringify({ artifact_id: id, approval_id: approvalId, from_status: currentStatus, to_status: 'approval_required' }), nowStr);
-    } catch {}
+    } catch { /* safe */ }
 
     return {
       ok: true,
@@ -374,7 +374,7 @@ export async function promoteArtifact(id: string, body: any = {}) {
     dbInstance.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'promotion', 'promote_to_candidate', ?, 'candidate', ?, ?)`)
       .run(generateId(), id, JSON.stringify({ artifact_id: id, from_status: currentStatus, to_status: 'candidate', direct: true }), nowStr);
-  } catch {}
+  } catch { /* safe */ }
 
   return {
     ok: true,
@@ -415,7 +415,7 @@ export async function approvePromotion(artifactId: string, body: any = {}) {
     dbInstance.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'promotion', 'approve_promotion', ?, 'approved', ?, ?)`)
       .run(generateId(), artifactId, JSON.stringify({ artifact_id: artifactId, reviewed_by: reviewedBy, model_family: art.model_family }), nowStr);
-  } catch {}
+  } catch { /* safe */ }
 
   return { ok: true, promotion_status: 'approved', message: 'Promotion approved' };
 }
@@ -442,7 +442,7 @@ export async function rejectPromotion(artifactId: string, body: any = {}) {
     dbInstance.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'promotion', 'reject_promotion', ?, 'rejected', ?, ?)`)
       .run(generateId(), artifactId, JSON.stringify({ artifact_id: artifactId, reviewed_by: reviewedBy }), nowStr);
-  } catch {}
+  } catch { /* safe */ }
 
   return { ok: true, promotion_status: 'rejected', message: 'Promotion rejected' };
 }
@@ -550,21 +550,21 @@ export async function sealRelease(artifactId: string, body: any = {}) {
     dbInstance.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'release', 'seal_release', ?, 'sealed', ?, ?)`)
       .run(generateId(), artifactId, JSON.stringify({ release_id: releaseId, artifact_id: artifactId, model_id: targetModelId, sealed_by: sealedBy, release_name: releaseName }), nowStr);
-  } catch {}
+  } catch { /* safe */ }
 
   // Audit: manifest created
   try {
     dbInstance.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'release', 'manifest_created', ?, 'success', ?, ?)`)
       .run(generateId(), releaseId, JSON.stringify({ release_id: releaseId, artifact_id: artifactId }), nowStr);
-  } catch {}
+  } catch { /* safe */ }
 
   // Audit: release notes created
   try {
     dbInstance.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'release', 'release_notes_created', ?, 'success', ?, ?)`)
       .run(generateId(), releaseId, JSON.stringify({ release_id: releaseId, release_name: releaseName }), nowStr);
-  } catch {}
+  } catch { /* safe */ }
 
   return {
     ok: true,
@@ -832,7 +832,7 @@ function readJsonFile(path: string): any {
     if (fs.existsSync(path)) {
       return JSON.parse(fs.readFileSync(path, 'utf-8'));
     }
-  } catch {}
+  } catch { /* safe */ }
   return null;
 }
 
@@ -879,7 +879,7 @@ export function getArtifactReleasePackage(artifactId: string): ReleasePackageSta
   // Parse metrics
   let metrics: Record<string, any> = {};
   if (art.metrics_snapshot_json) {
-    try { metrics = JSON.parse(art.metrics_snapshot_json); } catch {}
+    try { metrics = JSON.parse(art.metrics_snapshot_json); } catch { /* safe */ }
   }
 
   // Release info
@@ -914,7 +914,7 @@ export function getArtifactReleasePackage(artifactId: string): ReleasePackageSta
             releaseInfo.package_storage_path = pkgDir;
             releaseInfo.package_present = true;
           }
-        } catch {}
+        } catch { /* safe */ }
       }
     }
   }
@@ -1233,7 +1233,7 @@ export function getReleaseDeliveryManifest(releaseId: string): ReleaseDeliveryMa
                   totalSize += stat.size;
                 }
               }
-            } catch {}
+            } catch { /* safe */ }
           };
           walk(pkgDir);
           pkgInfo = {
@@ -1244,7 +1244,7 @@ export function getReleaseDeliveryManifest(releaseId: string): ReleaseDeliveryMa
             contents: files,
           };
         }
-      } catch {}
+      } catch { /* safe */ }
     }
   }
 

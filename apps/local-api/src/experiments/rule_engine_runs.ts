@@ -1,4 +1,5 @@
 import { getDatabase } from '../db/builtin-sqlite.js';
+import { resolveWorkerPath, resolveRunDir } from '../python-runner.js';
 
 function genId()  { return crypto.randomUUID(); }
 function now()    { return new Date().toISOString(); }
@@ -236,14 +237,14 @@ export async function createRuleFromTracker(trackerRunId: string) {
   const { mkdirSync } = require('fs');
 
   const safeId = trackerRunId.replace(/[^a-zA-Z0-9]/g, '');
-  const outputDir = `E:\\AGI_Factory\\runs\\rule_engine_runs\\re_${safeId}`;
+  const outputDir = resolveRunDir('rule_engine', trackerRunId);
   const manifestOut = `${outputDir}\\rule_engine_manifest.json`;
   mkdirSync(outputDir, { recursive: true });
 
   try {
     const pythonCmd = [
       'python',
-      'E:\\AGI_Factory\\repo\\workers\\python-worker\\rule_engine_runner.py',
+      resolveWorkerPath('rule_engine_runner.py'),
       '--tracker-manifest', tr.manifest_path,
       '--output-dir', outputDir,
     ];

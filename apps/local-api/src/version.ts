@@ -11,7 +11,7 @@ function findPackageJson(startDir: string): string | null {
       try {
         const parsed = JSON.parse(fs.readFileSync(candidate, 'utf8')) as { name?: string };
         if (parsed.name === 'agi-model-factory') return candidate;
-      } catch {}
+      } catch { /* version file may not exist yet */ }
     }
     const parent = path.dirname(current);
     if (parent === current) return nearest;

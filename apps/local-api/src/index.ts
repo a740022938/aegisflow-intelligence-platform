@@ -1,5 +1,9 @@
 import fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
+import ws from '@fastify/websocket';
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
+import jwt from '@fastify/jwt';
 import { z } from 'zod';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -43,6 +47,32 @@ import { registerClassifierRoutes } from './classifier/index.js';
 import { registerExperimentsRoutes } from './experiments/index.js';
 import { registerModelsRoutes } from './models/index.js';
 import { APP_VERSION } from './version.js';
+import { metrics, registerMetricsRoute } from './observability/index.js';
+import { initWorkerPool, shutdownWorkerPool, getWorkerPool } from './worker-pool/index.js';
+import { getTaskQueue, initQueue } from './queue/index.js';
+import { registerOpenClawBridgeRoutes } from './openclaw-bridge/index.js';
+import { registerDigitalEmployeeRoutes } from './digital-employee/index.js';
+import { registerAuthRoutes, authMiddleware } from './auth/index.js';
+import { registerInferenceRoutes } from './inference/index.js';
+import { registerAlertingRoutes, startSystemHealthMonitor } from './alerting/index.js';
+import { registerExperimentCompareRoutes } from './experiments/compare.js';
+import { registerTrainingV2Routes } from './training-v2/index.js';
+import { registerStorageRoutes } from './storage-v2/index.js';
+import { registerSchedulerRoutes, stopScheduler } from './scheduler/index.js';
+import { registerAnnotationRoutes } from './annotation/index.js';
+import { registerHuggingFaceRoutes } from './huggingface/index.js';
+import { registerModelMonitorRoutes } from './model-monitor/index.js';
+import { registerDeploymentV2Routes } from './deployment-v2/index.js';
+import { registerWorkspaceRoutes } from './workspace/index.js';
+import { registerCostTrackerRoutes } from './cost-tracker/index.js';
+import { registerBackflowV2Routes } from './backflow-v2/index.js';
+import { registerDataChainRoutes } from './data-chain/index.js';
+import { registerDatasetVersionRoutes } from './dataset-versions/index.js';
+import { registerProductionObservationRoutes } from './production-observations/index.js';
+import { recordHealthCheck, recordMasterSwitch, recordHeartbeatReceived, getCoreStatus } from './core-monitor.js';
+import { registerWebSocketHub } from './ws-hub/index.js';
+import { registerModelLineageRoutes } from './model-lineage/index.js';
+import { registerNotifyRoutes } from './notify/index.js';
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -58,7 +88,9 @@ function loadEnvFile(filePath: string) {
       const value = line.slice(eq + 1).trim().replace(/^['"]|['"]$/g, '');
       if (!process.env[key]) process.env[key] = value;
     }
-  } catch {}
+  } catch (err) {
+    console.error(`[env] Failed to load ${filePath}:`, err);
+  }
 }
 
 function bootstrapLocalEnv() {
@@ -95,7 +127,9 @@ function restoreOpenClawTokens() {
         process.env.OPENCLAW_ADMIN_TOKEN = adminRow.value;
       }
     }
-  } catch {}
+  } catch (err) {
+    console.error('[openclaw] Failed to restore tokens from DB:', err);
+  }
 }
 restoreOpenClawTokens();
 
@@ -126,7 +160,9 @@ function bootstrapOpenClawTokenPersistence() {
     } else if (dbAdmin) {
       process.env.OPENCLAW_ADMIN_TOKEN = dbAdmin;
     }
-  } catch {}
+  } catch (err) {
+    console.error('[openclaw] Token bootstrap failed:', err?.message);
+  }
 }
 
 
@@ -195,11 +231,133 @@ const app: FastifyInstance = fastify({
   },
 });
 
+// 全局错误拦截器
+app.setErrorHandler((error: any, _request, reply) => {
+  const statusCode = error.statusCode || 500;
+  app.log.error({ err: error, url: _request.url }, `[${statusCode}] ${error.message}`);
+  reply.status(statusCode).send({
+    ok: false,
+    error: statusCode >= 500 ? 'Internal Server Error' : error.message,
+    code: error.code || 'UNKNOWN',
+    path: _request.url,
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // 注册CORS
 app.register(cors, {
-  origin: '*', // 开发环境允许所有来源
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 });
+
+// WebSocket
+app.register(ws);
+registerWebSocketHub(app);
+
+// Swagger/OpenAPI 文档
+app.register(swagger, {
+  openapi: {
+    info: { title: 'AegisFlow Intelligence Platform API', version: APP_VERSION, description: '天枢智治平台 — AI ML Pipeline 自动化管理 API' },
+    servers: [{ url: 'http://localhost:8787', description: 'Local dev' }],
+    components: { securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' } } },
+  },
+});
+app.register(swaggerUi, { routePrefix: '/docs', uiConfig: { docExpansion: 'list' } });
+
+// JWT 认证
+const JWT_SECRET = process.env.JWT_SECRET || 'aip-dev-jwt-secret-change-in-production';
+app.register(jwt, { secret: JWT_SECRET });
+authMiddleware(app);
+
+// 全局认证守卫: /api/* 路由除白名单外均需 JWT
+const PUBLIC_PATHS = new Set([
+  '/api/health', '/api/db/ping', '/api/metrics', '/api/auth/login',
+  '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2', '/api/openclaw/master-switch',
+  '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status',
+]);
+const DOCS_PREFIXES = ['/docs', '/swagger', '/openapi'];
+
+app.addHook('onRequest', async (request, reply) => {
+  const path = request.url?.split('?')[0] || '';
+  if (!path.startsWith('/api/')) return;
+  if (PUBLIC_PATHS.has(path)) return;
+  if (DOCS_PREFIXES.some(p => path.startsWith(p))) return;
+  try { await request.jwtVerify(); } catch { return reply.code(401).send({ ok: false, error: 'unauthorized' }); }
+});
+
+// 全局防缓存（防止浏览器缓存 API 响应导致显示过期数据）
+app.addHook('onSend', async (_request, reply, payload) => {
+  if (typeof payload === 'string' && reply.statusCode < 300) {
+    reply.header('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+  return payload;
+});
+
+// 注册可观测性中间件（请求指标收集）
+metrics.middleware(app);
+
+// 注册 Metrics 路由
+registerMetricsRoute(app);
+
+// 注册 OpenClaw 双向通信桥接路由
+registerOpenClawBridgeRoutes(app);
+
+// 注册数字员工路由
+registerDigitalEmployeeRoutes(app);
+
+// 注册认证路由
+registerAuthRoutes(app);
+
+// 注册推理 API 路由
+registerInferenceRoutes(app);
+
+// 注册告警路由 + 启动健康监控
+registerAlertingRoutes(app);
+startSystemHealthMonitor(app);
+
+// 注册实验对比路由
+registerExperimentCompareRoutes(app);
+
+// 注册训练 v2 路由 (多架构/超参搜索/蒸馏/合并)
+registerTrainingV2Routes(app);
+
+// 注册对象存储路由
+registerStorageRoutes(app);
+
+// 注册调度器路由 (Cron + 事件驱动)
+registerSchedulerRoutes(app);
+
+// 注册标注系统路由 (SAM 辅助)
+registerAnnotationRoutes(app);
+
+// 注册 HuggingFace 路由
+registerHuggingFaceRoutes(app);
+
+// 注册模型监控路由
+registerModelMonitorRoutes(app);
+
+// 注册部署管道 v2 路由
+registerDeploymentV2Routes(app);
+
+// 注册多租户/工作空间路由
+registerWorkspaceRoutes(app);
+
+// 注册成本追踪路由
+registerCostTrackerRoutes(app);
+
+// 注册回流 v2 路由 (漂移检测/错误分析/自动重训/模型合并建议)
+registerBackflowV2Routes(app);
+
+// 注册之前漏掉的模块路由
+registerDataChainRoutes(app);
+registerDatasetVersionRoutes(app);
+registerProductionObservationRoutes(app);
+
+// 模型血缘 & 注册中心
+registerModelLineageRoutes(app);
+
+// 通知系统 (Telegram)
+registerNotifyRoutes(app);
 
 // OpenClaw 旧路径显式兼容（防止客户端命中 /openclaw/* 返回 404）
 app.get('/openclaw/master-switch', async (_request: any, reply: any) => {
@@ -324,7 +482,9 @@ function writeOpenClawEvent(eventType: string, actor: string, reason: string, be
       JSON.stringify(afterState || {}),
       nowIso(),
     );
-  } catch {}
+  } catch (err) {
+    console.error('[openclaw] Failed to write event:', err);
+  }
 }
 
 function writeOpenClawAudit(action: string, target: string, result: 'success' | 'failed' | 'partial', detail: Record<string, any>) {
@@ -334,7 +494,9 @@ function writeOpenClawAudit(action: string, target: string, result: 'success' | 
       INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'openclaw', ?, ?, ?, ?, ?)
     `).run(crypto.randomUUID(), action, target, result, JSON.stringify(detail || {}), nowIso());
-  } catch {}
+  } catch (err) {
+    console.error('[openclaw] Failed to write audit:', err);
+  }
 }
 
 function buildOpenClawStatus(row: any) {
@@ -390,6 +552,7 @@ function buildOpenClawStatus(row: any) {
 }
 
 app.get('/api/openclaw/master-switch', async (request: any, reply: any) => {
+  reply.header('Cache-Control', 'no-store, no-cache, must-revalidate');
   const row = getOpenClawControlRow();
   const state = serializeOpenClawState(row);
   const status = buildOpenClawStatus(row);
@@ -646,25 +809,38 @@ app.get('/api/deployments/:id/health', async (request: any, reply: any) => {
   return result;
 });
 
-// Health check interface
+// Health check interface (enhanced)
 app.get('/api/health', async (request, reply) => {
   app.log.info('Health check requested');
   try {
     const dbInstance = db.getDatabase();
     const since24h = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
-    const jTotal = (dbInstance.prepare(`SELECT COUNT(*) as c FROM workflow_jobs`).get() as any).c;
-    const jFailed = (dbInstance.prepare(`SELECT COUNT(*) as c FROM workflow_jobs WHERE status = 'failed' AND updated_at >= '${since24h}'`).get() as any).c;
-    const jPaused = (dbInstance.prepare(`SELECT COUNT(*) as c FROM workflow_jobs WHERE status = 'paused'`).get() as any).c;
-    const aPending = (dbInstance.prepare(`SELECT COUNT(*) as c FROM approvals WHERE status = 'pending'`).get() as any).c;
-    const retryLimit = (dbInstance.prepare(`SELECT COUNT(*) as c FROM audit_logs WHERE action = 'workflow_retry_limit_exceeded' AND created_at >= '${since24h}'`).get() as any).c;
-    const staleRecon = (dbInstance.prepare(`SELECT COUNT(*) as c FROM audit_logs WHERE action = 'workflow_reconcile_stale' AND created_at >= '${since24h}'`).get() as any).c;
+    const jTotal = (dbInstance.prepare('SELECT COUNT(*) as c FROM workflow_jobs').get() as any).c;
+    const jFailed = (dbInstance.prepare('SELECT COUNT(*) as c FROM workflow_jobs WHERE status = ? AND updated_at >= ?').get('failed', since24h) as any)?.c || 0;
+    const jPaused = (dbInstance.prepare('SELECT COUNT(*) as c FROM workflow_jobs WHERE status = ?').get('paused') as any)?.c || 0;
+    const aPending = (dbInstance.prepare('SELECT COUNT(*) as c FROM approvals WHERE status = ?').get('pending') as any)?.c || 0;
+    const retryLimit = (dbInstance.prepare('SELECT COUNT(*) as c FROM audit_logs WHERE action = ? AND created_at >= ?').get('workflow_retry_limit_exceeded', since24h) as any)?.c || 0;
+    const staleRecon = (dbInstance.prepare('SELECT COUNT(*) as c FROM audit_logs WHERE action = ? AND created_at >= ?').get('workflow_reconcile_stale', since24h) as any)?.c || 0;
+
+    const dbStats = db.getDbStats();
+    const workerPoolStats = getWorkerPool().getStats();
+    const queueStats = getTaskQueue().getStats();
+
     return {
       ok: true,
       service: 'local-api',
       timestamp: new Date().toISOString(),
       version: APP_VERSION,
       uptime: process.uptime(),
-      database: 'ok',
+      database: {
+        status: 'ok',
+        path: dbStats.dbPath,
+        queries: dbStats.totalQueries,
+        errors: dbStats.totalErrors,
+        journalMode: dbStats.journalMode,
+      },
+      workerPool: workerPoolStats,
+      taskQueue: queueStats,
       workflows: { total: jTotal, failed_24h: jFailed, paused: jPaused },
       approvals: { pending: aPending },
       incidents: { retry_limit_exceeded_24h: retryLimit, stale_reconciled_24h: staleRecon },
@@ -2915,17 +3091,113 @@ const start = async () => {
     // 初始化数据库连接（延迟加载，不立即连接）
     app.log.info('Database connection will be initialized on first request...');
     bootstrapOpenClawTokenPersistence();
+
+    // 初始化 Worker 池
+    try {
+      await initWorkerPool();
+      app.log.info('✅ Worker pool initialized');
+    } catch (wpErr) {
+      app.log.warn(`Worker pool init skipped: ${wpErr}`);
+    }
+
+    // 初始化任务队列
+    try {
+      initQueue();
+      app.log.info('✅ Task queue initialized');
+    } catch (qErr) {
+      app.log.warn(`Task queue init skipped: ${qErr}`);
+    }
     
     await app.listen({ port: PORT, host: HOST });
     
+    // ── Internal OpenClaw heartbeat ─────────────────────────────────
+    if (process.env.OPENCLAW_HEARTBEAT_TOKEN) {
+      const HEARTBEAT_INTERVAL = parseInt(process.env.OPENCLAW_HEARTBEAT_INTERVAL || '15', 10) * 1000;
+      const ocBase = process.env.OPENCLAW_BASE_URL || 'http://127.0.0.1:18789';
+      const hbToken = process.env.OPENCLAW_HEARTBEAT_TOKEN;
+      let hbCount = 0;
+
+      const sendHeartbeat = async () => {
+        try {
+          // Update local heartbeat timestamp (keeps AIP showing 'online')
+          const hbDb = db.getDatabase();
+          const now = new Date().toISOString();
+          hbDb.prepare(`UPDATE openclaw_control SET last_heartbeat_at = ?, updated_at = ? WHERE id = 1`).run(now, now);
+
+          // Push event to OpenClaw gateway (if reachable)
+          await fetch(`${ocBase}/api/aip/event`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-openclaw-token': hbToken },
+            body: JSON.stringify({
+              event_type: 'heartbeat_status',
+              source: 'aip',
+              payload: {
+                uptime: process.uptime(),
+                version: APP_VERSION,
+                workerPool: getWorkerPool().getStats(),
+                taskQueue: getTaskQueue().getStats(),
+              },
+              timestamp: now,
+            }),
+            signal: AbortSignal.timeout(3000),
+          }).catch(() => {});
+
+          hbCount++;
+        } catch { /* safe */ }
+      };
+
+      // Send immediately on startup + repeat every interval
+      sendHeartbeat();
+      setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
+      app.log.info(`[heartbeat] Internal heartbeat active (every ${HEARTBEAT_INTERVAL/1000}s)`);
+    }
+
     app.log.info(`✅ Server started successfully`);
     app.log.info(`📡 Listening on http://${HOST}:${PORT}`);
     app.log.info(`🔗 Health check: http://${HOST}:${PORT}/api/health`);
+    app.log.info(`📊 Metrics: http://${HOST}:${PORT}/api/metrics`);
+    app.log.info(`📚 API Docs: http://${HOST}:${PORT}/docs`);
+    app.log.info(`🔌 OpenClaw Bridge: http://${HOST}:${PORT}/api/openclaw/capabilities`);
+    app.log.info(`🤖 System Status: http://${HOST}:${PORT}/api/system/status`);
+    app.log.info(`👤 Digital Employee: http://${HOST}:${PORT}/api/employee/dashboard`);
+    app.log.info(`🔐 Auth Login: POST /api/auth/login`);
+    app.log.info(`🧠 Model Inference: POST /api/infer`);
+    app.log.info(`🎯 Training v2: POST /api/training/v2/jobs (YOLO/ViT/BERT/LLM/LoRA)`);
+    app.log.info(`🔬 HPO: POST /api/training/v2/jobs (超参自动搜索)`);
+    app.log.info(`🧪 Distill: POST /api/training/v2/distill (知识蒸馏)`);
+    app.log.info(`🔗 Merge: POST /api/training/v2/merge (模型合并)`);
+    app.log.info(`🔔 Alerting: GET /api/alerting/channels`);
+    app.log.info(`📦 Storage v2: POST /api/storage/v2/datasets (MinIO/S3/Local)`);
+    app.log.info(`⏰ Scheduler: POST /api/scheduler/jobs (Cron/Interval)`);
+    app.log.info(`🏷️  Annotation: POST /api/annotation/projects (SAM 辅助)`);
+    app.log.info(`🤗 HuggingFace: POST /api/hub/pull`);
+    app.log.info(`📊 Model Monitor: POST /api/monitor/metrics`);
+    app.log.info(`🚀 Deploy v2: POST /api/deploy/v2/endpoints (Canary/Rollback)`);
+    app.log.info(`👥 Workspace: POST /api/ws/teams (Multi-tenant)`);
+    app.log.info(`💰 Cost Tracker: POST /api/cost/record`);
+    app.log.info(`🔄 Backflow v2: POST /api/backflow/v2/analyze (漂移检测+自动重训)`);
     app.log.info(`🗄️  Database test: http://${HOST}:${PORT}/api/db/ping`);
     
     // 优雅关闭处理
     const shutdown = async (signal: string) => {
       app.log.info(`Received ${signal}, shutting down gracefully...`);
+      
+      // 关闭 Worker 池
+      try {
+        await shutdownWorkerPool();
+        app.log.info('Worker pool shut down');
+      } catch (wpErr) {
+        app.log.error(`Error shutting down worker pool: ${wpErr}`);
+      }
+      try {
+        const { stopSystemHealthMonitor } = await import('./alerting/index.js');
+        stopSystemHealthMonitor();
+        app.log.info('Health monitor stopped');
+      } catch { }
+      try {
+        stopScheduler();
+        app.log.info('Scheduler stopped');
+      } catch { }
       
       // 关闭数据库连接
       try {
@@ -3277,11 +3549,12 @@ function walkFiles(root: string, match: (name: string) => boolean, out: string[]
 }
 
 function getLatestRealBackup(): RealBackupView | null {
+  const dataRoot = process.env.AGI_FACTORY_ROOT || process.env.AIP_REPO_ROOT || '';
   const backupRoots = [
     path.resolve(process.cwd(), 'backups'),
     path.resolve(process.cwd(), '..', 'backups'),
     path.resolve(process.cwd(), '../..', 'backups'),
-    'E:\\AGI_Factory\\backups',
+    dataRoot ? `${dataRoot}\\backups` : 'E:\\AGI_Factory\\backups',
   ];
   const existingRoots = backupRoots.filter((p) => fs.existsSync(p));
   if (existingRoots.length === 0) return null;
@@ -3314,13 +3587,15 @@ function getLatestRealBackup(): RealBackupView | null {
         zip_path: zipPath,
         recovery_commands: {
           db_restore: dbSnapshotPath
-            ? `Copy-Item "${dbSnapshotPath}" "E:\\AGI_Factory\\repo\\packages\\db\\agi_factory.db" -Force`
+            ? `Copy-Item "${dbSnapshotPath}" "<project-root>\\packages\\db\\agi_factory.db" -Force`
             : 'N/A',
           verify: 'python scripts/recovery_verify.py',
           regression: 'python scripts/regression_v500.py',
         },
       };
-    } catch {}
+    } catch (err) {
+      console.error('[seal] Seal summary error:', err?.message);
+    }
   }
   return null;
 }
@@ -3607,7 +3882,7 @@ app.get('/api/plugins/pool', async (request: any, reply: any) => {
         if (Array.isArray(reg?.capabilities)) return reg.capabilities;
         if (typeof reg?.capabilities === 'string') return JSON.parse(reg.capabilities);
         if (typeof reg?.capability === 'string') return [reg.capability];
-      } catch {}
+      } catch { /* safe */ }
       return [];
     })();
     return {
@@ -4043,6 +4318,41 @@ app.get('/api/health/risks', async (request: any, reply: any) => {
         ? 'Some items need attention. Review details above.' 
         : 'Issues detected. Please address before proceeding.',
   };
+});
+
+// ── System Status ────────────────────────────────────────────────────────────
+app.get('/api/system/status', async (_request, reply) => {
+  const dbStats = db.getDbStats();
+  const wpStats = getWorkerPool().getStats();
+  const qStats = getTaskQueue().getStats();
+  return {
+    ok: true,
+    version: APP_VERSION,
+    node: process.version,
+    platform: process.platform,
+    uptime: process.uptime(),
+    database: dbStats,
+    workerPool: wpStats,
+    taskQueue: qStats,
+    memory: {
+      rss: Math.round(process.memoryUsage().rss / 1024 / 1024) + 'MB',
+      heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
+    },
+    env: {
+      NODE_ENV: process.env.NODE_ENV || 'development',
+      AIP_REPO_ROOT: process.env.AIP_REPO_ROOT || 'auto',
+      AGI_FACTORY_ROOT: process.env.AGI_FACTORY_ROOT || 'auto',
+      WORKER_POOL_MIN: process.env.WORKER_POOL_MIN || '2',
+      WORKER_POOL_MAX: process.env.WORKER_POOL_MAX || '8',
+      QUEUE_CONCURRENCY: process.env.QUEUE_CONCURRENCY || '4',
+    },
+  };
+});
+
+// ── 核心链路监控 ─────────────────────────────────────────────────────────
+app.get('/api/core/status', async (_request, reply) => {
+  const cs = getCoreStatus();
+  return { ok: true, core: cs };
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────────

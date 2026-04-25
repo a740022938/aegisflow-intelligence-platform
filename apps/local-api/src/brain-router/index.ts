@@ -42,7 +42,9 @@ function writeAudit(action: string, target: string, result: 'success' | 'failed'
       INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'brain_router', ?, ?, ?, ?, ?)
     `).run(crypto.randomUUID(), action, target, result, JSON.stringify(detail || {}), nowIso());
-  } catch {}
+  } catch (err) {
+    console.error('[brain-router] Audit write failed:', err?.message);
+  }
 }
 
 function enforceWriteGuard(sourcePath?: string) {
@@ -55,7 +57,8 @@ function enforceWriteGuard(sourcePath?: string) {
 }
 
 function buildDatasetPipeline(input: z.infer<typeof produceSchema>) {
-  const sourcePath = String(input.source_path || 'E:/AGI_Factory/outputs/test_video.mp4');
+  const dataRoot = process.env.AGI_FACTORY_ROOT || process.env.AIP_REPO_ROOT || '';
+  const sourcePath = String(input.source_path || (dataRoot ? `${dataRoot}/outputs/test_video.mp4` : '/data/outputs/test_video.mp4'));
   const datasetId = String(input.dataset_id || `auto_ds_${Date.now()}`);
   const experimentId = String(input.experiment_id || `auto_exp_${Date.now()}`);
   return {

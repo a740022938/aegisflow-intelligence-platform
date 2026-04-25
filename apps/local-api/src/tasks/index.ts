@@ -138,7 +138,7 @@ function ensureTaskColumns() {
   if (!columnSet.has('output_summary')) migrationStatements.push('ALTER TABLE tasks ADD COLUMN output_summary TEXT');
   if (!columnSet.has('error_message')) migrationStatements.push('ALTER TABLE tasks ADD COLUMN error_message TEXT');
 
-  migrationStatements.forEach(sql => { try { db.exec(sql); } catch {} });
+  migrationStatements.forEach(sql => { try { db.exec(sql); } catch { /* safe */ } });
   schemaEnsured = true;
 }
 

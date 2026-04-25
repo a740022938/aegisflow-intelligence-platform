@@ -28,4 +28,17 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'chart-vendor': ['recharts', '@xyflow/react'],
+          'ui-vendor': ['lucide-react', 'react-grid-layout'],
+          'data-vendor': ['@tanstack/react-query', 'zustand', 'axios'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 500,
+  },
 });

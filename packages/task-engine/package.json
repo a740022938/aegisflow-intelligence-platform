@@ -1,0 +1,8 @@
+{
+  "name": "@agi-factory/task-engine",
+  "version": "6.8.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "description": "Task execution engine for AIP (stub - TODO: implement)"
+}

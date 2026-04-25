@@ -1,5 +1,6 @@
 import { getDatabase } from '../db/builtin-sqlite.js';
 import { logAudit } from '../audit/index.js';
+import { resolveWorkerPath, resolveRunDir } from '../python-runner.js';
 
 function genId()  { return crypto.randomUUID(); }
 function now()    { return new Date().toISOString(); }
@@ -275,7 +276,7 @@ export async function autoCreateFromExperiment(experimentId: string) {
   // Call sam_handoff_builder.py via temp JSON file to avoid Windows shell quoting issues
   const { execSync } = require('child_process');
   const { writeFileSync, mkdirSync, existsSync } = require('fs');
-  const runDir = `E:\\AGI_Factory\\runs\\handoff_${experimentId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const runDir = resolveRunDir('handoff', experimentId);
   const manifestOut = `${runDir}\\sam_handoff_manifest.json`;
   const metricsFile = `${runDir}\\_metrics_tmp.json`;
 
@@ -286,7 +287,7 @@ export async function autoCreateFromExperiment(experimentId: string) {
     // Build command — only push optional args with non-empty values
     const pythonCmd = [
       'python',
-      'E:\\AGI_Factory\\repo\\workers\\python-worker\\sam_handoff_builder.py',
+      resolveWorkerPath('sam_handoff_builder.py'),
       '--metrics-file', metricsFile,
       '--output-dir', runDir,
       '--source-experiment-id', experimentId,

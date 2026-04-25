@@ -26,6 +26,7 @@ const PluginPool = lazy(() => import('./pages/PluginPool'));
 const PluginCanvas = lazy(() => import('./pages/PluginCanvas'));
 const ModuleCenter = lazy(() => import('./pages/ModuleCenter'));
 const WorkflowComposer = lazy(() => import('./pages/workflow-composer/WorkflowComposer'));
+const ModulePage = lazy(() => import('./pages/ModulePage'));
 
 function RouteFallback() {
   return (
@@ -98,6 +99,25 @@ const App: React.FC = () => {
             <Route path="plugin-canvas" element={<PluginCanvas />} />
             <Route path="workflow-composer" element={<WorkflowComposer />} />
             <Route path="audit" element={<Audit />} />
+            {/* ── 新模块占位页 ── */}
+            <Route path="digital-employee" element={<ModulePage />} />
+            <Route path="training-v2" element={<ModulePage />} />
+            <Route path="hpo" element={<ModulePage />} />
+            <Route path="distill" element={<ModulePage />} />
+            <Route path="model-merge" element={<ModulePage />} />
+            <Route path="inference" element={<ModulePage />} />
+            <Route path="annotation" element={<ModulePage />} />
+            <Route path="huggingface" element={<ModulePage />} />
+            <Route path="backflow-v2" element={<ModulePage />} />
+            <Route path="scheduler" element={<ModulePage />} />
+            <Route path="alerting" element={<ModulePage />} />
+            <Route path="model-monitor" element={<ModulePage />} />
+            <Route path="deploy-v2" element={<ModulePage />} />
+            <Route path="workspace" element={<ModulePage />} />
+            <Route path="cost-tracker" element={<ModulePage />} />
+            <Route path="storage-v2" element={<ModulePage />} />
+            <Route path="system-status" element={<ModulePage />} />
+            <Route path="api-docs" element={<ModulePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

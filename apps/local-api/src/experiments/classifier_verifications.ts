@@ -1,4 +1,5 @@
 import { getDatabase } from '../db/builtin-sqlite.js';
+import { resolveWorkerPath, resolveRunDir } from '../python-runner.js';
 
 function genId()  { return crypto.randomUUID(); }
 function now()    { return new Date().toISOString(); }
@@ -222,14 +223,14 @@ export async function createVerificationFromSegmentation(segmentationId: string)
   const { execSync } = require('child_process');
   const { mkdirSync } = require('fs');
 
-  const outputDir = `E:\\AGI_Factory\\runs\\classifier_verifications\\cv_${segmentationId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const outputDir = resolveRunDir('classifier_verif', segmentationId);
   const manifestOut = `${outputDir}\\classifier_verification_manifest.json`;
   mkdirSync(outputDir, { recursive: true });
 
   try {
     const pythonCmd = [
       'python',
-      'E:\\AGI_Factory\\repo\\workers\\python-worker\\classifier_runner.py',
+      resolveWorkerPath('classifier_runner.py'),
       '--manifest', seg.manifest_path,
       '--output-dir', outputDir,
       '--model-type', 'resnet18',

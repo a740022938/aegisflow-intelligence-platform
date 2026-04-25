@@ -10,6 +10,10 @@ import { logAudit } from '../audit/index.js';
 import { resolveRoute } from '../cost-routing/index.js';
 import { autoCreateFromExperiment } from '../experiments/patch_sets.js';
 
+function resolveDataRoot(): string {
+  return process.env.AGI_FACTORY_ROOT || process.env.AIP_REPO_ROOT || 'E:\\AGI_Factory';
+}
+
 function resolveRepoRoot(pathMod: any, fsMod: any): string {
   const candidates = [
     process.env.AIP_REPO_ROOT,
@@ -1279,7 +1283,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
         try {
           const meta = typeof dsRecord.meta_json === 'string' ? JSON.parse(dsRecord.meta_json) : dsRecord.meta_json;
           if (meta.dataset_yaml) datasetYaml = String(meta.dataset_yaml);
-        } catch {}
+        } catch { /* safe */ }
       }
       if (!datasetYaml && dsRecord?.storage_path) {
         const candidateYaml = path.join(String(dsRecord.storage_path), 'data.yaml');
@@ -1295,7 +1299,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
           resolvedInput.dataset_yaml ? `input.dataset_yaml=${resolvedInput.dataset_yaml}` : '',
           dsRecord?.meta_json ? 'meta_json.dataset_yaml' : '',
           dsRecord?.storage_path ? `${dsRecord.storage_path}/data.yaml` : '',
-          `E:\\AGI_Factory\\datasets\\${dataset_id}\\data.yaml`,
+          `${resolveDataRoot()}\\datasets\\${dataset_id}\\data.yaml`,
         ].filter(Boolean).join(', ');
         const errMsg = `[dataset_yaml not found] Cannot start real YOLO training for dataset_id="${dataset_id}". Searched: ${searchPaths}. Ensure dataset has a valid data.yaml or set dataset_yaml in input/meta_json.`;
         await logJob(db, step.job_id, step.id, 'error', errMsg);
@@ -1713,7 +1717,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
         try {
           const meta = typeof dsRecord.meta_json === 'string' ? JSON.parse(dsRecord.meta_json) : dsRecord.meta_json;
           if (meta.dataset_yaml) datasetYaml = String(meta.dataset_yaml);
-        } catch {}
+        } catch { /* safe */ }
       }
       if (!datasetYaml && dsRecord?.storage_path) {
         const candidate = path.join(String(dsRecord.storage_path), 'data.yaml');
@@ -2326,7 +2330,7 @@ async function executeArchiveModel(step: StepRecord): Promise<{ ok: boolean; out
     db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
                 VALUES (?, 'workflow', 'archive_model', ?, 'success', ?, ?)`)
       .run(uuid(), step.job_id, JSON.stringify({ step_id: step.id, artifact_id: artifactId, model_id, experiment_id: experimentRef }), now());
-  } catch {}
+  } catch { /* safe */ }
 
   await logJob(db, step.job_id, step.id, 'info', `[archive_model] archived model_id=${model_id} as artifact_id=${artifactId}`);
 
@@ -2423,7 +2427,7 @@ async function executeReleaseModel(step: StepRecord): Promise<{ ok: boolean; out
       if (!sourceEvaluationId) sourceEvaluationId = artifact.evaluation_id || '';
       if (!sourceDatasetId) sourceDatasetId = artifact.dataset_id || '';
       if (artifact.metrics_snapshot_json) {
-        try { metricsObj = JSON.parse(artifact.metrics_snapshot_json); } catch {}
+        try { metricsObj = JSON.parse(artifact.metrics_snapshot_json); } catch { /* safe */ }
       }
     }
   }
@@ -2557,7 +2561,7 @@ async function executeReleaseModel(step: StepRecord): Promise<{ ok: boolean; out
       db.prepare(`UPDATE artifacts SET promotion_status = 'released', release_id = ?, updated_at = ? WHERE id = ?`)
         .run(releaseId, nowStr, sourceArtifactId);
     }
-  } catch {}
+  } catch { /* safe */ }
 
   // 9. 最小验证
   const validation: { name: string; passed: boolean; message: string }[] = [];
@@ -2600,7 +2604,7 @@ async function executeReleaseModel(step: StepRecord): Promise<{ ok: boolean; out
     db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
                 VALUES (?, 'release', 'validation', ?, ?, ?, ?)`)
       .run(uuid(), releaseId, allValid ? 'passed' : 'failed', JSON.stringify({ validation, release_id: releaseId }), nowStr);
-  } catch {}
+  } catch { /* safe */ }
 
   const validationError = !allValid
     ? `release validation failed: ${validation.filter(v => !v.passed).map(v => v.name).join(', ')}`
@@ -2759,7 +2763,7 @@ async function executeExportModel(step: StepRecord): Promise<{ ok: boolean; outp
   const model = db.prepare(`SELECT model_id, artifact_path FROM models WHERE model_id = ?`).get(modelId) as any;
   if (!model) return { ok: false, output: null, error: `model "${modelId}" not found` };
   const format = String(rawInput.export_format || 'onnx');
-  const exportPath = String(rawInput.export_path || `E:\\AGI_Factory\\outputs\\exports\\${modelId}.${format}`);
+  const exportPath = String(rawInput.export_path || `${resolveDataRoot()}\\outputs\\exports\\${modelId}.${format}`);
   return { ok: true, output: { model_id: modelId, export_format: format, export_path: exportPath, source_path: model.artifact_path || '' } };
 }
 
@@ -2853,7 +2857,7 @@ async function executeReleaseValidate(step: StepRecord): Promise<{ ok: boolean; 
     let hasAnyPtFile = false;
     try {
       hasAnyPtFile = readdirSync(resolvedReleasePath).some((f: string) => f.endsWith('.pt'));
-    } catch {}
+    } catch { /* safe */ }
     const isFallback = rawInput.allow_fallback === true || rawInput.execution_mode === 'fallback';
     for (const fname of [...requiredFiles, ...optionalFiles]) {
       const fpath = pathJoin(resolvedReleasePath, fname);
@@ -2960,7 +2964,7 @@ async function executeReleaseValidate(step: StepRecord): Promise<{ ok: boolean; 
         try {
           const ptFiles = readdirSync(resolvedReleasePath).filter((f: string) => f.endsWith('.pt'));
           if (ptFiles.length > 0) modelFilePath = pathJoin(resolvedReleasePath, ptFiles[0]);
-        } catch {}
+        } catch { /* safe */ }
       }
     }
     try {
@@ -3746,7 +3750,7 @@ async function executeRetrainTrigger(step: StepRecord): Promise<{ ok: boolean; o
       },
     });
     if (routeResult && routeResult.ok && 'decision' in routeResult) routeBinding = routeResult.decision;
-  } catch {}
+  } catch { /* safe */ }
 
   const queuePriority = routeBinding?.route_type === 'cloud_high_capability'
     ? 'high'
@@ -3772,7 +3776,7 @@ async function executeRetrainTrigger(step: StepRecord): Promise<{ ok: boolean; o
         }),
         now(),
       );
-  } catch {}
+  } catch { /* safe */ }
 
   return {
     ok: true,
@@ -3840,9 +3844,12 @@ async function executeFrameExtract(step: StepRecord): Promise<{ ok: boolean; out
   const outputJson = join(outputDir, 'extract_output.json');
   mkdirSync(outputDir, { recursive: true });
 
+  const pathMod = require('path');
+  const fsMod = require('fs');
+  const workerScript = resolvePythonWorkerPath(pathMod, fsMod, 'frame_extractor.py');
   const pythonCmd = [
     'python',
-    join('E:', 'AGI_Factory', 'repo', 'workers', 'python-worker', 'frame_extractor.py'),
+    workerScript,
     '--video', sourcePath,
     '--output-dir', outputDir,
     '--fps', String(fps),
@@ -3862,7 +3869,7 @@ async function executeFrameExtract(step: StepRecord): Promise<{ ok: boolean; out
     execSync(pythonCmd.join(' '), {
       encoding: 'utf-8',
       timeout: 300 * 1000, // 5 min max
-      cwd: 'E:\\AGI_Factory\\repo\\workers\\python-worker',
+      cwd: pathMod.dirname(workerScript),
     });
 
     const elapsed = Date.now() - startTime;
@@ -3972,9 +3979,12 @@ async function executeFrameClean(step: StepRecord): Promise<{ ok: boolean; outpu
   mkdirSync(cleanedDir, { recursive: true });
   const outputJson = join(cleanedDir, 'clean_output.json');
 
+  const pathMod = require('path');
+  const fsMod = require('fs');
+  const cleanerScript = resolvePythonWorkerPath(pathMod, fsMod, 'frame_cleaner.py');
   const pythonCmd = [
     'python',
-    join('E:', 'AGI_Factory', 'repo', 'workers', 'python-worker', 'frame_cleaner.py'),
+    cleanerScript,
     '--frames-dir', framesDir,
     '--output-dir', cleanedDir,
     '--output-json', outputJson,
@@ -3993,7 +4003,7 @@ async function executeFrameClean(step: StepRecord): Promise<{ ok: boolean; outpu
     execSync(pythonCmd.join(' '), {
       encoding: 'utf-8',
       timeout: 300 * 1000,
-      cwd: 'E:\\AGI_Factory\\repo\\workers\\python-worker',
+      cwd: pathMod.dirname(cleanerScript),
     });
 
     if (existsSync(outputJson)) {
@@ -4088,7 +4098,7 @@ async function executeDatasetRegister(step: StepRecord): Promise<{ ok: boolean; 
   const datasetName = String(rawInput.dataset_name || `Dataset ${datasetId}`);
   const cleanedCount = Number(rawInput.cleaned_frame_count || rawInput.sample_count || 0);
   const sampleCount = cleanedCount > 0 ? cleanedCount : 100;
-  const storagePath = String(rawInput.cleaned_output_dir || rawInput.storage_path || `E:\\AGI_Factory\\outputs\\datasets\\${datasetId}`);
+  const storagePath = String(rawInput.cleaned_output_dir || rawInput.storage_path || `${resolveDataRoot()}\\outputs\\datasets\\${datasetId}`);
   const existing = db.prepare('SELECT id FROM datasets WHERE id = ?').get(datasetId) as any;
 
   if (existing) {
@@ -4131,7 +4141,7 @@ async function executeDatasetRegister(step: StepRecord): Promise<{ ok: boolean; 
     db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
                 VALUES (?, 'workflow', 'dataset_register', ?, 'success', ?, ?)`)
       .run(uuid(), step.job_id, JSON.stringify({ step_id: step.id, dataset_id: datasetId, sample_count: sampleCount, storage_path: storagePath }), now());
-  } catch {}
+  } catch { /* safe */ }
   await logJob(db, step.job_id, step.id, 'info', `[dataset_register] dataset_id=${datasetId}, sample_count=${sampleCount}`);
 
   // ── v8D-3: 产物校验 ────────────────────────────────────────────────────
@@ -4285,7 +4295,7 @@ async function executeDatasetSplit(step: StepRecord): Promise<{ ok: boolean; out
   const trainCount = Math.max(1, Math.floor(total * trainRatio));
   const valCount = Math.max(0, Math.floor(total * valRatio));
   const testCount = Math.max(0, total - trainCount - valCount);
-  const basePath = String(rawInput.split_output_dir || `${ds.storage_path || `E:\\AGI_Factory\\outputs\\datasets\\${datasetId}`}\\splits\\${runId}`);
+  const basePath = String(rawInput.split_output_dir || `${ds.storage_path || `${resolveDataRoot()}\\outputs\\datasets\\${datasetId}`}\\splits\\${runId}`);
   const { mkdirSync, writeFileSync } = require('fs');
   const { join } = require('path');
   mkdirSync(basePath, { recursive: true });
@@ -4315,7 +4325,7 @@ async function executeDatasetSplit(step: StepRecord): Promise<{ ok: boolean; out
   // ── v8E-3: 最小真实化 — 读真实文件列表并写入 split .txt ──────────────
   let executionMode = 'mock';
   const { existsSync, readdirSync } = require('fs');
-  const imgSrcDir = join(ds.storage_path || `E:\\AGI_Factory\\outputs\\datasets\\${datasetId}`, 'images', 'train');
+  const imgSrcDir = join(ds.storage_path || `${resolveDataRoot()}\\outputs\\datasets\\${datasetId}`, 'images', 'train');
   let allImages: string[] = [];
   if (existsSync(imgSrcDir)) {
     allImages = readdirSync(imgSrcDir).filter((f: string) => /\.(jpg|jpeg|png)$/i.test(f));
@@ -4372,7 +4382,7 @@ async function executeDatasetSplit(step: StepRecord): Promise<{ ok: boolean; out
     db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
                 VALUES (?, 'workflow', 'dataset_split', ?, 'success', ?, ?)`)
       .run(uuid(), step.job_id, JSON.stringify({ step_id: step.id, dataset_id: datasetId, run_id: runId, train_count: trainCount, val_count: valCount, test_count: testCount }), now());
-  } catch {}
+  } catch { /* safe */ }
   await logJob(db, step.job_id, step.id, 'info', `[dataset_split] dataset_id=${datasetId}, split=${trainCount}/${valCount}/${testCount}`);
 
   // ── v8D-3: 产物校验 ────────────────────────────────────────────────────
@@ -4667,7 +4677,7 @@ async function executeYoloDetect(step: StepRecord): Promise<{ ok: boolean; outpu
 
   // Simulate YOLO detect execution (real YOLO in production)
   const runId = `run-${Date.now()}-detect`;
-  const outputDir = `E:\\AGI_Factory\\runs\\detect_${runId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const outputDir = `${resolveDataRoot()}\\runs\\detect_${runId.replace(/[^a-zA-Z0-9]/g, '')}`;
 
   db.prepare(`INSERT INTO runs (id, run_code, name, source_type, source_id, status, workspace_path, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(runId, 'yolo_detect', 'yolo_detect', 'experiment', experiment_id, 'success', outputDir, now(), now());
@@ -5000,7 +5010,10 @@ async function executeClassifierVerify(step: StepRecord): Promise<{ ok: boolean;
   // ── 生成记录（pending）──────────────────────────────────────────────────
   const verifId = `verif-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   const ts = now();
-  const verifDir = join(process.cwd() || 'E:\\AGI_Factory\\repo', 'runs', `verif_${verifId.replace(/[^a-zA-Z0-9]/g, '')}`);
+  const pathMod2 = require('path');
+  const fsMod2 = require('fs');
+  const repoRoot = resolveRepoRoot(pathMod2, fsMod2);
+const verifDir = join(process.env.AIP_REPO_ROOT || repoRoot || process.cwd(), 'runs', `verif_${verifId.replace(/[^a-zA-Z0-9]/g, '')}`);
   mkdirSync(verifDir, { recursive: true });
 
   db.prepare(`
@@ -5579,7 +5592,7 @@ const STEP_DRYRUN_CHECKERS: Record<string, (input: Record<string, unknown>) => P
     try {
       const { unfrozen, reason } = await isClassifierUnfrozen();
       if (!unfrozen) return { status: 'error', checkedItems: items, blockedReason: reason || 'classifier unavailable' };
-    } catch {}
+    } catch { /* safe */ }
     const hasError = items.some(i => i.status === 'error');
     return hasError ? { status: 'error', checkedItems: items, blockedReason: items.filter(i => i.status === 'error').map(i => i.message).join('; ') } : { status: 'ok', checkedItems: items, mockResult: 'classifier_verify dry-run: all checks passed' };
   },
@@ -6144,7 +6157,7 @@ function writeWorkflowAudit(db: any, action: string, target: string, result: 'su
   try {
     db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at) VALUES (?, 'workflow', ?, ?, ?, ?, ?)`)
       .run(uuid(), action, target, result, JSON.stringify(detail || {}), now());
-  } catch {}
+  } catch { /* safe */ }
 }
 
 function classifyRootCauseClass(stepKey: string, errorType: string): string {
@@ -6983,7 +6996,7 @@ function createJobReflectionArtifacts(db: any, jobId: string, status: 'completed
         });
       }
     }
-  } catch {}
+  } catch { /* safe */ }
 }
 
 
@@ -7928,7 +7941,7 @@ export function classifyError(errorMsg: string): ErrorClassification {
     return { category: 'cuda_unavailable', severity: 'recoverable', summary: 'CUDA 不可用', hint: '切换到 yolo-detect-debug preset（device=cpu），或显式传入 device=cpu' };
   }
   if (m.includes('no such file') && (m.includes('.yaml') || m.includes('dataset'))) {
-    return { category: 'dataset_missing', severity: 'config', summary: '数据集文件不存在', hint: '检查 dataset_yaml 路径是否正确，确认数据集已挂载到 E:\\AGI_Factory\\datasets\\{dataset_id}\\' };
+    return { category: 'dataset_missing', severity: 'config', summary: '数据集文件不存在', hint: '检查 dataset_yaml 路径是否正确，确认数据集路径存在 (可通过 AGI_FACTORY_ROOT 环境变量配置)' };
   }
   if (m.includes('no such column') || m.includes('table') && m.includes('no such')) {
     return { category: 'schema_error', severity: 'fatal', summary: '数据库 schema 错误', hint: '此为系统内部错误，需要 schema 迁移修复，请联系维护人员' };
@@ -8165,12 +8178,12 @@ export function getJobFailureReport(jobId: string): {
       recovery_suggestions: recoverySuggestions,
       retry_history: retryHistory.map((r: any) => {
         let detail: any = {};
-        try { detail = JSON.parse(r.detail_json || '{}'); } catch {}
+        try { detail = JSON.parse(r.detail_json || '{}'); } catch { /* safe */ }
         return { attempt: detail.retry_count || 0, started_at: r.created_at, finished_at: r.created_at, error: detail.error || '' };
       }),
       audit_trail: auditTrail.map((r: any) => {
         let detail: any = {};
-        try { detail = JSON.parse(r.detail_json || '{}'); } catch {}
+        try { detail = JSON.parse(r.detail_json || '{}'); } catch { /* safe */ }
         return { action: r.action, result: r.result, created_at: r.created_at, detail };
       }),
     },

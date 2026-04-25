@@ -30,6 +30,13 @@ const Icon = ({ name, size = 16 }: { name: string; size?: number }) => {
     output:     <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><path d="M3 1h7l3 3v11H3z"/><path d="M10 1v3h3M5 8h6M5 11h6" stroke="#24384C" strokeWidth="1.1" fill="none" strokeLinecap="round"/></svg>,
     api:        <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="3" width="12" height="2" rx="1"/><rect x="2" y="7" width="9" height="2" rx="1"/><rect x="2" y="11" width="6" height="2" rx="1"/></svg>,
     composer:   <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="3" r="2"/><circle cx="13" cy="8" r="2"/><circle cx="3" cy="13" r="2"/><path d="M5 3h4l3 5-3 5H5l-2-5 2-5z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" fill="none"/></svg>,
+    brain:      <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><path d="M8 1C4.5 1 2 3 2 6c0 2 1 3 2 4l1 4h6l1-4c1-1 2-2 2-4 0-3-2.5-5-6-5z"/><circle cx="5.5" cy="6" r="1.2"/><circle cx="10.5" cy="6" r="1.2"/><path d="M6 8.5c0 0 1 1 2 1s2-1 2-1" stroke="#24384C" strokeWidth="1.2" fill="none"/></svg>,
+    clock:      <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l3 2" stroke="#24384C" strokeWidth="1.5" strokeLinecap="round" fill="none"/></svg>,
+    bell:       <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><path d="M8 1C6 1 4.5 2.5 4.5 5v2c0 1-.5 2-1.5 3h10c-1-1-1.5-2-1.5-3V5c0-2.5-1.5-4-3.5-4z"/><path d="M6 12c0 1.1.9 2 2 2s2-.9 2-2" stroke="#24384C" strokeWidth="1.2" fill="none"/></svg>,
+    settings:   <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2.5M8 12.5V15M1 8h2.5M12.5 8H15M3 3l2 2M11 11l2 2M3 13l2-2M11 5l2-2" stroke="currentColor" strokeWidth="1.2" fill="none"/></svg>,
+    merge:      <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><circle cx="4" cy="4" r="2.5"/><circle cx="4" cy="12" r="2.5"/><circle cx="12" cy="8" r="2.5"/><path d="M4 6.5v3M5.5 4.5l5 2.5M5.5 11.5l5-2.5" stroke="currentColor" strokeWidth="1.2" fill="none"/></svg>,
+    database:   <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><ellipse cx="8" cy="4" rx="6" ry="2.5"/><path d="M2 4v4c0 1.38 2.68 2.5 6 2.5s6-1.12 6-2.5V4M2 8v4c0 1.38 2.68 2.5 6 2.5s6-1.12 6-2.5V8" stroke="#24384C" strokeWidth="1" fill="none"/></svg>,
+    label:      <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="3" width="12" height="10" rx="2"/><circle cx="6" cy="6" r="1.5"/><path d="M6 10l3-3 3 3" stroke="#24384C" strokeWidth="1.2" fill="none"/></svg>,
   };
   return <span style={{ display: 'flex', alignItems: 'center' }}>{icons[name] || icons.tasks}</span>;
 };
@@ -64,7 +71,7 @@ function AppShell() {
   const dragState = useRef<{ active: boolean; startX: number; startWidth: number }>({ active: false, startX: 0, startWidth: 288 });
 
   // ── 侧边栏分组折叠 ──
-  const DEFAULT_COLLAPSED = ['governance', 'knowledge', 'output'];
+  const DEFAULT_COLLAPSED = ['governance', 'intelligence', 'automation', 'systemAdmin', 'knowledge', 'output'];
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set(DEFAULT_COLLAPSED));
   const toggleSection = useCallback((key: string) => {
     setCollapsed(prev => {
@@ -262,6 +269,54 @@ function AppShell() {
                 <NavItem to="/plugin-pool" icon="api" label={t.nav.pluginPool} />
                 <NavItem to="/tasks" icon="tasks" label={t.nav.taskOrchestration} />
                 <NavItem to="/cost-routing" icon="route" label={t.nav.costRouting} />
+              </>)}
+            </div>
+
+            {/* ── 智能增强 ── */}
+            <div className="nav-section">
+              <div className="nav-section-label" onClick={() => toggleSection('intelligence')}>
+                {t.nav.intelligence}
+                <span className="nav-section-arrow">{collapsed.has('intelligence') ? '▸' : '▾'}</span>
+              </div>
+              {!collapsed.has('intelligence') && (<>
+                <NavItem to="/digital-employee" icon="brain" label={t.nav.digitalEmployee} />
+                <NavItem to="/training-v2" icon="training" label={t.nav.trainingV2} />
+                <NavItem to="/hpo" icon="run" label={t.nav.hpo} />
+                <NavItem to="/distill" icon="eval" label={t.nav.distill} />
+                <NavItem to="/model-merge" icon="merge" label={t.nav.modelMerge} />
+                <NavItem to="/inference" icon="run" label={t.nav.inference} />
+                <NavItem to="/annotation" icon="label" label={t.nav.annotation} />
+                <NavItem to="/huggingface" icon="api" label={t.nav.huggingface} />
+              </>)}
+            </div>
+
+            {/* ── 自动化 ── */}
+            <div className="nav-section">
+              <div className="nav-section-label" onClick={() => toggleSection('automation')}>
+                {t.nav.automation}
+                <span className="nav-section-arrow">{collapsed.has('automation') ? '▸' : '▾'}</span>
+              </div>
+              {!collapsed.has('automation') && (<>
+                <NavItem to="/backflow-v2" icon="feedback" label={t.nav.backflowV2} />
+                <NavItem to="/scheduler" icon="clock" label={t.nav.scheduler} />
+                <NavItem to="/alerting" icon="bell" label={t.nav.alerting} />
+                <NavItem to="/model-monitor" icon="eval" label={t.nav.modelMonitor} />
+                <NavItem to="/deploy-v2" icon="deploy" label={t.nav.deployV2} />
+              </>)}
+            </div>
+
+            {/* ── 系统管理 ── */}
+            <div className="nav-section">
+              <div className="nav-section-label" onClick={() => toggleSection('systemAdmin')}>
+                {t.nav.systemAdmin}
+                <span className="nav-section-arrow">{collapsed.has('systemAdmin') ? '▸' : '▾'}</span>
+              </div>
+              {!collapsed.has('systemAdmin') && (<>
+                <NavItem to="/workspace" icon="modules" label={t.nav.workspace} />
+                <NavItem to="/cost-tracker" icon="route" label={t.nav.costTracker} />
+                <NavItem to="/storage-v2" icon="database" label={t.nav.storageV2} />
+                <NavItem to="/system-status" icon="factory" label={t.nav.systemStatus} />
+                <NavItem to="/api-docs" icon="api" label={t.nav.apiDocs} />
               </>)}
             </div>
 

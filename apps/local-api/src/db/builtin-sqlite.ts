@@ -12,6 +12,10 @@ import type { SqlMigrationReport, SqlMigrationStateReport } from './migration-ru
 import { reconcileSchemaColumns } from './schema-reconciler.js';
 import type { SchemaReconcileReport } from './schema-reconciler.js';
 
+const DB_BUSY_TIMEOUT = parseInt(process.env.SQLITE_BUSY_TIMEOUT || '5000', 10);
+const DB_CACHE_SIZE = parseInt(process.env.SQLITE_CACHE_SIZE || '-64000', 10);
+const DB_MMAP_SIZE = parseInt(process.env.SQLITE_MMAP_SIZE || '0', 10);
+
 function getDbPath(): string {
   if (process.env.SQLITE_DB_PATH) {
     return path.resolve(process.env.SQLITE_DB_PATH);
@@ -24,6 +28,33 @@ let dbInstance: DatabaseSync | null = null;
 let lastDbGovernanceReport: DbGovernanceReport | null = null;
 let lastSqlMigrationReport: SqlMigrationReport | null = null;
 let lastSchemaReconcileReport: SchemaReconcileReport | null = null;
+let activeConnections = 0;
+let totalQueries = 0;
+let totalErrors = 0;
+
+export function getDbStats() {
+  return {
+    activeConnections,
+    totalQueries,
+    totalErrors,
+    dbPath,
+    journalMode: 'WAL',
+    busyTimeout: DB_BUSY_TIMEOUT,
+  };
+}
+
+function applyPragmas(db: DatabaseSync) {
+  try { db.exec(`PRAGMA journal_mode = WAL;`); } catch { }
+  try { db.exec(`PRAGMA foreign_keys = ON;`); } catch { }
+  try { db.exec(`PRAGMA busy_timeout = ${DB_BUSY_TIMEOUT};`); } catch { }
+  try { db.exec(`PRAGMA cache_size = ${DB_CACHE_SIZE};`); } catch { }
+  try { db.exec(`PRAGMA synchronous = NORMAL;`); } catch { }
+  try { db.exec(`PRAGMA temp_store = MEMORY;`); } catch { }
+  try { db.exec(`PRAGMA mmap_size = ${DB_MMAP_SIZE};`); } catch { }
+  if (DB_CACHE_SIZE < 0) {
+    try { db.exec(`PRAGMA cache_size = ${DB_CACHE_SIZE};`); } catch { }
+  }
+}
 
 function bootstrapDatabase() {
   if (dbInstance) return;
@@ -38,13 +69,8 @@ function bootstrapDatabase() {
   }
 
   dbInstance = new DatabaseSync(dbPath, { readOnly: false });
-
-  try {
-    dbInstance.exec('PRAGMA journal_mode = WAL;');
-  } catch {
-    // 忽略旧环境不支持 WAL 的异常
-  }
-  dbInstance.exec('PRAGMA foreign_keys = ON;');
+  activeConnections++;
+  applyPragmas(dbInstance);
 
   lastSqlMigrationReport = runSqlMigrations(dbInstance);
   if (lastSqlMigrationReport.applied > 0) {
@@ -139,8 +165,14 @@ export function testConnection(): {
 
 export function query(sql: string, params: any[] = []): any[] {
   const db = getDatabase();
-  const stmt = db.prepare(sql);
-  return params.length > 0 ? stmt.all(...params) : stmt.all();
+  try {
+    const stmt = db.prepare(sql);
+    totalQueries++;
+    return params.length > 0 ? stmt.all(...params) : stmt.all();
+  } catch (err) {
+    totalErrors++;
+    throw err;
+  }
 }
 
 export function run(
@@ -148,20 +180,46 @@ export function run(
   params: any[] = [],
 ): { changes: number; lastInsertRowid: number } {
   const db = getDatabase();
-  const stmt = db.prepare(sql);
-  const result = params.length > 0 ? stmt.run(...params) : stmt.run();
-  return {
-    changes: Number(result.changes),
-    lastInsertRowid: Number(result.lastInsertRowid),
-  };
+  try {
+    const stmt = db.prepare(sql);
+    const result = params.length > 0 ? stmt.run(...params) : stmt.run();
+    totalQueries++;
+    return {
+      changes: Number(result.changes),
+      lastInsertRowid: Number(result.lastInsertRowid),
+    };
+  } catch (err) {
+    totalErrors++;
+    throw err;
+  }
+}
+
+export function transaction<T>(fn: () => T): T {
+  const db = getDatabase();
+  try {
+    db.exec('BEGIN IMMEDIATE');
+    const result = fn();
+    db.exec('COMMIT');
+    return result;
+  } catch (err) {
+    try { db.exec('ROLLBACK'); } catch { }
+    throw err;
+  }
 }
 
 export function closeDatabase() {
   if (dbInstance) {
     dbInstance.close();
     dbInstance = null;
+    activeConnections = Math.max(0, activeConnections - 1);
     console.log('🔒 数据库连接已关闭');
   }
+}
+
+export function reopenDatabase() {
+  closeDatabase();
+  dbInstance = null;
+  return getDatabase();
 }
 
 export default {

@@ -67,11 +67,11 @@ models/
 desktop_migrated/
 archives/
 
-# Local env secrets
+# Local env secrets (WARNING: .env.local may contain real credentials)
+# Keep a clean .env.example for reference, never commit .env* files
 .env
 .env.*
 !.env.example
-!.env.local.example
 
 # Runtime database snapshots
 packages/db/*.db.bak*

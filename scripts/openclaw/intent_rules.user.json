@@ -1,0 +1,65 @@
+{
+  "_comment": "用户自定义意图规则。编辑此文件可添加你自己的关键词→模板映射。",
+  "_format": {
+    "id": "规则唯一ID",
+    "keywords": ["触发关键词列表"],
+    "keywords_weighted": {"关键词": 权重},
+    "exclude_keywords": ["排除关键词"],
+    "template": "对应模板ID (full-flywheel / dataset-flywheel / front-chain / train-only / evaluate-only)",
+    "base_confidence": 0.0-1.0,
+    "params": {},
+    "description": "描述文本"
+  },
+  "rules": [
+    {
+      "id": "my-quick-train",
+      "keywords": ["速训", "快速训练", "quick train", "轻量训练"],
+      "keywords_weighted": {
+        "速训": 0.6,
+        "快速": 0.3,
+        "quick": 0.3,
+        "轻量": 0.3
+      },
+      "exclude_keywords": [],
+      "template": "train-only",
+      "base_confidence": 0.88,
+      "params": {
+        "model": "yolov8n.pt",
+        "epochs": 10,
+        "imgsz": 320
+      },
+      "description": "快速试跑 (10 epochs)"
+    },
+    {
+      "id": "my-export-model",
+      "keywords": ["导出", "export", "导出模型", "下载模型", "save model"],
+      "keywords_weighted": {
+        "导出": 0.5,
+        "export": 0.4,
+        "下载": 0.3
+      },
+      "exclude_keywords": [],
+      "template": "",
+      "base_confidence": 0.75,
+      "params": {
+        "export_model": true
+      },
+      "description": "导出已训练的模型文件"
+    },
+    {
+      "id": "my-cleanup",
+      "keywords": ["清理", "clean", "打扫", "删除临时", "清空", "cleanup"],
+      "keywords_weighted": {
+        "清理": 0.5,
+        "clean": 0.3
+      },
+      "exclude_keywords": [],
+      "template": "",
+      "base_confidence": 0.8,
+      "params": {
+        "run_cleanup": true
+      },
+      "description": "清理临时文件和中间产物"
+    }
+  ]
+}

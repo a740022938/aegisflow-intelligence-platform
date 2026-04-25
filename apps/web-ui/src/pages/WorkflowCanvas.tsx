@@ -160,8 +160,8 @@ export default function WorkflowCanvas() {
     setLoadingSteps(false);
   }, [setEdges, setNodes]);
 
-  useEffect(() => { fetchJobs(); }, [fetchJobs]);
-  useEffect(() => { if (selectedJob) fetchSteps(selectedJob); }, [selectedJob, fetchSteps]);
+  useEffect(() => { fetchJobs(); const int = setInterval(fetchJobs, 10000); return () => clearInterval(int); }, [fetchJobs]);
+  useEffect(() => { if (selectedJob) { fetchSteps(selectedJob); const int = setInterval(() => fetchSteps(selectedJob), 10000); return () => clearInterval(int); } }, [selectedJob, fetchSteps]);
 
   const onNodeClick = useCallback<NodeMouseHandler>((_evt, node) => {
     setSelectedNodeId(node.id);

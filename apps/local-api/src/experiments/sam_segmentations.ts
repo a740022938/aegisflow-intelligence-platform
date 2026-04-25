@@ -1,5 +1,6 @@
 import { getDatabase } from '../db/builtin-sqlite.js';
 import { logAudit } from '../audit/index.js';
+import { resolveWorkerPath, resolveRunDir, resolveCheckpoint } from '../python-runner.js';
 
 function genId()  { return crypto.randomUUID(); }
 function now()    { return new Date().toISOString(); }
@@ -238,7 +239,7 @@ export async function createSegmentationFromHandoff(handoffId: string) {
   const { execSync } = require('child_process');
   const { writeFileSync, mkdirSync, existsSync } = require('fs');
 
-  const segOutputDir = `E:\\AGI_Factory\\runs\\segmentations\\seg_${handoffId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const segOutputDir = resolveRunDir('segmentations', handoffId);
   const manifestOut  = `${segOutputDir}\\sam_segmentation_manifest.json`;
 
   try {
@@ -246,9 +247,9 @@ export async function createSegmentationFromHandoff(handoffId: string) {
 
     const pythonCmd = [
       'python',
-      'E:\\AGI_Factory\\repo\\workers\\python-worker\\sam_runner.py',
+      resolveWorkerPath('sam_runner.py'),
       '--manifest',   sh.manifest_path,
-      '--checkpoint', 'E:\\AGI_Factory\\checkpoints\\sam_vit_b.pth',
+      '--checkpoint', resolveCheckpoint('sam_vit_b.pth'),
       '--output-dir', segOutputDir,
       '--model-type', 'vit_b',
       '--device',     'cpu',

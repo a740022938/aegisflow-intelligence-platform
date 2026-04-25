@@ -1,0 +1,8 @@
+{
+  "name": "@agi-factory/storage",
+  "version": "6.8.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "description": "Storage abstraction layer for AIP (stub - TODO: implement)"
+}

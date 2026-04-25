@@ -1,4 +1,5 @@
 import { getDatabase } from '../db/builtin-sqlite.js';
+import { resolveWorkerPath, resolveRunDir } from '../python-runner.js';
 
 function genId()  { return crypto.randomUUID(); }
 function now()    { return new Date().toISOString(); }
@@ -249,14 +250,14 @@ export async function createTrackerFromVerification(verificationId: string) {
   const { mkdirSync } = require('fs');
 
   const safeId = verificationId.replace(/[^a-zA-Z0-9]/g, '');
-  const outputDir = `E:\\AGI_Factory\\runs\\tracker_runs\\tr_${safeId}`;
+  const outputDir = resolveRunDir('tracker', verificationId);
   const manifestOut = `${outputDir}\\tracker_manifest.json`;
   mkdirSync(outputDir, { recursive: true });
 
   try {
     const pythonCmd = [
       'python',
-      'E:\\AGI_Factory\\repo\\workers\\python-worker\\tracker_runner.py',
+      resolveWorkerPath('tracker_runner.py'),
       '--manifest', cv.manifest_path,
       '--output-dir', outputDir,
       '--iou-threshold', '0.3',

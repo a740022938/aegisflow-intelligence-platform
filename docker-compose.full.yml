@@ -2,7 +2,7 @@ name: agi-model-factory-full
 
 services:
   local-api:
-    image: ghcr.io/a740022938/agi-model-factory-api:v6.7.0
+    image: ghcr.io/a740022938/agi-model-factory-api:v6.8.0
     container_name: agi-local-api
     restart: unless-stopped
     ports:
@@ -10,12 +10,19 @@ services:
     environment:
       - NODE_ENV=production
       - TZ=Asia/Shanghai
+      - OPENCLAW_HEARTBEAT_TOKEN=${OPENCLAW_HEARTBEAT_TOKEN:-}
+      - OPENCLAW_ADMIN_TOKEN=${OPENCLAW_ADMIN_TOKEN:-}
+    env_file:
+      - .env.local
     volumes:
       - ./packages/db:/app/packages/db
       - ./outputs:/app/outputs
+      - ./workers:/app/workers
+      - ./models:/app/models
+      - ./data:/app/data
 
   web-ui:
-    image: ghcr.io/a740022938/agi-model-factory-web:v6.7.0
+    image: ghcr.io/a740022938/agi-model-factory-web:v6.8.0
     container_name: agi-web-ui
     restart: unless-stopped
     depends_on:

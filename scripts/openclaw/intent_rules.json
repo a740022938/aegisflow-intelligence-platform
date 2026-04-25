@@ -1,13 +1,46 @@
 {
-  "version": "1.0.0",
-  "updated_at": "2026-04-17T00:00:00Z",
+  "version": "2.0.0",
+  "updated_at": "2026-04-25T00:00:00Z",
   "defaults": {
     "always_run_scripts": [
-      "discover_capabilities"
+      "discover_capabilities",
+      "bidirectional_bridge heartbeat"
     ],
-    "fallback_readme": true
+    "fallback_readme": true,
+    "auto_trigger_threshold": 0.7
   },
   "rules": [
+    {
+      "id": "bidirectional-health-check",
+      "keywords_any": ["health", "健康", "体检", "巡检", "check", "status", "状态"],
+      "actions": [
+        { "type": "run_script", "script_key": "bidirectional_bridge", "script_args": ["heartbeat"] },
+        { "type": "run_script", "script_key": "health_patrol" },
+        { "type": "run_script", "script_key": "bidirectional_bridge", "script_args": ["capabilities"] }
+      ]
+    },
+    {
+      "id": "intent-driven-workflow",
+      "keywords_any": ["训练", "train", "yolo", "评估", "evaluate", "抽帧", "extract", "全链路", "飞轮", "flywheel", "数据集", "dataset", "模型", "model"],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "bidirectional_bridge",
+          "script_args": ["intent", "{user_input}"]
+        }
+      ]
+    },
+    {
+      "id": "command-workflow",
+      "keywords_any": ["暂停", "pause", "恢复", "resume", "取消", "cancel", "重试", "retry"],
+      "actions": [
+        {
+          "type": "run_script",
+          "script_key": "bidirectional_bridge",
+          "script_args": ["command", "{action}", "{target}"]
+        }
+      ]
+    },
     {
       "id": "dataset-check",
       "keywords_any": ["dataset", "数据集", "版本", "version"],
@@ -20,87 +53,51 @@
       ]
     },
     {
-      "id": "health-audit-plugin-workflow",
-      "keywords_any": ["health", "健康", "体检", "巡检", "check", "audit", "审计", "日志", "log", "plugin", "插件", "workflow", "工作流", "画布", "pipeline", "model", "模型", "分类", "classifier", "yolo", "sam"],
+      "id": "full-audit-report",
+      "keywords_any": ["report", "报告", "汇总", "总结", "概览", "overview", "审计", "audit"],
       "actions": [
-        {
-          "type": "run_script",
-          "script_key": "discover_capabilities"
-        },
-        {
-          "type": "run_script",
-          "script_key": "health_patrol"
-        },
-        {
-          "type": "run_script",
-          "script_key": "plugin_pool_scan"
-        },
-        {
-          "type": "run_script",
-          "script_key": "run_queue_scan"
-        },
-        {
-          "type": "run_script",
-          "script_key": "dashboard_snapshot"
-        },
-        {
-          "type": "run_script",
-          "script_key": "build_ops_report"
-        }
-      ]
-    },
-    {
-      "id": "ops-report",
-      "keywords_any": ["report", "报告", "汇总", "总结", "概览", "overview"],
-      "actions": [
-        {
-          "type": "run_script",
-          "script_key": "health_patrol"
-        },
-        {
-          "type": "run_script",
-          "script_key": "plugin_pool_scan"
-        },
-        {
-          "type": "run_script",
-          "script_key": "run_queue_scan"
-        },
-        {
-          "type": "run_script",
-          "script_key": "dashboard_snapshot"
-        },
-        {
-          "type": "run_script",
-          "script_key": "build_ops_report"
-        }
+        { "type": "run_script", "script_key": "health_patrol" },
+        { "type": "run_script", "script_key": "plugin_pool_scan" },
+        { "type": "run_script", "script_key": "run_queue_scan" },
+        { "type": "run_script", "script_key": "dashboard_snapshot" },
+        { "type": "run_script", "script_key": "build_ops_report" }
       ]
     },
     {
       "id": "yolo-flywheel",
-      "keywords_any": ["yolo", "飞轮", "flywheel", "训练", "评估", "模型", "数据集"],
+      "keywords_any": ["yolo", "飞轮", "flywheel", "自学习", "闭环"],
       "actions": [
+        { "type": "run_script", "script_key": "yolo_flywheel_scan" },
+        { "type": "run_script", "script_key": "build_ops_report" },
         {
           "type": "run_script",
-          "script_key": "yolo_flywheel_scan"
-        },
-        {
-          "type": "run_script",
-          "script_key": "build_ops_report"
+          "script_key": "bidirectional_bridge",
+          "script_args": ["workflow", "full-flywheel"]
         }
       ]
     },
     {
       "id": "self-evolve",
-      "keywords_any": ["升级", "新功能", "自学习", "无师自通", "learn", "evolve", "auto rule"],
+      "keywords_any": ["升级", "新功能", "自学习", "learn", "evolve", "auto rule"],
       "actions": [
-        {
-          "type": "run_script",
-          "script_key": "auto_generate_intent_rules"
-        },
-        {
-          "type": "run_script",
-          "script_key": "discover_capabilities"
-        }
+        { "type": "run_script", "script_key": "auto_generate_intent_rules" },
+        { "type": "run_script", "script_key": "discover_capabilities" },
+        { "type": "run_script", "script_key": "bidirectional_bridge", "script_args": ["capabilities"] }
+      ]
+    },
+    {
+      "id": "vision-pipeline",
+      "keywords_any": ["视觉", "vision", "sam", "分割", "segment", "检测", "detect", "跟踪", "track", "分类", "classify"],
+      "actions": [
+        { "type": "run_script", "script_key": "bidirectional_bridge", "script_args": ["capabilities"] }
+      ]
+    },
+    {
+      "id": "system-control",
+      "keywords_any": ["openclaw", "bridge", "桥接", "双向", "通信"],
+      "actions": [
+        { "type": "run_script", "script_key": "bidirectional_bridge", "script_args": ["heartbeat"] },
+        { "type": "run_script", "script_key": "bidirectional_bridge", "script_args": ["capabilities"] }
       ]
     }
   ]

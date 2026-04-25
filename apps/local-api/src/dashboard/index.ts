@@ -73,7 +73,7 @@ export async function getRecentActivity(limit = 30) {
         const a = actionMap[row.status] || 'created';
         push(type, row.id, row.name || row.title || row.experiment_name || row.deployment_name || type, row.updated_at || row.created_at, a);
       });
-    } catch {}
+    } catch { /* safe */ }
   };
 
   safe('experiments', 'id, experiment_name as name, status, updated_at', "status != 'deleted'", 'experiment', {
@@ -175,14 +175,14 @@ export function getDeploymentRelations(deploymentId: string) {
     const row = db.prepare('SELECT artifact_id, training_job_id, evaluation_id FROM deployments WHERE id = ?').get(deploymentId) as any;
     if (!row) return { artifact: null, evaluation: null, training: null };
     if (row.artifact_id) {
-      try { artifact = db.prepare('SELECT id, name, artifact_type, status, path, created_at FROM artifacts WHERE id = ?').get(row.artifact_id) as any; } catch {}
+      try { artifact = db.prepare('SELECT id, name, artifact_type, status, path, created_at FROM artifacts WHERE id = ?').get(row.artifact_id) as any; } catch { /* safe */ }
     }
     if (row.evaluation_id) {
-      try { evaluation = db.prepare('SELECT id, name as title, status, evaluation_type, created_at FROM evaluations WHERE id = ?').get(row.evaluation_id) as any; } catch {}
+      try { evaluation = db.prepare('SELECT id, name as title, status, evaluation_type, created_at FROM evaluations WHERE id = ?').get(row.evaluation_id) as any; } catch { /* safe */ }
     }
     if (row.training_job_id) {
       // experiments table has 'name' column, not 'experiment_name'
-      try { training = db.prepare('SELECT id, name, status, created_at FROM experiments WHERE id = ?').get(row.training_job_id) as any; } catch {}
+      try { training = db.prepare('SELECT id, name, status, created_at FROM experiments WHERE id = ?').get(row.training_job_id) as any; } catch { /* safe */ }
     }
     return { artifact, evaluation, training };
   } catch { return { artifact: null, evaluation: null, training: null }; }

@@ -262,7 +262,7 @@ export default function Dashboard() {
               <div className="dash-openclaw-banner">OpenClaw 心跳令牌未配置（已兼容运行，建议尽快配置）</div>
             )}
             <div className="dash-openclaw-metrics">
-              <div className="dash-openclaw-metric"><span>在线状态</span><strong>{ocStatus?.online_status === 'online' ? '在线' : '离线'}</strong></div>
+              <div className="dash-openclaw-metric"><span>在线状态</span><strong>{!openclaw ? '检测中' : (ocStatus?.online_status === 'online' ? '在线' : '离线')}</strong></div>
               <div className="dash-openclaw-metric"><span>执行状态</span><strong>{ocStatus?.execution_status === 'executing' ? '执行中' : '空闲'}</strong></div>
               <div className="dash-openclaw-metric"><span>最近一次动作</span><strong>{(openclaw as any)?.last_action ? `${(openclaw as any).last_action.run_name || (openclaw as any).last_action.run_code}` : (ocStatus?.last_action ? `${ocStatus.last_action.run_name || ocStatus.last_action.run_code}` : '—')}</strong></div>
               <div className="dash-openclaw-metric"><span>最近一次错误</span><strong>{(openclaw as any)?.last_error?.message || ocStatus?.last_error?.message || '—'}</strong></div>

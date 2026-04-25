@@ -1,0 +1,8 @@
+{
+  "name": "@agi-factory/template-engine",
+  "version": "6.8.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "description": "Template rendering engine for AIP (stub - TODO: implement)"
+}

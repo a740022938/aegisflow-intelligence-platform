@@ -285,7 +285,7 @@ function writeIncidentAudit(db: any, action: string, target: string, result: 'su
       INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at)
       VALUES (?, 'incident', ?, ?, ?, ?, ?)
     `).run(crypto.randomUUID(), action, target, result, JSON.stringify(detail || {}), nowIso());
-  } catch {}
+  } catch { /* safe */ }
 }
 
 function addIncidentAction(
@@ -313,7 +313,9 @@ function addIncidentAction(
       JSON.stringify(meta || {}),
       nowIso(),
     );
-  } catch {}
+  } catch (err) {
+    console.error('[ops] Event write failed:', err?.message);
+  }
 }
 
 function upsertIncident(db: any, p: Omit<IncidentRecord, 'created_at' | 'updated_at'>) {
