@@ -10,7 +10,7 @@ echo.
 
 setlocal enabledelayedexpansion
 
-set "REPO=E:\AGI_Factory\repo"
+set "REPO=E:\AIP\repo"
 set "DB=%REPO%\packages\db\agi_factory.db"
 set "BRANCH=main"
 

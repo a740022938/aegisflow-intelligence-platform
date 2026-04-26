@@ -30,12 +30,12 @@ if (-not $Token) {
 }
 if (-not $Token) {
     try {
-        $dbPath = "E:\AGI_Factory\repo\packages\db\agi_factory.db"
+        $dbPath = "E:\AIP\repo\packages\db\agi_factory.db"
         if (Test-Path $dbPath) {
             $tmp = Join-Path $env:TEMP "smoke_read_openclaw_token.py"
             @"
 import sqlite3
-db = r'E:\AGI_Factory\repo\packages\db\agi_factory.db'
+db = r'E:\AIP\repo\packages\db\agi_factory.db'
 try:
     conn = sqlite3.connect(db)
     cur = conn.cursor()

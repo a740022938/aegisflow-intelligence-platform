@@ -83,4 +83,31 @@ apps/local-api/server.err
 apps/local-api/smoke_test.py
 apps/local-api/test_video.mp4
 *.pt
+*.pth
+*.onnx
+*.safetensors
 *.mp4
+*.token
+*.key
+
+# Model weights (never commit)
+runs/
+outputs/
+datasets/
+checkpoints/
+models/
+
+# AIP local assets & backups
+_AIP_ASSETS/
+_AIP_BACKUPS/
+_AIP_REPORTS/
+_TEMP/
+_DELETE_CANDIDATES/
+
+# Snapshot files
+scripts/snapshot/
+
+# AIP internal backups
+backups/
+releases/
+audit/

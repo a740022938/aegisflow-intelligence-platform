@@ -1,6 +1,6 @@
 param(
-  [string]$DatasetRoot = 'E:\AGI_Factory\datasets\yolo-test-ds',
-  [string]$DatabasePath = 'E:\AGI_Factory\repo\packages\db\agi_factory.db',
+  [string]$DatasetRoot = 'E:\AIP\datasets\yolo-test-ds',
+  [string]$DatabasePath = 'E:\AIP\repo\packages\db\agi_factory.db',
   [string]$DatasetCode = 'yolo_phasea_f2',
   [string]$DatasetName = 'YOLO Phase-A F2 Dataset',
   [string]$DatasetVersion = 'v1.0.0-f2'

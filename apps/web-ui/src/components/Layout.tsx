@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import './Layout.css';
 import { type Lang, translations, getStoredLang, setStoredLang } from '../i18n';
-import { APP_VERSION } from '../constants/appVersion';
+import { APP_VERSION, BUILD_DATE } from '../constants/appVersion';
 import { APP_META } from '../constants/appMeta';
 import { loadSidebarWidth, saveSidebarWidth } from '../layout/layoutStorage';
 
@@ -305,22 +305,18 @@ function AppShell() {
               </>)}
             </div>
 
-            {/* ── 系统管理 ── */}
+            {/* ── 视觉实验室 ── */}
             <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('systemAdmin')}>
-                {t.nav.systemAdmin}
-                <span className="nav-section-arrow">{collapsed.has('systemAdmin') ? '▸' : '▾'}</span>
+              <div className="nav-section-label" onClick={() => toggleSection('visionLab')}>
+                {t.nav.visionLab}
+                <span className="nav-section-arrow">{collapsed.has('visionLab') ? '▸' : '▾'}</span>
               </div>
-              {!collapsed.has('systemAdmin') && (<>
-                <NavItem to="/workspace" icon="modules" label={t.nav.workspace} />
-                <NavItem to="/cost-tracker" icon="route" label={t.nav.costTracker} />
-                <NavItem to="/storage-v2" icon="database" label={t.nav.storageV2} />
-                <NavItem to="/system-status" icon="factory" label={t.nav.systemStatus} />
-                <NavItem to="/api-docs" icon="api" label={t.nav.apiDocs} />
+              {!collapsed.has('visionLab') && (<>
+                <NavItem to="/vision-lab/mahjong-debug" icon="template" label={t.nav.mahjongDebug} />
               </>)}
             </div>
 
-            {/* ── 治理与回流 ── */}
+            {/* ── 自动化 ── */}
             <div className="nav-section">
               <div className="nav-section-label" onClick={() => toggleSection('governance')}>
                 {t.nav.governance}
@@ -357,7 +353,8 @@ function AppShell() {
             </div>
           </div>
           <div className="sidebar-footer">
-            <div className="sidebar-footer-text">v{displayVersion} · {APP_META.appName}</div>
+            <div className="sidebar-footer-text">AIP {APP_VERSION}</div>
+            <div className="sidebar-footer-build">Build {BUILD_DATE}</div>
           </div>
         </nav>
         <div

@@ -4,13 +4,13 @@ REM AGI Model Factory v6.0.0 Rollback Script (Windows Native)
 REM ============================================================
 REM 用途：回退 v6.0.0 插件化底座变更
 REM 适用范围：回退到 P3 Official Seal (v5.5.0)
-REM 前置条件：在 repo 根目录执行（E:\AGI_Factory\repo）
+REM 前置条件：在 repo 根目录执行（E:\AIP\repo）
 REM 注意：会删除插件系统所有文件，请确认后再执行
 REM ============================================================
 
 setlocal enabledelayedexpansion
 
-set "REPO_ROOT=E:\AGI_Factory\repo"
+set "REPO_ROOT=E:\AIP\repo"
 set "BACKUP_TAG=p3-official-seal-20260413"
 
 echo ============================================================

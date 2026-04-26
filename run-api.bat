@@ -1,3 +1,3 @@
 @echo off
-cd /d E:\AGI_Factory\repo
+cd /d E:\AIP\repo
 call start_local_api.bat

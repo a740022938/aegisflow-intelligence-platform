@@ -14,7 +14,7 @@ if ([string]::IsNullOrWhiteSpace($DatasetVersionId)) {
   exit 0
 }
 
-$dbPath = 'E:\AGI_Factory\repo\packages\db\agi_factory.db'
+$dbPath = 'E:\AIP\repo\packages\db\agi_factory.db'
 if (-not (Test-Path $dbPath)) {
   $result = [ordered]@{
     ok = $false

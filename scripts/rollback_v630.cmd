@@ -6,7 +6,7 @@ REM ============================================================
 
 setlocal enabledelayedexpansion
 
-set "REPO=E:\AGI_Factory\repo"
+set "REPO=E:\AIP\repo"
 set "DB=%REPO%\packages\db\agi_factory.db"
 set "SNAPSHOT=%REPO%\backups\v6.3.0\db\agi_factory_v6.3.0_snapshot.db"
 set "GIT_REF=HEAD~1"

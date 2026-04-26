@@ -15,6 +15,7 @@ export const translations = {
       intelligence: '智能增强',
       automation: '自动化',
       systemAdmin: '系统管理',
+      visionLab: '视觉实验室',
       knowledge: '知识',
       output: '输出',
       // ── 菜单项 ──
@@ -61,6 +62,8 @@ export const translations = {
       intentEngine: '意图引擎',
       systemStatus: '系统状态',
       apiDocs: 'API 文档',
+      // ── 视觉实验室 ──
+      mahjongDebug: '麻将视觉调试台',
     },
     // 通用
     common: {
@@ -154,6 +157,7 @@ export const translations = {
       intelligence: 'Intelligence',
       automation: 'Automation',
       systemAdmin: 'System Admin',
+      visionLab: 'Vision Lab',
       knowledge: 'Knowledge',
       output: 'Output',
       // ── Nav items ──
@@ -200,6 +204,8 @@ export const translations = {
       intentEngine: 'Intent Engine',
       systemStatus: 'System Status',
       apiDocs: 'API Docs',
+      // ── Vision Lab ──
+      mahjongDebug: 'Mahjong Debug Console',
     },
     // Common
     common: {

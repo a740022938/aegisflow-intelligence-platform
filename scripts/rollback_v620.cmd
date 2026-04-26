@@ -8,7 +8,7 @@ echo.
 
 REM 1. 恢复 index.ts (移除 outputs 路由)
 echo [1/4] Restoring index.ts...
-cd /d E:\AGI_Factory\repo\apps\local-api\src
+cd /d E:\AIP\repo\apps\local-api\src
 powershell -Command "(Get-Content index.ts -Raw) -replace 'import \{ registerOutputsRoutes \} from ''./outputs/index.js'';', '' | Set-Content index.ts -Encoding UTF8"
 powershell -Command "(Get-Content index.ts -Raw) -replace 'registerOutputsRoutes\(app\);', '' | Set-Content index.ts -Encoding UTF8"
 
@@ -23,17 +23,17 @@ if exist "outputs\" (
 
 REM 3. 恢复 package.json 版本
 echo [3/4] Restoring package.json version...
-powershell -Command "(Get-Content 'E:\AGI_Factory\repo\apps\local-api\package.json' -Raw) -replace '\"version\": \"6.2.0\"', '\"version\": \"6.1.0\"' | Set-Content 'E:\AGI_Factory\repo\apps\local-api\package.json' -Encoding UTF8"
-powershell -Command "(Get-Content 'E:\AGI_Factory\repo\apps\web-ui\package.json' -Raw) -replace '\"version\": \"6.2.0\"', '\"version\": \"6.1.0\"' | Set-Content 'E:\AGI_Factory\repo\apps\web-ui\package.json' -Encoding UTF8"
+powershell -Command "(Get-Content 'E:\AIP\repo\apps\local-api\package.json' -Raw) -replace '\"version\": \"6.2.0\"', '\"version\": \"6.1.0\"' | Set-Content 'E:\AIP\repo\apps\local-api\package.json' -Encoding UTF8"
+powershell -Command "(Get-Content 'E:\AIP\repo\apps\web-ui\package.json' -Raw) -replace '\"version\": \"6.2.0\"', '\"version\": \"6.1.0\"' | Set-Content 'E:\AIP\repo\apps\web-ui\package.json' -Encoding UTF8"
 
 REM 4. 删除 outputs 产物目录和模板
 echo [4/4] Removing output artifacts and templates...
-if exist "E:\AGI_Factory\repo\outputs\" (
-    rmdir /s /q "E:\AGI_Factory\repo\outputs"
+if exist "E:\AIP\repo\outputs\" (
+    rmdir /s /q "E:\AIP\repo\outputs"
     echo   Removed outputs/
 )
-if exist "E:\AGI_Factory\repo\templates\outputs\" (
-    rmdir /s /q "E:\AGI_Factory\repo\templates\outputs"
+if exist "E:\AIP\repo\templates\outputs\" (
+    rmdir /s /q "E:\AIP\repo\templates\outputs"
     echo   Removed templates/outputs/
 )
 

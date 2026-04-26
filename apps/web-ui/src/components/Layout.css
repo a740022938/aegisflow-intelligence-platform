@@ -311,9 +311,15 @@ body.layout-resizing * {
   border-top: 1px solid var(--border);
 }
 .sidebar-footer-text {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-main);
   font-weight: 600;
+  line-height: 1.35;
+}
+.sidebar-footer-build {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
 }
 
 .topbar-wechat {

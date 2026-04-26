@@ -16,7 +16,7 @@ if ($DryRun -is [bool]) {
 }
 
 $ErrorActionPreference = 'Stop'
-$repo = 'E:\AGI_Factory\repo'
+$repo = 'E:\AIP\repo'
 $workflowFile = Join-Path $repo 'apps\local-api\src\workflow\index.ts'
 
 if (!(Test-Path $workflowFile)) {

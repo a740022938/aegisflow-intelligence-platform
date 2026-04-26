@@ -27,6 +27,7 @@ const PluginCanvas = lazy(() => import('./pages/PluginCanvas'));
 const ModuleCenter = lazy(() => import('./pages/ModuleCenter'));
 const WorkflowComposer = lazy(() => import('./pages/workflow-composer/WorkflowComposer'));
 const ModulePage = lazy(() => import('./pages/ModulePage'));
+const MahjongDebug = lazy(() => import('./pages/MahjongDebug'));
 
 function RouteFallback() {
   return (
@@ -118,6 +119,7 @@ const App: React.FC = () => {
             <Route path="storage-v2" element={<ModulePage />} />
             <Route path="system-status" element={<ModulePage />} />
             <Route path="api-docs" element={<ModulePage />} />
+            <Route path="vision-lab/mahjong-debug" element={<MahjongDebug />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
