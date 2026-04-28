@@ -1,3 +1,4 @@
 @echo off
-cd /d E:\AIP\repo
-pnpm --dir apps/web-ui dev
+set "AIP_ROOT=%~dp0"
+cd /d "%AIP_ROOT%"
+pnpm dev:web

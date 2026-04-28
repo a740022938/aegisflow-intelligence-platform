@@ -1,3 +1,4 @@
 @echo off
-cd /d E:\AIP\repo
-call start_local_api.bat
+set "AIP_ROOT=%~dp0"
+cd /d "%AIP_ROOT%"
+pnpm dev:api

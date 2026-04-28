@@ -1,5 +1,26 @@
 # Changelog
 
+## v7.2.0 Stable (2026-04-29)
+
+### Fixed
+- Unified package versions to 7.2.0 across all sub-packages
+- Removed stale hardcoded path comments from feedback/index.ts
+- Added missing .gitkeep for empty staging directory
+- Fixed CSS @keyframes minify warnings (7 files, 9 blocks)
+- Added production preview script (`pnpm run preview`)
+- Improved test fallback message
+
+### Verified
+- lint PASS (--max-warnings 0)
+- build PASS with zero CSS warnings
+- db:doctor PASS (124 tables, 311 indexes)
+- CLI 7.2.0 / Core 7.2.0
+- Sidebar shows AIP v7.2.0 / Build 2026.04.29
+
+### Notes
+- This is the current sealed stable baseline.
+- Repository hygiene completed (root cleanup, bat scripts de-hardcoded, env.example deduplicated, release process documented).
+
 ## v6.8.0 (2026-04-25)
 
 ### Added

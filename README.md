@@ -1,133 +1,216 @@
-# 天枢智治平台（AegisFlow Intelligence Platform, AIP）
+# AegisFlow Intelligence Platform (AIP)
 
-天枢智治平台（AIP）是面向数据-训练-评估-发布全流程的本地化智能治理平台。
-当前仓库为**可运行社区版（Community Edition）**，用于公开演示与二次开发。
+天枢智治平台 — 面向数据-训练-评估-发布全流程的本地化智能治理平台。
 
-## 版本与定位
+**AIP v7.2.0 Stable** | Build 2026.04.29 | Community Edition
 
-- 当前公开版本：`AIP v6.8.0 Build 2026.04.26`
-- 仓库定位：`可运行社区版`
-- 目标：在去敏前提下保留核心主干能力（Workflow Composer / Governance Hub / 审计基础链路）
+---
 
-## 主要能力
+## Overview
 
-- Workflow Composer：可视化编排、运行追踪、结果面板
-- Governance Hub：治理中枢视图与运行态汇聚
-- 训练与评估主干：数据集、训练、评估、归档、发布链路
-- incident / playbook / audit 基础能力
-- OpenClaw 协作适配层（需自行配置 token 与地址）
+AIP is a local-first AI governance platform that covers the full ML lifecycle: data management, training, evaluation, deployment, and audit. It runs entirely on your machine with SQLite and Node.js — no cloud required.
 
-## 快速启动
+- **Workflow Composer**: Visual pipeline editor with step-level tracing
+- **Governance Hub**: Central dashboard for incidents, approvals, and audit
+- **Self-Learning Flywheel**: Dataset → train → evaluate → archive → feedback loop (YOLO, classification, vision pipelines)
+- **Plugin System**: 8 builtin plugins (rule engine, report pack, SAM vision, badcase miner, etc.)
+- **OpenClaw Integration**: Bidirectional command bridge, heartbeat, circuit breaker
+- **Official CLI**: `aip start / status / health / doctor / logs / open / stop`
 
-### 1. 环境要求
+---
 
-- Node.js `>=22.0.0`
-- pnpm `9.x`
+## Quick Start
+
+### Prerequisites
+
+- Node.js >= 22
+- pnpm 9.x
 - Git
 
-### 2. 安装
+### Install
 
 ```bash
-git clone <your-public-repo-url>
+git clone https://github.com/a740022938/aegisflow-intelligence-platform.git
 cd aegisflow-intelligence-platform
 pnpm install
 ```
 
-### 3. 配置
+### Configure
 
 ```bash
 cp .env.example .env.local
+# Edit .env.local as needed
 ```
 
-按需修改 `.env.local`：
-
-- `OPENCLAW_BASE_URL`
-- `OPENCLAW_HEARTBEAT_TOKEN`
-- `OPENCLAW_ADMIN_TOKEN`
-- 端口与日志级别
-
-> 公开仓库不包含真实 `.env` 与任何私有凭据。
-
-### 4. 初始化与运行
+### Initialize Database
 
 ```bash
 pnpm run db:init
+```
+
+### Start
+
+```bash
 pnpm run dev
 ```
 
-访问：
+Or use the CLI:
 
-- Web UI: `http://127.0.0.1:5173`
-- Local API: `http://127.0.0.1:8787`
-- Health: `http://127.0.0.1:8787/api/health`
-
-## 数据库运维（新增）
-
-- 数据库采用 `migration-first` 启动策略，迁移目录默认：`packages/db/migrations-core`
-- 核心迁移已拆分为分层文件：`schema_tables` / `schema_indexes` / `schema_views`
-- 可通过环境变量覆盖迁移目录：`AIP_DB_MIGRATIONS_DIR`
-- 迁移执行包含 checksum 校验，防止同名迁移文件被静默篡改
-- 查看迁移状态：`pnpm run db:migrate:status`
-- 创建新迁移文件：`pnpm run db:migrate:new -- your_change_name`
-- 本地诊断：`pnpm run db:doctor`
-- 严格诊断（存在缺失索引即失败）：`pnpm run db:doctor:strict`
-- 运行时诊断接口：`GET /api/system/database/diagnostics`
-- Schema 漂移接口：`GET /api/system/database/schema-drift`
-- 迁移状态接口：`GET /api/system/database/migrations`
-- 维护接口：`POST /api/system/database/maintenance`（body: `{ "mode": "checkpoint|optimize|full" }`）
-- CI 质量门禁：`.github/workflows/quality-gate.yml`（typecheck/lint/db:init/db:doctor:strict）
-
-## 目录结构（公开版）
-
-```text
-aegisflow-intelligence-platform/
-├─ apps/
-│  ├─ web-ui/
-│  └─ local-api/
-├─ packages/
-├─ scripts/
-├─ templates/
-├─ docs/
-│  ├─ architecture/
-│  └─ public-release/
-├─ .env.example
-└─ README.md
+```bash
+aip start
 ```
 
-## 边界说明
+### Access
 
-- 本仓库移除了私有封板材料、桌面验证产物、本地日志与快照导出。
-- 若要启用完整 OpenClaw 协同能力，需自行部署并配置目标服务。
-- 部分高级能力依赖本地模型、数据目录与插件环境，默认不随公开仓库提供。
-- 模型权重（`.pt`、`.pth`、`.onnx`、`.safetensors`）、数据集、日志、备份文件不提交到仓库。
-- `.env.local` 包含本地开发凭据，不提交。使用 `.env.example` 作为配置参考。
+| Service | URL |
+|---------|-----|
+| Web UI | http://127.0.0.1:5173 |
+| Local API | http://127.0.0.1:8787 |
+| API Docs (Swagger) | http://127.0.0.1:8787/docs |
+| Health | http://127.0.0.1:8787/api/health |
 
-## 文档入口
+---
 
-- 架构说明：`docs/architecture/ARCHITECTURE_OVERVIEW.md`
-- 公开发布说明：`docs/public-release/PUBLIC_RELEASE_NOTES.md`
-- 清洗与安全说明：`docs/public-release/SANITIZATION_AND_SECURITY.md`
-- 保留/剥离清单：`docs/public-release/KEEP_EXCLUDE_MANIFEST.md`
-- Phase F.0 官网同步清单：`docs/public-release/F0_WEBSITE_SYNC_CHECKLIST.md`
-- Phase F.0 新用户上手闭环：`docs/public-release/F0_NEW_USER_ONBOARDING.md`
-- Phase F.0 首发后巡检报告：`docs/public-release/F0_POST_LAUNCH_INSPECTION.md`
-- Phase F.1 社区反馈归档：`docs/public-release/F1_COMMUNITY_FEEDBACK_ARCHIVE.md`
-- 社区协作说明：`CONTRIBUTING.md`
-- 问题反馈入口：`https://github.com/a740022938/aegisflow-intelligence-platform/issues/new/choose`
+## CLI Commands
 
-## 架构概览
+```bash
+aip start          # Start API + Web services
+aip stop           # Stop all services
+aip restart        # Restart all services
+aip status         # Show service status
+aip health         # Check API health
+aip logs           # Tail API + Web logs
+aip logs api       # Tail API log only
+aip logs web       # Tail Web log only
+aip open           # Open Web UI in browser
+aip version        # Show CLI and Core versions
+aip doctor         # Run 11-point system diagnostics
+aip config init    # Initialize config (~/.aip/config.json)
+aip config set home <path>   # Set project path
+aip gateway status # Show gateway status
+```
 
-- 前端：`apps/web-ui`（Workflow Composer / Governance Hub / 运行结果消费）
-- 后端：`apps/local-api`（工作流运行、治理接口、审计主干）
-- 数据层：SQLite（默认路径 `packages/db/agi_factory.db`）
-- 文档层：`docs/architecture` 与 `docs/public-release` 维护公开版边界与治理说明
+---
 
-## 后续路线（Community Edition）
+## Build & Quality
 
-- 持续增强 Workflow Composer 的稳定性与可观测性
-- 补齐社区可复用模板与最小数据样例
-- 完善插件适配层文档与安全实践示例
-- 增加面向社区贡献者的开发/测试规范
+```bash
+pnpm run build       # Production build (Web UI)
+pnpm run lint        # ESLint check (--max-warnings 0)
+pnpm run typecheck   # TypeScript type checking
+pnpm run db:doctor   # Database diagnostics
+pnpm run test:smoke  # Smoke tests (requires API running)
+pnpm run preview     # Preview production build
+```
+
+---
+
+## Project Structure
+
+```
+aegisflow-intelligence-platform/
+├── apps/
+│   ├── local-api/          # Backend API (Fastify + TypeScript)
+│   ├── web-ui/             # Frontend (React + Vite + TypeScript)
+│   └── aip-cli/            # Official CLI tool
+├── packages/
+│   ├── db/                 # Database (SQLite, migrations)
+│   ├── logger/             # Logging utilities
+│   ├── plugin-runtime/     # Plugin lifecycle manager
+│   ├── plugin-sdk/         # Plugin development SDK
+│   ├── shared-types/       # Shared TypeScript types
+│   ├── storage/            # File storage utilities
+│   ├── task-engine/        # Task execution engine
+│   └── template-engine/    # Template rendering engine
+├── plugins/
+│   └── builtin/            # 8 builtin plugins
+├── workers/
+│   └── python-worker/      # Python scripts (training, eval, vision)
+├── scripts/                # Maintenance and upgrade scripts
+├── templates/              # Workflow templates
+├── docs/                   # Architecture and release documentation
+├── tests/                  # Smoke tests
+├── docker/                 # Docker configuration
+├── api-tests/              # HTTP API tests
+├── .env.example            # Configuration template
+├── Makefile                # Build commands
+├── package.json            # Root package manifest
+└── README.md
+```
+
+---
+
+## Configuration
+
+All configuration is managed through environment variables (via `.env.local`). Key variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LOCAL_API_PORT` | 8787 | API server port |
+| `WEB_UI_PORT` | 5173 | Web UI dev server port |
+| `OPENCLAW_BASE_URL` | http://127.0.0.1:18789 | OpenClaw gateway address |
+| `OPENCLAW_HEARTBEAT_TOKEN` | (required) | Heartbeat authentication token |
+| `OPENCLAW_ADMIN_TOKEN` | (required) | Admin operations token |
+| `JWT_SECRET` | (required) | JWT signing secret |
+| `WORKER_POOL_MIN` | 2 | Python worker pool min size |
+| `WORKER_POOL_MAX` | 8 | Python worker pool max size |
+| `QUEUE_CONCURRENCY` | 4 | Task queue concurrency |
+
+See `.env.example` for the full list.
+
+---
+
+## OpenClaw Integration
+
+AIP integrates with [OpenClaw](https://github.com/anomalyco/opencode) for bidirectional AI agent orchestration:
+
+- **Master Switch**: Enable/disable OpenClaw execution layer
+- **Heartbeat**: Health monitoring with configurable timeout
+- **Circuit Breaker**: Automatic fail-safe (3 failures → triggered)
+- **Command Bridge**: Pause/resume/cancel/retry workflow jobs from OpenClaw
+- **Intent Engine**: Natural language → workflow template resolution
+- **Capability Discovery**: `GET /api/openclaw/capabilities`
+
+Configure `OPENCLAW_HEARTBEAT_TOKEN` and `OPENCLAW_ADMIN_TOKEN` in `.env.local`.
+
+---
+
+## Development
+
+```bash
+pnpm run dev        # Start API + Web UI concurrently
+pnpm run dev:api    # Start API only
+pnpm run dev:web    # Start Web UI only
+pnpm run setup      # Run setup script
+```
+
+### Database Operations
+
+```bash
+pnpm run db:init              # Initialize database
+pnpm run db:doctor            # Run diagnostics
+pnpm run db:migrate:status    # Check migration state
+pnpm run db:migrate:new <name> # Create new migration
+```
+
+---
+
+## Release Policy
+
+- Sealed stable releases are tagged as `vX.Y.Z-stable`
+- Each release passes: lint, typecheck, build (zero CSS warnings), db:doctor
+- No secrets, model weights, datasets, logs, or database files are committed
+- See `docs/release/RELEASE_PROCESS.md` for full process
+
+---
+
+## Community
+
+- **GitHub**: https://github.com/a740022938/aegisflow-intelligence-platform
+- **Issues**: https://github.com/a740022938/aegisflow-intelligence-platform/issues
+- **Contributing**: See `CONTRIBUTING.md`
+
+---
 
 ## License
 
