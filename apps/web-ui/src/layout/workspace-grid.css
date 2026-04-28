@@ -2,6 +2,13 @@
   width: 100%;
 }
 
+/* Ensure the grid wrapper expands to container width and allows children to shrink */
+.workspace-grid-wrap {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .workspace-grid-item {
   overflow: visible !important;
 }
@@ -24,7 +31,7 @@
 }
 
 @keyframes editing-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.5); }
+  from, to { box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.5); }
   50% { box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.25); }
 }
 
@@ -67,6 +74,9 @@
   flex: 1;
   overflow: auto;
   padding: 12px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 /* 拖拽和缩放时的视觉反馈 */

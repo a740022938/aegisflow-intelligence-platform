@@ -10,8 +10,10 @@ import './Runs.css';
 type RunTab = 'overview' | 'steps' | 'logs' | 'artifacts' | 'raw';
 
 const STATUS_COLORS: Record<string, string> = {
-  queued: '#6b7280', running: '#3b82f6', success: '#10b981',
-  failed: '#ef4444', cancelled: '#9ca3af', paused: '#f59e0b',
+  queued: '#3B82F6', running: '#3B82F6', success: '#10B981',
+  succeeded: '#10B981', completed: '#10B981',
+  failed: '#EF4444', cancelled: '#F59E0B', paused: '#F59E0B',
+  pending: '#3B82F6', blocked: '#8B5CF6', skipped: '#EAB308',
 };
 const STATUS_LABELS: Record<string, string> = {
   queued: '排队中', running: '执行中', success: '成功',
@@ -405,7 +407,10 @@ export default function Runs() {
               <SectionCard>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 700 }}>{selectedRun.name}</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {selectedRun.name}
+                      <StatusBadge s={STATUS_LABELS[selectedRun.status] || selectedRun.status} />
+                    </div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>
                       {selectedRun.id} · {selectedRun.run_code} · {selectedRun.source_type ? SOURCE_LABELS[selectedRun.source_type] || selectedRun.source_type : '—'}
                     </div>
@@ -486,7 +491,7 @@ export default function Runs() {
                   steps.length === 0 ? <EmptyState icon="⚙" message="暂无步骤" /> : (
                     <div className="ui-table-wrap">
                       <table className="ui-table">
-                        <thead><tr><th>#</th><th>Key</th><th>名称</th><th>状态</th><th>时长</th><th>开始</th><th>结束</th></tr></thead>
+                        <thead><tr><th>#</th><th>Key</th><th>名称</th><th>状态</th><th>时长</th><th>错误</th><th>开始</th><th>结束</th></tr></thead>
                         <tbody>{steps.sort((a, b) => (a.step_order ?? 0) - (b.step_order ?? 0)).map(s => (
                           <tr key={s.id}>
                             <td>{s.step_order ?? 0}</td>
@@ -494,6 +499,7 @@ export default function Runs() {
                             <td>{s.step_name || '—'}</td>
                             <td><StatusBadge s={STATUS_LABELS[s.status] || s.status} /></td>
                             <td>{s.duration_ms ? `${s.duration_ms}ms` : '—'}</td>
+                            <td style={{ fontSize: 11, color: s.error_message ? '#EF4444' : 'var(--text-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={s.error_message || ''}>{s.error_message || '—'}</td>
                             <td>{fmt(s.started_at)}</td>
                             <td>{fmt(s.finished_at)}</td>
                           </tr>

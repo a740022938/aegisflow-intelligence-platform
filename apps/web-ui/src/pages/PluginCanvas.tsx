@@ -143,7 +143,7 @@ function buildPluginDag(catalog: CatalogPlugin[]): { nodes: Node[]; edges: Edge[
       nodes.push({
         id: nodeId,
         data: {
-          label: `${getIcon(p.icon)} ${p.name}\n${p.plugin_id}`,
+          label: `${getIcon(p.icon)} ${p.name} v${p.version}\n${p.plugin_id}`,
           status: p.status,
           isTrial,
         },
@@ -200,6 +200,10 @@ export default function PluginCanvas() {
       const r = await fetch(`${API}/plugins/catalog`, { signal: controller.signal });
       if (r.ok) {
         const d = await r.json();
+        if (d?._unauthorized) {
+          setCatError('访问未授权，请检查身份认证配置');
+          return;
+        }
         if (Array.isArray(d?.catalog) && d.catalog.length > 0) {
           setCatalog(d.catalog.map(normalizeCatalogItem));
           return;
@@ -208,6 +212,10 @@ export default function PluginCanvas() {
       const fallback = await fetch(`${API}/plugins/pool`, { signal: controller.signal });
       if (!fallback.ok) throw new Error(`HTTP ${fallback.status}`);
       const pd = await fallback.json();
+      if (pd?._unauthorized) {
+        setCatError('访问未授权，请检查身份认证配置');
+        return;
+      }
       const plugins = Array.isArray(pd?.plugins) ? pd.plugins : [];
       setCatalog(plugins.map(normalizeCatalogItem));
       setCatError('目录接口不可用，已回退到插件池数据');
@@ -252,7 +260,7 @@ export default function PluginCanvas() {
   // 构建 DAG
   useEffect(() => {
     if (leftTab !== 'plugins') { setNodes([]); setEdges([]); return; }
-    const { nodes: nds, edges: eds } = buildPluginDag(catalog);
+    const { nodes: nds, edges: eds } = buildPluginDag(catalog || []);
     setNodes(nds);
     setEdges(eds);
   }, [catalog, leftTab, setNodes, setEdges]);
@@ -261,7 +269,7 @@ export default function PluginCanvas() {
   const onNodeClick = useCallback((_: any, node: Node) => {
     if (node.id.startsWith('plugin:')) {
       const pid = node.id.replace('plugin:', '');
-      const p = catalog.find(pl => pl.plugin_id === pid);
+      const p = (catalog || []).find(pl => pl.plugin_id === pid);
       setSelectedPlugin(p || null);
     }
   }, [catalog]);
@@ -306,10 +314,10 @@ export default function PluginCanvas() {
                     </div>
                   </div>
                 ) : catalog.length === 0 ? (
-                  <EmptyState icon="🧩" title="无插件" description="目录中暂无插件。" />
+                  <EmptyState icon="🧩" title="无插件" description="No plugins registered. Run: pnpm aip:cli:doctor" />
                 ) : (
                   Object.entries(
-                    catalog.filter(p => p.status !== 'residual').reduce<Record<string, CatalogPlugin[]>>((acc, p) => {
+                    (catalog || []).filter(p => p.status !== 'residual').reduce<Record<string, CatalogPlugin[]>>((acc, p) => {
                       const cat = p.category || 'other';
                       if (!acc[cat]) acc[cat] = [];
                       acc[cat].push(p);
@@ -323,6 +331,8 @@ export default function PluginCanvas() {
                       {plugins.map(p => {
                         const s = STATUS_COLORS[p.status] || STATUS_COLORS.planned;
                         const isTrial = p.status === 'trial';
+                        const rColor = ({ LOW: '#15803d', MEDIUM: '#b45309', HIGH: '#dc2626', CRITICAL: '#991b1b' } as Record<string, string>)[p.risk_level] || '#6b7280';
+                        const rBg = ({ LOW: '#f0fdf4', MEDIUM: '#fffbeb', HIGH: '#fef2f2', CRITICAL: '#fef2f2' } as Record<string, string>)[p.risk_level] || '#f9fafb';
                         return (
                           <div key={p.plugin_id} className="plugin-node-item" onClick={() => setSelectedPlugin(p)} style={{
                             border: `1px solid ${s.border}`, background: s.bg, color: s.text,
@@ -335,14 +345,25 @@ export default function PluginCanvas() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                               <span>{getIcon(p.icon)}</span>
                               <div>
-                                <div style={{ fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 160 }}>
+                                <div style={{ fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150 }}>
                                   {p.name}
                                 </div>
                                 <div style={{ fontSize: 10, opacity: 0.7 }}>
                                   {p.plugin_id}
-                                  {p.risk_level !== 'LOW' && (
-                                    <span style={{ marginLeft: 4 }}>{p.risk_level === 'MEDIUM' ? '⚠️' : ''} {p.risk_level}</span>
-                                  )}
+                                </div>
+                                <div style={{ display: 'flex', gap: 3, marginTop: 3, alignItems: 'center' }}>
+                                  <span style={{ padding: '0 5px', borderRadius: 8, fontSize: 9, fontWeight: 700, background: rBg, color: rColor }}>
+                                    {p.risk_level}
+                                  </span>
+                                  <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>v{p.version}</span>
+                                  <Link
+                                    to={`/audit?filter=plugin:${p.plugin_id}`}
+                                    className="ui-btn ui-btn-ghost ui-btn-xs"
+                                    style={{ fontSize: 9, padding: '0 4px', textDecoration: 'none', lineHeight: '16px' }}
+                                    onClick={e => e.stopPropagation()}
+                                  >
+                                    📋
+                                  </Link>
                                 </div>
                               </div>
                             </div>
@@ -361,7 +382,7 @@ export default function PluginCanvas() {
 
         {/* ===== 中间：DAG 画布 ===== */}
         <SectionCard
-          title={leftTab === 'plugins' ? `插件 DAG · ${catalog.filter(p=>p.status!=='residual').length} 节点` : '画布'}
+          title={leftTab === 'plugins' ? `插件 DAG · ${(catalog || []).filter(p=>p.status!=='residual').length} 节点` : '画布'}
         >
           {!!catError && (
             <div style={{ marginBottom: 8, padding: '8px 10px', borderRadius: 8, border: '1px solid #fde68a', background: '#fffbeb', color: '#92400e', fontSize: 11 }}>
@@ -374,7 +395,7 @@ export default function PluginCanvas() {
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%' }}>
                   <EmptyState message="正在加载画布..." />
                 </div>
-              ) : catalog.filter(p => p.status !== 'residual').length === 0 ? (
+              ) : (catalog || []).filter(p => p.status !== 'residual').length === 0 ? (
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', flexDirection:'column', gap:8 }}>
                   <span style={{ fontSize:40 }}>🧩</span>
                   <span style={{ color:'var(--text-muted)', fontSize:13 }}>目录中暂无插件</span>

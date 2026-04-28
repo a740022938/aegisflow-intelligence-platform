@@ -173,7 +173,7 @@ export const NODE_REGISTRY: Record<NodeType, NodeConfig> = {
     inputs: [],
     outputs: ['video', 'image_batch'],
     params: [
-      { key: 'source_path', label: 'Source Path', labelZh: '源路径', type: 'string', required: true, default: 'E:/AGI_Factory/datasets/raw/demo.mp4', placeholder: 'e.g. E:/datasets/raw_videos', bindable: true },
+      { key: 'source_path', label: 'Source Path', labelZh: '源路径', type: 'string', required: true, default: '', placeholder: 'e.g. /path/to/videos or workspace://datasets/raw', bindable: true },
       { key: 'source_type', label: 'Source Type', labelZh: '源类型', type: 'select', required: true, defaultValue: 'video', options: [{ value: 'video', label: 'Video' }, { value: 'image_batch', label: 'Image Batch' }], bindable: false },
     ],
     execution: {

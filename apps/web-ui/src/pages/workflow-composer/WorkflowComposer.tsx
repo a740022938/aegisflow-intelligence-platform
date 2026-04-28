@@ -1036,7 +1036,7 @@ function WorkflowComposerInner() {
       nodesTpl = [
         // 泳道1: 数据入口区
         makeNode('tpl_video_source', 'video-source', lane1X, rowY, {
-          source_path: 'E:/AGI_Factory/datasets/raw/demo.mp4',
+          source_path: '',
           source_type: 'video',
         }),
         makeNode('tpl_frame_extract', 'frame-extract', lane1X, rowY + rowGapY, {

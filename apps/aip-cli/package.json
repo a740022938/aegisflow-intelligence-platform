@@ -1,0 +1,24 @@
+{
+  "name": "@aip/cli",
+  "version": "7.2.0",
+  "description": "AIP (AegisFlow Intelligence Platform) official CLI",
+  "type": "module",
+  "bin": {
+    "aip": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "zod": "^3.25.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

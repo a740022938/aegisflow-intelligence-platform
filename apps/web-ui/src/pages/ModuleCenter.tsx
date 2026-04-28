@@ -19,8 +19,10 @@ type ModuleItem = {
 type PluginLite = {
   plugin_id: string;
   name: string;
+  version: string;
   status: string;
   enabled: boolean;
+  capabilities: string[];
 };
 
 type AuditLite = {
@@ -122,30 +124,44 @@ export default function ModuleCenter() {
   const [err, setErr] = useState('');
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [busyKey, setBusyKey] = useState('');
+  const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({ health: true, openclaw: true, pool: true, jobs: true, routes: true, audit: true, summary: true });
+  const [unauthorized, setUnauthorized] = useState(false);
   const [layoutEdit, setLayoutEdit] = useState(false);
   const [layouts, setLayouts] = useState<LayoutConfig>(() => loadLayout(LAYOUT_KEY) || DEFAULT_LAYOUTS);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setErr('');
+    setUnauthorized(false);
+    setSectionLoading({ health: true, openclaw: true, pool: true, jobs: true, routes: true, audit: true, summary: true });
     try {
-      const [healthR, openclawR, poolR, jobsR, routeR, auditR, summaryR] = await Promise.allSettled([
-        fetchJsonWithTimeout('/api/health'),
-        fetchJsonWithTimeout('/api/openclaw/master-switch'),
-        fetchJsonWithTimeout('/api/plugins/pool'),
-        fetchJsonWithTimeout('/api/workflow-jobs?limit=100&offset=0'),
-        fetchJsonWithTimeout('/api/route-policies?limit=200'),
-        fetchJsonWithTimeout('/api/audit/recent?limit=20&hours=24'),
-        fetchJsonWithTimeout('/api/dashboard/summary'),
+      const results = await Promise.allSettled([
+        fetchJsonWithTimeout('/api/health').catch(() => null),
+        fetchJsonWithTimeout('/api/openclaw/master-switch').catch(() => null),
+        fetchJsonWithTimeout('/api/plugins/pool').catch(() => null),
+        fetchJsonWithTimeout('/api/workflow-jobs?limit=100&offset=0').catch(() => null),
+        fetchJsonWithTimeout('/api/route-policies?limit=200').catch(() => null),
+        fetchJsonWithTimeout('/api/audit/recent?limit=20&hours=24').catch(() => null),
+        fetchJsonWithTimeout('/api/dashboard/summary').catch(() => null),
       ]);
 
-      const health: any = healthR.status === 'fulfilled' ? healthR.value : null;
-      const oc: any = openclawR.status === 'fulfilled' ? openclawR.value : null;
-      const pool: any = poolR.status === 'fulfilled' ? poolR.value : null;
-      const jobs: any = jobsR.status === 'fulfilled' ? jobsR.value : null;
-      const routes: any = routeR.status === 'fulfilled' ? routeR.value : null;
-      const audits: any = auditR.status === 'fulfilled' ? auditR.value : null;
-      const summary: any = summaryR.status === 'fulfilled' ? summaryR.value : null;
+      const safe = (r: PromiseSettledResult<any>) => r.status === 'fulfilled' ? r.value : null;
+      const checkAuth = (v: any) => { if (v?._unauthorized) setUnauthorized(true); };
+
+      const health: any = safe(results[0]); checkAuth(health);
+      setSectionLoading(prev => ({ ...prev, health: false }));
+      const oc: any = safe(results[1]); checkAuth(oc);
+      setSectionLoading(prev => ({ ...prev, openclaw: false }));
+      const pool: any = safe(results[2]); checkAuth(pool);
+      setSectionLoading(prev => ({ ...prev, pool: false }));
+      const jobs: any = safe(results[3]); checkAuth(jobs);
+      setSectionLoading(prev => ({ ...prev, jobs: false }));
+      const routes: any = safe(results[4]); checkAuth(routes);
+      setSectionLoading(prev => ({ ...prev, routes: false }));
+      const audits: any = safe(results[5]); checkAuth(audits);
+      setSectionLoading(prev => ({ ...prev, audit: false }));
+      const summary: any = safe(results[6]); checkAuth(summary);
+      setSectionLoading(prev => ({ ...prev, summary: false }));
 
       const plugins = Array.isArray(pool?.plugins) ? pool.plugins : [];
       const jobsList = Array.isArray(jobs?.jobs) ? jobs.jobs : [];
@@ -162,7 +178,7 @@ export default function ModuleCenter() {
         pluginsTotal: plugins.length,
         pluginsActive: plugins.filter((p: any) => p.status === 'active').length,
         pluginsTrial: plugins.filter((p: any) => p.status === 'trial').length,
-        plugins: plugins.map((p: any) => ({ plugin_id: p.plugin_id, name: p.name, status: p.status, enabled: !!p.enabled })),
+        plugins: plugins.map((p: any) => ({ plugin_id: p.plugin_id, name: p.name, version: p.version || '0.0.0', status: p.status, enabled: !!p.enabled, capabilities: Array.isArray(p.capabilities) ? p.capabilities : [] })),
         workflowsRunning: jobsList.filter((j: any) => j.status === 'running').length,
         workflowsTotal: jobsList.length,
         routePolicies: policies.length,
@@ -180,11 +196,11 @@ export default function ModuleCenter() {
       });
     } catch (e: any) {
       setErr(String(e?.message || e));
-      setSnapshot(null);
+      if (!snapshot) setSnapshot(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // eslint-disable-line
 
   useEffect(() => {
     refresh();
@@ -348,10 +364,14 @@ export default function ModuleCenter() {
       id: 'health_score',
       content: (
         <SectionCard title="总健康分" description="按模块状态加权">
+          {sectionLoading.health && !snapshot ? (
+            <div className="module-score-wrap"><div className="module-score-sub" style={{ color: 'var(--text-muted)' }}>Loading...</div></div>
+          ) : (
           <div className="module-score-wrap">
             <div className="module-score-value">{overallScore}</div>
-            <div className="module-score-sub">/ 100</div>
+            <div className="module-score-sub">{'\u002F'} 100</div>
           </div>
+          )}
         </SectionCard>
       ),
     },
@@ -409,7 +429,9 @@ export default function ModuleCenter() {
       content: (
         <SectionCard
           title="对齐指标（工厂口径）"
-          description={(
+          description={sectionLoading.summary && snapshot?.runningTasks == null ? (
+            <span style={{ color: 'var(--text-muted)' }}>加载工厂指标中...</span>
+          ) : (
             <span style={{ color: 'var(--text-secondary)' }}>
               与 Dashboard / Factory Status 一致 · 运行任务
               <strong style={{ color: 'var(--text-primary)', margin: '0 8px 0 4px' }}>{snapshot?.runningTasks ?? 0}</strong>
@@ -454,10 +476,13 @@ export default function ModuleCenter() {
           ) : (
             <div style={{ display: 'grid', gap: 8 }}>
               {trialPlugins.map((p) => (
-                <div key={p.plugin_id} className="module-issue-item">
+                <div key={p.plugin_id} className="module-issue-item" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <StatusBadge s="pending" />
-                  <span style={{ fontWeight: 600 }}>{p.name}</span>
-                  <code style={{ marginLeft: 6, fontSize: 11, color: 'var(--text-muted)' }}>{p.plugin_id}</code>
+                  <span style={{ fontWeight: 600, fontSize: 12 }}>{p.name}</span>
+                  <code style={{ fontSize: 10, color: 'var(--text-muted)' }}>v{p.version}</code>
+                  {p.capabilities?.slice(0, 2).map(c => (
+                    <span key={c} style={{ padding: '0 5px', borderRadius: 8, fontSize: 9, fontWeight: 600, background: '#eff6ff', color: '#1d4ed8' }}>{c}</span>
+                  ))}
                   <button className="ui-btn ui-btn-outline ui-btn-xs" style={{ marginLeft: 'auto' }} onClick={() => enablePlugin(p.plugin_id)} disabled={busyKey === `plugin-${p.plugin_id}`}>
                     {busyKey === `plugin-${p.plugin_id}` ? '处理中...' : '尝试启用'}
                   </button>
@@ -472,7 +497,9 @@ export default function ModuleCenter() {
       id: 'audit_feed',
       content: (
         <SectionCard title="最近审计流（24h）" description="统一观察关键变更">
-          {!snapshot?.auditRecent?.length ? (
+          {sectionLoading.audit && !snapshot?.auditRecent?.length ? (
+            <EmptyState icon="⏳" message="加载审计记录中..." />
+          ) : !snapshot?.auditRecent?.length ? (
             <EmptyState icon="📭" message="暂无审计记录" />
           ) : (
             <div className="module-audit-list">
@@ -492,7 +519,7 @@ export default function ModuleCenter() {
       ),
     },
   ]), [
-    overallScore, issues, modules, snapshot, toggleOpenClaw, busyKey, reconcileWorkflow, enablePluginsBatch, exportSnapshot, trialPlugins, enablePlugin,
+    overallScore, issues, modules, snapshot, toggleOpenClaw, busyKey, reconcileWorkflow, enablePluginsBatch, exportSnapshot, trialPlugins, enablePlugin, sectionLoading,
   ]);
 
   return (
@@ -520,6 +547,17 @@ export default function ModuleCenter() {
         )}
       />
 
+      {unauthorized && (
+        <SectionCard title="身份认证" style={{ marginBottom: 16 }}>
+          <div className="module-issue-item" style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#991b1b', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 18 }}>⚠️</span>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 13 }}>当前身份信息已过期或不可用</div>
+              <div style={{ fontSize: 11, opacity: 0.8 }}>部分数据未返回，请刷新页面或重新认证。以下显示缓存/默认值。</div>
+            </div>
+          </div>
+        </SectionCard>
+      )}
       {loading && !snapshot ? (
         <EmptyState message="加载模块快照中..." />
       ) : err ? (

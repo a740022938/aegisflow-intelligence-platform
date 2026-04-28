@@ -68,6 +68,16 @@ export const translations = {
     // 通用
     common: {
       loading: '加载中...',
+      home: '首页',
+      about: '关于',
+      systems: '系统',
+      help: '帮助',
+      wechat: '微信',
+      langSwitch: 'EN',
+      themeSwitch: '切换主题',
+      apiStatusPending: '检测中…',
+      apiStatusOk: 'API 正常',
+      apiStatusBad: 'API 异常',
       empty: '暂无数据',
       error: '出错了',
       retry: '重试',
@@ -109,6 +119,9 @@ export const translations = {
       recentActivity: '近期活动',
       systemStats: '系统统计',
       quickAccess: '快速入口',
+      lastAction: 'Last Action',
+      lastError: 'Last Error',
+      circuitState: 'Circuit State',
       execution: '执行类',
       dataTraining: '数据训练类',
       governance: '治理类',
@@ -144,7 +157,7 @@ export const translations = {
       daysAgo: '天前',
     },
   },
-  en: {
+    en: {
     // Navigation
     nav: {
       // ── Group labels ──
@@ -210,6 +223,16 @@ export const translations = {
     // Common
     common: {
       loading: 'Loading...',
+      home: 'Home',
+      about: 'About',
+      systems: 'Systems',
+      help: 'Help',
+      wechat: 'WeChat',
+      langSwitch: '中',
+      themeSwitch: 'Toggle Theme',
+      apiStatusPending: 'Checking…',
+      apiStatusOk: 'API Online',
+      apiStatusBad: 'API Offline',
       empty: 'No Data',
       error: 'Error',
       retry: 'Retry',
@@ -250,7 +273,10 @@ export const translations = {
       recentErrors: 'Recent Errors',
       recentActivity: 'Recent Activity',
       systemStats: 'System Stats',
-      quickAccess: 'Quick Access',
+      quickAccess: '快速入口',
+      lastAction: 'Last Action',
+      lastError: 'Last Error',
+      circuitState: 'Circuit State',
       execution: 'Execution',
       dataTraining: 'Data & Training',
       governance: 'Governance',
@@ -305,4 +331,35 @@ export function getStoredLang(): Lang {
 export function setStoredLang(lang: Lang) {
   if (typeof window === 'undefined') return;
   localStorage.setItem('agi_factory_site_lang', lang);
+}
+
+// Optional: server-side translation sync to align with backend-driven strings
+export async function syncTranslationsFromServer(lang: Lang): Promise<boolean> {
+  try {
+    // Endpoint is optional; if not present, gracefully skip
+    const resp = await fetch('/api/ui/i18n', {
+      method: 'GET',
+      headers: {
+        'Accept-Language': lang,
+      },
+    });
+    if (!resp || !resp.ok) return false;
+    const data = await resp.json();
+    if (!data || typeof data !== 'object') return false;
+    // Expect data to be shaped as { zh?: PartialDashboard, en?: PartialDashboard, ... }
+    // Merge each language dictionary if present
+    (Object.keys(data) as string[]).forEach((l) => {
+      const patch = (data as any)[l] as any;
+      if (patch && typeof patch === 'object') {
+        // merge top-level keys within that language
+        (translations as any)[l] = {
+          ...translations[(l as Lang)],
+          ...patch,
+        };
+      }
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }

@@ -9,9 +9,13 @@ import { createApproval, approveApproval, rejectApproval, findPendingApproval, g
 import { logAudit } from '../audit/index.js';
 import { resolveRoute } from '../cost-routing/index.js';
 import { autoCreateFromExperiment } from '../experiments/patch_sets.js';
+import { resolve } from 'node:path';
 
 function resolveDataRoot(): string {
-  return process.env.AGI_FACTORY_ROOT || process.env.AIP_REPO_ROOT || 'E:\\AGI_Factory';
+  if (process.env.AGI_FACTORY_ROOT) return process.env.AGI_FACTORY_ROOT;
+  if (process.env.AIP_WORKSPACE_ROOT) return process.env.AIP_WORKSPACE_ROOT;
+  if (process.env.AIP_REPO_ROOT) return process.env.AIP_REPO_ROOT;
+  return resolve(__dirname, '../../runtime');
 }
 
 function resolveRepoRoot(pathMod: any, fsMod: any): string {
@@ -598,7 +602,7 @@ function seedWorkflowFactoryTemplates() {
         },
       },
       default_input_json: {
-        source_path: 'E:/AGI_Factory/datasets/raw/demo.mp4',
+        source_path: '',
         experiment_id: 'exp-yolo-smart-flywheel',
         dataset_id: 'ds-yolo-smart-flywheel',
         template_version: '1.0.0',
@@ -1290,7 +1294,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
         if (fs.existsSync(candidateYaml)) datasetYaml = candidateYaml;
       }
       if (!datasetYaml) {
-        const conventionalYaml = path.join('E:', 'AGI_Factory', 'datasets', String(dataset_id), 'data.yaml');
+        const conventionalYaml = path.join(resolveDataRoot(), 'datasets', String(dataset_id), 'data.yaml');
         if (fs.existsSync(conventionalYaml)) datasetYaml = conventionalYaml;
       }
       if (!datasetYaml) {
@@ -1724,11 +1728,11 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
         if (fs.existsSync(candidate)) datasetYaml = candidate;
       }
       if (!datasetYaml) {
-        const conventional = path.join('E:', 'AGI_Factory', 'datasets', String(dataset_id), 'data.yaml');
+        const conventional = path.join(resolveDataRoot(), 'datasets', String(dataset_id), 'data.yaml');
         if (fs.existsSync(conventional)) datasetYaml = conventional;
       }
       if (!datasetYaml || !fs.existsSync(datasetYaml)) {
-        throw new Error(`dataset_yaml not found: "${datasetYaml || dataset_id}". Searched: input.dataset_yaml, meta_json.dataset_yaml, storage_path/data.yaml, E:\\AGI_Factory\\datasets\\${dataset_id}\\data.yaml`);
+        throw new Error(`dataset_yaml not found: "${datasetYaml || dataset_id}". Searched: input.dataset_yaml, meta_json.dataset_yaml, storage_path/data.yaml, ${resolveDataRoot()}\\datasets\\${dataset_id}\\data.yaml`);
       }
       
       // Build eval command
@@ -2175,7 +2179,7 @@ async function executeArchiveModel(step: StepRecord): Promise<{ ok: boolean; out
   // === 第一优先级：生成唯一的 artifact_id，所有地方共用 ===
   const artifactId = `art-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   
-  const archiveRoot = path.join('E:', 'AGI_Factory', 'archives');
+  const archiveRoot = path.join(resolveDataRoot(), 'archives');
   const modelArchiveDir = path.join(archiveRoot, model_id);
   const sourceModelPath = model.artifact_path || '';
   
@@ -2444,13 +2448,13 @@ async function executeReleaseModel(step: StepRecord): Promise<{ ok: boolean; out
   const releaseVersion = String(version || `${versionYear}.${versionMonthDay}.1`);
 
   // 3. 创建发布目录
-  const releaseRoot = path.join('E:', 'AGI_Factory', 'releases');
+  const releaseRoot = path.join(resolveDataRoot(), 'releases');
   const releaseDir = path.join(releaseRoot, model_id, releaseVersion);
   let releaseError: string | null = null;
   let releasedFiles: string[] = [];
 
   // 源归档目录
-  const archiveDir = path.join('E:', 'AGI_Factory', 'archives', model_id);
+  const archiveDir = path.join(resolveDataRoot(), 'archives', model_id);
 
   // 提前声明，避免 try 块作用域问题
   let manifest: any = {};
@@ -2832,7 +2836,7 @@ async function executeReleaseValidate(step: StepRecord): Promise<{ ok: boolean; 
   if (allPassed) {
     const t2 = Date.now();
     if (!resolvedReleasePath) {
-      resolvedReleasePath = pathJoin('E:', 'AGI_Factory', 'releases', modelId, resolvedVersion);
+      resolvedReleasePath = pathJoin(resolveDataRoot(), 'releases', modelId, resolvedVersion);
     }
     if (existsSync(resolvedReleasePath)) {
       checks.push({ name: 'release_dir_exists', passed: true, message: resolvedReleasePath, duration_ms: Date.now() - t2 });
@@ -3328,7 +3332,7 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
   }
 
   if (!resolvedReleasePath && resolvedVersion) {
-    resolvedReleasePath = pathJoin('E:', 'AGI_Factory', 'releases', modelId, resolvedVersion);
+    resolvedReleasePath = pathJoin(resolveDataRoot(), 'releases', modelId, resolvedVersion);
   }
 
   let resolvedValidationReportPath = validationReportPath;
@@ -3378,7 +3382,7 @@ async function executeFeedbackBackflow(step: StepRecord): Promise<{ ok: boolean;
   const risk = computeBackflowRisk(failedChecks, warnings, !validationFileExists, overallPassed);
   if (risk.risk_score >= 80) priority = 'high';
 
-  const feedbackDir = pathJoin('E:', 'AGI_Factory', 'feedback', modelId, resolvedVersion || 'unknown', feedbackId);
+  const feedbackDir = pathJoin(resolveDataRoot(), 'feedback', modelId, resolvedVersion || 'unknown', feedbackId);
   try {
     mkdirSync(feedbackDir, { recursive: true });
   } catch (err: any) {
@@ -3838,7 +3842,7 @@ async function executeFrameExtract(step: StepRecord): Promise<{ ok: boolean; out
   const fps = Number(rawInput.fps || 2);
   const maxFrames = Number(rawInput.max_frames || 0);
   const frameExtractionId = `fe-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const outputDir = String(rawInput.output_dir || join('E:', 'AGI_Factory', 'outputs', 'frames', frameExtractionId));
+  const outputDir = String(rawInput.output_dir || join(resolveDataRoot(), 'outputs', 'frames', frameExtractionId));
 
   // Step 2: Execute real extraction via Python runner
   const outputJson = join(outputDir, 'extract_output.json');
@@ -4502,7 +4506,7 @@ async function executeTrainConfigBuilder(_step: StepRecord): Promise<{ ok: boole
     if (existsSync(candidateYaml)) {
       datasetYaml = candidateYaml;
     } else {
-      const altYaml = path.join('E:', 'AGI_Factory', 'datasets', datasetId, 'data.yaml');
+      const altYaml = path.join(resolveDataRoot(), 'datasets', datasetId, 'data.yaml');
       if (existsSync(altYaml)) datasetYaml = altYaml;
     }
   }
@@ -4514,7 +4518,7 @@ async function executeTrainConfigBuilder(_step: StepRecord): Promise<{ ok: boole
   const trainConfig = {
     task: taskType,
     model: modelVariant,
-    data: datasetYaml || `E:/AGI_Factory/datasets/${datasetId}/data.yaml`,
+    data: datasetYaml || `runtime/datasets/${datasetId}/data.yaml`,
     epochs,
     imgsz,
     batch,
@@ -4562,7 +4566,7 @@ async function executeTrainConfigBuilder(_step: StepRecord): Promise<{ ok: boole
   };
 
   // ── 写真实配置文件 ─────────────────────────────────────────────
-  const configDir = path.join('E:', 'AGI_Factory', 'configs', 'train', experimentId);
+  const configDir = path.join(resolveDataRoot(), 'configs', 'train', experimentId);
   const configPath = path.join(configDir, 'train_config.yaml');
   try {
     fs.mkdirSync(configDir, { recursive: true });
@@ -4578,7 +4582,7 @@ async function executeTrainConfigBuilder(_step: StepRecord): Promise<{ ok: boole
       `model: ${modelVariant}`,
       '',
       '# Data',
-      `data: ${datasetYaml || `E:/AGI_Factory/datasets/${datasetId}/data.yaml`}`,
+      `data: ${datasetYaml || `runtime/datasets/${datasetId}/data.yaml`}`,
       '',
       '# Training',
       `epochs: ${epochs}`,
@@ -4870,7 +4874,8 @@ async function executeSamSegment(step: StepRecord): Promise<{ ok: boolean; outpu
   mkdirSync(segDir, { recursive: true });
 
   const shManifest = sh.manifest_path || '';
-  const checkpoint = 'E:\AGI_Factory\checkpoints\sam_vit_b.pth';
+  const repoRoot = resolveRepoRoot(pathMod, fsMod);
+  const checkpoint = pathMod.join(repoRoot, 'runtime', 'checkpoints', 'sam_vit_b.pth');
   const modelType = 'vit_b';
   const device = 'cpu';
 
@@ -5060,7 +5065,7 @@ const verifDir = join(process.env.AIP_REPO_ROOT || repoRoot || process.cwd(), 'r
   });
 
   // ── 调用 classifier_runner.py ───────────────────────────────────────────
-  const runnerScript = join('E:', 'AGI_Factory', 'repo', 'workers', 'python-worker', 'classifier_runner.py');
+  const runnerScript = join(resolveRepoRoot(require('path'), require('fs')), 'workers', 'python-worker', 'classifier_runner.py');
   const segManifest = seg.manifest_path || '';
   const outputDir = verifDir;
 
@@ -5367,16 +5372,16 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
       source_path: p.source_path,  // 透传给下游
       source_type: p.source_type,
       frame_extraction_id: `mock_fe_${Date.now()}`,
-      manifest_path: `E:/AGI_Factory/runs/mock_extraction/manifest.json`,
+      manifest_path: `${resolveDataRoot()}/runs/mock_extraction/manifest.json`,
     }),
     frame_extract: (p) => ({
       source_path: p.source_path,  // 透传
       frame_extraction_id: `mock_fe_${Date.now()}`,
-      manifest_path: `E:/AGI_Factory/runs/mock_extraction/manifest.json`,
+      manifest_path: `${resolveDataRoot()}/runs/mock_extraction/manifest.json`,
     }),
     frame_clean: (p) => ({
       frame_extraction_id: p.frame_extraction_id || `mock_fe_${Date.now()}`,
-      manifest_path: `E:/AGI_Factory/runs/mock_clean/manifest.json`,
+      manifest_path: `${resolveDataRoot()}/runs/mock_clean/manifest.json`,
       dataset_id: p.dataset_id || `mock_ds_${Date.now()}`,  // 生成dataset_id给下游
     }),
     dataset_register: (p) => ({
@@ -5384,7 +5389,7 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
     }),
     dataset_split: (p) => ({
       dataset_id: p.dataset_id,
-      split_manifest_path: `E:/AGI_Factory/datasets/${p.dataset_id}/split_manifest.json`,
+      split_manifest_path: `${resolveDataRoot()}/datasets/${p.dataset_id}/split_manifest.json`,
     }),
     dataset_loader: (p) => ({
       dataset_id: p.dataset_id,
@@ -5392,14 +5397,14 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
     
     // 训练节点：输出 experiment_id, model_id
     train_config_builder: (p) => ({
-      train_config_path: `E:/AGI_Factory/configs/train_config_${Date.now()}.yaml`,
+      train_config_path: `${resolveDataRoot()}/configs/train_config_${Date.now()}.yaml`,
       experiment_id: p.experiment_id,
       dataset_id: p.dataset_id,
     }),
     train_model: (p) => ({
       experiment_id: p.experiment_id,
       model_id: `mock_model_${Date.now()}`,
-      checkpoint_path: `E:/AGI_Factory/runs/train/checkpoint.pt`,
+      checkpoint_path: `${resolveDataRoot()}/runs/train/checkpoint.pt`,
     }),
     
     // 评估节点：输出 evaluation_id
@@ -5412,7 +5417,7 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
     // 检测节点：输出 verification_id
     yolo_detect: (p) => ({
       verification_id: `mock_verif_${Date.now()}`,
-      manifest_path: `E:/AGI_Factory/runs/detection/manifest.json`,
+      manifest_path: `${resolveDataRoot()}/runs/detection/manifest.json`,
       experiment_id: p.experiment_id,
       dataset_id: p.dataset_id,
     }),
@@ -5420,7 +5425,7 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
     // 分割节点：输出 segmentation_id
     sam_segment: (p) => ({
       segmentation_id: `mock_seg_${Date.now()}`,
-      manifest_path: `E:/AGI_Factory/runs/segmentation/manifest.json`,
+      manifest_path: `${resolveDataRoot()}/runs/segmentation/manifest.json`,
     }),
     sam_handoff: (p) => ({
       handoff_id: `mock_handoff_${Date.now()}`,
@@ -5430,13 +5435,13 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
     // 分类验证节点：输出 verification_id
     classifier_verify: (p) => ({
       verification_id: `mock_verif_${Date.now()}`,
-      manifest_path: `E:/AGI_Factory/runs/classification/manifest.json`,
+      manifest_path: `${resolveDataRoot()}/runs/classification/manifest.json`,
     }),
     
     // 追踪节点：输出 tracker_run_id
     tracker_run: (p) => ({
       tracker_run_id: `mock_track_${Date.now()}`,
-      manifest_path: `E:/AGI_Factory/runs/tracker/manifest.json`,
+      manifest_path: `${resolveDataRoot()}/runs/tracker/manifest.json`,
     }),
     
     // 其他节点
@@ -5453,10 +5458,10 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
     }),
     badcase_mine: (p) => ({
       badcase_count: 42,
-      badcase_manifest: `E:/AGI_Factory/runs/badcase/manifest.json`,
+      badcase_manifest: `${resolveDataRoot()}/runs/badcase/manifest.json`,
     }),
     export_model: (p) => ({
-      export_path: `E:/AGI_Factory/models/exported/model_${Date.now()}.onnx`,
+      export_path: `${resolveDataRoot()}/models/exported/model_${Date.now()}.onnx`,
     }),
     archive_model: (p) => ({
       artifact_id: `mock_artifact_${Date.now()}`,
@@ -5465,7 +5470,7 @@ function generateDryRunMockOutput(stepKey: string, params: Record<string, any>):
       release_id: `mock_rel_${Date.now()}`,
       model_id: p.model_id,
       version: '2026.0421.1',
-      release_path: `E:/AGI_Factory/releases/${p.model_id}/2026.0421.1`,
+      release_path: `${resolveDataRoot()}/releases/${p.model_id}/2026.0421.1`,
     }),
     release_validate: (p) => ({
       release_status: 'validated',
@@ -5700,7 +5705,9 @@ const STEP_DRYRUN_CHECKERS: Record<string, (input: Record<string, unknown>) => P
     items.push({ code: 'RESOURCE_OK', item: 'model', status: 'ok', message: 'model status=' + (model.status || 'unknown') });
     
     // 检查是否有归档产物
-    const archiveDir = 'E:/AGI_Factory/archives/' + model_id;
+    const repoRoot = process.env.AIP_REPO_ROOT || process.cwd();
+    const workspaceRoot = process.env.AIP_WORKSPACE_ROOT || (repoRoot + '/runtime');
+    const archiveDir = workspaceRoot + '/archives/' + model_id;
     items.push({ code: 'ARCHIVE_CHECK', item: 'archive_dir', status: 'warning', message: 'Will check archive dir at runtime: ' + archiveDir });
 
     const hasError = items.some(i => i.status === 'error');

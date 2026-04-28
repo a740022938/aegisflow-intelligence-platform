@@ -152,7 +152,7 @@
 }
 
 .dash-title {
-  font-size: var(--text-2xl);
+  font-size: clamp(18px, 2.5vw, 28px);
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -288,7 +288,7 @@
 }
 
 @keyframes dash-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
+  from, to { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.2); }
 }
 
@@ -811,5 +811,102 @@
   
   .dash-activity-action {
     display: none;
+  }
+
+  .dash-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .dash-header-main {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .dash-header-meta {
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+  .dash-openclaw-header {
+    flex-wrap: wrap;
+  }
+  .dash-openclaw-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dash-flight-deck {
+    padding: var(--space-2);
+    gap: var(--space-3);
+  }
+  .dash-header {
+    padding: var(--space-3);
+  }
+  .dash-title {
+    font-size: 17px;
+  }
+  .dash-subtitle {
+    font-size: 12px;
+  }
+  .dash-openclaw-card {
+    padding: var(--space-3);
+  }
+  .dash-openclaw-title {
+    font-size: 15px;
+  }
+  .dash-openclaw-switch {
+    width: 52px;
+    height: 28px;
+  }
+  .dash-openclaw-switch-knob {
+    width: 20px;
+    height: 20px;
+    top: 4px;
+    left: 4px;
+  }
+  .dash-openclaw-switch.on .dash-openclaw-switch-knob {
+    left: 28px;
+  }
+  .dash-openclaw-metrics {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+  .dash-openclaw-metric {
+    padding: 8px;
+  }
+  .dash-openclaw-metric strong {
+    font-size: 12px;
+    white-space: normal;
+    word-break: break-word;
+  }
+  .dash-instrument-panel {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  .dash-instrument-card {
+    grid-column: span 1;
+  }
+  .dash-instrument-primary,
+  .dash-instrument-wide {
+    grid-column: span 1;
+  }
+  .dash-instrument-value {
+    font-size: 22px;
+  }
+  .dash-module-grid {
+    grid-template-columns: 1fr;
+  }
+  .dash-module-group:last-child .dash-module-grid {
+    grid-template-columns: 1fr;
+  }
+  .dash-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dash-modules-panel {
+    padding: var(--space-3);
+  }
+  .dash-motion-panel {
+    padding: var(--space-3);
   }
 }

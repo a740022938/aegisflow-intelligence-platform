@@ -150,6 +150,69 @@ function ApprovalBadge({ status, policy }: { status?: string; policy?: string })
   );
 }
 
+const STEP_COLORS: Record<string, string> = {
+  pending: '#6B7280',
+  running: '#3B82F6',
+  succeeded: '#10B981',
+  completed: '#10B981',
+  success: '#10B981',
+  failed: '#EF4444',
+  cancelled: '#F59E0B',
+  blocked: '#8B5CF6',
+  skipped: '#EAB308',
+};
+
+function StepTimeline({ steps, activeStepId, onStepClick }: { steps: any[]; activeStepId?: string; onStepClick?: (id: string) => void }) {
+  if (!steps || steps.length === 0) return null;
+  const sorted = [...steps].sort((a, b) => (Number(a.step_order ?? 0) - Number(b.step_order ?? 0)));
+  return (
+    <div style={{ display: 'flex', gap: 0, alignItems: 'center', padding: '12px 0', overflow: 'auto' }}>
+      {sorted.map((step, idx) => {
+        const color = STEP_COLORS[step.status] || '#6B7280';
+        const isActive = step.id === activeStepId;
+        return (
+          <React.Fragment key={step.id}>
+            <div
+              onClick={() => onStepClick?.(step.id)}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                cursor: onStepClick ? 'pointer' : 'default', minWidth: 80,
+                opacity: step.status === 'pending' ? 0.4 : 1,
+              }}
+            >
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: isActive ? color : 'transparent',
+                border: `2px solid ${color}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 600,
+                color: isActive ? '#fff' : color,
+                transition: 'all 0.2s',
+              }}>
+                {step.status === 'succeeded' || step.status === 'completed' || step.status === 'success' ? '✓' :
+                 step.status === 'failed' ? '✗' :
+                 step.status === 'running' ? '●' :
+                 step.status === 'cancelled' ? '—' :
+                 step.status === 'blocked' ? '⊘' :
+                 step.status === 'skipped' ? '→' : String(idx + 1)}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'center', maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {step.step_name || step.step_key || `Step ${idx + 1}`}
+              </div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                {step.status}
+              </div>
+            </div>
+            {idx < sorted.length - 1 && (
+              <div style={{ flex: 1, height: 2, background: color, opacity: 0.3, minWidth: 20, margin: '0 4px' }} />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function WorkflowJobs() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
@@ -159,6 +222,7 @@ export default function WorkflowJobs() {
   const [search, setSearch] = useState('');
 
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
+  const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
   const [jobSteps, setJobSteps] = useState<any[]>([]);
   const [jobApprovals, setJobApprovals] = useState<any[]>([]);
   const [jobReflections, setJobReflections] = useState<any[]>([]);
@@ -388,6 +452,7 @@ export default function WorkflowJobs() {
 
   const openJob = async (j: any) => {
     setSelectedJob(j);
+    setSelectedStepId(null);
     setJobSteps([]);
     setJobApprovals([]);
     setJobReflections([]);
@@ -632,6 +697,59 @@ export default function WorkflowJobs() {
                   { label: 'Created', value: fmtTs(selectedJob.created_at) },
                   { label: 'Finished', value: selectedJob.finished_at ? fmtTs(selectedJob.finished_at) : '暂无完成时间' },
                 ]} />
+              </SectionCard>
+
+              <SectionCard title="Status Timeline">
+                {detailLoading ? (
+                  <EmptyState message="Loading..." />
+                ) : jobSteps.length === 0 ? (
+                  <EmptyState icon="⚙" message="No steps to display" />
+                ) : (
+                  <>
+                    <StepTimeline steps={jobSteps} activeStepId={selectedStepId || undefined} onStepClick={setSelectedStepId} />
+                    {selectedStepId && (() => {
+                      const step = jobSteps.find((s: any) => s.id === selectedStepId);
+                      if (!step) return null;
+                      return (
+                        <div style={{ marginTop: 8, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
+                            {step.step_name || step.step_key} — Step Details
+                          </div>
+                          {step.input_json != null && (
+                            <div style={{ marginBottom: 8 }}>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>input_json</div>
+                              <pre style={{ margin: 0, fontSize: 11, whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto', background: 'var(--bg-elevated)', padding: 8, borderRadius: 6 }}>{pretty(step.input_json)}</pre>
+                            </div>
+                          )}
+                          {step.output_json != null && (
+                            <div style={{ marginBottom: 8 }}>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>output_json</div>
+                              <pre style={{ margin: 0, fontSize: 11, whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto', background: 'var(--bg-elevated)', padding: 8, borderRadius: 6 }}>{pretty(step.output_json)}</pre>
+                            </div>
+                          )}
+                          {step.error_message && (
+                            <div style={{ marginBottom: 8 }}>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: '#EF4444', marginBottom: 4 }}>error_message</div>
+                              <pre style={{ margin: 0, fontSize: 11, whiteSpace: 'pre-wrap', background: '#EF444422', padding: 8, borderRadius: 6 }}>{step.error_message}</pre>
+                            </div>
+                          )}
+                          {step.logs && step.logs.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>logs</div>
+                              <div style={{ maxHeight: 200, overflow: 'auto', background: '#1a1a2e', borderRadius: 6, padding: 8, fontFamily: 'var(--font-mono)', fontSize: 11, lineHeight: 1.5 }}>
+                                {(Array.isArray(step.logs) ? step.logs : [step.logs]).map((log: any, i: number) => (
+                                  <div key={i} style={{ color: '#d4d4d4' }}>
+                                    {typeof log === 'string' ? log : JSON.stringify(log)}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </>
+                )}
               </SectionCard>
 
               <SectionCard title="Recent Reflection Hint">

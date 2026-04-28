@@ -23,7 +23,7 @@ const _ensureClassifierResultsTable = () => {
       crop_y2              INTEGER,
       yolo_original_class  TEXT,
       yolo_original_conf  REAL,
-      classifier_model_path TEXT   DEFAULT 'E:/mahjong_vision_strongest',
+      classifier_model_path TEXT   DEFAULT 'runtime/models/mahjong_vision_strongest',
       model_type           TEXT   DEFAULT 'ViT-B/16',
       execution_mode       TEXT   DEFAULT 'real',
       predicted_class_id  INTEGER,
@@ -612,7 +612,7 @@ export async function registerDataChainRoutes(app: FastifyInstance) {
           if (body.image_base64) {
             script = `
 import sys, base64, json, io
-sys.path.insert(0, r'E:\\AGI_Factory\\apps\\local-api\\src')
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'apps', 'local-api', 'src'))
 from PIL import Image
 from mahjong_vision_classifier import classify_crop, get_model
 model, processor = get_model()
@@ -624,8 +624,8 @@ print(json.dumps({'predicted_class_id': r.class_id, 'predicted_label': r.label, 
 `;
           } else {
             script = `
-import sys, json
-sys.path.insert(0, r'E:\\AGI_Factory\\apps\\local-api\\src')
+import sys, json, os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'apps', 'local-api', 'src'))
 from PIL import Image
 from mahjong_vision_classifier import classify_crop, get_model
 model, processor = get_model()
@@ -687,7 +687,8 @@ print(json.dumps({'predicted_class_id': r.class_id, 'predicted_label': r.label, 
         row.top5_json, row.infer_time_ms, row.dataset_version_id, row.created_at
       );
 
-      return { ok: true, classifier_result: row, model_info: { path: 'E:/mahjong_vision_strongest', model_type: 'ViT-B/16', classes: 34 } };
+      const modelPath = process.env.AIP_WORKSPACE_ROOT ? process.env.AIP_WORKSPACE_ROOT + '/models/mahjong_vision_strongest' : 'runtime/models/mahjong_vision_strongest';
+      return { ok: true, classifier_result: row, model_info: { path: modelPath, model_type: 'ViT-B/16', classes: 34 } };
     } catch (error) {
       return reply.status(500).send({ ok: false, error: String(error) });
     }

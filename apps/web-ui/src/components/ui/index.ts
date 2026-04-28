@@ -62,3 +62,6 @@ export { default as HealthPatrolPanel } from './HealthPatrolPanel';
 export { default as VerificationSummaryPanel } from './VerificationSummaryPanel';
 export { default as TrendSummaryPanel } from './TrendSummaryPanel';
 export { default as RiskSignalBadge } from './RiskSignalBadge';
+
+export { default as StepStatusIndicator } from './StepStatusIndicator';
+export type { StepStatusIndicatorProps } from './StepStatusIndicator';

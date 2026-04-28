@@ -2,6 +2,22 @@
 
 const API_BASE_URL = '/api';
 
+// 全局 axios 响应拦截器: 处理 401 / 网络错误兜底
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn('[api] 401 Unauthorized — using dev fallback');
+      return Promise.resolve({ data: { ok: false, error: 'unauthorized', _unauthorized: true } });
+    }
+    if (!error.response) {
+      console.warn('[api] Network error — using dev fallback');
+      return Promise.resolve({ data: { ok: false, error: 'network_error', _networkError: true } });
+    }
+    return Promise.reject(error);
+  }
+);
+
 export interface Task {
   id: string;
   title: string;

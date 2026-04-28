@@ -73,6 +73,7 @@ import { recordHealthCheck, recordMasterSwitch, recordHeartbeatReceived, getCore
 import { registerWebSocketHub } from './ws-hub/index.js';
 import { registerModelLineageRoutes } from './model-lineage/index.js';
 import { registerNotifyRoutes } from './notify/index.js';
+import { registerMahjongPredictRoutes } from './vision-bus/mahjong-predict.js';
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -139,6 +140,16 @@ restoreOpenClawTokens();
 function bootstrapOpenClawTokenPersistence() {
   try {
     ensureOpenClawTables();
+    try {
+      const cRow = db.getDatabase().prepare(`SELECT circuit_state, circuit_fail_count, timeout_window_count FROM openclaw_control WHERE id = 1`).get() as any;
+      if (cRow) {
+        const cs = String(cRow.circuit_state || 'normal');
+        if (cs === 'triggered') console.warn('[openclaw] Circuit was in triggered state on startup');
+        console.log(`[openclaw] Circuit state restored: ${cs}`);
+      }
+    } catch (err) {
+      console.error('[openclaw] Failed to restore circuit state:', err);
+    }
     const dbInstance = db.getDatabase();
 
     const envHeartbeat = String(process.env.OPENCLAW_HEARTBEAT_TOKEN || '').trim();
@@ -275,12 +286,14 @@ const PUBLIC_PATHS = new Set([
   '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2', '/api/openclaw/master-switch',
   '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status',
 ]);
+const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static'];
 const DOCS_PREFIXES = ['/docs', '/swagger', '/openapi'];
 
 app.addHook('onRequest', async (request, reply) => {
   const path = request.url?.split('?')[0] || '';
   if (!path.startsWith('/api/')) return;
   if (PUBLIC_PATHS.has(path)) return;
+  if (PUBLIC_PREFIXES.some(p => path.startsWith(p))) return;
   if (DOCS_PREFIXES.some(p => path.startsWith(p))) return;
   try { await request.jwtVerify(); } catch { return reply.code(401).send({ ok: false, error: 'unauthorized' }); }
 });
@@ -358,6 +371,9 @@ registerModelLineageRoutes(app);
 
 // 通知系统 (Telegram)
 registerNotifyRoutes(app);
+
+// 麻将视觉调试台 — 预测预览
+registerMahjongPredictRoutes(app);
 
 // OpenClaw 旧路径显式兼容（防止客户端命中 /openclaw/* 返回 404）
 app.get('/openclaw/master-switch', async (_request: any, reply: any) => {
@@ -674,6 +690,16 @@ app.post('/api/openclaw/token', async (request: any, reply: any) => {
   try {
     ensureOpenClawTables();
     const dbInstance = db.getDatabase();
+    try {
+      const cRow = dbInstance.prepare(`SELECT circuit_state, circuit_fail_count, timeout_window_count FROM openclaw_control WHERE id = 1`).get() as any;
+      if (cRow) {
+        const cs = String(cRow.circuit_state || 'normal');
+        if (cs === 'triggered') console.warn('[openclaw] Circuit was in triggered state on startup');
+        console.log(`[openclaw] Circuit state restored: ${cs}`);
+      }
+    } catch (err) {
+      console.error('[openclaw] Failed to restore circuit state:', err);
+    }
     if (token) {
       process.env.OPENCLAW_HEARTBEAT_TOKEN = token;
       dbInstance.prepare(`INSERT OR REPLACE INTO openclaw_config (key, value, updated_at) VALUES ('heartbeat_token', ?, ?)`).run(token, nowIso());
@@ -3107,7 +3133,11 @@ const start = async () => {
     } catch (qErr) {
       app.log.warn(`Task queue init skipped: ${qErr}`);
     }
-    
+
+    const qStats = getTaskQueue().getStats();
+    const recoveredCount = (qStats as any).recovered || 0;
+    console.log(`[queue] Recovery complete: ${recoveredCount} tasks restored from DB`);
+
     await app.listen({ port: PORT, host: HOST });
     
     // ── Internal OpenClaw heartbeat ─────────────────────────────────
@@ -3554,7 +3584,7 @@ function getLatestRealBackup(): RealBackupView | null {
     path.resolve(process.cwd(), 'backups'),
     path.resolve(process.cwd(), '..', 'backups'),
     path.resolve(process.cwd(), '../..', 'backups'),
-    dataRoot ? `${dataRoot}\\backups` : 'E:\\AGI_Factory\\backups',
+    dataRoot ? `${dataRoot}\\backups` : '',
   ];
   const existingRoots = backupRoots.filter((p) => fs.existsSync(p));
   if (existingRoots.length === 0) return null;

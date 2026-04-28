@@ -139,6 +139,11 @@ export default function GovernanceHub() {
   const [operationsOverview, setOperationsOverview] = useState<any>(null);
   const [assistantForceFail, setAssistantForceFail] = useState(false);
   const [showAssistantRaw, setShowAssistantRaw] = useState(false);
+  const [healthData, setHealthData] = useState<any>(null);
+  const [openclawData, setOpenclawData] = useState<any>(null);
+  const [dbPingData, setDbPingData] = useState<any>(null);
+  const [dbDiagData, setDbDiagData] = useState<any>(null);
+  const [healthLoading, setHealthLoading] = useState(false);
 
   const [statusFilter, setStatusFilter] = useState('');
   const [severityFilter, setSeverityFilter] = useState('');
@@ -153,6 +158,23 @@ export default function GovernanceHub() {
     const r = await fetch(`${API}/incidents/summary`);
     const d = await r.json();
     if (d?.ok) setSummary(d.data || null);
+  }, []);
+
+  const fetchSystemHealth = useCallback(async () => {
+    setHealthLoading(true);
+    try {
+      const [h, o, p, d] = await Promise.allSettled([
+        fetch(`${API}/health`).then((r) => r.json()),
+        fetch(`${API}/openclaw/master-switch`).then((r) => r.json()),
+        fetch(`${API}/db/ping`).then((r) => r.json()),
+        fetch(`${API}/system/database/diagnostics`).then((r) => r.json()),
+      ]);
+      if (h.status === 'fulfilled') setHealthData(h.value);
+      if (o.status === 'fulfilled') setOpenclawData(o.value);
+      if (p.status === 'fulfilled') setDbPingData(p.value);
+      if (d.status === 'fulfilled') setDbDiagData(d.value);
+    } catch {}
+    setHealthLoading(false);
   }, []);
 
   const fetchIncidents = useCallback(async () => {
@@ -391,6 +413,10 @@ export default function GovernanceHub() {
     if (selectedId) fetchIncidentDetail(selectedId).then(() => undefined);
   }, [selectedId, fetchIncidentDetail]);
 
+  useEffect(() => {
+    fetchSystemHealth().then(() => undefined);
+  }, [fetchSystemHealth]);
+
   const stats = useMemo(() => {
     const bySeverity = summary?.by_severity || {};
     const byStatus = summary?.by_status || {};
@@ -426,6 +452,187 @@ export default function GovernanceHub() {
       />
 
       {!!error && <div className="ui-alert ui-alert-danger">{error}</div>}
+
+      <SectionCard title="System Health Summary" className="gh-panel">
+        {healthLoading && !healthData && !openclawData && !dbPingData && !dbDiagData ? (
+          <div className="gh-muted">Loading system health data...</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            {/* Card 1: API Status */}
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: 16,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    backgroundColor: healthData?.ok ? '#22c55e' : 'var(--danger)',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+                <strong style={{ color: 'var(--text-primary)' }}>API Status</strong>
+              </div>
+              {healthData ? (
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+                  <div>Status: {healthData.ok ? 'OK' : 'Error'}</div>
+                  <div>Version: {healthData.version || '—'}</div>
+                  <div>Uptime: {typeof healthData.uptime === 'number' ? `${Math.floor(healthData.uptime)}s` : (healthData.uptime || '—')}</div>
+                  {healthData.workerPool ? (
+                    <div>Worker Pool: {healthData.workerPool.busy ?? 0} busy / {healthData.workerPool.idle ?? 0} idle / {healthData.workerPool.total ?? 0} total</div>
+                  ) : (
+                    <div>Worker Pool: no data available — the health endpoint may not expose worker pool metrics</div>
+                  )}
+                  {healthData.taskQueue ? (
+                    <div>Task Queue: {healthData.taskQueue.active ?? 0} active / {healthData.taskQueue.queued ?? 0} queued</div>
+                  ) : (
+                    <div>Task Queue: no data available — the health endpoint may not expose task queue metrics</div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Unable to fetch API health data. Check that the API server at {API}/health is running.</div>
+              )}
+            </div>
+
+            {/* Card 2: OpenClaw Status */}
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: 16,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    backgroundColor: openclawData?.circuit_state === 'triggered' ? 'var(--danger)' : (openclawData?.online ? '#22c55e' : '#eab308'),
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+                <strong style={{ color: 'var(--text-primary)' }}>OpenClaw Status</strong>
+              </div>
+              {openclawData ? (
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+                  <div>Status: {openclawData.online ? 'Online' : 'Offline'}</div>
+                  <div>Circuit State: {openclawData.circuit_state || '—'}</div>
+                  <div>Failure Count: {openclawData.failure_count ?? 0}</div>
+                  <div>Timeout Count: {openclawData.timeout_count ?? 0}</div>
+                  <div>Last Heartbeat: {openclawData.last_heartbeat ? fmtTs(openclawData.last_heartbeat) : '—'}</div>
+                  {openclawData.circuit_state === 'triggered' && (
+                    <button
+                      className="ui-btn ui-btn-xs ui-btn-warning"
+                      style={{ marginTop: 8 }}
+                      onClick={async () => {
+                        try {
+                          await fetch(`${API}/openclaw/master-switch`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'recover' }),
+                          });
+                          fetchSystemHealth();
+                        } catch {}
+                      }}
+                    >
+                      Recover Circuit
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Unable to fetch OpenClaw status. The service at {API}/openclaw/master-switch may be unavailable.</div>
+              )}
+            </div>
+
+            {/* Card 3: Database Status */}
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: 16,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    backgroundColor: dbPingData?.error_count > 0 ? '#eab308' : (dbPingData?.ok ? '#22c55e' : 'var(--danger)'),
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+                <strong style={{ color: 'var(--text-primary)' }}>Database Status</strong>
+              </div>
+              {dbPingData ? (
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+                  <div>Status: {dbPingData.ok ? 'Connected' : 'Error'}</div>
+                  <div>Tables: {Array.isArray(dbPingData.tables) ? dbPingData.tables.length : (dbPingData.table_count ?? '—')}</div>
+                  <div>Queries: {dbPingData.query_count ?? '—'}</div>
+                  <div>Errors: {dbPingData.error_count ?? 0}</div>
+                  <div>Journal Mode: {dbPingData.journal_mode || '—'}</div>
+                  {dbPingData.error_count > 0 && (
+                    <div style={{ color: '#eab308', marginTop: 4 }}>Warning: {dbPingData.error_count} database error(s) detected</div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Unable to fetch database status. The endpoint {API}/db/ping may be unreachable.</div>
+              )}
+            </div>
+
+            {/* Card 4: Worker Pool */}
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: 16,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    backgroundColor: dbDiagData?.worker_errors?.length > 0 ? '#eab308' : '#22c55e',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+                <strong style={{ color: 'var(--text-primary)' }}>Worker Pool</strong>
+              </div>
+              {dbDiagData ? (
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+                  <div>Total Workers: {dbDiagData.total_workers ?? dbDiagData.worker_pool?.total ?? '—'}</div>
+                  <div>Busy: {dbDiagData.busy_workers ?? dbDiagData.worker_pool?.busy ?? '—'}</div>
+                  <div>Idle: {dbDiagData.idle_workers ?? dbDiagData.worker_pool?.idle ?? '—'}</div>
+                  <div>Queued Tasks: {dbDiagData.queued_tasks ?? dbDiagData.task_queue?.queued ?? '—'}</div>
+                  {dbDiagData.worker_errors?.length > 0 && (
+                    <div style={{ color: '#eab308', marginTop: 4 }}>
+                      Worker Errors: {dbDiagData.worker_errors.map((e: any) => e.message || String(e)).join('; ')}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Unable to fetch worker diagnostics. The endpoint {API}/system/database/diagnostics may be unavailable.</div>
+              )}
+            </div>
+          </div>
+        )}
+      </SectionCard>
 
       <SectionCard title="事件总览" className="gh-panel">
         <div className="gh-stats-grid">

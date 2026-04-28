@@ -38,6 +38,11 @@ const STATUS_MAP: Record<string, { color: string; bg: string }> = {
   archived: { color: 'var(--text-muted)', bg: 'var(--bg-elevated)' },
   created: { color: 'var(--text-muted)', bg: 'var(--bg-elevated)' },
   deleted: { color: 'var(--text-muted)', bg: 'var(--bg-elevated)' },
+
+  // 扩展状态
+  paused: { color: 'var(--warning)', bg: 'var(--warning-light)' },
+  blocked: { color: '#8B5CF6', bg: '#8B5CF622' },
+  skipped: { color: '#EAB308', bg: '#EAB30822' },
 };
 
 export { STATUS_MAP as STATUS_COLORS };

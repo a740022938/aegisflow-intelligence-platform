@@ -82,6 +82,7 @@ apps/local-api/local_api.db
 apps/local-api/server.err
 apps/local-api/smoke_test.py
 apps/local-api/test_video.mp4
+apps/local-api/src/db/builtin-sqlite.db
 *.pt
 *.pth
 *.onnx

@@ -6,12 +6,33 @@ interface State { error: Error | null; }
 export class ErrorBoundary extends React.Component<Props, State> {
   state: State = { error: null };
 
+  private _errorHandler: ((event: ErrorEvent) => void) | null = null;
+  private _unhandledHandler: ((event: PromiseRejectionEvent) => void) | null = null;
+
   static getDerivedStateFromError(error: Error): State {
     return { error };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error('[ErrorBoundary]', error, info.componentStack);
+  }
+
+  componentDidMount() {
+    this._errorHandler = (event: ErrorEvent) => {
+      console.error('[ErrorBoundary] Caught async error:', event.error);
+      event.preventDefault();
+    };
+    window.addEventListener('error', this._errorHandler);
+    this._unhandledHandler = (event: PromiseRejectionEvent) => {
+      console.error('[ErrorBoundary] Unhandled rejection:', event.reason);
+      event.preventDefault();
+    };
+    window.addEventListener('unhandledrejection', this._unhandledHandler);
+  }
+
+  componentWillUnmount() {
+    if (this._errorHandler) window.removeEventListener('error', this._errorHandler);
+    if (this._unhandledHandler) window.removeEventListener('unhandledrejection', this._unhandledHandler);
   }
 
   render() {

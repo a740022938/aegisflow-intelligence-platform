@@ -166,16 +166,20 @@ export default function PluginPool() {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10000);
     try {
-      // P0-B: 使用新 registry 端点（统一结构）
       const r = await fetch('/api/plugins/registry', { signal: controller.signal });
+      const d = await r.json().catch(() => ({}));
+      if (d?._unauthorized) {
+        setItems([]);
+        setLoadError('API requires authentication token. Configure OPENCLAW tokens or JWT.');
+        return;
+      }
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const d = await r.json();
       if (!d?.ok) {
-        throw new Error(d?.error || '插件系统未启用');
+        throw new Error(d?.error || 'Plugin system not enabled');
       }
       setItems(Array.isArray(d?.items) ? d.items : []);
     } catch (err: any) {
-      setLoadError(err?.name === 'AbortError' ? '请求超时，请检查 local-api 服务' : `加载失败：${String(err?.message || err)}`);
+      setLoadError(err?.name === 'AbortError' ? 'Request timeout' : `Load failed: ${String(err?.message || err)}`);
       setItems([]);
     } finally {
       clearTimeout(timer);
@@ -204,12 +208,16 @@ export default function PluginPool() {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
       });
       const d = await r.json().catch(() => ({}));
+      if (d?._unauthorized) {
+        setLoadError('Authentication required for plugin toggle');
+        return;
+      }
       if (!r.ok || d?.ok === false) {
         throw new Error(String(d?.error || `HTTP ${r.status}`));
       }
-      await fetchPool();
+      fetchPool();
     } catch (err: any) {
-      setLoadError(`插件操作失败：${String(err?.message || err)}`);
+      setLoadError(`Plugin action failed: ${String(err?.message || err)}`);
     } finally { setBusyId(''); }
   }, [fetchPool]);
 
@@ -428,10 +436,17 @@ export default function PluginPool() {
   if (loadError && items.length === 0) {
     return (
       <div className="page-root" style={{ padding: 40 }}>
-        <EmptyState icon="⚠️" title="插件池加载失败" description={loadError} />
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
-          <button className="ui-btn ui-btn-primary" onClick={fetchPool}>重试</button>
+        <EmptyState icon="\u26A0\uFE0F" title="Plugin Pool" description={loadError} />
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
+          <button className="ui-btn ui-btn-primary" onClick={fetchPool}>Retry</button>
         </div>
+        {loadError.includes('authentication') && (
+          <div style={{ maxWidth: 480, margin: '16px auto 0', padding: 12, borderRadius: 8, background: 'var(--bg-surface)', border: '1px solid var(--border)', fontSize: 12, color: 'var(--text-secondary)' }}>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>How to enable:</div>
+            <div>1. Login at POST /api/auth/login</div>
+            <div>2. Or configure OPENCLAW_HEARTBEAT_TOKEN in .env.local</div>
+          </div>
+        )}
       </div>
     );
   }
@@ -475,10 +490,10 @@ export default function PluginPool() {
         </div>
       )}
 
-      {loadError && !loading && (
-        <div style={{ padding: 40, textAlign: 'center', color: '#EF4444' }}>
-          <div style={{ marginBottom: 12 }}>❌ {loadError}</div>
-          <button className="ui-btn ui-btn-primary" onClick={fetchPool}>重试</button>
+      {loadError && !loading && items.length > 0 && (
+        <div style={{ padding: '8px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 6, color: '#dc2626', fontSize: 12, marginBottom: 12 }}>
+          {loadError}
+          {loadError.includes('auth') && (<span> — <Link to="/audit" style={{ color: '#dc2626', fontWeight: 600 }}>Check audit logs</Link></span>)}
         </div>
       )}
 
@@ -556,29 +571,75 @@ function PluginList({
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</span>
-            <StatusTag status={p.status} />
+            <span style={{ fontWeight: 600, fontSize: 13 }}>
+              {p.name}
+              <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: 11, marginLeft: 6 }}>v{p.version}</span>
+            </span>
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              <RiskBadge level={p.risk_level} />
+              <StatusTag status={p.status} />
+            </div>
           </div>
           {!compact && (
             <>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
-                {p.plugin_id} · v{p.version}
+                {p.plugin_id}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
                 {(p.capabilities || []).slice(0, 3).map(c => <CapTag key={c} cap={c} />)}
               </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2, marginTop: 6 }}>
+                {!p.enabled && p.error_reason && (
+                  <div style={{ padding: '3px 7px', borderRadius: 6, background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', fontSize: 10, width: '100%' }}>
+                    ⛔ {p.error_reason}
+                  </div>
+                )}
+                <Link
+                  to={`/audit?filter=plugin:${p.plugin_id}`}
+                  className="ui-btn ui-btn-ghost ui-btn-xs"
+                  style={{ textDecoration: 'none', fontSize: 11 }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  📋 审计
+                </Link>
+              </div>
             </>
           )}
-          {p.status !== 'frozen' && p.status !== 'planned' && p.status !== 'residual' && (
-            <button
-              className={`ui-btn ui-btn-xs ${p.enabled ? 'ui-btn-outline' : 'ui-btn-success'}`}
-              disabled={busyId === p.plugin_id || p.status === 'trial'}
-              onClick={(e) => { e.stopPropagation(); onToggle(p); }}
-              style={{ marginTop: 8, width: '100%' }}
-            >
-              {busyId === p.plugin_id ? '...' : p.enabled ? '禁用' : '启用'}
-            </button>
+          {compact && !p.enabled && p.error_reason && (
+            <div style={{ marginTop: 6, padding: '3px 7px', borderRadius: 6, background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', fontSize: 10 }}>
+              ⛔ {p.error_reason}
+            </div>
           )}
+          {p.status !== 'frozen' && p.status !== 'planned' && p.status !== 'residual' && (
+            <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+              <button
+                className={`ui-btn ui-btn-xs ${p.enabled ? 'ui-btn-outline' : 'ui-btn-success'}`}
+                disabled={busyId === p.plugin_id || p.status === 'trial'}
+                onClick={(e) => { e.stopPropagation(); onToggle(p); }}
+                style={{ flex: 1 }}
+              >
+                {busyId === p.plugin_id ? '...' : p.enabled ? '禁用' : '启用'}
+              </button>
+              <Link
+                to={`/audit?filter=plugin:${p.plugin_id}`}
+                className="ui-btn ui-btn-ghost ui-btn-xs"
+                style={{ textDecoration: 'none', fontSize: 11, flexShrink: 0 }}
+                onClick={e => e.stopPropagation()}
+              >
+                📋 审计
+              </Link>
+            </div>
+          )}
+          {p.status === 'frozen' || p.status === 'planned' || p.status === 'residual' ? (
+            <Link
+              to={`/audit?filter=plugin:${p.plugin_id}`}
+              className="ui-btn ui-btn-ghost ui-btn-xs"
+              style={{ textDecoration: 'none', fontSize: 11, marginTop: 8, display: 'inline-block' }}
+              onClick={e => e.stopPropagation()}
+            >
+              📋 审计
+            </Link>
+          ) : null}
         </div>
       ))}
     </div>
@@ -672,8 +733,17 @@ function PluginDetailPanel({ plugin, onClose }: { plugin: PluginItem; onClose: (
                 </div>
               </div>
 
+              {plugin.error_reason && (
+                <div style={{ padding: '8px 10px', borderRadius: 8, background: '#fef2f2', border: '1px solid #fecaca' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: '#dc2626', marginBottom: 2 }}>错误信息</div>
+                  <div style={{ fontSize: 12, color: '#991b1b' }}>{plugin.error_reason}</div>
+                </div>
+              )}
               <Link to="/plugin-canvas" className="ui-btn ui-btn-outline ui-btn-sm" style={{ textAlign: 'center', textDecoration: 'none' }}>
                 🔌 在 Canvas 中查看
+              </Link>
+              <Link to={`/audit?filter=plugin:${plugin.plugin_id}`} className="ui-btn ui-btn-outline ui-btn-sm" style={{ textAlign: 'center', textDecoration: 'none' }}>
+                📋 审计条目
               </Link>
             </div>
           ) : (

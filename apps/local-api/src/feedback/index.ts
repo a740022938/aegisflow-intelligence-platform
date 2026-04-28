@@ -55,7 +55,7 @@ function presentType(sourceType: any, triggerType: any): FeedbackType {
 }
 
 function exportDirPath(): string {
-  // local-api cwd is E:\AGI_Factory\repo\apps\local-api
+  // local-api cwd is the api project root
   return path.resolve(process.cwd(), '../..', 'outputs', 'feedback_exports');
 }
 

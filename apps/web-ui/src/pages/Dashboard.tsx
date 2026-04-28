@@ -261,13 +261,13 @@ export default function Dashboard() {
             {openclaw && openclaw.token_configured === false && (
               <div className="dash-openclaw-banner">OpenClaw 心跳令牌未配置（已兼容运行，建议尽快配置）</div>
             )}
-            <div className="dash-openclaw-metrics">
-              <div className="dash-openclaw-metric"><span>在线状态</span><strong>{!openclaw ? '检测中' : (ocStatus?.online_status === 'online' ? '在线' : '离线')}</strong></div>
-              <div className="dash-openclaw-metric"><span>执行状态</span><strong>{ocStatus?.execution_status === 'executing' ? '执行中' : '空闲'}</strong></div>
-              <div className="dash-openclaw-metric"><span>最近一次动作</span><strong>{(openclaw as any)?.last_action ? `${(openclaw as any).last_action.run_name || (openclaw as any).last_action.run_code}` : (ocStatus?.last_action ? `${ocStatus.last_action.run_name || ocStatus.last_action.run_code}` : '—')}</strong></div>
-              <div className="dash-openclaw-metric"><span>最近一次错误</span><strong>{(openclaw as any)?.last_error?.message || ocStatus?.last_error?.message || '—'}</strong></div>
-              <div className="dash-openclaw-metric"><span>熔断状态</span><strong>{((openclaw as any)?.circuit_state === 'triggered') ? '已触发' : (ocStatus?.circuit_status || '正常')}</strong></div>
-            </div>
+        <div className="dash-openclaw-metrics">
+          <div className="dash-openclaw-metric"><span>{t.dashboard.online}</span><strong>{openclaw?.status?.online_status === 'online' ? t.dashboard.online : t.dashboard.offline}</strong></div>
+          <div className="dash-openclaw-metric"><span>{t.dashboard.execution}</span><strong>{ocStatus?.execution_status === 'executing' ? (lang === 'zh' ? '执行中' : 'Executing') : (lang === 'zh' ? '空闲' : 'Idle')}</strong></div>
+          <div className="dash-openclaw-metric"><span>{t.dashboard.lastAction}</span><strong>{(openclaw as any)?.last_action ? `${(openclaw as any).last_action.run_name || (openclaw as any).last_action.run_code}` : (ocStatus?.last_action ? `${ocStatus.last_action.run_name || ocStatus.last_action.run_code}` : '—')}</strong></div>
+          <div className="dash-openclaw-metric"><span>{t.dashboard.lastError}</span><strong>{(openclaw as any)?.last_error?.message || ocStatus?.last_error?.message || '—'}</strong></div>
+          <div className="dash-openclaw-metric"><span>{t.dashboard.circuitState || (lang === 'zh' ? '熔断状态' : 'Circuit State')}</span><strong>{(((openclaw as any)?.circuit_state) === 'triggered') ? (lang === 'zh' ? '已触发' : 'Triggered') : (ocStatus?.circuit_status || (lang === 'zh' ? '正常' : 'Normal'))}</strong></div>
+        </div>
           </div>
         ),
       },

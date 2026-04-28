@@ -561,7 +561,7 @@
 
 /* ── 选中状态动画 ── */
 @keyframes comfy-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px currentColor; }
+  from, to { box-shadow: 0 0 0 2px currentColor; }
   50% { box-shadow: 0 0 0 4px currentColor, 0 0 20px currentColor; }
 }
 
@@ -615,7 +615,7 @@
 }
 
 @keyframes port-warn-pulse {
-  0%, 100% { opacity: 1; }
+  from, to { opacity: 1; }
   50% { opacity: 0.4; }
 }
 

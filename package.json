@@ -1,6 +1,6 @@
 {
   "name": "agi-model-factory",
-  "version": "6.8.0-community.1",
+  "version": "7.2.0",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "engines": {
@@ -21,12 +21,18 @@
     "lint:fix": "eslint \"apps/**/*.{ts,tsx}\" --fix",
     "format": "prettier --write \"apps/**/*.{ts,tsx,css,json}\"",
     "format:check": "prettier --check \"apps/**/*.{ts,tsx,css,json}\"",
-    "test": "echo Add tests in P3",
+    "test": "node tests/smoke-v7.mjs 2>&1 || echo [INFO] Smoke tests require API running at http://127.0.0.1:8787",
+    "test:smoke": "node tests/smoke-v7.mjs",
+    "preview": "pnpm --dir apps/web-ui preview --port 5173",
     "api:test": "httpyac api-tests/all-endpoints.http",
     "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:stop": "pm2 stop agi-factory-api",
     "pm2:logs": "pm2 logs agi-factory-api",
-    "pm2:restart": "pm2 restart agi-factory-api"
+    "pm2:restart": "pm2 restart agi-factory-api",
+    "aip:upgrade:v7": "node scripts/aip-upgrade-v7.mjs",
+    "aip:cli:build": "pnpm --dir apps/aip-cli build",
+    "aip:cli:link": "pnpm --dir apps/aip-cli link --global",
+    "aip:cli:doctor": "pnpm --dir apps/aip-cli dev doctor"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.31.1",

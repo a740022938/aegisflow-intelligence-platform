@@ -7,6 +7,10 @@ interface PoolWorker {
   id: string;
   spawnedAt: number;
   taskCount: number;
+  alive: boolean;
+  lastStartedAt: number | null;
+  lastFinishedAt: number | null;
+  lastError: string | null;
 }
 
 interface PoolConfig {
@@ -16,6 +20,7 @@ interface PoolConfig {
   maxTaskPerWorker: number;
   pythonCmd: string;
   workerDir: string;
+  taskTimeoutMs: number;
 }
 
 interface TaskResult {
@@ -33,6 +38,7 @@ const DEFAULT_CONFIG: PoolConfig = {
   maxTaskPerWorker: 50,
   pythonCmd: 'python',
   workerDir: '',
+  taskTimeoutMs: 300_000,
 };
 
 class PythonWorkerPool extends EventEmitter {
@@ -60,6 +66,15 @@ class PythonWorkerPool extends EventEmitter {
       totalErrors: this.totalErrors,
       minWorkers: this.config.minWorkers,
       maxWorkers: this.config.maxWorkers,
+      workers: this.workers.map(w => ({
+        id: w.id,
+        busy: w.busy,
+        alive: w.alive,
+        taskCount: w.taskCount,
+        lastStartedAt: w.lastStartedAt,
+        lastFinishedAt: w.lastFinishedAt,
+        lastError: w.lastError,
+      })),
     };
   }
 
@@ -105,6 +120,8 @@ class PythonWorkerPool extends EventEmitter {
     if (!task) return;
 
     worker.busy = true;
+    worker.alive = true;
+    worker.lastStartedAt = Date.now();
     this.activeTasks++;
 
     const { script, args, resolve } = task;
@@ -119,15 +136,35 @@ class PythonWorkerPool extends EventEmitter {
 
     let stdout = '';
     let stderr = '';
+    let timedOut = false;
+
+    const timeoutMs = this.config.taskTimeoutMs;
+    const timeoutHandle = setTimeout(() => {
+      timedOut = true;
+      try { child.kill(); } catch { }
+      console.error('[worker_pool] worker_timeout:', { workerId: worker.id, timeoutMs, script });
+      worker.lastError = 'worker_timeout';
+      worker.lastFinishedAt = Date.now();
+      worker.alive = false;
+      this.totalErrors++;
+      this.activeTasks--;
+      worker.busy = false;
+      resolve({ ok: false, stdout: '', stderr: 'Task timed out', code: null, durationMs: Date.now() - startTime });
+      this.dispatchNext();
+    }, timeoutMs);
 
     child.stdout?.on('data', (data: Buffer) => { stdout += data.toString(); });
     child.stderr?.on('data', (data: Buffer) => { stderr += data.toString(); });
 
     child.on('close', (code) => {
+      clearTimeout(timeoutHandle);
+      if (timedOut) return;
       const durationMs = Date.now() - startTime;
       worker.taskCount++;
       this.activeTasks--;
       this.totalTasksCompleted++;
+      worker.lastFinishedAt = Date.now();
+      worker.alive = false;
 
       if (code !== 0) this.totalErrors++;
 
@@ -151,9 +188,14 @@ class PythonWorkerPool extends EventEmitter {
     });
 
     child.on('error', (err) => {
+      clearTimeout(timeoutHandle);
+      if (timedOut) return;
       this.totalErrors++;
       this.activeTasks--;
       worker.busy = false;
+      worker.alive = false;
+      worker.lastError = err.message;
+      worker.lastFinishedAt = Date.now();
       resolve({ ok: false, stdout: '', stderr: err.message, code: -1, durationMs: Date.now() - startTime });
       this.dispatchNext();
     });
@@ -169,6 +211,10 @@ class PythonWorkerPool extends EventEmitter {
       id,
       spawnedAt: Date.now(),
       taskCount: 0,
+      alive: true,
+      lastStartedAt: null,
+      lastFinishedAt: null,
+      lastError: null,
     };
     worker.process.unref();
     this.workers.push(worker);

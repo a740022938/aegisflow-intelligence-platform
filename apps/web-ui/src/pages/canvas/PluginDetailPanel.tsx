@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface PluginDetailItem {
   plugin_id: string;
@@ -15,6 +16,7 @@ interface PluginDetailItem {
   icon: string;
   color: string;
   description: string;
+  error_reason?: string;
   capabilities: string[];
   permissions: string[];
   allowed_upstream: string[];
@@ -114,6 +116,13 @@ export default function PluginDetailPanel({ plugin, onClose, onToggleEnabled, bu
         </div>
       )}
 
+      {plugin.error_reason && (
+        <div style={{ padding: '8px 10px', borderRadius: 8, background: '#fef2f2', border: '1px solid #fecaca' }}>
+          <BlockTitle>错误信息</BlockTitle>
+          <div style={{ fontSize: 12, color: '#991b1b' }}>{plugin.error_reason}</div>
+        </div>
+      )}
+
       {plugin.description && (
         <div>
           <BlockTitle>描述</BlockTitle>
@@ -174,6 +183,13 @@ export default function PluginDetailPanel({ plugin, onClose, onToggleEnabled, bu
             {busy ? '处理中...' : plugin.enabled ? '停用插件' : '启用插件'}
           </button>
         )}
+        <Link
+          to={`/audit?filter=plugin:${plugin.plugin_id}`}
+          className="ui-btn ui-btn-outline ui-btn-sm"
+          style={{ textAlign: 'center', textDecoration: 'none' }}
+        >
+          📋 审计条目
+        </Link>
         <div style={{ padding: '8px 12px', borderRadius: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 11, textAlign: 'center' }}>
           画布模式：基础操作可用，分析执行交给 OpenClaw
         </div>

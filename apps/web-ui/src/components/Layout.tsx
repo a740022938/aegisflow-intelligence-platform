@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import './Layout.css';
-import { type Lang, translations, getStoredLang, setStoredLang } from '../i18n';
+import { type Lang, translations, getStoredLang, setStoredLang, syncTranslationsFromServer } from '../i18n';
 import { APP_VERSION, BUILD_DATE } from '../constants/appVersion';
 import { APP_META } from '../constants/appMeta';
 import { loadSidebarWidth, saveSidebarWidth } from '../layout/layoutStorage';
@@ -68,6 +68,7 @@ function AppShell() {
     return saved === 'light' ? 'light' : 'dark';
   });
   const [sidebarWidth, setSidebarWidth] = useState<number>(() => loadSidebarWidth(288));
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dragState = useRef<{ active: boolean; startX: number; startWidth: number }>({ active: false, startX: 0, startWidth: 288 });
 
   // ── 侧边栏分组折叠 ──
@@ -100,23 +101,35 @@ function AppShell() {
     setStoredLang(lang);
   }, [lang]);
 
+  // Optional: sync translations from server to unify frontend/backend wording
+  useEffect(() => {
+    (async () => {
+      try {
+        await syncTranslationsFromServer(lang);
+      } catch {
+        // ignore
+      }
+    })();
+  }, [lang]);
+
   useEffect(() => {
     localStorage.setItem('agi_factory_site_theme', theme);
   }, [theme]);
 
+  const closeSidebar = () => setSidebarOpen(false);
   const t = translations[lang];
   const text = {
-    subtitle: lang === 'zh' ? APP_META.consoleLabelZh : APP_META.consoleLabelEn,
-    home: lang === 'zh' ? '首页' : 'Home',
-    about: lang === 'zh' ? '关于' : 'About',
-    systems: lang === 'zh' ? '系统' : 'Systems',
-    help: lang === 'zh' ? '帮助' : 'Help',
-    wechat: 'WeChat',
-    langSwitch: lang === 'zh' ? 'EN' : '中',
-    themeSwitch: theme === 'dark' ? (lang === 'zh' ? '浅色' : 'Light') : (lang === 'zh' ? '深色' : 'Dark'),
-    apiStatusPending: lang === 'zh' ? '检测中…' : 'Checking…',
-    apiStatusOk: lang === 'zh' ? 'API 正常' : 'API Online',
-    apiStatusBad: lang === 'zh' ? 'API 异常' : 'API Offline',
+    subtitle: t.dashboard.subtitle,
+    home: t.common.home,
+    about: t.common.about,
+    systems: t.common.systems,
+    help: t.common.help,
+    wechat: t.common.wechat,
+    langSwitch: t.common.langSwitch,
+    themeSwitch: t.common.themeSwitch,
+    apiStatusPending: t.common.apiStatusPending,
+    apiStatusOk: t.common.apiStatusOk,
+    apiStatusBad: t.common.apiStatusBad,
   };
   const displayVersion = apiVersion && apiVersion !== '…' ? apiVersion : APP_VERSION;
   const openExternal = (url: string) => {
@@ -164,11 +177,16 @@ function AppShell() {
     <div className={`app-shell theme-${theme}`}>
       {/* ── Topbar ── */}
       <header className="topbar">
-        <div className="topbar-brand">
-          <div className="topbar-logo">AG</div>
-          <div>
-          <div className="topbar-title">{APP_META.appName}</div>
-          <div className="topbar-subtitle">{text.subtitle}</div>
+        <div className="topbar-left">
+          <button className="topbar-hamburger" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle sidebar">
+            <span className="hamburger-line" /><span className="hamburger-line" /><span className="hamburger-line" />
+          </button>
+          <div className="topbar-brand">
+            <div className="topbar-logo">AG</div>
+            <div>
+            <div className="topbar-title">{APP_META.appName}</div>
+            <div className="topbar-subtitle">{text.subtitle}</div>
+            </div>
           </div>
         </div>
         <nav className="topbar-nav">
@@ -203,8 +221,8 @@ function AppShell() {
       {/* ── Main row ── */}
       <div className="main-row">
         {/* ── Sidebar ── */}
-        <nav className="sidebar" style={{ width: sidebarWidth }}>
-          <div className="sidebar-scroll">
+        <nav className={`sidebar${sidebarOpen ? ' open' : ''}`} style={{ width: sidebarWidth }}>
+          <div className="sidebar-scroll" onClick={(e) => { const target = e.target as HTMLElement; if (target.closest('.nav-item')) setSidebarOpen(false); }}>
             {/* ── 概览 ── */}
             <div className="nav-section">
               <div className="nav-section-label" onClick={() => toggleSection('overview')}>
@@ -357,6 +375,7 @@ function AppShell() {
             <div className="sidebar-footer-build">Build {BUILD_DATE}</div>
           </div>
         </nav>
+        <div className={`sidebar-backdrop${sidebarOpen ? ' visible' : ''}`} onClick={() => setSidebarOpen(false)} />
         <div
           className="sidebar-resizer"
           title="拖拽调整侧栏宽度"

@@ -313,7 +313,7 @@ export default function FactoryStatus() {
         id: 'blocked_gates',
         content: (
           <SectionCard className={`role-card ${roleClass('risk')}`} title={`阻塞 Gate (${timeRange})`} description="点击查看详情">
-            {blocked_gates?.length === 0 ? (
+            {!Array.isArray(blocked_gates) || blocked_gates.length === 0 ? (
               <div className="factory-empty-ok">✅ 无阻塞</div>
             ) : (
               <div className="factory-list-compact">
@@ -334,7 +334,7 @@ export default function FactoryStatus() {
         id: 'recent_failures',
         content: (
           <SectionCard className={`role-card ${roleClass('risk')}`} title={`最近失败任务 (${timeRange})`} description="点击行查看根因详情">
-            {recent_failures?.length === 0 ? (
+            {!Array.isArray(recent_failures) || recent_failures.length === 0 ? (
               <div className="factory-empty-ok">✅ 无失败</div>
             ) : (
               <div className="factory-list-compact">
@@ -357,7 +357,7 @@ export default function FactoryStatus() {
         id: 'recovery_drill',
         content: (
           <SectionCard className={`role-card ${roleClass('gov')}`} title="恢复演练" description="最近演练记录">
-            {recent_recoveries?.length === 0 ? (
+            {!Array.isArray(recent_recoveries) || recent_recoveries.length === 0 ? (
               <div className="factory-muted-sm">暂无演练记录</div>
             ) : (
               <div className="factory-list-compact">
@@ -383,7 +383,7 @@ export default function FactoryStatus() {
         id: 'failure_reasons',
         content: (
           <SectionCard className={`role-card ${roleClass('risk')}`} title={`失败原因聚合 (${timeRange})`} description="点击查看任务">
-            {failure_reasons?.length === 0 ? (
+            {!Array.isArray(failure_reasons) || failure_reasons.length === 0 ? (
               <div className="factory-empty-ok">✅ 无失败</div>
             ) : (
               <div className="factory-list-tight">
@@ -404,7 +404,7 @@ export default function FactoryStatus() {
         id: 'recent_releases',
         content: (
           <SectionCard className={`role-card ${roleClass('gov')}`} title="最近发布" description={`${timeRange} 内`}>
-            {recent_releases?.length === 0 ? (
+            {!Array.isArray(recent_releases) || recent_releases.length === 0 ? (
               <div className="factory-muted-sm">暂无发布</div>
             ) : (
               <div className="factory-list-compact">
@@ -427,7 +427,7 @@ export default function FactoryStatus() {
         id: 'backup_records',
         content: (
           <SectionCard className={`role-card ${roleClass('data')}`} title="备份记录" description={`${timeRange} 内`}>
-            {recent_backups?.length === 0 ? (
+            {!Array.isArray(recent_backups) || recent_backups.length === 0 ? (
               <div className="factory-empty-warn">⚠️ 无备份记录</div>
             ) : (
               <div className="factory-list-compact">

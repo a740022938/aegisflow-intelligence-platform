@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { ReactGridLayout } from 'react-grid-layout';
 import { type LayoutConfig, type LayoutBreakpoint } from './layoutStorage';
+import { getBp } from './responsive';
 import './workspace-grid.css';
 
 const GridLayout = ReactGridLayout as React.ComponentType<any>;
@@ -17,11 +18,7 @@ type Props = {
   onChange: (next: LayoutConfig) => void;
 };
 
-function pickBreakpoint(width: number): LayoutBreakpoint {
-  if (width >= 1200) return 'lg';
-  if (width >= 900) return 'md';
-  return 'sm';
-}
+// breakpoint resolution centralized in responsive.ts (getBp)
 
 function colsFor(bp: LayoutBreakpoint) {
   if (bp === 'lg') return 12;
@@ -31,20 +28,41 @@ function colsFor(bp: LayoutBreakpoint) {
 
 export default function WorkspaceGrid({ editable, layouts, cards, onChange }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [width, setWidth] = useState(1200);
+  const [width, setWidth] = useState<number>(() => typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [bp, setBp] = useState<LayoutBreakpoint>(getBp(width));
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const bp = pickBreakpoint(width);
+  // bp is now tracked in state to react to container/window size changes
   const cols = colsFor(bp);
 
   useEffect(() => {
     const target = containerRef.current;
     if (!target) return;
-    const apply = () => setWidth(Math.max(320, Math.floor(target.clientWidth)));
+    const apply = () => {
+      // Use container width to drive layout; fallback to viewport if container width not yet available
+      const containerW = target?.clientWidth ?? 0;
+      const w = Math.max(320, Math.floor(containerW > 0 ? containerW : (typeof window !== 'undefined' ? window.innerWidth : 1024)));
+      const newBp = getBp(w);
+      setWidth(w);
+      setBp(newBp);
+      // Debug helper for responsive debugging (remove in production)
+      // console.debug('[AIP] WorkspaceGrid updated', { w, newBp });
+    };
     apply();
     const observer = new ResizeObserver(apply);
     observer.observe(target);
-    return () => observer.disconnect();
+    // Optional: also respond to window resize to keep breakpoint aligned if layout causes width drift
+    const onWinResize = () => {
+      const containerW = containerRef.current?.clientWidth ?? 0;
+      const w = Math.max(320, Math.floor(containerW > 0 ? containerW : (typeof window !== 'undefined' ? window.innerWidth : 1024)));
+      setWidth(w);
+      setBp(getBp(w));
+    };
+    window.addEventListener('resize', onWinResize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', onWinResize);
+    };
   }, []);
 
   const activeLayout = useMemo(() => {

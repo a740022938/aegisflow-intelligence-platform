@@ -51,6 +51,7 @@ interface RegisteredPlugin {
   registered_at: string;
   last_executed_at?: string;
   execution_count: number;
+  error_reason?: string;
 }
 
 /**
@@ -252,6 +253,7 @@ export class PluginManager {
       registered_at: p.registered_at,
       last_executed_at: p.last_executed_at,
       execution_count: p.execution_count,
+      error_reason: p.error_reason,
       // V1 新增字段 (从 manifest 中获取，旧插件默认值)
       category: (p.manifest as any).category || 'legacy/unknown',
       status: (p.manifest as any).status || 'active' as any,
@@ -535,6 +537,45 @@ export class PluginManager {
     this.systemEnabled = enabled;
     this.audit.setEnabled(enabled);
     console.log(`[PluginManager] Plugin system ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  /**
+   * 获取完整插件信息
+   */
+  getPluginInfo(pluginId: string): PluginInfo | null {
+    const plugin = this.plugins.get(pluginId);
+    if (!plugin) {
+      return null;
+    }
+    return {
+      plugin_id: plugin.manifest.plugin_id,
+      name: plugin.manifest.name,
+      version: plugin.manifest.version,
+      capabilities: plugin.manifest.capabilities,
+      permissions: plugin.manifest.permissions || [],
+      risk_level: plugin.manifest.risk_level,
+      enabled: plugin.enabled,
+      author: plugin.manifest.author,
+      description: plugin.manifest.description,
+      tags: plugin.manifest.tags,
+      registered_at: plugin.registered_at,
+      last_executed_at: plugin.last_executed_at,
+      execution_count: plugin.execution_count,
+      error_reason: plugin.error_reason,
+      category: (plugin.manifest as any).category || 'legacy/unknown',
+      status: (plugin.manifest as any).status || 'active' as any,
+      execution_mode: (plugin.manifest as any).execution_mode || 'readonly' as any,
+      requires_approval: (plugin.manifest as any).requires_approval ?? false,
+      dry_run_supported: (plugin.manifest as any).dry_run_supported ?? false,
+      ui_node_type: (plugin.manifest as any).ui_node_type,
+      allowed_upstream: (plugin.manifest as any).allowed_upstream,
+      allowed_downstream: (plugin.manifest as any).allowed_downstream,
+      input_schema: (plugin.manifest as any).input_schema,
+      output_schema: (plugin.manifest as any).output_schema,
+      icon: (plugin.manifest as any).icon,
+      color: (plugin.manifest as any).color,
+      documentation_url: (plugin.manifest as any).documentation_url,
+    };
   }
 
   /**

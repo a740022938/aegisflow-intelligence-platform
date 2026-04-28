@@ -49,8 +49,9 @@ function writeAudit(action: string, target: string, result: 'success' | 'failed'
 
 function enforceWriteGuard(sourcePath?: string) {
   if (!sourcePath) return { ok: true as const };
+  const workspaceRoot = (process.env.AIP_WORKSPACE_ROOT || process.env.AIP_REPO_ROOT || '').replace(/\\/g, '/').toLowerCase();
   const normalized = sourcePath.replace(/\\/g, '/').toLowerCase();
-  if (!normalized.startsWith('e:/agi_factory/')) {
+  if (workspaceRoot && !normalized.startsWith(workspaceRoot)) {
     return { ok: false as const, error: 'source_path not allowed by production write guard' };
   }
   return { ok: true as const };

@@ -1,4 +1,5 @@
 import { EventEmitter } from 'node:events';
+import * as db from '../db/builtin-sqlite.js';
 
 export type TaskPriority = 'critical' | 'high' | 'normal' | 'low';
 
@@ -44,10 +45,12 @@ class TaskQueue extends EventEmitter {
   private completedCount = 0;
   private failedCount = 0;
   private processing = false;
+  private recoveredCount = 0;
 
   constructor(options: Partial<QueueOptions> = {}) {
     super();
     this.options = { ...DEFAULT_OPTIONS, ...options };
+    this.ensureQueueTable();
   }
 
   registerHandler(type: string, handler: TaskHandler) {
@@ -61,6 +64,7 @@ class TaskQueue extends EventEmitter {
       completed: this.completedCount,
       failed: this.failedCount,
       total: this.queue.length + this.completedCount + this.failedCount,
+      recovered: this.recoveredCount,
     };
   }
 
@@ -73,6 +77,7 @@ class TaskQueue extends EventEmitter {
     this.queue.push(entry);
     this.queue.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
     this.emit('enqueued', entry);
+    this.persistTask(entry);
     this.processNext();
     return entry.id;
   }
@@ -83,6 +88,7 @@ class TaskQueue extends EventEmitter {
     this.queue[idx].status = 'cancelled';
     this.queue.splice(idx, 1);
     this.emit('cancelled', taskId);
+    this.removeTaskFromDb(taskId);
     return true;
   }
 
@@ -92,6 +98,93 @@ class TaskQueue extends EventEmitter {
 
   listTasks(status?: string): QueueTask[] {
     return status ? this.queue.filter(t => t.status === status) : [...this.queue];
+  }
+
+  private ensureQueueTable() {
+    try {
+      const dbInstance = db.getDatabase();
+      dbInstance.exec(`
+        CREATE TABLE IF NOT EXISTS queue_tasks (
+          id TEXT PRIMARY KEY,
+          type TEXT NOT NULL,
+          data_json TEXT NOT NULL DEFAULT '{}',
+          priority TEXT NOT NULL DEFAULT 'normal',
+          status TEXT NOT NULL DEFAULT 'queued',
+          retries INTEGER NOT NULL DEFAULT 0,
+          maxRetries INTEGER NOT NULL DEFAULT 3,
+          created_at INTEGER NOT NULL,
+          started_at INTEGER,
+          finished_at INTEGER,
+          error TEXT,
+          result_json TEXT
+        )
+      `);
+    } catch (err) {
+      console.error('[queue] Failed to ensure queue table:', err);
+    }
+  }
+
+  private persistTask(task: QueueTask) {
+    try {
+      const dbInstance = db.getDatabase();
+      dbInstance.prepare(`
+        INSERT INTO queue_tasks (id, type, data_json, priority, status, retries, maxRetries, created_at, started_at, finished_at, error, result_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        task.id,
+        task.type,
+        JSON.stringify(task.data || {}),
+        task.priority,
+        task.status,
+        task.retries,
+        task.maxRetries,
+        task.createdAt,
+        task.startedAt || null,
+        task.finishedAt || null,
+        task.error || null,
+        task.result ? JSON.stringify(task.result) : null,
+      );
+    } catch (err) {
+      console.error('[queue] Failed to persist task:', err);
+    }
+  }
+
+  private removeTaskFromDb(taskId: string) {
+    try {
+      const dbInstance = db.getDatabase();
+      dbInstance.prepare(`DELETE FROM queue_tasks WHERE id = ?`).run(taskId);
+    } catch (err) {
+      console.error('[queue] Failed to remove task from DB:', err);
+    }
+  }
+
+  recoverFromDb() {
+    try {
+      const dbInstance = db.getDatabase();
+      const rows = dbInstance.prepare(`SELECT * FROM queue_tasks WHERE status IN ('queued', 'running')`).all() as any[];
+      for (const row of rows) {
+        const task: QueueTask = {
+          id: row.id,
+          type: row.type,
+          data: (() => { try { return JSON.parse(row.data_json || '{}'); } catch { return {}; } })(),
+          priority: row.priority || 'normal',
+          status: 'queued',
+          retries: row.retries || 0,
+          maxRetries: row.maxRetries || 3,
+          createdAt: row.created_at,
+          startedAt: undefined,
+          finishedAt: undefined,
+          error: undefined,
+          result: undefined,
+        };
+        this.queue.push(task);
+        this.recoveredCount++;
+      }
+      this.queue.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+      console.log(`[queue] Recovered ${this.recoveredCount} tasks from DB`);
+    } catch (err) {
+      console.error('[queue] Failed to recover tasks from DB:', err);
+    }
   }
 
   private async processNext() {
@@ -135,6 +228,7 @@ class TaskQueue extends EventEmitter {
       this.activeCount--;
       this.completedCount++;
       this.emit('completed', task);
+      this.removeTaskFromDb(task.id);
     } catch (err: any) {
       task.error = err.message || String(err);
       task.finishedAt = Date.now();
@@ -155,6 +249,7 @@ class TaskQueue extends EventEmitter {
         this.activeCount--;
         this.failedCount++;
         this.emit('failed', task);
+        this.removeTaskFromDb(task.id);
       }
     }
 
@@ -174,7 +269,9 @@ export function getTaskQueue(): TaskQueue {
 }
 
 export function initQueue() {
-  return getTaskQueue();
+  const queue = getTaskQueue();
+  queue.recoverFromDb();
+  return queue;
 }
 
 export type { TaskHandler };
