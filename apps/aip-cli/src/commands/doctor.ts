@@ -3,6 +3,7 @@ import { ensureAipDirs, PATHS, getProjectPackagePath } from '../paths.js';
 import { isPortInUse } from '../process.js';
 import { checkHealth } from '../health.js';
 import { log } from '../logger.js';
+import { getCliVersion } from '../version.js';
 import fs from 'node:fs';
 import { execSync } from 'node:child_process';
 
@@ -18,7 +19,7 @@ export async function runDoctor() {
   ensureAipDirs();
   const config = loadConfig();
 
-  log('AIP Doctor v7.1.0');
+  log(`AIP Doctor v${getCliVersion()}`);
   log('');
 
   printCheck('~/.aip exists', {

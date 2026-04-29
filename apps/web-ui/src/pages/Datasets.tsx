@@ -7,6 +7,7 @@ import {
 } from '../components/ui';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
 import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
 import '../components/ui/shared.css';
 import './Datasets.css';
 
@@ -17,7 +18,7 @@ const LABEL_FORMATS  = ['coco','yolo','pascal_voc','json','csv','other'];
 const DATASET_STATUSES = ['draft','active','archived'];
 
 // Workspace layout key
-const LAYOUT_KEY = 'datasets-detail';
+const LAYOUT_KEY = 'datasets';
 
 // Default layouts for detail workspace cards
 const DEFAULT_LAYOUTS: LayoutConfig = {
@@ -120,7 +121,7 @@ export default function Datasets() {
   });
 
   // Workspace layout state
-  const [layoutEdit, setLayoutEdit] = useState(false);
+  const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
   const [layouts, setLayouts] = useState<LayoutConfig>(DEFAULT_LAYOUTS);
 
   // Load saved layout
@@ -134,14 +135,8 @@ export default function Datasets() {
   // Save layout on change
   const handleLayoutChange = useCallback((next: LayoutConfig) => {
     setLayouts(next);
-    saveLayout(LAYOUT_KEY, next);
-  }, []);
-
-  // Reset layout
-  const handleResetLayout = useCallback(() => {
-    setLayouts(DEFAULT_LAYOUTS);
-    clearLayout(LAYOUT_KEY);
-  }, []);
+    if (layoutEdit && canUseLayoutEditor) saveLayout(LAYOUT_KEY, next);
+  }, [layoutEdit, canUseLayoutEditor]);
 
   // ── Fetch list ────────────────────────────────────────────────────────────
   const fetchList = useCallback(async () => {
@@ -378,7 +373,7 @@ export default function Datasets() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="page-root">
+    <div className="page-root" ref={contentRef}>
       <PageHeader
         title="数据集"
         subtitle={`${filtered.length} / ${total} 条`}
@@ -474,18 +469,21 @@ export default function Datasets() {
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>数据集概览工作台</div>
                           <div style={{ display: 'flex', gap: 8 }}>
                             <button
-                              onClick={() => setLayoutEdit(v => !v)}
+                              onClick={toggleEdit}
+                              disabled={!canUseLayoutEditor}
+                              title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
                               style={{
                                 padding: '6px 14px', background: layoutEdit ? 'rgba(34,211,238,0.15)' : 'var(--bg-elevated)',
                                 border: `1px solid ${layoutEdit ? 'rgba(34,211,238,0.5)' : 'var(--border-light)'}`,
                                 borderRadius: '6px', cursor: 'pointer', fontSize: 12, color: layoutEdit ? '#22d3ee' : 'var(--text-main)',
+                                opacity: !canUseLayoutEditor ? 0.5 : 1,
                               }}
                             >
                               {layoutEdit ? '✓ 完成编辑' : '✎ 编辑布局'}
                             </button>
                             {layoutEdit && (
                               <button
-                                onClick={handleResetLayout}
+                                onClick={() => { setLayouts(DEFAULT_LAYOUTS); clearLayout(LAYOUT_KEY); }}
                                 style={{
                                   padding: '6px 14px', background: 'var(--bg-elevated)', border: '1px solid var(--border-light)',
                                   borderRadius: '6px', cursor: 'pointer', fontSize: 12, color: 'var(--text-main)',
@@ -496,12 +494,29 @@ export default function Datasets() {
                             )}
                           </div>
                         </div>
-                        <WorkspaceGrid
-                          editable={layoutEdit}
-                          layouts={layouts}
-                          cards={workspaceCards}
-                          onChange={handleLayoutChange}
-                        />
+                        {detailLoading && !selectedDs ? (
+                          <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
+                        ) : shouldUseLayoutEditor ? (
+                          <div>
+                            <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+                              layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+                            </div>
+                            <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={workspaceCards} onChange={handleLayoutChange} />
+                          </div>
+                        ) : (
+                          <div>
+                            <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+                              layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+                            </div>
+                            <div className="responsive-card-grid">
+                              {workspaceCards.map((c: any) => (
+                                <div key={c.id} style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                                  {c.content}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
                   </>

@@ -530,3 +530,147 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   v7.2.1: Fluid responsive grid — no hardcoded breakpoints
+   Cards auto-fit: 1/2/3+ columns based on container width
+   ═══════════════════════════════════════════════════════════ */
+
+.factory-status-responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: clamp(8px, 2vw, 16px);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: clamp(4px, 1vw, 12px);
+  box-sizing: border-box;
+}
+
+.factory-status-grid-cell {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* All inner panels adapt to grid cell width */
+.factory-status-grid-cell > *,
+.factory-status-grid-cell > * > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Toolbar: natural wrapping */
+.factory-status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(4px, 1vw, 8px);
+  align-items: center;
+}
+
+.factory-status-time-range {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Stage flow: wrap at any width */
+.factory-stage-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(4px, 1vw, 8px);
+  align-items: center;
+}
+
+.factory-stage-card {
+  flex: 1 1 calc(33.333% - clamp(4px, 1vw, 8px));
+  min-width: clamp(80px, 18vw, 120px);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid;
+  text-decoration: none;
+  text-align: center;
+}
+
+.factory-stage-arrow {
+  color: var(--text-muted);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Quick actions: auto grid */
+.factory-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 6px;
+}
+
+/* buttons and toolbar items stay readable */
+.factory-status-time-btn {
+  height: 30px;
+  padding: 4px clamp(6px, 1.5vw, 12px);
+  font-size: clamp(10px, 1.8vw, 12px);
+  border: none;
+  cursor: pointer;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* All card internals: no overflow */
+.factory-stack,
+.factory-list-drill,
+.factory-list-compact,
+.factory-list-tight,
+.factory-click-item,
+.factory-inline-link,
+.factory-failure-row,
+.factory-release-row,
+.factory-recovery-row,
+.factory-drill-card,
+.factory-backup-row,
+.factory-backup-item {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* flex items that currently use space-between: wrap vertically on narrow */
+.factory-inline-link,
+.factory-click-item,
+.factory-release-row,
+.factory-recovery-head,
+.factory-drill-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* pre/code: wrap, don't overflow */
+pre, code {
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+/* Only remaining breakpoint: truly tiny screens get single column */
+@media (max-width: 360px) {
+  .factory-stage-card {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .factory-stage-arrow {
+    display: none;
+  }
+  .factory-status-time-btn {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+}

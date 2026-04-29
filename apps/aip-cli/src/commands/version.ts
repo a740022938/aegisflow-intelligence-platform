@@ -3,18 +3,7 @@ import { loadConfig } from '../config.js';
 import { log } from '../logger.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-function getCliVersion(): string {
-  try {
-    const cliPkgPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'package.json');
-    if (fs.existsSync(cliPkgPath)) {
-      const pkg = JSON.parse(fs.readFileSync(cliPkgPath, 'utf8'));
-      return pkg.version || 'unknown';
-    }
-  } catch {}
-  return 'unknown';
-}
+import { getCliVersion } from '../version.js';
 
 export async function runVersion() {
   const config = loadConfig();

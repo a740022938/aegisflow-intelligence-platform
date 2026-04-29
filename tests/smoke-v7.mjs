@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 const API = 'http://127.0.0.1:8787';
 let failed = 0;
 let passed = 0;
+let authToken = '';
 
 async function check(name, fn) {
   try {
@@ -15,10 +16,26 @@ async function check(name, fn) {
   }
 }
 
-async function fetchJson(url) {
-  const response = await fetch(url);
+async function fetchJson(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (authToken) headers.Authorization = `Bearer ${authToken}`;
+  const response = await fetch(url, { ...options, headers });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
+}
+
+async function loginForSmoke() {
+  const username = process.env.AIP_SMOKE_USERNAME || 'admin';
+  const password = process.env.AIP_SMOKE_PASSWORD || 'aip-admin';
+  const response = await fetch(`${API}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  if (!response.ok) throw new Error(`login HTTP ${response.status}`);
+  const data = await response.json();
+  if (!data?.ok || !data?.token) throw new Error('login token missing');
+  authToken = data.token;
 }
 
 async function main() {
@@ -28,6 +45,11 @@ async function main() {
   await check('health', async () => {
     const data = await fetchJson(`${API}/api/health`);
     if (!data.ok) throw new Error('Health check failed');
+  });
+
+  // 1.5 Auth bootstrap for protected APIs
+  await check('auth-login', async () => {
+    await loginForSmoke();
   });
 
   // 2. Tasks API

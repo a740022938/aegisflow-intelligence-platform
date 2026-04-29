@@ -21,9 +21,9 @@ export interface LayoutConfig {
   sm: LayoutItem[];
 }
 
-// Storage key prefix and version
-const KEY_PREFIX = 'agi_layout_v1';
-const LAYOUT_VERSION = '1.0.0';
+// Storage key prefix and version — v7.2.1 bumps prefix to invalidate old bad layouts
+const KEY_PREFIX = 'agi_layout_v2';
+const LAYOUT_VERSION = '7.2.1';
 
 /**
  * Generate storage key for a page
@@ -34,19 +34,55 @@ function getStorageKey(pageKey: string): string {
 }
 
 /**
- * Validate if a layout item is valid
+ * Validate and clamp a layout item (v7.2.1 responsive hotfix)
  */
 function isValidLayoutItem(item: unknown): item is LayoutItem {
   if (!item || typeof item !== 'object') return false;
   const i = item as Record<string, unknown>;
-  return (
-    typeof i.i === 'string' &&
-    typeof i.x === 'number' &&
-    typeof i.y === 'number' &&
-    typeof i.w === 'number' &&
-    typeof i.h === 'number' &&
-    i.x >= 0 && i.y >= 0 && i.w > 0 && i.h > 0
-  );
+  if (
+    typeof i.i !== 'string' ||
+    typeof i.x !== 'number' ||
+    typeof i.y !== 'number' ||
+    typeof i.w !== 'number' ||
+    typeof i.h !== 'number'
+  ) return false;
+  // Clamp to safe bounds
+  i.x = Math.max(0, i.x);
+  i.y = Math.max(0, i.y);
+  i.w = Math.max(1, i.w);
+  i.h = Math.max(1, i.h);
+  return true;
+}
+
+/**
+ * Validate with min-size clamp for responsive safety (v7.2.1 engine fix)
+ * Desktop: w≥4, minW≥4, h≥3, minH≥3
+ * Tablet:  w≥3, minW≥3, h≥3, minH≥3
+ * Mobile:  w=1 (single column)
+ */
+function clampLayoutItem(item: LayoutItem, cols: number = 12): LayoutItem {
+  const minW = cols >= 12 ? 4 : cols >= 8 ? 3 : 1;
+  const minH = 3;
+  return {
+    ...item,
+    w: Math.max(minW, Math.min(item.w, cols)),
+    h: Math.max(minH, item.h),
+    x: Math.max(0, Math.min(item.x, cols - minW)),
+    y: Math.max(0, item.y),
+    minW: Math.max(minW, item.minW || minW),
+    minH: Math.max(minH, item.minH || minH),
+  };
+}
+
+/**
+ * Clamp all items in a layout config with column-aware safety
+ */
+function clampLayoutConfig(config: LayoutConfig, cols?: { lg?: number; md?: number; sm?: number }): LayoutConfig {
+  return {
+    lg: config.lg.map(i => clampLayoutItem(i, cols?.lg ?? 12)),
+    md: config.md.map(i => clampLayoutItem(i, cols?.md ?? 8)),
+    sm: config.sm.map(i => clampLayoutItem(i, cols?.sm ?? 1)),
+  };
 }
 
 /**
@@ -75,7 +111,7 @@ export function loadLayout(pageKey: string): LayoutConfig | null {
 
     // Handle legacy format (direct LayoutConfig)
     if (isValidLayoutConfig(parsed)) {
-      return parsed;
+      return clampLayoutConfig(parsed);
     }
 
     // Handle versioned format

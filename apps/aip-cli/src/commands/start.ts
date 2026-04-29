@@ -3,6 +3,7 @@ import { ensureAipDirs, PATHS, getProjectPackagePath } from '../paths.js';
 import { spawnDetached, writePidFile, waitForPort, waitForHealth, isPortInUse } from '../process.js';
 import { checkHealth } from '../health.js';
 import { log, ok, warn, fail, info } from '../logger.js';
+import { getCliVersion } from '../version.js';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -93,5 +94,5 @@ export async function runStart() {
   log(`API     http://${config.host}:${config.apiPort}    ${apiOnline ? 'online' : 'offline'}`);
   log(`Web     http://${config.host}:${config.webPort}    ${webOnline ? 'online' : 'offline'}`);
   log(`DB      ${dbStatus}`);
-  log('Version 7.1.0');
+  log(`Version ${getCliVersion()}`);
 }

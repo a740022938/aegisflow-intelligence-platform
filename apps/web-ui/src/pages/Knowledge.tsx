@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EmptyState, PageHeader, SectionCard, StatusBadge } from '../components/ui';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
 import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
 import '../components/ui/shared.css';
 import './Knowledge.css';
 import { roleClass } from '../theme/colorRoles';
@@ -83,7 +84,7 @@ export default function KnowledgePage() {
   const [selected, setSelected] = useState<KnowledgeEntry | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [msg, setMsg] = useState('');
-  const [layoutEdit, setLayoutEdit] = useState(false);
+  const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
   const [layouts, setLayouts] = useState<LayoutConfig>(DEFAULT_LAYOUTS);
   const [form, setForm] = useState({
     title: '',
@@ -106,17 +107,10 @@ export default function KnowledgePage() {
     }
   }, []);
 
-  // Save layout on change
-  const handleLayoutChange = useCallback((next: LayoutConfig) => {
-    setLayouts(next);
-    saveLayout(LAYOUT_KEY, next);
-  }, []);
-
-  // Reset layout
-  const handleResetLayout = useCallback(() => {
-    setLayouts(DEFAULT_LAYOUTS);
-    clearLayout(LAYOUT_KEY);
-  }, []);
+  // Save layout on change (only when in edit mode and meets threshold)
+  useEffect(() => {
+    if (layoutEdit && canUseLayoutEditor) saveLayout(LAYOUT_KEY, layouts);
+  }, [layouts, layoutEdit, canUseLayoutEditor]);
 
   async function loadEntries() {
     setLoading(true);
@@ -384,14 +378,16 @@ export default function KnowledgePage() {
   ], [entries, loading, filter, category, selected, categoryStats, recentActivity]);
 
   return (
-    <div className="knowledge-page page-root">
+    <div className="knowledge-page page-root" ref={contentRef}>
       <PageHeader
         title="知识中心"
         subtitle="任务经验 · 失败复盘 · 模型结论 · 处理建议"
         actions={(
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
-              onClick={() => setLayoutEdit(v => !v)}
+              onClick={toggleEdit}
+              disabled={!canUseLayoutEditor}
+              title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
               style={{
                 padding: '10px 18px', background: layoutEdit ? 'rgba(34,211,238,0.15)' : 'var(--bg-elevated)',
                 border: `1px solid ${layoutEdit ? 'rgba(34,211,238,0.5)' : 'var(--border-light)'}`,
@@ -403,7 +399,7 @@ export default function KnowledgePage() {
             </button>
             {layoutEdit && (
               <button
-                onClick={handleResetLayout}
+                onClick={() => { setLayouts(DEFAULT_LAYOUTS); clearLayout(LAYOUT_KEY); }}
                 style={{
                   padding: '10px 18px', background: 'var(--bg-elevated)', border: '1px solid var(--border-light)',
                   borderRadius: '8px', cursor: 'pointer', fontSize: '14px', color: 'var(--text-main)',
@@ -422,12 +418,29 @@ export default function KnowledgePage() {
         </div>
       )}
 
-      <WorkspaceGrid
-        editable={layoutEdit}
-        layouts={layouts}
-        cards={cards}
-        onChange={handleLayoutChange}
-      />
+      {loading && entries.length === 0 ? (
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
+      ) : shouldUseLayoutEditor ? (
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={cards} onChange={setLayouts} />
+        </div>
+      ) : (
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <div className="responsive-card-grid">
+            {cards.map((c: any) => (
+              <div key={c.id} style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                {c.content}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Create Modal */}
       {showCreate && (

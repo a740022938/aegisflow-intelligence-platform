@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { EmptyState, PageHeader, SectionCard, StatusBadge } from '../components/ui';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
 import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
 import '../components/ui/shared.css';
 import './ModuleCenter.css';
 
@@ -126,7 +127,7 @@ export default function ModuleCenter() {
   const [busyKey, setBusyKey] = useState('');
   const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({ health: true, openclaw: true, pool: true, jobs: true, routes: true, audit: true, summary: true });
   const [unauthorized, setUnauthorized] = useState(false);
-  const [layoutEdit, setLayoutEdit] = useState(false);
+  const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
   const [layouts, setLayouts] = useState<LayoutConfig>(() => loadLayout(LAYOUT_KEY) || DEFAULT_LAYOUTS);
 
   const refresh = useCallback(async () => {
@@ -209,8 +210,8 @@ export default function ModuleCenter() {
   }, [refresh]);
 
   useEffect(() => {
-    saveLayout(LAYOUT_KEY, layouts);
-  }, [layouts]);
+    if (layoutEdit && canUseLayoutEditor) saveLayout(LAYOUT_KEY, layouts);
+  }, [layouts, layoutEdit, canUseLayoutEditor]);
 
   const toggleOpenClaw = useCallback(async () => {
     if (!snapshot) return;
@@ -523,13 +524,18 @@ export default function ModuleCenter() {
   ]);
 
   return (
-    <div className="page-root module-center-page">
+    <div className="page-root module-center-page" ref={contentRef}>
       <PageHeader
         title="模块中心"
         subtitle="统一模块状态、健康评分、控制与审计"
         actions={(
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`} onClick={() => setLayoutEdit((v) => !v)}>
+            <button
+              className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
+              onClick={toggleEdit}
+              disabled={!canUseLayoutEditor}
+              title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
+            >
               {layoutEdit ? '退出布局编辑' : '布局编辑'}
             </button>
             <button
@@ -559,7 +565,7 @@ export default function ModuleCenter() {
         </SectionCard>
       )}
       {loading && !snapshot ? (
-        <EmptyState message="加载模块快照中..." />
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
       ) : err ? (
         <SectionCard title="模块中心加载失败">
           <EmptyState icon="⚠️" title="请求失败" description={err} />
@@ -567,13 +573,26 @@ export default function ModuleCenter() {
             <button className="ui-btn ui-btn-primary ui-btn-sm" onClick={refresh}>重试</button>
           </div>
         </SectionCard>
+      ) : shouldUseLayoutEditor ? (
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={cards} onChange={setLayouts} />
+        </div>
       ) : (
-        <WorkspaceGrid
-          editable={layoutEdit}
-          layouts={layouts}
-          cards={cards}
-          onChange={setLayouts}
-        />
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <div className="responsive-card-grid">
+            {cards.map((c: any) => (
+              <div key={c.id} style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                {c.content}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

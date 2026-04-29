@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
 import { useNavigate } from 'react-router-dom';
 import '../components/ui/shared.css';
 import './Dashboard.css';
@@ -7,7 +8,7 @@ import { APP_VERSION } from '../constants/appVersion';
 import { APP_META } from '../constants/appMeta';
 import { roleClass } from '../theme/colorRoles';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
-import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { clearLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
 import { PageHeader } from '../components/ui';
 
 // Plugin Status 类型定义
@@ -125,8 +126,8 @@ export default function Dashboard() {
   const [switchBusy, setSwitchBusy] = useState(false);
   
   // 布局状态
-  const [layoutEdit, setLayoutEdit] = useState(false);
-  const [layouts, setLayouts] = useState<LayoutConfig>(() => loadLayout(LAYOUT_KEY) || DEFAULT_LAYOUTS);
+  const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
+  const [layouts, setLayouts] = useState<LayoutConfig>(DEFAULT_LAYOUTS);
 
   // 监听语言变化
   useEffect(() => {
@@ -138,10 +139,10 @@ export default function Dashboard() {
     return () => window.removeEventListener('storage', handleStorage);
   }, [lang]);
 
-  // 布局持久化
+  // 布局持久化 (only persist when in edit mode with sufficient width)
   useEffect(() => {
-    saveLayout(LAYOUT_KEY, layouts);
-  }, [layouts]);
+    if (layoutEdit && canUseLayoutEditor) saveLayout(LAYOUT_KEY, layouts);
+  }, [layouts, layoutEdit, canUseLayoutEditor]);
 
   const t = translations[lang];
   const td = t.dashboard;
@@ -625,7 +626,7 @@ export default function Dashboard() {
   }, [s, activities, plugins, lang, t, td, openclaw, openclawEnabled, ocStatus, switchBusy, toggleOpenClawSwitch, navigate, isActive, pluginStats]);
 
   return (
-    <div className="page-root dashboard-page">
+    <div className="page-root dashboard-page" ref={contentRef}>
       <PageHeader
         title={APP_META.appName}
         subtitle={td.title}
@@ -635,10 +636,12 @@ export default function Dashboard() {
             <button className="dash-refresh-btn" onClick={fetchAll} disabled={loading}>
               {loading ? '⟳' : '↻'}
             </button>
-            <button
-              className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
-              onClick={() => setLayoutEdit((v) => !v)}
-            >
+              <button
+                className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
+                onClick={toggleEdit}
+                disabled={!canUseLayoutEditor}
+                title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
+              >
               {layoutEdit ? '退出布局编辑' : '布局编辑'}
             </button>
             <button
@@ -655,14 +658,27 @@ export default function Dashboard() {
       />
 
       {loading && !summary ? (
-        <div className="dash-loading">加载中...</div>
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
+      ) : shouldUseLayoutEditor ? (
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={cards} onChange={setLayouts} />
+        </div>
       ) : (
-        <WorkspaceGrid
-          editable={layoutEdit}
-          layouts={layouts}
-          cards={cards}
-          onChange={setLayouts}
-        />
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <div className="responsive-card-grid">
+            {cards.map((c: any) => (
+              <div key={c.id} className="factory-status-grid-cell" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                {c.content}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

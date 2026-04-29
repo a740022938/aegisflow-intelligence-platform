@@ -10,7 +10,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader, SectionCard, EmptyState } from '../components/ui';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
-import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { clearLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
 import '../components/ui/shared.css';
 import '../layout/workspace-grid.css';
 
@@ -152,13 +153,13 @@ export default function PluginPool() {
   const [selected, setSelected] = useState<PluginItem | null>(null);
 
   // Workbench layout state
-  const [layoutEdit, setLayoutEdit] = useState(false);
-  const [layouts, setLayouts] = useState<LayoutConfig>(() => loadLayout(LAYOUT_KEY) || DEFAULT_LAYOUTS);
+  const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
+  const [layouts, setLayouts] = useState<LayoutConfig>(DEFAULT_LAYOUTS);
 
-  // Persist layout changes
+  // Persist layout changes (only when in edit mode with sufficient width)
   useEffect(() => {
-    saveLayout(LAYOUT_KEY, layouts);
-  }, [layouts]);
+    if (layoutEdit && canUseLayoutEditor) saveLayout(LAYOUT_KEY, layouts);
+  }, [layouts, layoutEdit, canUseLayoutEditor]);
 
   const fetchPool = useCallback(async () => {
     setLoading(true);
@@ -452,7 +453,7 @@ export default function PluginPool() {
   }
 
   return (
-    <div className="page-root" style={{ flex: 1, overflow: 'hidden' }}>
+    <div className="page-root" style={{ flex: 1, overflow: 'auto' }} ref={contentRef}>
       <PageHeader
         title="Plugin Pool"
         subtitle={`${activeItems.length} plugins · 工作台布局`}
@@ -460,7 +461,9 @@ export default function PluginPool() {
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <button
               className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
-              onClick={() => setLayoutEdit(v => !v)}
+              onClick={toggleEdit}
+              disabled={!canUseLayoutEditor}
+              title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
             >
               {layoutEdit ? '✓ 完成编辑' : '✏️ 编辑布局'}
             </button>
@@ -484,12 +487,6 @@ export default function PluginPool() {
         )}
       />
 
-      {loading && items.length === 0 && (
-        <div style={{ padding: 40, textAlign: 'center' }}>
-          <EmptyState message="加载中..." />
-        </div>
-      )}
-
       {loadError && !loading && items.length > 0 && (
         <div style={{ padding: '8px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 6, color: '#dc2626', fontSize: 12, marginBottom: 12 }}>
           {loadError}
@@ -497,19 +494,29 @@ export default function PluginPool() {
         </div>
       )}
 
-      {!loading && !loadError && items.length === 0 && (
-        <div style={{ padding: 40, textAlign: 'center' }}>
-          <EmptyState message="暂无插件数据" />
-          <button className="ui-btn ui-btn-outline" onClick={fetchPool} style={{ marginTop: 12 }}>刷新</button>
+      {loading && items.length === 0 ? (
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
+      ) : shouldUseLayoutEditor ? (
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={cards} onChange={setLayouts} />
+        </div>
+      ) : (
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <div className="responsive-card-grid">
+            {cards.map((c: any) => (
+              <div key={c.id} className="factory-status-grid-cell" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                {c.content}
+              </div>
+            ))}
+          </div>
         </div>
       )}
-
-      <WorkspaceGrid
-        editable={layoutEdit}
-        layouts={layouts}
-        cards={cards}
-        onChange={setLayouts}
-      />
 
       {/* Detail Panel - floating, not part of grid */}
       {selected && (

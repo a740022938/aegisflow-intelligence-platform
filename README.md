@@ -97,7 +97,6 @@ aip gateway status # Show gateway status
 ```bash
 pnpm run build       # Production build (Web UI)
 pnpm run lint        # ESLint check (--max-warnings 0)
-pnpm run typecheck   # TypeScript type checking
 pnpm run db:doctor   # Database diagnostics
 pnpm run test:smoke  # Smoke tests (requires API running)
 pnpm run preview     # Preview production build
@@ -162,7 +161,7 @@ See `.env.example` for the full list.
 
 ## OpenClaw Integration
 
-AIP integrates with [OpenClaw](https://github.com/anomalyco/opencode) for bidirectional AI agent orchestration:
+AIP integrates with [OpenClaw](https://github.com/openclaw/openclaw) for bidirectional AI agent orchestration:
 
 - **Master Switch**: Enable/disable OpenClaw execution layer
 - **Heartbeat**: Health monitoring with configurable timeout

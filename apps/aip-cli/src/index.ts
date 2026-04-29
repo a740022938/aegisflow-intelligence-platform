@@ -11,6 +11,7 @@ import { runVersion } from './commands/version.js';
 import { runDoctor } from './commands/doctor.js';
 import { runConfig } from './commands/config.js';
 import { runGateway } from './commands/gateway.js';
+import { getCliVersion } from './version.js';
 
 export interface AipConfig {
   home: string;
@@ -42,7 +43,7 @@ async function main() {
     case 'config': await runConfig(sub, args.slice(2)); break;
     case 'gateway': await runGateway(sub); break;
     default:
-      console.log(`AIP CLI v7.1.0`);
+      console.log(`AIP CLI v${getCliVersion()}`);
       console.log(`Usage: aip <command>`);
       console.log(``);
       console.log(`Commands:`);

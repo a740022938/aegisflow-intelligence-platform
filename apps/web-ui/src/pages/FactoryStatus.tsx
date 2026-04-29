@@ -1,12 +1,12 @@
 // v5.2.0 — Factory Status Page with Root Cause Traceability (Workbench Layout 版)
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { StatusBadge, PageHeader, SectionCard, EmptyState, LineagePanel, DrilldownPanel, TimelinePanel, IncidentDetail, ReleaseGovernancePanel, ReleaseComparePanel, RollbackReadinessBadge, HealthPatrolPanel, VerificationSummaryPanel, TrendSummaryPanel, RiskSignalBadge } from '../components/ui';
 import '../components/ui/shared.css';
 import './FactoryStatus.css';
 import { roleClass } from '../theme/colorRoles';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
-import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { clearLayout, clearAllLayouts, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
 
 const API = '/api';
 const LAYOUT_KEY = 'factory-status';
@@ -117,14 +117,46 @@ export default function FactoryStatus() {
   const [showTimeline, setShowTimeline] = useState(false);
   const [showIncident, setShowIncident] = useState(false);
 
-  // 布局状态
-  const [layoutEdit, setLayoutEdit] = useState(false);
-  const [layouts, setLayouts] = useState<LayoutConfig>(() => loadLayout(LAYOUT_KEY) || DEFAULT_LAYOUTS);
+  // v7.2.1: content-based width detection to handle sidebar-offset cases
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [contentWidth, setContentWidth] = useState<number>(1200);
 
-  // 布局持久化
   useEffect(() => {
-    saveLayout(LAYOUT_KEY, layouts);
-  }, [layouts]);
+    const el = contentRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect?.width;
+      if (width && width > 0) setContentWidth(width);
+    });
+    observer.observe(el);
+    setContentWidth(el.getBoundingClientRect().width);
+    return () => observer.disconnect();
+  }, []);
+
+  const canUseLayoutEditor = contentWidth >= 1200; // react-grid-layout only when user clicks edit AND screen is wide enough
+  const [layoutEdit, setLayoutEdit] = useState(false);
+  const shouldUseLayoutEditor = layoutEdit && canUseLayoutEditor;
+
+  // Default: CSS Grid, never reads saved layout. Only loads saved layout when user enters edit mode.
+  const [layouts, setLayouts] = useState<LayoutConfig>(DEFAULT_LAYOUTS);
+
+  // When user clicks edit AND screen is wide enough: load saved layout
+  useEffect(() => {
+    if (layoutEdit && canUseLayoutEditor) {
+      const saved = loadLayout(LAYOUT_KEY);
+      if (saved) setLayouts(saved);
+    }
+  }, [layoutEdit, canUseLayoutEditor]);
+
+  // Auto-exit edit mode when content shrinks below 1200px
+  useEffect(() => {
+    if (!canUseLayoutEditor && layoutEdit) setLayoutEdit(false);
+  }, [canUseLayoutEditor, layoutEdit]);
+
+  // 布局持久化 — only save when in edit mode
+  useEffect(() => {
+    if (layoutEdit && canUseLayoutEditor) saveLayout(LAYOUT_KEY, layouts);
+  }, [layouts, layoutEdit, canUseLayoutEditor]);
 
   const fetchStatus = useCallback(async () => {
     setLoading(true);
@@ -485,7 +517,7 @@ export default function FactoryStatus() {
   if (!status) return <div className="factory-status-loading">加载中...</div>;
 
   return (
-    <div className="page-root factory-status-page">
+    <div className="page-root factory-status-page" ref={contentRef}>
       <PageHeader
         title="工厂运行态"
         subtitle={`Production Readiness Dashboard · ${timeRange === '24h' ? '24小时' : timeRange === '7d' ? '7天' : '30天'}`}
@@ -514,13 +546,15 @@ export default function FactoryStatus() {
             <button
               className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
               onClick={() => setLayoutEdit((v) => !v)}
+              disabled={!canUseLayoutEditor}
+              title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
             >
               {layoutEdit ? '退出布局编辑' : '布局编辑'}
             </button>
             <button
               className="ui-btn ui-btn-outline ui-btn-sm"
               onClick={() => {
-                clearLayout(LAYOUT_KEY);
+                clearAllLayouts();
                 setLayouts(DEFAULT_LAYOUTS);
               }}
             >
@@ -532,13 +566,31 @@ export default function FactoryStatus() {
 
       {loading && !status ? (
         <div className="factory-status-loading">加载中...</div>
+      ) : shouldUseLayoutEditor ? (
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: react-grid-edit · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <WorkspaceGrid
+            editable={layoutEdit}
+            layouts={layouts}
+            cards={cards}
+            onChange={setLayouts}
+          />
+        </div>
       ) : (
-        <WorkspaceGrid
-          editable={layoutEdit}
-          layouts={layouts}
-          cards={cards}
-          onChange={setLayouts}
-        />
+        <div>
+          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+            layoutMode: css-grid · contentWidth: {Math.round(contentWidth)}px
+          </div>
+          <div className="factory-status-responsive-grid">
+            {cards.map(c => (
+              <div key={c.id} className="factory-status-grid-cell">
+                {c.content}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Drilldown Panels - 浮动覆盖层 */}

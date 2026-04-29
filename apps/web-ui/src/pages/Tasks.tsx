@@ -12,7 +12,8 @@ import {
   EntityLinkChips,
 } from '../components/ui';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
-import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { clearLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
+import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
 import '../components/ui/shared.css';
 import './Tasks.css';
 
@@ -35,7 +36,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 // Workspace layout key
-const LAYOUT_KEY = 'tasks-detail';
+const LAYOUT_KEY = 'tasks';
 
 // Default layouts for detail workspace cards
 const DEFAULT_LAYOUTS: LayoutConfig = {
@@ -186,22 +187,13 @@ export default function Tasks() {
   const [retryingTask, setRetryingTask] = useState(false);
 
   // Workspace layout state
-  const [layoutEdit, setLayoutEdit] = useState(false);
+  const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
   const [layouts, setLayouts] = useState<LayoutConfig>(DEFAULT_LAYOUTS);
 
-  // Load saved layout
+  // Save layout on change (only when in edit mode with sufficient width)
   useEffect(() => {
-    const saved = loadLayout(LAYOUT_KEY);
-    if (saved) {
-      setLayouts(saved);
-    }
-  }, []);
-
-  // Save layout on change
-  const handleLayoutChange = useCallback((next: LayoutConfig) => {
-    setLayouts(next);
-    saveLayout(LAYOUT_KEY, next);
-  }, []);
+    if (layoutEdit && canUseLayoutEditor) saveLayout(LAYOUT_KEY, layouts);
+  }, [layouts, layoutEdit, canUseLayoutEditor]);
 
   // Reset layout
   const handleResetLayout = useCallback(() => {
@@ -509,7 +501,7 @@ export default function Tasks() {
   }, [selectedTask, taskSummary, workflowJobId, relatedModel, relatedDataset, relatedArtifact, visionItems]);
 
   return (
-    <div className="tsk-root">
+    <div className="tsk-root" ref={contentRef}>
       <PageHeader
         title="任务中心"
         subtitle={`${filtered.length} / ${totalTasks} 条 · ${statusCounts.running} 执行中`}
@@ -543,7 +535,7 @@ export default function Tasks() {
       />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
-        <div className="tsk-root">
+    <div className="tsk-root">
         {/* Left */}
         <div className="tsk-left">
           {/* Stats */}
@@ -722,14 +714,16 @@ export default function Tasks() {
                     {selectedTask.error_message && (
                       <div className="ui-flash ui-flash-err" style={{ marginBottom: 14 }}>错误：{selectedTask.error_message}</div>
                     )}
-                    {/* Workspace Grid for cards */}
+                    {/* Workspace Grid for cards - responsive gate */}
                     {workspaceCards.length > 0 && (
                       <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>任务概览工作台</div>
                           <div style={{ display: 'flex', gap: 8 }}>
                             <button
-                              onClick={() => setLayoutEdit(v => !v)}
+                              onClick={toggleEdit}
+                              disabled={!canUseLayoutEditor}
+                              title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
                               style={{
                                 padding: '6px 14px', background: layoutEdit ? 'rgba(34,211,238,0.15)' : 'var(--bg-elevated)',
                                 border: `1px solid ${layoutEdit ? 'rgba(34,211,238,0.5)' : 'var(--border-light)'}`,
@@ -751,12 +745,29 @@ export default function Tasks() {
                             )}
                           </div>
                         </div>
-                        <WorkspaceGrid
-                          editable={layoutEdit}
-                          layouts={layouts}
-                          cards={workspaceCards}
-                          onChange={handleLayoutChange}
-                        />
+                        {detailLoading && !selectedTask ? (
+                          <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
+                        ) : shouldUseLayoutEditor ? (
+                          <div>
+                            <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+                              layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+                            </div>
+                            <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={workspaceCards} onChange={setLayouts} />
+                          </div>
+                        ) : (
+                          <div>
+                            <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
+                              layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
+                            </div>
+                            <div className="responsive-card-grid">
+                              {workspaceCards.map((c: any) => (
+                                <div key={c.id} className="factory-status-grid-cell" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                                  {c.content}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
                   </>

@@ -787,8 +787,89 @@ a:hover { color: var(--primary-hover); text-decoration: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   Phase 4: 组件库统一
-   统一按钮、表格、模态框、卡片
+    Phase 4: 响应式断点（v7.2.1 responsive hotfix）
+   ═══════════════════════════════════════════════════════════ */
+
+/* 全局响应式安全规则 */
+.ui-page-container,
+.page-container,
+.page-root {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* 表格/日志/代码块横向滚动 */
+.ui-table,
+pre, code, .log-panel {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* grid/card 安全宽度 */
+@media (max-width: 768px) {
+  .ui-form-grid { grid-template-columns: 1fr; }
+  .ui-stats-grid { grid-template-columns: 1fr; }
+
+  .ui-toolbar,
+  .ui-toolbar-left,
+  .ui-toolbar-right {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .ui-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  .ui-page-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .ui-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  .ui-section-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .ui-split-layout {
+    flex-direction: column;
+  }
+  .ui-split-sidebar {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .ui-detail-header {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .ui-detail-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .ui-info-label {
+    width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ui-info-label {
+    width: 80px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+    Phase 4: 组件库统一
+    统一按钮、表格、模态框、卡片
    ═══════════════════════════════════════════════════════════ */
 
 /* ── InfoTable 统一 ── */
@@ -948,4 +1029,34 @@ a:hover { color: var(--primary-hover); text-decoration: none; }
 .ui-empty-actions {
   display: flex;
   gap: var(--space-3);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   v7.2.1: Responsive card grid — shared CSS Grid fallback
+   Used by all WorkspaceGrid pages when not in edit mode
+   ═══════════════════════════════════════════════════════════ */
+
+.responsive-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: clamp(10px, 1.6vw, 16px);
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.responsive-card-grid > * {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (max-width: 360px) {
+  .responsive-card-grid {
+    grid-template-columns: 1fr;
+  }
 }

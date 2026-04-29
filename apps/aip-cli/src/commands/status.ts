@@ -3,6 +3,7 @@ import { readPidFile, isProcessAlive, isPortInUse } from '../process.js';
 import { PATHS } from '../paths.js';
 import { checkHealth } from '../health.js';
 import { log } from '../logger.js';
+import { getCliVersion } from '../version.js';
 
 export async function runStatus() {
   const config = loadConfig();
@@ -33,6 +34,6 @@ export async function runStatus() {
   log(`Web Port ${config.webPort} (${webPortActive ? 'in use' : 'free'})`);
   log(`Health   ${healthStatus}`);
   log(`DB       ${dbStatus}`);
-  log('Version  7.1.0');
+  log(`Version  ${getCliVersion()}`);
   log(`Logs     ${PATHS.logsDir}`);
 }
