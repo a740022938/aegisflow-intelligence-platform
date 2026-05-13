@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { initConfig } from './config.js';
 import { runStart } from './commands/start.js';
+import { runMl } from './commands/ml.js';
 import { runStop } from './commands/stop.js';
 import { runRestart } from './commands/restart.js';
 import { runStatus } from './commands/status.js';
@@ -42,12 +43,16 @@ async function main() {
     case 'doctor': await runDoctor(); break;
     case 'config': await runConfig(sub, args.slice(2)); break;
     case 'gateway': await runGateway(sub); break;
+    case 'ml':
+    case 'manual':
+    case 'commands':
+      await runMl(); break;
     default:
       console.log(`AIP CLI v${getCliVersion()}`);
       console.log(`Usage: aip <command>`);
       console.log(``);
       console.log(`Commands:`);
-      console.log(`  start        Start AIP services`);
+       console.log(`  start        Start AIP services`);
       console.log(`  stop         Stop AIP services`);
       console.log(`  restart      Restart AIP services`);
       console.log(`  status       Show AIP status`);
@@ -57,7 +62,8 @@ async function main() {
       console.log(`  version      Show version info`);
       console.log(`  doctor       Run diagnostics`);
       console.log(`  config       Manage configuration`);
-      console.log(`  gateway      Gateway lifecycle operations`);
+       console.log(`  gateway      Gateway lifecycle operations`);
+       console.log(`  ml           本机命令大全 (辅助)`);
       console.log(``);
       console.log(`Config:`);
       console.log(`  aip config init              Initialize config`);

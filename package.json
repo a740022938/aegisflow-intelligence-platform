@@ -1,6 +1,6 @@
 {
   "name": "agi-model-factory",
-  "version": "7.2.1",
+  "version": "7.3.0-rc1",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "engines": {
@@ -8,10 +8,10 @@
   },
   "scripts": {
     "setup": "node scripts/setup.js",
-    "dev": "concurrently -n api,web -c cyan,green \"pnpm dev:api\" \"pnpm dev:web\"",
-    "dev:web": "pnpm --dir apps/web-ui dev",
-    "dev:api": "pnpm --dir apps/local-api dev",
-    "build": "pnpm --dir apps/web-ui build",
+    "dev": "concurrently -n api,web -c cyan,green \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:web": "npm --prefix apps/web-ui run dev",
+    "dev:api": "npm --prefix apps/local-api run dev",
+    "build": "npm --prefix apps/web-ui run build",
     "db:init": "node scripts/init-db.js",
     "db:doctor": "node scripts/db-doctor.js",
     "db:doctor:strict": "node scripts/db-doctor.js --strict",
@@ -23,7 +23,7 @@
     "format:check": "prettier --check \"apps/**/*.{ts,tsx,css,json}\"",
     "test": "node tests/smoke-v7.mjs 2>&1 || echo [INFO] Smoke tests require API running at http://127.0.0.1:8787",
     "test:smoke": "node tests/smoke-v7.mjs",
-    "preview": "pnpm --dir apps/web-ui preview --port 5173",
+    "preview": "npm --prefix apps/web-ui run preview -- --port 5173",
     "api:test": "httpyac api-tests/all-endpoints.http",
     "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:stop": "pm2 stop agi-factory-api",

@@ -1,0 +1,434 @@
+# ================================
+# AIP 本机命令大全（专业稳定版）
+# ================================
+# 适用机器：Win11 原生环境
+# 项目目录：E:\AIP
+# 当前策略：稳定优先、固定版本、不追新
+# 适用范围：AIP v7.2.x / OpenClaw 联调 / 本地开发与日常运维
+# 更新时间：2026-05-03
+# ================================
+
+
+# ============================================================
+# 0. 当前稳定基线（必须优先确认）
+# ============================================================
+
+# 当前建议封存组合：
+# Node       v22.19.0
+# npm        10.9.3
+# nvm        v22.19.0
+# OpenClaw   2026.3.23 (ccfeecb)
+# AIP        CLI/Core 7.3.0-rc1
+
+# 版本检查：
+node -v
+npm -v
+nvm current
+openclaw --version
+aip version
+
+# 路径检查：
+where.exe node
+where.exe npm
+where.exe openclaw
+where.exe aip
+
+# 当前应看到的核心路径：
+# node/npm/openclaw 应优先来自：
+# C:\nvm4w\nodejs
+#
+# aip 当前来自：
+# C:\Users\74002\AppData\Local\pnpm
+
+
+# ============================================================
+# 1. 日常最常用命令
+# ============================================================
+
+# 查看 AIP 版本
+aip version
+
+# 查看当前运行状态
+aip status
+
+# 检查后端健康状态
+aip health
+
+# 打开 AIP 网页界面
+aip open
+
+# 环境诊断
+aip doctor
+
+
+# ============================================================
+# 2. 启动、停止、重启
+# ============================================================
+
+# 启动 API + Web
+aip start
+
+# 停止 API + Web
+aip stop
+
+# 重启 API + Web
+aip restart
+
+# 重启 OpenClaw Gateway（AIP 封装命令）
+aip gateway restart
+
+
+# ============================================================
+# 3. 日志查看
+# ============================================================
+
+# 查看日志文件列表
+aip logs
+
+# 查看 API 日志
+aip logs api
+
+# 查看 Web 日志
+aip logs web
+
+
+# ============================================================
+# 4. 浏览器地址
+# ============================================================
+
+# AIP 首页
+http://127.0.0.1:5173
+
+# 工厂运行状态页
+http://127.0.0.1:5173/factory-status
+
+# 后端健康检查
+http://127.0.0.1:8787/api/health
+
+# OpenClaw 控制台
+http://127.0.0.1:18789
+
+
+# ============================================================
+# 5. PowerShell 使用方式
+# ============================================================
+
+# 进入项目目录
+cd E:\AIP
+
+# 启动
+aip start
+
+# 查看状态
+aip status
+
+# 健康检查
+aip health
+
+# 停止
+aip stop
+
+
+# ============================================================
+# 6. CMD 使用方式
+# ============================================================
+
+# 进入项目目录
+cd /d E:\AIP
+
+# 启动
+aip start
+
+# 查看状态
+aip status
+
+# 健康检查
+aip health
+
+# 停止
+aip stop
+
+
+# ============================================================
+# 7. 端口检查
+# ============================================================
+
+# 检查 AIP API / Web 端口
+Get-NetTCPConnection -LocalPort 8787,5173 -State Listen
+
+# 检查 OpenClaw Gateway 端口
+Get-NetTCPConnection -LocalPort 18789 -State Listen
+
+# 如果端口被占用，查看进程：
+Get-NetTCPConnection -LocalPort 8787,5173,18789 -State Listen |
+  Select-Object LocalAddress,LocalPort,OwningProcess
+
+# 根据 PID 查看进程：
+Get-Process -Id <PID>
+
+
+# ============================================================
+# 8. OpenClaw 常用命令
+# ============================================================
+
+# 查看 OpenClaw 版本
+openclaw --version
+
+# 查看 Gateway 状态
+openclaw gateway status
+
+# 重启 Gateway
+openclaw gateway restart
+
+# 停止 Gateway
+openclaw gateway stop
+
+# 前台运行 Gateway（调试用）
+openclaw gateway run
+
+# 注意：
+# Win11 原生环境下 Gateway stop/restart 可能存在残留进程或端口占用。
+# 如遇异常，优先执行：
+openclaw gateway stop
+openclaw gateway status
+openclaw gateway restart
+
+
+# ============================================================
+# 9. OpenClaw 固定版本策略
+# ============================================================
+
+# 当前本机稳定建议版本：
+# OpenClaw 2026.3.23
+
+# 推荐安装固定版本：
+npm install -g openclaw@2026.3.23
+
+# 不建议使用以下命令：
+# npm install -g openclaw
+# npm update -g openclaw
+
+# 原因：
+# 不带版本号会安装最新版，可能引入新的 Windows 原生兼容问题。
+
+
+# ============================================================
+# 10. Node / npm / nvm 管理
+# ============================================================
+
+# 查看当前 Node：
+node -v
+
+# 查看当前 npm：
+npm -v
+
+# 查看 nvm 当前版本：
+nvm current
+
+# 查看已安装 Node 版本：
+nvm list
+
+# 使用当前稳定 Node：
+nvm use 22.19.0
+
+# 安装当前稳定 Node：
+nvm install 22.19.0
+
+# 不建议当前使用 Node 24 作为主力稳定环境。
+# 当前稳定组合建议：
+# Node v22.19.0 + npm 10.9.3
+
+
+# ============================================================
+# 11. AIP / OpenClaw 认证令牌
+# ============================================================
+# 本文件为本机私有文件，不作为公开仓库内容。
+
+# OpenClaw admin token
+# 用于 command / workflow / run-script 等管理接口
+x-openclaw-admin-token: 123456789
+
+# OpenClaw heartbeat token
+# 用于 heartbeat-v2 / result 等心跳与结果回传接口
+x-openclaw-token: 123456789
+
+
+# ============================================================
+# 12. 获取 AIP JWT
+# ============================================================
+
+$login = Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8787/api/auth/login" `
+  -ContentType "application/json" `
+  -Body (@{ username="admin"; password="aip-admin" } | ConvertTo-Json)
+
+$jwt = $login.token
+$jwt
+
+
+# ============================================================
+# 13. AIP / OpenClaw 联调测试
+# ============================================================
+
+# 能力清单
+Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:8787/api/openclaw/capabilities" `
+  -Headers @{ Authorization = "Bearer $jwt" }
+
+# 事件列表
+Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:8787/api/openclaw/events?limit=5" `
+  -Headers @{ Authorization = "Bearer $jwt" }
+
+# 心跳
+Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8787/api/openclaw/heartbeat-v2" `
+  -Headers @{ Authorization = "Bearer $jwt"; "x-openclaw-token" = "123456789" } `
+  -ContentType "application/json" `
+  -Body (@{ actor="manual-check"; runtime_online=$true } | ConvertTo-Json)
+
+# 管理命令
+Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8787/api/openclaw/command" `
+  -Headers @{ Authorization = "Bearer $jwt"; "x-openclaw-admin-token" = "123456789"; "x-openclaw-token" = "123456789" } `
+  -ContentType "application/json" `
+  -Body (@{ command="inspect"; target="system" } | ConvertTo-Json)
+
+# 工作流触发
+Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8787/api/openclaw/workflow" `
+  -Headers @{ Authorization = "Bearer $jwt"; "x-openclaw-admin-token" = "123456789"; "x-openclaw-token" = "123456789" } `
+  -ContentType "application/json" `
+  -Body (@{ workflow="evaluate-only"; params=@{} } | ConvertTo-Json)
+
+
+# ============================================================
+# 14. 故障恢复
+# ============================================================
+
+# UI 打不开时：
+aip restart
+aip status
+aip health
+aip open
+
+# API 不在线时：
+aip stop
+aip start
+aip health
+
+# OpenClaw Gateway 异常时：
+aip gateway restart
+
+# 或使用 OpenClaw 原生命令：
+openclaw gateway status
+openclaw gateway restart
+
+# 如果 Gateway 仍异常，再检查端口：
+Get-NetTCPConnection -LocalPort 18789 -State Listen
+
+
+# ============================================================
+# 15. 不建议再用的命令
+# ============================================================
+
+# 当前机器 pnpm 链路曾被 Device Guard 拦截，不建议日常直接使用：
+# pnpm.cmd run dev
+# pnpm.cmd run dev:api
+# pnpm.cmd run dev:web
+
+# 日常统一走：
+aip start
+aip stop
+
+# 继续
+aip restart
+
+# ============================================================
+# 16. 建议新增：aip ml 命令大全
+# ============================================================
+
+# 目标：
+# 以后输入：
+aip ml
+
+# 自动显示本文件中的命令大全，类似：
+# - 当前稳定基线
+# - AIP 常用命令
+# - OpenClaw 常用命令
+# - Node/npm/nvm 检查
+# - 联调测试命令
+# - 故障恢复命令
+# - 禁用/不建议命令
+
+# 建议实现方式：
+# 在 AIP CLI 中新增 ml/help/manual 子命令别名：
+#
+# aip ml
+# aip manual
+# aip commands
+## 三个命令都输出同一份命令手册。
+
+
+# ============================================================
+# 17. 给 Qclaw 的施工要求：实现 aip ml
+# ============================================================
+
+# 任务标题：
+# 为 AIP CLI 增加本机命令大全入口 aip ml
+
+# 目标：
+# 在不影响现有 aip version/status/health/start/stop/restart/logs/open/doctor/gateway 命令的前提下，
+# 新增一个只读帮助命令：
+#
+#   aip ml
+#
+# 用于在终端输出 AIP 本机常用命令大全。
+
+# 功能要求：
+# 1. 新增 aip ml 子命令。
+# 2. 输出内容包含：
+#    - 稳定基线：Node v22.19.0 / npm 10.9.3 / OpenClaw 2026.3.23 / AIP 7.3.0-rc1
+#    - AIP 日常命令
+#    - OpenClaw 命令
+#    - Node/npm/nvm 检查命令
+#    - 端口检查命令
+#    - JWT 获取与联调命令
+#    - 故障恢复命令
+#    - 不建议使用的命令
+
+# 3. 命令只读，不启动服务、不停止服务、不修改配置。
+# 4. 不硬编码个人绝对路径到程序逻辑中；如果展示本机路径，只作为帮助文本显示。
+# 5. 不改动现有 CLI 命令行为。
+# 6. 增加最小验证：
+#    - aip ml 可正常输出
+#    - aip version 正常
+#    - aip status 正常
+#    - aip health 正常
+
+# 验证命令：
+aip ml
+aip version
+aip status
+aip health
+
+# 验收标准：
+# 1. 执行 aip ml 不报错。
+# 2. 输出内容清晰、有分区、有稳定基线。
+# 3. 不影响 AIP 原有启动、停止、状态、健康检查命令。
+# 4. build/typecheck/lint 如项目要求，应全部通过。
+
+
+# ============================================================
+# 18. 最重要记住
+# ============================================================
+
+# 日常启动只用：
+aip start
+
+# 日常检查只用：
+aip status
+aip health
+
+# 日常恢复只用：
+aip restart
+
+# OpenClaw 只装固定版：
+npm install -g openclaw@2026.3.23
+
+# 当前稳定组合：
+# Node v22.19.0 + npm 10.9.3 + OpenClaw 2026.3.23 + AIP 7.3.0-rc1

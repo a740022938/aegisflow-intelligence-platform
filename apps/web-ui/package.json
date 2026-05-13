@@ -1,6 +1,6 @@
 {
   "name": "web-ui",
-  "version": "7.2.1",
+  "version": "7.3.0-rc1",
   "private": true,
   "scripts": {
     "dev": "vite",

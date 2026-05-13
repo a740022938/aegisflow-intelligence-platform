@@ -28,6 +28,8 @@ const ModuleCenter = lazy(() => import('./pages/ModuleCenter'));
 const WorkflowComposer = lazy(() => import('./pages/workflow-composer/WorkflowComposer'));
 const ModulePage = lazy(() => import('./pages/ModulePage'));
 const MahjongDebug = lazy(() => import('./pages/MahjongDebug'));
+const OpenAxiomReadonly = lazy(() => import('./pages/OpenAxiomReadonly'));
+const AssistantCenter = lazy(() => import('./pages/AssistantCenter'));
 
 function RouteFallback() {
   return (
@@ -120,6 +122,8 @@ const App: React.FC = () => {
             <Route path="system-status" element={<ModulePage />} />
             <Route path="api-docs" element={<ModulePage />} />
             <Route path="vision-lab/mahjong-debug" element={<MahjongDebug />} />
+            <Route path="openaxiom-readonly" element={<OpenAxiomReadonly />} />
+            <Route path="assistant-center" element={<AssistantCenter />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

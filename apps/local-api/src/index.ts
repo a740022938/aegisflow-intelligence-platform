@@ -51,6 +51,7 @@ import { metrics, registerMetricsRoute } from './observability/index.js';
 import { initWorkerPool, shutdownWorkerPool, getWorkerPool } from './worker-pool/index.js';
 import { getTaskQueue, initQueue } from './queue/index.js';
 import { registerOpenClawBridgeRoutes } from './openclaw-bridge/index.js';
+import { registerComfyRoutes } from './comfy/index.js';
 import { registerDigitalEmployeeRoutes } from './digital-employee/index.js';
 import { registerAuthRoutes, authMiddleware } from './auth/index.js';
 import { registerInferenceRoutes } from './inference/index.js';
@@ -74,6 +75,8 @@ import { registerWebSocketHub } from './ws-hub/index.js';
 import { registerModelLineageRoutes } from './model-lineage/index.js';
 import { registerNotifyRoutes } from './notify/index.js';
 import { registerMahjongPredictRoutes } from './vision-bus/mahjong-predict.js';
+import { registerOpenAxiomBridgeRoutes, registerOpenAxiomHistoryRoutes } from './openaxiom-bridge/index.js';
+import { registerAssistantCenterRoutes } from './routes/assistant-center/index.js';
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -282,11 +285,12 @@ authMiddleware(app);
 
 // 全局认证守卫: /api/* 路由除白名单外均需 JWT
 const PUBLIC_PATHS = new Set([
-  '/api/health', '/api/db/ping', '/api/metrics', '/api/auth/login',
+  '/api/health', '/api/comfy/health', '/api/db/ping', '/api/metrics', '/api/auth/login',
   '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2', '/api/openclaw/master-switch',
   '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status',
+  '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
 ]);
-const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static'];
+const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static', '/api/comfy/history', '/api/openaxiom', '/api/assistant-center'];
 const DOCS_PREFIXES = ['/docs', '/swagger', '/openapi'];
 
 app.addHook('onRequest', async (request, reply) => {
@@ -374,6 +378,13 @@ registerNotifyRoutes(app);
 
 // 麻将视觉调试台 — 预测预览
 registerMahjongPredictRoutes(app);
+// ComfyUI bridge registration
+registerComfyRoutes(app);
+// OpenAxiom 只读桥接路由
+registerOpenAxiomBridgeRoutes(app);
+registerOpenAxiomHistoryRoutes(app);
+// Assistant Center 只读作战中枢
+registerAssistantCenterRoutes(app);
 
 // OpenClaw 旧路径显式兼容（防止客户端命中 /openclaw/* 返回 404）
 app.get('/openclaw/master-switch', async (_request: any, reply: any) => {

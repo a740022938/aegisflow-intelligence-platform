@@ -1,6 +1,6 @@
 {
   "name": "@aip/cli",
-  "version": "7.2.1",
+  "version": "7.3.0-rc1",
   "description": "AIP (AegisFlow Intelligence Platform) official CLI",
   "type": "module",
   "bin": {

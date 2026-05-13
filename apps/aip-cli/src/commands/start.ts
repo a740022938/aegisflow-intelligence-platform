@@ -35,7 +35,7 @@ export async function runStart() {
     apiOnline = true;
   } else {
     info(`Starting API on port ${config.apiPort}...`);
-    const apiResult = await spawnDetached('pnpm', ['run', 'dev:api'], config.home, PATHS.apiLogFile);
+    const apiResult = await spawnDetached('npm', ['run', 'dev:api'], config.home, PATHS.apiLogFile);
     if (apiResult.ok && apiResult.pid) {
       writePidFile(PATHS.apiPidFile, apiResult.pid);
       info(`API spawned (pid ${apiResult.pid})`);
@@ -49,7 +49,7 @@ export async function runStart() {
     webOnline = true;
   } else {
     info(`Starting Web on port ${config.webPort}...`);
-    const webResult = await spawnDetached('pnpm', ['run', 'dev:web'], config.home, PATHS.webLogFile);
+    const webResult = await spawnDetached('npm', ['run', 'dev:web'], config.home, PATHS.webLogFile);
     if (webResult.ok && webResult.pid) {
       writePidFile(PATHS.webPidFile, webResult.pid);
       info(`Web spawned (pid ${webResult.pid})`);

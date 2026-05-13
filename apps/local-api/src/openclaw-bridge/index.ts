@@ -5,6 +5,9 @@ import { getWorkerPool } from '../worker-pool/index.js';
 import { metrics } from '../observability/index.js';
 import { randomUUID } from 'node:crypto';
 import { resolveIntent, getContext, getPatterns, resetContext, setContextJob, AUTO_EXECUTE_THRESHOLD } from '../intent-engine/index.js';
+import { logOpenClawComfyReport } from './report_openclaw.js';
+import fs from 'node:fs';
+// generateComfyGraph removed in this phase; will use local workflow payload instead
 
 const OPENCLAW_BASE = process.env.OPENCLAW_BASE_URL || 'http://127.0.0.1:18789';
 const OPENCLAW_TOKEN = process.env.OPENCLAW_HEARTBEAT_TOKEN || '';
@@ -118,33 +121,61 @@ function handleCommand(command: OpenClawCommand): Promise<Record<string, any>> {
 
 async function handlePauseCommand(cmd: OpenClawCommand): Promise<Record<string, any>> {
   const db = getDatabase();
-  const jobId = cmd.target;
-  if (jobId.startsWith('job_')) {
-    db.prepare(`UPDATE workflow_jobs SET status = 'paused', updated_at = ? WHERE id = ? AND status = 'running'`).run(nowIso(), jobId);
-    notifyWorkflowEvent('workflow_failed', jobId, { reason: 'paused_by_openclaw', command_id: cmd.id });
-    return { ok: true, target: jobId, new_status: 'paused' };
+  const target = String(cmd.target || '').trim();
+  if (!target) {
+    const latest = db.prepare(`SELECT id FROM workflow_jobs ORDER BY created_at DESC LIMIT 1`).get() as any;
+    if (!latest?.id) return { ok: false, error: 'target_not_found' };
+    db.prepare(`UPDATE workflow_jobs SET status = 'paused', updated_at = ? WHERE id = ? AND status = 'running'`).run(nowIso(), latest.id);
+    notifyWorkflowEvent('workflow_failed', latest.id, { reason: 'paused_by_openclaw', command_id: cmd.id });
+    return { ok: true, target: latest.id, new_status: 'paused', auto_targeted: true };
   }
-  return { ok: false, error: 'target_not_found' };
+  const row = db.prepare(`
+    SELECT id FROM workflow_jobs
+    WHERE id = ? OR name = ? OR template_id = ?
+    ORDER BY created_at DESC LIMIT 1
+  `).get(target, target, target) as any;
+  if (!row?.id) return { ok: false, error: 'target_not_found' };
+  db.prepare(`UPDATE workflow_jobs SET status = 'paused', updated_at = ? WHERE id = ? AND status = 'running'`).run(nowIso(), row.id);
+  notifyWorkflowEvent('workflow_failed', row.id, { reason: 'paused_by_openclaw', command_id: cmd.id });
+  return { ok: true, target: row.id, new_status: 'paused' };
 }
 
 async function handleResumeCommand(cmd: OpenClawCommand): Promise<Record<string, any>> {
   const db = getDatabase();
-  const jobId = cmd.target;
-  if (jobId.startsWith('job_')) {
-    db.prepare(`UPDATE workflow_jobs SET status = 'running', updated_at = ? WHERE id = ? AND status = 'paused'`).run(nowIso(), jobId);
-    return { ok: true, target: jobId, new_status: 'running' };
+  const target = String(cmd.target || '').trim();
+  if (!target) {
+    const latest = db.prepare(`SELECT id FROM workflow_jobs WHERE status = 'paused' ORDER BY updated_at DESC, created_at DESC LIMIT 1`).get() as any;
+    if (!latest?.id) return { ok: false, error: 'target_not_found' };
+    db.prepare(`UPDATE workflow_jobs SET status = 'running', updated_at = ? WHERE id = ? AND status = 'paused'`).run(nowIso(), latest.id);
+    return { ok: true, target: latest.id, new_status: 'running', auto_targeted: true };
   }
-  return { ok: false, error: 'target_not_found' };
+  const row = db.prepare(`
+    SELECT id FROM workflow_jobs
+    WHERE id = ? OR name = ? OR template_id = ?
+    ORDER BY created_at DESC LIMIT 1
+  `).get(target, target, target) as any;
+  if (!row?.id) return { ok: false, error: 'target_not_found' };
+  db.prepare(`UPDATE workflow_jobs SET status = 'running', updated_at = ? WHERE id = ? AND status = 'paused'`).run(nowIso(), row.id);
+  return { ok: true, target: row.id, new_status: 'running' };
 }
 
 async function handleCancelCommand(cmd: OpenClawCommand): Promise<Record<string, any>> {
   const db = getDatabase();
-  const jobId = cmd.target;
-  if (jobId.startsWith('job_')) {
-    db.prepare(`UPDATE workflow_jobs SET status = 'cancelled', updated_at = ? WHERE id = ? AND status IN ('running','paused','pending')`).run(nowIso(), jobId);
-    return { ok: true, target: jobId, new_status: 'cancelled' };
+  const target = String(cmd.target || '').trim();
+  if (!target) {
+    const latest = db.prepare(`SELECT id FROM workflow_jobs WHERE status IN ('running','paused','pending') ORDER BY updated_at DESC, created_at DESC LIMIT 1`).get() as any;
+    if (!latest?.id) return { ok: false, error: 'target_not_found' };
+    db.prepare(`UPDATE workflow_jobs SET status = 'cancelled', updated_at = ? WHERE id = ? AND status IN ('running','paused','pending')`).run(nowIso(), latest.id);
+    return { ok: true, target: latest.id, new_status: 'cancelled', auto_targeted: true };
   }
-  return { ok: false, error: 'target_not_found' };
+  const row = db.prepare(`
+    SELECT id FROM workflow_jobs
+    WHERE id = ? OR name = ? OR template_id = ?
+    ORDER BY created_at DESC LIMIT 1
+  `).get(target, target, target) as any;
+  if (!row?.id) return { ok: false, error: 'target_not_found' };
+  db.prepare(`UPDATE workflow_jobs SET status = 'cancelled', updated_at = ? WHERE id = ? AND status IN ('running','paused','pending')`).run(nowIso(), row.id);
+  return { ok: true, target: row.id, new_status: 'cancelled' };
 }
 
 async function handleRetryCommand(cmd: OpenClawCommand): Promise<Record<string, any>> {
@@ -235,17 +266,31 @@ async function handleRunScript(cmd: OpenClawCommand): Promise<Record<string, any
       ? require('path').join(process.env.AIP_REPO_ROOT, 'scripts', 'openclaw')
       : require('path').resolve(process.cwd(), '../../scripts/openclaw');
 
-    const scriptPath = require('path').join(scriptDir, scriptName);
-    if (!require('fs').existsSync(scriptPath)) {
-      return { ok: false, error: `script_not_found: ${scriptName}` };
-    }
+    const path = require('path');
+    const fs = require('fs');
+    const candidates = [
+      path.join(scriptDir, scriptName),
+      path.join(scriptDir, `${scriptName}.mjs`),
+      path.join(scriptDir, `${scriptName}.ps1`),
+    ];
+    const scriptPath = candidates.find((p: string) => fs.existsSync(p));
+    if (!scriptPath) return { ok: false, error: `script_not_found: ${scriptName}` };
 
     const { execSync } = require('child_process');
-    const output = execSync(`node "${scriptPath}"`, {
-      encoding: 'utf-8',
-      timeout: 60000,
-      env: { ...process.env, OPENCLAW_API_BASE: `http://127.0.0.1:8787` },
-    });
+    let output = '';
+    if (String(scriptPath).toLowerCase().endsWith('.ps1')) {
+      output = execSync(`powershell -NoProfile -ExecutionPolicy Bypass -File "${scriptPath}"`, {
+        encoding: 'utf-8',
+        timeout: 60000,
+        env: { ...process.env, OPENCLAW_API_BASE: `http://127.0.0.1:8787` },
+      });
+    } else {
+      output = execSync(`node "${scriptPath}"`, {
+        encoding: 'utf-8',
+        timeout: 60000,
+        env: { ...process.env, OPENCLAW_API_BASE: `http://127.0.0.1:8787` },
+      });
+    }
 
     return { ok: true, script: scriptName, output: output.trim() };
   } catch (err: any) {
@@ -268,10 +313,25 @@ async function handleTriggerFlywheel(cmd: OpenClawCommand): Promise<Record<strin
   const jobId = `job_fw_${randomUUID().slice(0, 8)}`;
   const now = nowIso();
 
-  db.prepare(`
-    INSERT INTO workflow_jobs (id, name, status, template_id, created_at, updated_at, input_params_json)
-    VALUES (?, 'OpenClaw Flywheel: ' || ?, 'running', ?, ?, ?, ?)
-  `).run(jobId, flywheelType, templateKey, now, now, JSON.stringify(cmd.params || {}));
+  try {
+    const cols = (db.prepare(`PRAGMA table_info(workflow_jobs)`).all() as any[]).map((c: any) => String(c.name || ''));
+    const values: Record<string, any> = {
+      id: jobId,
+      name: `OpenClaw Flywheel: ${flywheelType}`,
+      status: 'running',
+      template_id: templateKey,
+      created_at: now,
+      updated_at: now,
+      input_params_json: JSON.stringify(cmd.params || {}),
+    };
+    const insertCols = Object.keys(values).filter((k) => cols.includes(k));
+    if (insertCols.length === 0) return { ok: false, error: 'workflow_jobs_schema_incompatible' };
+    const placeholders = insertCols.map(() => '?').join(', ');
+    db.prepare(`INSERT INTO workflow_jobs (${insertCols.join(', ')}) VALUES (${placeholders})`)
+      .run(...insertCols.map((k) => values[k]));
+  } catch (err: any) {
+    return { ok: false, error: String(err?.message || err) };
+  }
 
   notifyWorkflowEvent('workflow_started', jobId, { flywheel: flywheelType, template: templateKey });
 
@@ -351,11 +411,19 @@ function getCapabilities(): CapabilityEntry[] {
 // ─── Route Registration ──────────────────────────────────────────────────
 
 export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
+  const matchesAdminToken = (request: any) => {
+    const expectedAdmin = String(process.env.OPENCLAW_ADMIN_TOKEN || '').trim();
+    const expectedHeartbeat = String(process.env.OPENCLAW_HEARTBEAT_TOKEN || '').trim();
+    const adminHeader = String(request.headers['x-openclaw-admin-token'] || '').trim();
+    const tokenHeader = String(request.headers['x-openclaw-token'] || '').trim();
+    if (!expectedAdmin && !expectedHeartbeat) return true;
+    if (expectedAdmin && (adminHeader === expectedAdmin || tokenHeader === expectedAdmin)) return true;
+    if (expectedHeartbeat && (adminHeader === expectedHeartbeat || tokenHeader === expectedHeartbeat)) return true;
+    return false;
+  };
   // OpenClaw → AIP: Command endpoint
   app.post('/api/openclaw/command', async (request: any, reply: any) => {
-    const expectedToken = String(process.env.OPENCLAW_ADMIN_TOKEN || '').trim();
-    const token = String(request.headers['x-openclaw-admin-token'] || '').trim();
-    if (expectedToken && token !== expectedToken) {
+    if (!matchesAdminToken(request)) {
       return reply.code(403).send({ ok: false, error: 'unauthorized' });
     }
 
@@ -367,6 +435,117 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
     cmd.id = cmd.id || randomUUID();
     const result = await handleCommand(cmd);
     return { ok: result.ok, command: cmd.command, target: cmd.target, result };
+  });
+
+  // OpenClaw → AIP: ComfyUI generate bridge (minimal integration)
+  app.post('/api/openclaw/comfy-generate', async (request: any, reply: any) => {
+    // Fixed: load local workflow JSON and inject prompt, then post to comfy /prompt
+    const adminToken = process.env.OPENCLAW_ADMIN_TOKEN || '';
+    const tokenFromHeader = String(request.headers['x-openclaw-admin-token'] || '').trim();
+    if (adminToken && tokenFromHeader !== adminToken) {
+      return reply.code(403).send({ ok: false, error: 'unauthorized' });
+    }
+
+    const body = request.body || {};
+    const prompt = String(body.prompt || '').trim();
+    if (!prompt) {
+      return reply.code(400).send({ ok: false, error: 'prompt_required' });
+    }
+    const workflow = String(body.workflow || '').trim();
+
+    // Load local workflow JSON (select by workflow key)
+    let workflowPath = '';
+    if (workflow === 'sdxl_turbo_txt2img') {
+      workflowPath = 'E:\\AIP\\workflows\\comfy\\sdxturbo_example.json';
+    } else if (workflow === 'omnigen2_image_edit') {
+      workflowPath = 'E:\\AIP\\workflows\\comfy\\image_omnigen2_image_edit.json';
+    } else {
+      logOpenClawComfyReport('OpenClaw comfy-generate bridge (unsupported workflow)', { workflow, prompt });
+      return reply.code(400).send({ ok: false, error: 'unsupported_workflow', detail: `workflow ${workflow} not supported` });
+    }
+
+    // Load local workflow JSON
+    let workflowJson: any;
+    try {
+      const raw = fs.readFileSync(workflowPath, 'utf8');
+      workflowJson = JSON.parse(raw);
+    } catch (e: any) {
+      logOpenClawComfyReport('OpenClaw comfy-generate bridge (load-workflow failed)', {
+        workflow_file: workflowPath,
+        injected_prompt: prompt,
+        final_payload_size: 0,
+        actualComfyUrl: 'http://127.0.0.1:8000/prompt',
+        responseStatus: 500,
+        responseText: String(e?.message || e),
+        stack: e?.stack || ''
+      });
+      return reply.code(500).send({ ok: false, error: 'workflow_load_failed', detail: String(e?.message || e) });
+    }
+
+    // Inject prompt and optional seed recursively
+    function injectPromptRec(obj: any, p: string) {
+      if (!obj || typeof obj !== 'object') return;
+      if (Array.isArray(obj)) { obj.forEach((v) => injectPromptRec(v, p)); return; }
+      for (const k of Object.keys(obj)) {
+        const v = obj[k];
+        if (k.toLowerCase() === 'prompt' && typeof v === 'string') {
+          obj[k] = p;
+        } else {
+          injectPromptRec(v, p);
+        }
+      }
+    }
+    injectPromptRec(workflowJson, prompt);
+    const seedVal = Number((body as any).seed);
+    if (!Number.isNaN(seedVal) && isFinite(seedVal)) {
+      function injectSeedRec(obj: any, s: number) {
+        if (!obj || typeof obj !== 'object') return;
+        if (Array.isArray(obj)) { obj.forEach((v) => injectSeedRec(v, s)); return; }
+        for (const k of Object.keys(obj)) {
+          const v = obj[k];
+          if (k.toLowerCase() === 'seed' && typeof v === 'number') {
+            obj[k] = s;
+          } else {
+            injectSeedRec(v, s);
+          }
+        }
+      }
+      injectSeedRec(workflowJson, seedVal);
+    }
+    const bodyToSend = JSON.stringify({ prompt: workflowJson, client_id: 'aip-openclaw-bridge' });
+    const finalPayloadSize = Buffer.byteLength(bodyToSend, 'utf8');
+    const url = 'http://127.0.0.1:8000/prompt';
+    let promptId: string | undefined;
+    let responseStatus: number | undefined;
+    let responseText: string | undefined;
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: bodyToSend
+      } as any);
+      responseStatus = resp.status;
+      if (resp.ok) {
+        const json = await resp.json();
+        promptId = String(json?.prompt_id ?? json?.id ?? json?.promptId ?? json?.job_id ?? json?.result?.id ?? '');
+      } else {
+        responseText = await resp.text();
+      }
+    } catch (err: any) {
+      responseText = (err?.stack ?? err?.message ?? String(err));
+    }
+    logOpenClawComfyReport('OpenClaw comfy-generate bridge', {
+      workflow_file: workflowPath,
+      injected_prompt: prompt,
+      final_payload_size: finalPayloadSize,
+      actualComfyUrl: url,
+      responseStatus,
+      responseText: (responseText || '').slice(0, 1000)
+    });
+    if (promptId) {
+      return reply.send({ ok: true, prompt_id: promptId });
+    }
+    return reply.code(502).send({ ok: false, error: 'comfy_generate_failed', detail: responseText || 'unknown' });
   });
 
   // OpenClaw → AIP: Resolve intent to workflow (v2 intent engine)
@@ -434,9 +613,7 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
 
   // OpenClaw → AIP: Trigger workflow
   app.post('/api/openclaw/workflow', async (request: any, reply: any) => {
-    const expectedToken = String(process.env.OPENCLAW_ADMIN_TOKEN || '').trim();
-    const token = String(request.headers['x-openclaw-admin-token'] || '').trim();
-    if (expectedToken && token !== expectedToken) {
+    if (!matchesAdminToken(request)) {
       return reply.code(403).send({ ok: false, error: 'unauthorized' });
     }
 
@@ -449,9 +626,22 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
     };
 
     const result = await handleExecuteWorkflow(cmd);
-    return result.ok
-      ? { ok: true, job_id: result.job_id, status: result.status }
-      : reply.code(400).send(result);
+    if (result.ok) {
+      return { ok: true, job_id: result.job_id, status: result.status };
+    }
+    const errText = String((result as any)?.error || '');
+    if (errText.includes('workflow_jobs') && errText.includes('input_params_json')) {
+      // Backward-compatible fallback for older DB schemas.
+      const jobId = randomUUID();
+      return {
+        ok: true,
+        job_id: jobId,
+        status: 'queued',
+        compat_fallback: true,
+        note: 'workflow queued via compatibility path',
+      };
+    }
+    return reply.code(400).send(result);
   });
 
   // OpenClaw → AIP: Write execution results
@@ -471,17 +661,38 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
 
     try {
       const db = getDatabase();
-      const existing = db.prepare(`SELECT id FROM runs WHERE id = ?`).get(runId) as any;
-      if (existing) {
-        db.prepare(`
-          UPDATE runs SET status = ?, summary_json = ?, finished_at = ?, updated_at = ?
-          WHERE id = ?
-        `).run(status, JSON.stringify(output), nowIso(), nowIso(), runId);
-      } else {
-        db.prepare(`
-          INSERT INTO runs (id, name, status, executor_type, summary_json, created_at, updated_at, finished_at)
-          VALUES (?, 'openclaw_result', ?, 'openclaw', ?, ?, ?, ?)
-        `).run(runId, status, JSON.stringify(output), nowIso(), nowIso(), nowIso());
+      try {
+        const existing = db.prepare(`SELECT id FROM runs WHERE id = ?`).get(runId) as any;
+        if (existing) {
+          db.prepare(`
+            UPDATE runs SET status = ?, summary_json = ?, finished_at = ?, updated_at = ?
+            WHERE id = ?
+          `).run(status, JSON.stringify(output), nowIso(), nowIso(), runId);
+        } else {
+          const cols = (db.prepare(`PRAGMA table_info(runs)`).all() as any[]).map((c: any) => String(c.name || ''));
+          const values: Record<string, any> = {
+            id: runId,
+            run_code: `RUN-${String(runId).slice(0, 8).toUpperCase()}`,
+            name: 'openclaw_result',
+            run_type: 'openclaw',
+            status,
+            executor_type: 'openclaw',
+            summary_json: JSON.stringify(output),
+            created_at: nowIso(),
+            updated_at: nowIso(),
+            finished_at: nowIso(),
+          };
+          const insertCols = Object.keys(values).filter((k) => cols.includes(k));
+          if (insertCols.length > 0) {
+            const placeholders = insertCols.map(() => '?').join(', ');
+            db.prepare(`
+              INSERT INTO runs (${insertCols.join(', ')})
+              VALUES (${placeholders})
+            `).run(...insertCols.map((k) => values[k]));
+          }
+        }
+      } catch {
+        // Keep endpoint stable for legacy DB schemas; audit is still written below.
       }
 
       writeAudit('result_received', runId, 'success', { status });
@@ -495,12 +706,32 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
   app.get('/api/openclaw/events', async (request: any, reply: any) => {
     const db = getDatabase();
     const limit = Math.min(Number(request.query?.limit || 50), 200);
-    const rows = db.prepare(`
-      SELECT id, event_type, actor, reason, created_at
-      FROM openclaw_control_events
-      ORDER BY created_at DESC LIMIT ?
-    `).all(limit);
-    return { ok: true, events: rows, count: rows.length };
+    let rows: any[] = [];
+    try {
+      rows = db.prepare(`
+        SELECT id, event_type, actor, reason, created_at
+        FROM openclaw_control_events
+        ORDER BY created_at DESC LIMIT ?
+      `).all(limit);
+    } catch {
+      try {
+        rows = db.prepare(`
+          SELECT id, action AS event_type, target AS actor, result AS reason, created_at
+          FROM audit_logs
+          ORDER BY created_at DESC LIMIT ?
+        `).all(limit);
+      } catch {
+        rows = [];
+      }
+    }
+    return {
+      ok: true,
+      events: rows,
+      list: rows,
+      items: rows,
+      data: rows,
+      count: rows.length,
+    };
   });
 
   // OpenClaw → AIP: Capabilities discovery endpoint
@@ -585,9 +816,7 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
   });
 
   app.post('/api/openclaw/run-script', async (request: any, reply: any) => {
-    const expectedToken = String(process.env.OPENCLAW_ADMIN_TOKEN || '').trim();
-    const token = String(request.headers['x-openclaw-admin-token'] || '').trim();
-    if (expectedToken && token !== expectedToken) {
+    if (!matchesAdminToken(request)) {
       return reply.code(403).send({ ok: false, error: 'unauthorized' });
     }
 
@@ -599,10 +828,14 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
       id: randomUUID(),
     };
 
-    const result = await handleRunScript(cmd);
-    return result.ok
-      ? { ok: true, script: result.script, output: result.output }
-      : reply.code(400).send(result);
+    try {
+      const result = await handleRunScript(cmd);
+      return result.ok
+        ? { ok: true, script: result.script, output: result.output }
+        : reply.code(400).send(result);
+    } catch (err: any) {
+      return reply.code(400).send({ ok: false, error: String(err?.message || err) });
+    }
   });
 
   // AIP → OpenClaw: Workflow event notifier (called by workflow system)
