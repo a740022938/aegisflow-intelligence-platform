@@ -2,7 +2,15 @@
 
 天枢智治平台 — 面向数据-训练-评估-发布全流程的本地化智能治理平台。
 
-**AIP v7.2.0 Stable** | Build 2026.04.29 | Community Edition
+**Current pre-release: AIP v7.3.0-rc1 Assistant Center Readonly Baseline** | Build 2026.05.12 | Release Candidate
+
+[GitHub Release: v7.3.0-rc1](https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v7.3.0-rc1)
+
+> Historical note: `v6.8.0-community.1` is a previous Community Edition milestone. The current latest pre-release line is `v7.3.0-rc1`.
+
+AIP v7.3.0-rc1 introduces the first readonly Assistant Center baseline, including service status overview, full stack health check, task package generation, report and backup summaries, and safety boundary visibility.
+
+This release candidate is readonly by design. It does not include file deletion, OpenClaw restart, node.exe stop/taskkill, auto-fix actions, model training, or label save/restore/batch-save operations.
 
 ---
 
