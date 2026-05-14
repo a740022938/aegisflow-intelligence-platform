@@ -132,6 +132,9 @@ function AppShell() {
     apiStatusBad: t.common.apiStatusBad,
   };
   const displayVersion = apiVersion && apiVersion !== '…' ? apiVersion : APP_VERSION;
+  const openclawStatus = systemData?.openclaw?.status || {};
+  const openclawOnlineStatus = systemData?.openclaw?.online_status ?? openclawStatus.online_status;
+  const openclawCircuitState = systemData?.openclaw?.circuit_state ?? openclawStatus.circuit_status;
   const openExternal = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -413,7 +416,7 @@ function AppShell() {
                   <div className="topbar-kv"><span>{lang === 'zh' ? '版本形态' : 'Edition'}</span><strong>{APP_META.edition}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? 'API状态' : 'API Status'}</span><strong>{apiOk ? (lang === 'zh' ? '正常' : 'Online') : (lang === 'zh' ? '异常' : 'Offline')}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? '服务版本' : 'Service Version'}</span><strong>{healthData?.version || '—'}</strong></div>
-                  <div className="topbar-kv"><span>{lang === 'zh' ? '数据库' : 'Database'}</span><strong>{healthData?.database || '—'}</strong></div>
+                   <div className="topbar-kv"><span>{lang === 'zh' ? '数据库' : 'Database'}</span><strong>{healthData?.database?.status || '—'}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? '运行时长' : 'Uptime'}</span><strong>{healthData?.uptime ? `${Math.floor(Number(healthData.uptime) / 60)}m` : '—'}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? '工作流总数' : 'Workflows'}</span><strong>{healthData?.workflows?.total ?? '—'}</strong></div>
                 </div>
@@ -422,10 +425,10 @@ function AppShell() {
                 <div className="topbar-modal-grid">
                   <div className="topbar-kv"><span>API</span><strong>{systemData?.health?.ok ? (lang === 'zh' ? '健康' : 'Healthy') : (lang === 'zh' ? '异常' : 'Error')}</strong></div>
                   <div className="topbar-kv"><span>OpenClaw</span><strong>{systemData?.openclaw?.enabled ? (lang === 'zh' ? '已开启' : 'Enabled') : (lang === 'zh' ? '已关闭' : 'Disabled')}</strong></div>
-                  <div className="topbar-kv"><span>{lang === 'zh' ? '在线状态' : 'Online Status'}</span><strong>{systemData?.openclaw?.online_status || '—'}</strong></div>
-                  <div className="topbar-kv"><span>{lang === 'zh' ? '熔断状态' : 'Circuit'}</span><strong>{systemData?.openclaw?.circuit_state || '—'}</strong></div>
-                  <div className="topbar-kv"><span>{lang === 'zh' ? '运行任务' : 'Running Tasks'}</span><strong>{systemData?.summary?.running_tasks ?? '—'}</strong></div>
-                  <div className="topbar-kv"><span>{lang === 'zh' ? '运行实验' : 'Running Experiments'}</span><strong>{systemData?.summary?.running_experiments ?? '—'}</strong></div>
+                  <div className="topbar-kv"><span>{lang === 'zh' ? '在线状态' : 'Online Status'}</span><strong>{String(openclawOnlineStatus ?? '—')}</strong></div>
+                  <div className="topbar-kv"><span>{lang === 'zh' ? '熔断状态' : 'Circuit'}</span><strong>{String(openclawCircuitState ?? '—')}</strong></div>
+                  <div className="topbar-kv"><span>{lang === 'zh' ? '运行任务' : 'Running Tasks'}</span><strong>{String(systemData?.summary?.running_tasks ?? '—')}</strong></div>
+                  <div className="topbar-kv"><span>{lang === 'zh' ? '运行实验' : 'Running Experiments'}</span><strong>{String(systemData?.summary?.running_experiments ?? '—')}</strong></div>
                 </div>
               )}
               {panel === 'help' && (

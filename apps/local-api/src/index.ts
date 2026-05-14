@@ -288,7 +288,7 @@ authMiddleware(app);
 const PUBLIC_PATHS = new Set([
   '/api/health', '/api/comfy/health', '/api/db/ping', '/api/metrics', '/api/auth/login',
   '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2', '/api/openclaw/master-switch',
-  '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status',
+  '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status', '/api/dashboard/summary',
   '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
 ]);
 const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static', '/api/comfy/history', '/api/openaxiom', '/api/assistant-center', '/api/memory-hub'];

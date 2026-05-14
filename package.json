@@ -1,6 +1,6 @@
 {
   "name": "agi-model-factory",
-  "version": "7.3.0-rc1",
+  "version": "7.3.0-rc2",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "engines": {
@@ -23,6 +23,7 @@
     "format:check": "prettier --check \"apps/**/*.{ts,tsx,css,json}\"",
     "test": "node tests/smoke-v7.mjs 2>&1 || echo [INFO] Smoke tests require API running at http://127.0.0.1:8787",
     "test:smoke": "node tests/smoke-v7.mjs",
+    "test:smoke:rc2": "tsx tests/smoke-v7-rc2-boundaries.mjs",
     "preview": "npm --prefix apps/web-ui run preview -- --port 5173",
     "api:test": "httpyac api-tests/all-endpoints.http",
     "pm2:start": "pm2 start ecosystem.config.cjs",

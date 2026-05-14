@@ -20,6 +20,16 @@ function firstValidationError(validation: any) {
     || 'Invalid request body';
 }
 
+function isExplicitMockRequest(input: any): boolean {
+  const mode = String(input?.executionMode || input?.execution_mode || '').toLowerCase();
+  return (
+    mode === 'mock' ||
+    mode === 'simulation' ||
+    input?.simulation === true ||
+    process.env.AIP_ALLOW_MOCK_TRAINING === '1'
+  );
+}
+
 function resolveRepoRoot(): string {
   const candidates = [
     process.env.AIP_REPO_ROOT,
@@ -62,7 +72,9 @@ const createTrainingRunSchema = z.object({
   training_config_id: z.string().optional(),
   dataset_id: z.string().optional(),
   dataset_version_id: z.string().optional(),
-  execution_mode: z.enum(['standard', 'yolo']).default('standard'),
+  execution_mode: z.enum(['standard', 'yolo', 'mock']).default('standard'),
+  executionMode: z.enum(['standard', 'yolo', 'mock', 'simulation']).optional(),
+  simulation: z.boolean().optional(),
   model_name: z.string().default(''),
   config_json: z.union([z.string(), z.any()]).default({}),
 });
@@ -151,10 +163,18 @@ export function createTrainingConfig(body: any) {
 
 // ── Training Run: create + auto-start ──────────────────────────────────────
 export function createTrainingRun(body: any) {
+  const normalizedBody = { ...body };
+  if (normalizedBody.executionMode && !normalizedBody.execution_mode) {
+    normalizedBody.execution_mode = normalizedBody.executionMode === 'simulation' ? 'mock' : normalizedBody.executionMode;
+  }
+  if (normalizedBody.simulation === true && !normalizedBody.execution_mode) {
+    normalizedBody.execution_mode = 'mock';
+  }
   const db = getDatabase();
-  const validation = createTrainingRunSchema.safeParse(body);
+  const validation = createTrainingRunSchema.safeParse(normalizedBody);
   if (!validation.success) return { ok: false, error: firstValidationError(validation) };
   const d = validation.data;
+  const explicitMock = isExplicitMockRequest(d);
 
   const configStr = typeof d.config_json === 'string' ? d.config_json : JSON.stringify(d.config_json || {});
   const summaryStr = JSON.stringify({
@@ -190,7 +210,8 @@ export function createTrainingRun(body: any) {
     lrf: parseJson(configStr)?.lrf || 0.01,
     momentum: parseJson(configStr)?.momentum || 0.937,
     weight_decay: parseJson(configStr)?.weight_decay || 0.0005,
-  } : {};
+    simulation: false,
+  } : explicitMock ? { simulation: true, execution_mode: 'mock' } : {};
 
   // 1. Create run (source_type='training')
   (db.prepare(`
@@ -198,7 +219,7 @@ export function createTrainingRun(body: any) {
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `) as any).run(
     runId, code, d.name, 'training', d.training_config_id || '',
-    'running', 8, 'manual', d.execution_mode === 'yolo' ? 'yolo' : 'mock', '', configStr, summaryStr, '',
+    'running', 8, 'manual', d.execution_mode === 'yolo' ? 'yolo' : (explicitMock ? 'mock' : 'none'), '', configStr, summaryStr, '',
     d.dataset_version_id || '', d.execution_mode, JSON.stringify(yoloConfig), '{}', 0, n, n
   );
 
@@ -208,7 +229,7 @@ export function createTrainingRun(body: any) {
     .run(startCkptId, runId, 0, 0, '', '{}', 0, 0, 0, 'Training started', n, n);
 
   // 3. Kick off async executor with execution mode
-  void _executeTrainingRun(runId, trainingRunId, configStr, d.model_name, d.execution_mode, d.dataset_version_id).catch((err: any) => {
+  void _executeTrainingRun(runId, trainingRunId, configStr, d.model_name, d.execution_mode, d.dataset_version_id, explicitMock).catch((err: any) => {
     console.error("[TRAINING ERROR]", err);
     const db2 = getDatabase();
     const nn = now();
@@ -220,7 +241,7 @@ export function createTrainingRun(body: any) {
   return { ok: true, run, training_run_id: trainingRunId };
 }
 
-async function _executeTrainingRun(runId: string, trainingRunId: string, configStr: string, modelName: string, executionMode?: string, datasetVersionId?: string) {
+async function _executeTrainingRun(runId: string, trainingRunId: string, configStr: string, modelName: string, executionMode?: string, datasetVersionId?: string, explicitMock = false) {
   const db = getDatabase();
   const run = (db.prepare('SELECT * FROM runs WHERE id = ?') as any).get(runId);
   const mode = executionMode || run?.execution_mode || 'standard';
@@ -234,13 +255,19 @@ async function _executeTrainingRun(runId: string, trainingRunId: string, configS
   (db.prepare('UPDATE runs SET env_snapshot_json = ? WHERE id = ?') as any).run(JSON.stringify(envSnapshot), runId);
 
   if (mode === 'yolo') {
-    return _executeYoloTraining(runId, configStr, modelName, datasetVersionId);
-  } else {
+    return _executeYoloTraining(runId, configStr, modelName, datasetVersionId, explicitMock);
+  } else if (mode === 'mock' || explicitMock) {
     return _executeMockTraining(runId, configStr, modelName);
   }
+  const err = `No real training executor for execution_mode="${mode}". Explicit mock simulation is required.`;
+  (db.prepare('UPDATE runs SET status=?, finished_at=?, error_message=?, exit_code=?, updated_at=? WHERE id=?') as any)
+    .run('failed', now(), err, 1, now(), runId);
+  (db.prepare('INSERT INTO run_logs (id,run_id,step_id,log_level,message,created_at) VALUES (?,?,?,?,?,?)') as any)
+    .run(generateId(), runId, '', 'error', err, now());
+  return { exit_code: 1, error: err };
 }
 
-async function _executeYoloTraining(runId: string, configStr: string, modelName: string, datasetVersionId?: string) {
+async function _executeYoloTraining(runId: string, configStr: string, modelName: string, datasetVersionId?: string, explicitMock = false) {
   const db = getDatabase();
   const config = parseJson(configStr, {}) as any;
   const epochs = config.epochs || 20;  // Reduced for B1 testing
@@ -258,9 +285,16 @@ async function _executeYoloTraining(runId: string, configStr: string, modelName:
   const storagePath = datasetVersion?.storage_path || sourceChain?.storage_path;
   
   if (!storagePath || !datasetVersion) {
-    // Fall back to mock if no real dataset
+    if (!explicitMock) {
+      const err = `[YOLO] No real dataset found; explicit mock simulation is required`;
+      (db.prepare('INSERT INTO run_logs (id,run_id,step_id,log_level,message,created_at) VALUES (?,?,?,?,?,?)') as any)
+        .run(generateId(), runId, '', 'error', err, now());
+      (db.prepare('UPDATE runs SET status=?, finished_at=?, error_message=?, exit_code=?, summary_json=?, updated_at=? WHERE id=?') as any)
+        .run('failed', now(), err, 1, JSON.stringify({ execution_mode: 'yolo', simulated: false, status: 'failed' }), now(), runId);
+      return { exit_code: 1, error: err };
+    }
     (db.prepare('INSERT INTO run_logs (id,run_id,step_id,log_level,message,created_at) VALUES (?,?,?,?,?,?)') as any)
-      .run(generateId(), runId, '', 'warn', `[YOLO] No real dataset found, falling back to mock training`, now());
+      .run(generateId(), runId, '', 'warn', `[YOLO] No real dataset found; explicit mock simulation enabled`, now());
     return _executeMockYoloTraining(runId, configStr, modelName, datasetVersionId);
   }
   
@@ -460,19 +494,21 @@ async function _executeMockYoloTraining(runId: string, configStr: string, modelN
   // Create artifact
   const artifactId = generateId();
   const artifactName = `yolo_${modelName || 'yolov8n'}_${datasetVersion?.version || 'unknown'}_${new Date().toISOString().slice(0, 10)}`;
-  const artifactPath = `/runs/train/${runId}/weights/best.pt`;
+  const artifactPath = `/mock/runs/train/${runId}/weights/best.pt`;
   const finalMetrics = JSON.stringify({
     best_mAP50: parseFloat(bestMap50.toFixed(4)),
     total_epochs: epochs,
     model_type: modelName || 'yolov8n',
     dataset_version_id: datasetVersionId || '',
     execution_mode: 'mock_yolo',
+    simulated: true,
+    mockArtifact: true,
   });
   
   (db.prepare(`
     INSERT INTO artifacts (id,name,artifact_type,status,source_type,training_job_id,dataset_id,model_family,format,version,path,file_size_bytes,metrics_snapshot_json,created_at,updated_at)
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-  `) as any).run(artifactId, artifactName, 'model', 'ready', 'training', runId, datasetVersion?.dataset_id || '', modelName || 'yolov8n', 'pytorch', 'v1', artifactPath, Math.floor(Math.random() * 100000000) + 100000000, finalMetrics, finishTime, finishTime);
+  `) as any).run(artifactId, artifactName, 'model', 'simulated', 'training', runId, datasetVersion?.dataset_id || '', modelName || 'yolov8n', 'pytorch', 'v1', artifactPath, 0, finalMetrics, finishTime, finishTime);
   
   // Link artifact to run
   const linkId = generateId();
@@ -485,7 +521,19 @@ async function _executeMockYoloTraining(runId: string, configStr: string, modelN
   
   // Update run status
   (db.prepare('UPDATE runs SET status=?, finished_at=?, exit_code=?, summary_json=?, updated_at=? WHERE id=?') as any)
-    .run('success', finishTime, 0, JSON.stringify({ best_mAP50: bestMap50, total_epochs: epochs, artifact_id: artifactId, artifact_name: artifactName, dataset_version_id: datasetVersionId, execution_mode: 'mock_yolo' }), now(), runId);
+    .run('simulated', finishTime, 0, JSON.stringify({
+      best_mAP50: bestMap50,
+      total_epochs: epochs,
+      artifact_id: artifactId,
+      artifact_name: artifactName,
+      dataset_version_id: datasetVersionId,
+      execution_mode: 'mock_yolo',
+      executionMode: 'mock',
+      simulated: true,
+      status: 'simulated',
+      mockArtifact: { mockArtifact: true, simulated: true, path: artifactPath },
+      mockCheckpoint: { mockCheckpoint: true, simulated: true, path: artifactPath },
+    }), now(), runId);
   
   return { exit_code: 0, artifact_id: artifactId };
 }
@@ -529,12 +577,12 @@ async function _executeMockTraining(runId: string, configStr: string, modelName:
       if (step === stepsPerEpoch) {
         await new Promise(res => setTimeout(res, delayPerStep));
         const ckptId = generateId();
-        const ckptPath = `/checkpoints/${runId}/epoch_${epoch}.pt`;
+        const ckptPath = `/mock/checkpoints/${runId}/epoch_${epoch}.pt`;
         const isBest = loss < bestLoss;
         if (isBest) { bestLoss = loss; bestCkptId = ckptId; }
 
         (db.prepare('INSERT INTO training_checkpoints (id,run_id,step,epoch,checkpoint_path,metrics_json,is_best,is_latest,file_size_bytes,notes,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)') as any)
-          .run(ckptId, runId, stepIdx, epoch, ckptPath, metrics, isBest ? 1 : 0, 0, Math.floor(Math.random() * 50000000) + 10000000, `Epoch ${epoch} checkpoint`, now(), now());
+          .run(ckptId, runId, stepIdx, epoch, ckptPath, metrics, isBest ? 1 : 0, 0, 0, `Mock epoch ${epoch} checkpoint (simulated)`, now(), now());
         (db.prepare('UPDATE training_checkpoints SET is_latest=0, updated_at=? WHERE run_id=? AND epoch>=?') as any).run(now(), runId, epoch);
 
         (db.prepare('INSERT INTO run_logs (id,run_id,step_id,log_level,message,created_at) VALUES (?,?,?,?,?,?)') as any)
@@ -560,13 +608,21 @@ async function _executeMockTraining(runId: string, configStr: string, modelName:
   // Write training artifact
   const artifactId = generateId();
   const artifactName = `trained_${modelName || 'model'}_${new Date().toISOString().slice(0, 10)}`;
-  const artifactPath = `/models/${runId}/final.pt`;
-  const finalMetrics = JSON.stringify({ final_loss: parseFloat(bestLoss.toFixed(4)), final_accuracy: parseFloat((1 - bestLoss).toFixed(4)), total_epochs: epochs, total_steps: totalSteps });
+  const artifactPath = `/mock/models/${runId}/final.pt`;
+  const finalMetrics = JSON.stringify({
+    final_loss: parseFloat(bestLoss.toFixed(4)),
+    final_accuracy: parseFloat((1 - bestLoss).toFixed(4)),
+    total_epochs: epochs,
+    total_steps: totalSteps,
+    execution_mode: 'mock',
+    simulated: true,
+    mockArtifact: true,
+  });
 
   (db.prepare(`
     INSERT INTO artifacts (id,name,artifact_type,status,source_type,training_job_id,model_family,format,version,path,file_size_bytes,metrics_snapshot_json,created_at,updated_at)
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-  `) as any).run(artifactId, artifactName, 'model', 'ready', 'training', runId, modelName || '', 'pytorch', 'v1', artifactPath, Math.floor(Math.random() * 100000000) + 50000000, finalMetrics, finishTime, finishTime);
+  `) as any).run(artifactId, artifactName, 'model', 'simulated', 'training', runId, modelName || '', 'pytorch', 'v1', artifactPath, 0, finalMetrics, finishTime, finishTime);
 
   // Link artifact to run
   const linkId = generateId();
@@ -577,7 +633,19 @@ async function _executeMockTraining(runId: string, configStr: string, modelName:
     .run(generateId(), runId, '', 'info', `Training completed: final_loss=${bestLoss.toFixed(4)} artifact=${artifactName}`, finishTime);
 
   (db.prepare('UPDATE runs SET status=?, finished_at=?, summary_json=?, updated_at=? WHERE id=?') as any)
-    .run('success', finishTime, JSON.stringify({ best_loss: bestLoss, total_epochs: epochs, total_steps: totalSteps, artifact_id: artifactId, artifact_name: artifactName }), now(), runId);
+    .run('simulated', finishTime, JSON.stringify({
+      best_loss: bestLoss,
+      total_epochs: epochs,
+      total_steps: totalSteps,
+      artifact_id: artifactId,
+      artifact_name: artifactName,
+      execution_mode: 'mock',
+      executionMode: 'mock',
+      simulated: true,
+      status: 'simulated',
+      mockArtifact: { mockArtifact: true, simulated: true, path: artifactPath },
+      mockCheckpoint: { mockCheckpoint: true, simulated: true, path: `/mock/checkpoints/${runId}` },
+    }), now(), runId);
 }
 
 // ── Checkpoint CRUD ─────────────────────────────────────────────────────────

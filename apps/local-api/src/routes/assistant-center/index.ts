@@ -152,12 +152,35 @@ async function httpJson(url: string, timeoutMs = HTTP_TIMEOUT_MS): Promise<{ ok:
 }
 
 async function runVersion(command: string, args: string[] = ['--version']) {
-  const candidates = process.platform === 'win32' && !/\.(cmd|exe|bat)$/i.test(command)
-    ? [command, `${command}.cmd`]
-    : [command];
+  const candidates: Array<{ command: string; args: string[] }> = [];
+  if (process.platform === 'win32' && command === 'npm') {
+    candidates.push({ command: 'npm.cmd', args });
+    if (process.env.npm_execpath) {
+      candidates.push({ command: process.execPath, args: [process.env.npm_execpath, ...args] });
+    }
+    const nodeDirNpm = path.join(path.dirname(process.execPath), 'npm.cmd');
+    candidates.push({ command: nodeDirNpm, args });
+    try {
+      const { stdout } = await execFileAsync('where', ['npm'], {
+        timeout: COMMAND_TIMEOUT_MS,
+        windowsHide: true,
+        maxBuffer: 128 * 1024,
+      });
+      for (const line of String(stdout || '').split(/\r?\n/).map(item => item.trim()).filter(Boolean)) {
+        candidates.push({ command: line, args });
+      }
+    } catch {
+      // PATH lookup is a readonly best-effort probe.
+    }
+  } else {
+    const baseCandidates = process.platform === 'win32' && !/\.(cmd|exe|bat)$/i.test(command)
+      ? [`${command}.cmd`, command]
+      : [command];
+    for (const candidate of baseCandidates) candidates.push({ command: candidate, args });
+  }
   for (const candidate of candidates) {
     try {
-      const { stdout } = await execFileAsync(candidate, args, {
+      const { stdout } = await execFileAsync(candidate.command, candidate.args, {
         timeout: COMMAND_TIMEOUT_MS,
         windowsHide: true,
         maxBuffer: 128 * 1024,
@@ -582,6 +605,7 @@ function buildChecks(statusPayload: Awaited<ReturnType<typeof collectStatus>>) {
     let status: CheckStatus = 'unknown';
     if (item.status === 'online') status = item.riskLevel === 'medium' ? 'warn' : 'pass';
     if (item.status === 'offline') status = 'fail';
+    if (item.type === 'tool' && item.riskLevel === 'low' && item.status === 'offline') status = 'warn';
     return {
       id: item.id,
       label: item.name,
@@ -646,6 +670,26 @@ export function registerAssistantCenterRoutes(app: FastifyInstance) {
     }
   });
 
+  app.get('/api/assistant-center/tools', async (_request, reply) => {
+    try {
+      const statusPayload = await collectStatus();
+      const tools = statusPayload.items.filter((item: any) => item.type === 'tool');
+      return { ok: true, items: tools, readonly: true, autoFixAllowed: false };
+    } catch (err: any) {
+      return reply.code(500).send({ ok: false, error: 'TOOLS_STATUS_FAILED', message: String(err?.message || err), readonly: true });
+    }
+  });
+
+  app.get('/api/assistant-center/version', async (_request, _reply) => {
+    return {
+      ok: true,
+      version: '7.3.0-rc1',
+      module: 'assistant-center',
+      readonly: true,
+      autoFixAllowed: false,
+    };
+  });
+
   app.post('/api/assistant-center/full-check', async (_request, reply) => {
     try {
       const statusPayload = await collectStatus();
@@ -696,6 +740,10 @@ export function registerAssistantCenterRoutes(app: FastifyInstance) {
   });
 
   app.get('/api/assistant-center/safety-boundaries', async (_request, _reply) => {
+    return { ok: true, items: SAFETY_BOUNDARIES, readonly: true, autoFixAllowed: false };
+  });
+
+  app.get('/api/assistant-center/safety-boundary', async (_request, _reply) => {
     return { ok: true, items: SAFETY_BOUNDARIES, readonly: true, autoFixAllowed: false };
   });
 

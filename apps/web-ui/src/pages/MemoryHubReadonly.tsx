@@ -67,17 +67,16 @@ function statusDot(ok: boolean | undefined) {
 }
 
 function copyBtn(text: string) {
-  const [copied, setCopied] = React.useState(false);
   return (
     <button
-      onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+      onClick={() => { navigator.clipboard.writeText(text); }}
       style={{
         padding: '4px 12px', fontSize: 12, background: 'var(--bg-input)',
         border: '1px solid var(--border-color)', borderRadius: 4, cursor: 'pointer',
         color: 'var(--text-primary)',
       }}
     >
-      {copied ? '已复制' : '复制'}
+      复制
     </button>
   );
 }
@@ -101,6 +100,24 @@ function MemoryHubReadonly() {
 
   const [selectedProfile, setSelectedProfile] = useState<ProfileData | null>(null);
   const [profileState, setProfileState] = useState<LoadState>('idle');
+
+  // Candidate safety UX state
+  const [candFile, setCandFile] = useState('');
+  const [candDetail, setCandDetail] = useState<any>(null);
+  const [dryRunResult, setDryRunResult] = useState<any>(null);
+  const [confirmText, setConfirmText] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const hasCandidateId = candFile.trim().length > 0;
+  const hasLoadedCandidate = Boolean(candDetail);
+  const dryRunOk = Boolean(dryRunResult?.ok && dryRunResult?.dryRun === true);
+  const approveConfirmOk = confirmText === 'APPROVE_MEMORY_CANDIDATE';
+  const rejectConfirmOk = confirmText === 'REJECT_MEMORY_CANDIDATE';
+  const archiveConfirmOk = confirmText === 'ARCHIVE_MEMORY_CANDIDATE';
+
+  const canApprove = hasCandidateId && hasLoadedCandidate && dryRunOk && approveConfirmOk && !actionLoading;
+  const canReject = hasCandidateId && hasLoadedCandidate && dryRunOk && rejectConfirmOk && !actionLoading;
+  const canArchive = hasCandidateId && hasLoadedCandidate && dryRunOk && archiveConfirmOk && !actionLoading;
 
   useEffect(() => {
     setStatusState('loading');
@@ -302,12 +319,13 @@ function MemoryHubReadonly() {
       {card('候选详情 / 校验 / Dry-Run / 真实动作', (
         <div style={{ fontSize: 13 }}>
           <div style={{ marginBottom: 8 }}>
-            <input id="cand-detail-id" placeholder="输入候选文件名 (如 candidate_xxx.json)" style={{ width: '100%', boxSizing: 'border-box', padding: '6px 10px', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 13 }} />
+            <input id="cand-detail-id" value={candFile} onChange={e => setCandFile(e.target.value)} placeholder="输入候选文件名 (如 candidate_xxx.json)" style={{ width: '100%', boxSizing: 'border-box', padding: '6px 10px', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 13 }} />
           </div>
           <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-            <button onClick={async () => {
-              const id = (document.getElementById('cand-detail-id') as HTMLInputElement)?.value.trim();
+            <button disabled={!hasCandidateId} onClick={async () => {
+              const id = candFile.trim();
               if (!id) return;
+              setActionLoading(true);
               const el = document.getElementById('cand-detail-result');
               if (!el) return; el.textContent = '加载中...';
               try {
@@ -318,68 +336,81 @@ function MemoryHubReadonly() {
                   fetch(`/api/memory-hub/candidates/${id}/reject-dry-run`, { method: 'POST' }).then(r => r.json()),
                   fetch(`/api/memory-hub/candidates/${id}/archive-dry-run`, { method: 'POST' }).then(r => r.json()),
                 ]);
+                setCandDetail(detail);
+                setDryRunResult(approveDR);
                 el.textContent = JSON.stringify({ detail, valid, 'approve-dry-run': approveDR, 'reject-dry-run': rejectDR, 'archive-dry-run': archiveDR }, null, 2);
               } catch (err: any) { el.textContent = `Error: ${err.message}`; }
-            }} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 4, cursor: 'pointer', background: 'var(--accent)', color: '#fff', border: 'none' }}>
+              setActionLoading(false);
+            }} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 4, cursor: hasCandidateId ? 'pointer' : 'not-allowed', background: hasCandidateId ? 'var(--accent)' : 'var(--bg-input)', color: hasCandidateId ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border-color)', opacity: hasCandidateId ? 1 : 0.5 }}>
               加载 Dry-Run
             </button>
             <span style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: '30px' }}>Dry-Run 不会修改任何文件</span>
           </div>
 
-          <div style={{ marginBottom: 8 }}>
-            <input id="cand-confirm-text" placeholder={`输入确认词 (如 APPROVE_MEMORY_CANDIDATE)`} style={{ width: '100%', boxSizing: 'border-box', padding: '6px 10px', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 13 }} />
+          {/* Safety Status Block */}
+          <div style={{ padding: '10px 14px', borderRadius: 6, border: '1px solid var(--border-color)', marginBottom: 12, fontSize: 12, lineHeight: 1.8 }}>
+            <strong>安全状态：</strong><br />
+            候选文件：{hasCandidateId ? <span style={{ color: 'var(--success)' }}>已输入</span> : <span style={{ color: 'var(--error)' }}>未输入</span>}<br />
+            候选详情：{hasLoadedCandidate ? <span style={{ color: 'var(--success)' }}>已加载</span> : <span style={{ color: 'var(--error)' }}>未加载</span>}<br />
+            Dry-Run：{dryRunOk ? <span style={{ color: 'var(--success)' }}>已通过</span> : <span style={{ color: 'var(--error)' }}>未执行</span>}<br />
+            确认词 App：{approveConfirmOk ? <span style={{ color: 'var(--success)' }}>匹配</span> : confirmText ? <span style={{ color: 'var(--error)' }}>不匹配</span> : <span style={{ color: 'var(--error)' }}>未输入</span>}<br />
+            真实动作：{canApprove || canReject || canArchive ? <strong style={{ color: 'var(--success)' }}>可执行</strong> : <span style={{ color: 'var(--error)' }}>锁定</span>}
           </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button onClick={async () => {
-              const id = (document.getElementById('cand-detail-id') as HTMLInputElement)?.value.trim();
-              const confirmText = (document.getElementById('cand-confirm-text') as HTMLInputElement)?.value.trim();
-              if (!id || !confirmText) return;
+
+          <div style={{ marginBottom: 8 }}>
+            <input id="cand-confirm-text" value={confirmText} onChange={e => setConfirmText(e.target.value)} placeholder="输入确认词 (如 APPROVE_MEMORY_CANDIDATE)" style={{ width: '100%', boxSizing: 'border-box', padding: '6px 10px', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 13 }} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <button disabled={!canApprove} onClick={async () => {
+              if (!canApprove) return;
+              setActionLoading(true);
               const el = document.getElementById('cand-detail-result');
               if (!el) return; el.textContent = '执行中...';
               try {
-                const r = await fetch(`/api/memory-hub/candidates/${id}/approve`, {
+                const r = await fetch(`/api/memory-hub/candidates/${candFile.trim()}/approve`, {
                   method: 'POST', headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ confirm: true, confirmText, humanNote: '' }),
                 });
                 el.textContent = JSON.stringify(await r.json(), null, 2);
               } catch (err: any) { el.textContent = `Error: ${err.message}`; }
-            }} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 4, cursor: 'pointer', background: '#2e7d32', color: '#fff', border: 'none' }}>
+              setActionLoading(false);
+            }} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 4, cursor: canApprove ? 'pointer' : 'not-allowed', background: canApprove ? '#2e7d32' : 'var(--bg-input)', color: canApprove ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border-color)', opacity: canApprove ? 1 : 0.5 }}>
               批准 (Approve)
             </button>
-            <button onClick={async () => {
-              const id = (document.getElementById('cand-detail-id') as HTMLInputElement)?.value.trim();
-              const confirmText = (document.getElementById('cand-confirm-text') as HTMLInputElement)?.value.trim();
-              if (!id || !confirmText) return;
+            <button disabled={!canReject} onClick={async () => {
+              if (!canReject) return;
+              setActionLoading(true);
               const el = document.getElementById('cand-detail-result');
               if (!el) return; el.textContent = '执行中...';
               try {
-                const r = await fetch(`/api/memory-hub/candidates/${id}/reject`, {
+                const r = await fetch(`/api/memory-hub/candidates/${candFile.trim()}/reject`, {
                   method: 'POST', headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ confirm: true, confirmText, humanNote: '', reason: '' }),
                 });
                 el.textContent = JSON.stringify(await r.json(), null, 2);
               } catch (err: any) { el.textContent = `Error: ${err.message}`; }
-            }} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 4, cursor: 'pointer', background: '#c62828', color: '#fff', border: 'none' }}>
+              setActionLoading(false);
+            }} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 4, cursor: canReject ? 'pointer' : 'not-allowed', background: canReject ? '#c62828' : 'var(--bg-input)', color: canReject ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border-color)', opacity: canReject ? 1 : 0.5 }}>
               驳回 (Reject)
             </button>
-            <button onClick={async () => {
-              const id = (document.getElementById('cand-detail-id') as HTMLInputElement)?.value.trim();
-              const confirmText = (document.getElementById('cand-confirm-text') as HTMLInputElement)?.value.trim();
-              if (!id || !confirmText) return;
+            <button disabled={!canArchive} onClick={async () => {
+              if (!canArchive) return;
+              setActionLoading(true);
               const el = document.getElementById('cand-detail-result');
               if (!el) return; el.textContent = '执行中...';
               try {
-                const r = await fetch(`/api/memory-hub/candidates/${id}/archive`, {
+                const r = await fetch(`/api/memory-hub/candidates/${candFile.trim()}/archive`, {
                   method: 'POST', headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ confirm: true, confirmText, humanNote: '' }),
                 });
                 el.textContent = JSON.stringify(await r.json(), null, 2);
               } catch (err: any) { el.textContent = `Error: ${err.message}`; }
-            }} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 4, cursor: 'pointer', background: '#6a1b9a', color: '#fff', border: 'none' }}>
+              setActionLoading(false);
+            }} style={{ padding: '6px 14px', fontSize: 12, borderRadius: 4, cursor: canArchive ? 'pointer' : 'not-allowed', background: canArchive ? '#6a1b9a' : 'var(--bg-input)', color: canArchive ? '#fff' : 'var(--text-secondary)', border: '1px solid var(--border-color)', opacity: canArchive ? 1 : 0.5 }}>
               归档 (Archive)
             </button>
             <span style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: '30px' }}>
-              真实动作需要输入确认词（APPROVE_MEMORY_CANDIDATE / REJECT_MEMORY_CANDIDATE / ARCHIVE_MEMORY_CANDIDATE）
+              真实动作会修改 candidate 状态。已锁定：请先输入候选文件名、加载详情、执行 dry-run，并输入正确确认词。
             </span>
           </div>
           <pre id="cand-detail-result" style={{ marginTop: 8, maxHeight: 500, overflow: 'auto', fontSize: 11, background: 'var(--bg-input)', padding: 12, borderRadius: 6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}></pre>

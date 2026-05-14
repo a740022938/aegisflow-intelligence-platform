@@ -49,6 +49,16 @@ function resolveRunRoot(pathMod: any, fsMod: any, kind: 'train' | 'val'): string
   return pathMod.join(repoRoot, 'runs', kind);
 }
 
+function isExplicitSimulationRequest(input: any): boolean {
+  const mode = String(input?.executionMode || input?.execution_mode || '').toLowerCase();
+  return (
+    mode === 'mock' ||
+    mode === 'simulation' ||
+    input?.simulation === true ||
+    process.env.AIP_ALLOW_MOCK_TRAINING === '1'
+  );
+}
+
 // ── State Machine ─────────────────────────────────────────────────────────────
 
 const JOB_STATES = ['pending', 'running', 'paused', 'completed', 'failed', 'cancelled'] as const;
@@ -1226,12 +1236,14 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
   let bestPt = '';
   let lastPt = '';
   let realMetrics: any = null;
-  let executionMode: 'real' | 'fallback' | 'preflight_failed' = 'fallback';
+  let executionMode: 'real' | 'mock' | 'preflight_failed' = 'real';
   let preflightResult: any = null;
   let configSnapshot: string = '';
   let envSnapshot: string = '';
   let finalDevice: string = '';
   let resumeUsed: boolean = false;
+  let simulated = false;
+  let mockCheckpoint: any = null;
 
   // v3.3.0: Device auto-detection
   if (!resolvedInput.device) {
@@ -1255,8 +1267,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
     await logJob(db, step.job_id, step.id, 'info', `Resume requested from: ${resumeFrom}`);
   }
 
-  // v3.3.0: Strict preflight - check allow_fallback
-  const allowFallback = resolvedInput.allow_fallback === true;
+  const allowMockTraining = isExplicitSimulationRequest(resolvedInput);
 
   if (taskType === 'vision_detect' && modelFamily === 'yolo') {
     // Real YOLO training
@@ -1307,15 +1318,21 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
         ].filter(Boolean).join(', ');
         const errMsg = `[dataset_yaml not found] Cannot start real YOLO training for dataset_id="${dataset_id}". Searched: ${searchPaths}. Ensure dataset has a valid data.yaml or set dataset_yaml in input/meta_json.`;
         await logJob(db, step.job_id, step.id, 'error', errMsg);
-        if (!allowFallback) {
+        if (!allowMockTraining) {
           return { ok: false, output: null, error: errMsg };
         }
-        // Fallback to mock
-        executionMode = 'fallback';
-        await logJob(db, step.job_id, step.id, 'warning', `${errMsg} → falling back to mock (allow_fallback=true)`);
+        executionMode = 'mock';
+        simulated = true;
+        await logJob(db, step.job_id, step.id, 'warning', `${errMsg} → explicit mock simulation enabled`);
         await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1500));
         loss = +(0.5 + Math.random() * 0.4).toFixed(4);
-        checkpoint_path = `/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`;
+        mockCheckpoint = {
+          mockCheckpoint: true,
+          simulated: true,
+          path: `/mock/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`,
+          reason: 'dataset_yaml not found',
+        };
+        checkpoint_path = '';
       }
       
       // ── Execute real training (only if datasetYaml resolved) ────────────
@@ -1389,7 +1406,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
             await logJob(db, step.job_id, step.id, 'info', `Training execution_mode: ${executionMode}`);
             
             // v3.3.0: Check preflight_failed and strict mode
-            if (executionMode === 'preflight_failed' && !allowFallback) {
+            if (executionMode === 'preflight_failed' && !allowMockTraining) {
               throw new Error(`Preflight failed and fallback not allowed: ${preflightResult?.errors?.join(', ')}`);
             }
           }
@@ -1399,7 +1416,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
           await logJob(db, step.job_id, step.id, 'error', `Training failed: ${errMsg}`);
           
           // v3.3.0: Check if fallback is allowed
-          if (!allowFallback) {
+          if (!allowMockTraining) {
             throw new Error(`Training failed and fallback not allowed: ${errMsg}`);
           }
           
@@ -1409,26 +1426,42 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
       } // end if (datasetYaml)
     } catch (e: any) {
       // v3.3.0: Check if fallback is allowed
-      if (!allowFallback) {
+      if (!allowMockTraining) {
         await logJob(db, step.job_id, step.id, 'error', `Real training failed, fallback not allowed: ${e.message}`);
         return { ok: false, output: null, error: e.message };
       }
       
-      // If real training fails, fall back to mock for now (but log the error)
-      executionMode = 'fallback';
-      await logJob(db, step.job_id, step.id, 'warning', `Real training failed, falling back to mock: ${e.message}`);
+      executionMode = 'mock';
+      simulated = true;
+      await logJob(db, step.job_id, step.id, 'warning', `Real training failed; explicit mock simulation enabled: ${e.message}`);
       
-      // Fallback to mock
       await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1500));
       loss = +(0.5 + Math.random() * 0.4).toFixed(4);
-      checkpoint_path = `/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`;
+      mockCheckpoint = {
+        mockCheckpoint: true,
+        simulated: true,
+        path: `/mock/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`,
+        reason: e.message,
+      };
+      checkpoint_path = '';
     }
   } else {
-    // Mock training for non-YOLO tasks
-    executionMode = 'fallback';
+    if (!allowMockTraining) {
+      const err = `No real training executor for task_type="${taskType}", model_family="${modelFamily}". Explicit mock simulation is required.`;
+      await logJob(db, step.job_id, step.id, 'error', err);
+      return { ok: false, output: null, error: err };
+    }
+    executionMode = 'mock';
+    simulated = true;
     await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1500));
     loss = +(0.5 + Math.random() * 0.4).toFixed(4);
-    checkpoint_path = `/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`;
+    mockCheckpoint = {
+      mockCheckpoint: true,
+      simulated: true,
+      path: `/mock/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`,
+      reason: 'non-yolo training requested in explicit mock mode',
+    };
+    checkpoint_path = '';
   }
   
   const artifactIndex = {
@@ -1443,6 +1476,8 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
     epoch: epochCount,
     execution_mode: executionMode,
     artifact_index: artifactIndex,
+    simulated,
+    mockCheckpoint,
   };
 
   // v3.0.0: Create or update model record with task_type and model_family
@@ -1450,6 +1485,9 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
     ? resolvedInput.model_id
     : `model-${experiment_id}`;
   try {
+    if (simulated) {
+      await logJob(db, step.job_id, step.id, 'warning', `[train_model] explicit mock simulation did not create/update a real model record`);
+    } else {
     const existingModel = db.prepare('SELECT model_id FROM models WHERE model_id = ?').get(modelId) as any;
     if (!existingModel) {
       db.prepare(`
@@ -1460,6 +1498,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
       db.prepare(`UPDATE models SET artifact_path = ?, updated_at = ? WHERE model_id = ?`)
         .run(checkpoint_path, now(), modelId);
     }
+    }
   } catch (e: any) {
     await logJob(db, step.job_id, step.id, 'warning', `Failed to create/update model record: ${e.message}`);
   }
@@ -1468,7 +1507,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
   try {
     db.prepare(`
       UPDATE experiments SET 
-        status = 'completed',
+        status = ?,
         task_type = ?,
         model_family = ?,
         execution_mode = ?,
@@ -1483,6 +1522,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
         updated_at = ?
       WHERE id = ?
     `).run(
+      simulated ? 'simulated' : 'completed',
       taskType,
       modelFamily,
       executionMode,
@@ -1522,11 +1562,15 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
     resume_used: resumeUsed,
     final_device: finalDevice,
     artifact_index: artifactIndex,
+    simulated,
+    status: simulated ? 'simulated' : 'completed',
+    mockCheckpoint,
+    mockArtifact: simulated ? { mockArtifact: true, simulated: true, path: '', reason: mockCheckpoint?.reason || 'explicit mock simulation' } : null,
   };
 
   try {
-    db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at) VALUES (?, 'workflow', 'training_completed', ?, 'success', ?, ?)`)
-      .run(uuid(), experiment_id, JSON.stringify({ 
+    db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at) VALUES (?, 'workflow', ?, ?, ?, ?, ?)`)
+      .run(uuid(), simulated ? 'training_simulated' : 'training_completed', experiment_id, simulated ? 'simulated' : 'success', JSON.stringify({
         job_id: step.job_id, 
         step_id: step.id, 
         experiment_id, 
@@ -1544,6 +1588,8 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
         artifact_index: artifactIndex,
         config_snapshot: configSnapshot,
         env_snapshot: envSnapshot,
+        simulated,
+        mockCheckpoint,
       }), now());
   } catch (_) {}
 
@@ -1553,16 +1599,20 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
   if (!expRecord) {
     trainWarnings.push(`experiment_id="${experiment_id}" not found in DB after training`);
   } else {
-    if (expRecord.status !== 'completed') trainWarnings.push(`experiment status="${expRecord.status}", expected "completed"`);
+    if (simulated) {
+      if (expRecord.status !== 'simulated') trainWarnings.push(`experiment status="${expRecord.status}", expected "simulated"`);
+    } else if (expRecord.status !== 'completed') trainWarnings.push(`experiment status="${expRecord.status}", expected "completed"`);
   }
   const modelRecord = db.prepare('SELECT model_id, artifact_path FROM models WHERE model_id = ?').get(modelId) as any;
-  if (!modelRecord) {
+  if (simulated) {
+    trainWarnings.push('simulated mock training did not produce a real model artifact');
+  } else if (!modelRecord) {
     trainWarnings.push(`model_id="${modelId}" not found in DB after training`);
   } else {
     if (!modelRecord.artifact_path || modelRecord.artifact_path.trim() === '') trainWarnings.push('model artifact_path is empty');
   }
-  if (!checkpoint_path || checkpoint_path.trim() === '') trainWarnings.push('checkpoint_path is empty');
-  if (executionMode === 'fallback') trainWarnings.push('execution_mode=fallback (real training did not run)');
+  if (!simulated && (!checkpoint_path || checkpoint_path.trim() === '')) trainWarnings.push('checkpoint_path is empty');
+  if (executionMode === 'mock') trainWarnings.push('execution_mode=mock (simulated training only)');
   const trainCheck = { passed: trainWarnings.length === 0, warnings: trainWarnings };
   if (!trainCheck.passed) {
     await logJob(db, step.job_id, step.id, 'warn', `[train_model] artifact validation: ${trainWarnings.join('; ')}`);
@@ -1689,7 +1739,9 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
   }
   
   // v8D-5: execution mode tracking
-  let evalExecutionMode: 'real' | 'fallback' | 'skipped' = 'fallback';
+  let evalExecutionMode: 'real' | 'mock' | 'skipped' = 'skipped';
+  const allowMockEvaluation = isExplicitSimulationRequest(rawInput);
+  let evalSimulated = false;
   
   if (resolvedEvalTaskType === 'vision_detect' && resolvedEvalModelFamily === 'yolo') {
     // Real YOLO evaluation
@@ -1790,14 +1842,32 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
       } catch (evalError: any) {
         const errMsg = evalError.message || String(evalError);
         await logJob(db, step.job_id, step.id, 'error', `Evaluation failed: ${errMsg}`);
-        evalExecutionMode = 'fallback';
+        evalExecutionMode = 'mock';
         throw new Error(`YOLO evaluation failed: ${errMsg}`);
       }
       
     } catch (e: any) {
-      evalExecutionMode = 'fallback';
-      await logJob(db, step.job_id, step.id, 'warning', `Real evaluation failed, falling back to mock: ${e.message}`);
+      if (!allowMockEvaluation) {
+        const err = `Real evaluation failed and mock simulation not explicitly allowed: ${e.message}`;
+        db.prepare(`UPDATE evaluations SET status = ?, error_message = ?, finished_at = ?, updated_at = ? WHERE id = ?`)
+          .run('failed', err, now(), now(), evaluationId);
+        await logJob(db, step.job_id, step.id, 'error', err);
+        return { ok: false, output: null, error: err };
+      }
+      evalExecutionMode = 'mock';
+      evalSimulated = true;
+      await logJob(db, step.job_id, step.id, 'warning', `Real evaluation failed; explicit mock simulation enabled: ${e.message}`);
     }
+  } else if (!allowMockEvaluation) {
+    const err = `No real evaluation executor for task_type="${resolvedEvalTaskType}", model_family="${resolvedEvalModelFamily}". Explicit mock simulation is required.`;
+    db.prepare(`UPDATE evaluations SET status = ?, error_message = ?, finished_at = ?, updated_at = ? WHERE id = ?`)
+      .run('failed', err, now(), now(), evaluationId);
+    await logJob(db, step.job_id, step.id, 'error', err);
+    return { ok: false, output: null, error: err };
+  } else {
+    evalExecutionMode = 'mock';
+    evalSimulated = true;
+    await logJob(db, step.job_id, step.id, 'warning', `Explicit mock evaluation simulation enabled`);
   }
 
   // Run evaluation steps (inline, adapted from evaluations/index.ts runEvaluation)
@@ -1878,7 +1948,6 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
       }
       await logJob(db, step.job_id, step.id, 'info', `Real eval metrics applied: ${Object.keys(metricValues).join(', ')}`);
     } else {
-      // Fall back to mock metrics
       const mockMetrics = MOCK_METRICS[evaluation_type as keyof typeof MOCK_METRICS] || MOCK_METRICS.custom;
       for (const [metricKey, metricValue] of Object.entries(mockMetrics)) {
         metricValues[metricKey] = Number(metricValue);
@@ -1905,6 +1974,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
     const summary = {
       evaluation_type,
       execution_mode: evalExecutionMode,
+      simulated: evalSimulated,
       total_samples: realEvalMetrics?.images || Math.floor(500 + Math.random() * 1500),
       total_instances: realEvalMetrics?.instances || 0,
       total_duration_ms: STEP_DEFINITIONS.reduce((s, s2) => s + s2.duration, 0),
@@ -1928,7 +1998,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
           updated_at = ?
       WHERE id = ?
     `).run(
-      'completed',
+      evalSimulated ? 'simulated' : 'completed',
       summaryJson,
       reportPath,
       evalManifestPath,
@@ -1961,6 +2031,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
       const mergedExpMetrics = {
         ...(expMetrics && typeof expMetrics === 'object' ? expMetrics : {}),
         eval_metrics: { ...metricValues },
+        simulated: evalSimulated,
         eval_index: {
           evaluation_id: evaluationId,
           report_path: reportPath,
@@ -2007,13 +2078,23 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
 
     // Workflow audit
     try {
-      db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at) VALUES (?, 'workflow', 'evaluation_completed', ?, 'success', ?, ?)`)
-        .run(uuid(), experiment_id, JSON.stringify({ job_id: step.job_id, step_id: step.id, experiment_id, model_id, dataset_id, evaluation_id: evaluationId }), now());
+      db.prepare(`INSERT INTO audit_logs (id, category, action, target, result, detail_json, created_at) VALUES (?, 'workflow', ?, ?, ?, ?, ?)`)
+        .run(
+          uuid(),
+          evalSimulated ? 'evaluation_simulated' : 'evaluation_completed',
+          experiment_id,
+          evalSimulated ? 'simulated' : 'success',
+          JSON.stringify({ job_id: step.job_id, step_id: step.id, experiment_id, model_id, dataset_id, evaluation_id: evaluationId, simulated: evalSimulated }),
+          now(),
+        );
     } catch (_) {}
 
     let artId = "";
     // v4.7.0: Auto-create artifact from evaluation result ───────────────────
     try {
+      if (evalSimulated) {
+        await logJob(db, step.job_id, step.id, 'warning', `explicit mock evaluation simulation did not create a real evaluation artifact`);
+      } else {
       const modelRecord = db.prepare('SELECT model_family, artifact_path FROM models WHERE model_id = ?').get(model_id) as any;
       const modelFamily = modelRecord?.model_family || evalModelFamily || '';
       const framework  = modelRecord?.framework || 'yolo';
@@ -2045,6 +2126,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
       db.prepare('UPDATE evaluations SET artifact_id = ?, updated_at = ? WHERE id = ?')
         .run(artId, now(), evaluationId);
       await logJob(db, step.job_id, step.id, 'info', `artifact_created: id=${artId}`);
+      }
     } catch (artErr: any) {
       require('fs').appendFileSync('workflow-err.log',
         `[${now()}] ARTIFACT_ERR eval=${evaluationId} err=${artErr.message}\\n`);
@@ -2064,7 +2146,19 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
       } catch (_) {}
     }
 
-const output = { experiment_id, model_id, dataset_id, evaluation_id: evaluationId, eval_status: 'completed', execution_mode: evalExecutionMode, metrics: metricValues, artifact_id: artId || '', eval_run_dir: realEvalDir || '' };
+const output = {
+  experiment_id,
+  model_id,
+  dataset_id,
+  evaluation_id: evaluationId,
+  eval_status: evalSimulated ? 'simulated' : 'completed',
+  execution_mode: evalExecutionMode,
+  simulated: evalSimulated,
+  metrics: metricValues,
+  artifact_id: artId || '',
+  eval_run_dir: realEvalDir || '',
+  mockArtifact: evalSimulated ? { mockArtifact: true, simulated: true, path: '', reason: 'explicit mock evaluation simulation' } : null,
+};
 
 // ── v8D-5: 产物校验 ────────────────────────────────────────────────────
 const evalWarnings: string[] = [];
@@ -2072,10 +2166,12 @@ const evalRecord = db.prepare('SELECT id, status, result_summary_json FROM evalu
 if (!evalRecord) {
   evalWarnings.push(`evaluation record id="${evaluationId}" not found after evaluation`);
 } else {
-  if (evalRecord.status !== 'completed') evalWarnings.push(`evaluation status="${evalRecord.status}", expected "completed"`);
+  if (evalSimulated) {
+    if (evalRecord.status !== 'simulated') evalWarnings.push(`evaluation status="${evalRecord.status}", expected "simulated"`);
+  } else if (evalRecord.status !== 'completed') evalWarnings.push(`evaluation status="${evalRecord.status}", expected "completed"`);
 }
 if (!metricValues || Object.keys(metricValues).length === 0) evalWarnings.push('no metrics recorded');
-if (evalExecutionMode === 'fallback') evalWarnings.push('execution_mode=fallback (real evaluation did not run)');
+if (evalExecutionMode === 'mock') evalWarnings.push('execution_mode=mock (simulated evaluation only)');
 if (evalWarnings.length === 0) {
   await logJob(db, step.job_id, step.id, 'info', `[evaluate_model] artifact validation: PASSED`);
 } else {
