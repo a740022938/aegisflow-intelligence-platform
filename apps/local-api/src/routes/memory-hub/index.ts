@@ -562,4 +562,53 @@ export function registerMemoryHubRoutes(app: FastifyInstance) {
   function calculateChecksum(text: string): string {
     return crypto.createHash('sha256').update(text).digest('hex');
   }
+
+  // --- Retrieval endpoints (v0.7-rc1) ---
+  app.get('/api/memory-hub/retrieval/status', async (_request, reply) => {
+    try {
+      const searchIndex = safeStat('exports/machine/search_index.json');
+      const dict = safeStat('exports/memory_dictionary.md');
+      const rel = safeStat('exports/machine/relation_index.json');
+      return { ok: true, mode: 'readonly', searchIndexExists: searchIndex?.isFile() || false, dictionaryExists: dict?.isFile() || false, relationIndexExists: rel?.isFile() || false };
+    } catch (e: any) { return reply.code(500).send({ ok: false, error: 'RETRIEVAL_STATUS_FAILED', message: String(e?.message || e) }); }
+  });
+
+  app.get('/api/memory-hub/retrieval/search', async (request: any, reply) => {
+    try {
+      const q = String(request.query?.q || '').slice(0,100);
+      if (!q) return reply.code(400).send({ ok: false, error: 'MISSING_QUERY' });
+      // Search memory_dictionary for matches
+      const dict = safeReadText('exports/memory_dictionary.md');
+      const lines = (dict || '').split('\n');
+      const results: string[] = [];
+      let found = false;
+      for (const line of lines) {
+        if (line.toLowerCase().includes(q.toLowerCase()) && line.trim().length > 5) {
+          results.push(line.trim()); found = true;
+        }
+      }
+      return { ok: true, mode: 'readonly', query: q, count: results.length, results: results.slice(0, 20) };
+    } catch (e: any) { return reply.code(500).send({ ok: false, error: 'RETRIEVAL_SEARCH_FAILED' }); }
+  });
+
+  app.get('/api/memory-hub/retrieval/relations', async (_request, reply) => {
+    try {
+      const data = safeReadJson('exports/machine/relation_index.json');
+      if (!data) return reply.code(404).send({ ok: false, error: 'RELATION_INDEX_NOT_FOUND' });
+      return { ok: true, mode: 'readonly', total: data.total_relations || 0, relations: (data.relations || []).slice(0, 50) };
+    } catch (e: any) { return reply.code(500).send({ ok: false, error: 'RELATIONS_FAILED' }); }
+  });
+
+  app.get('/api/memory-hub/candidates/:id/similar', async (request: any, reply) => {
+    try {
+      const clean = sanitizeCandidateId(request.params.id);
+      if (!clean) return reply.code(400).send({ ok: false, error: 'INVALID_ID' });
+      const data = safeReadJson(`inbox/candidates/${clean}`) || safeReadJson(`inbox/candidates_test/${clean}`);
+      if (!data) return reply.code(404).send({ ok: false, error: 'NOT_FOUND' });
+      const q = (data.title || '').slice(0, 30);
+      const dict = safeReadText('exports/memory_dictionary.md') || '';
+      const lines = dict.split('\n').filter(l => l.toLowerCase().includes(q.toLowerCase())).slice(0, 10);
+      return { ok: true, mode: 'readonly', candidateTitle: data.title, similar: lines };
+    } catch (e: any) { return reply.code(500).send({ ok: false, error: 'SIMILAR_FAILED' }); }
+  });
 }
