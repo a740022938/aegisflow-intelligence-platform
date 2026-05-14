@@ -611,4 +611,58 @@ export function registerMemoryHubRoutes(app: FastifyInstance) {
       return { ok: true, mode: 'readonly', candidateTitle: data.title, similar: lines };
     } catch (e: any) { return reply.code(500).send({ ok: false, error: 'SIMILAR_FAILED' }); }
   });
+
+  // --- UX & LAN endpoints (v0.8-rc1) ---
+  app.get('/api/memory-hub/ux/summary', async (_request, reply) => {
+    try {
+      const statsData = safeReadJson('exports/machine/memory_stats.json');
+      const candidateStatus = readAllCandidates(CANDIDATE_DIRS);
+      let pending=0,keep=0,imported=0,rejected=0,testOnly=0;
+      for (const {files} of candidateStatus) {
+        for (const f of files) {
+          const rs=f.review_status||'';
+          if (rs==='pending_review') pending++; else if (rs==='test_only') testOnly++;
+          else if (rs==='imported') imported++; else if (rs==='rejected') rejected++;
+          else keep++;
+        }
+      }
+      return { ok:true, memories:statsData?.database_memory_count||0, published:statsData?.published_count||0, archived:statsData?.archived_count||0, candidates:{pending,keep,imported,rejected,testOnly}, mode:'readonly' };
+    } catch(e:any){return reply.code(500).send({ok:false,error:'UX_SUMMARY_FAILED'});}
+  });
+
+  app.get('/api/memory-hub/lan/status', async (_request, reply) => {
+    try {
+      const lanStats=safeStat('exports/machine/lan_sync_plan.json');
+      const lanDir=fs.existsSync('E:/_AIP_MEMORY_HUB_LAN_SHARE');
+      return { ok:true, mode:'readonly', lanShareExists:fs.existsSync('E:/_AIP_MEMORY_HUB_LAN_SHARE'), syncPlanExists:lanStats?.isFile()||false, lastSyncPlan:(lanStats?.mtime?.toISOString()||null) };
+    } catch(e:any){return reply.code(500).send({ok:false,error:'LAN_STATUS_FAILED'});}
+  });
+
+  app.get('/api/memory-hub/lan/diff', async (_request, reply) => {
+    try {
+      const plan=safeReadJson('exports/machine/lan_sync_plan.json');
+      if(!plan) return reply.code(404).send({ok:false,error:'NO_SYNC_PLAN'});
+      return { ok:true, mode:'readonly', summary:{copy:plan.would_copy?.length||0,update:plan.would_update?.length||0,skip:plan.would_skip?.length||0,blocked:plan.blocked?.length||0}, generated:plan.generated_at };
+    } catch(e:any){return reply.code(500).send({ok:false,error:'LAN_DIFF_FAILED'});}
+  });
+
+  app.get('/api/memory-hub/lan/sync-plan', async (_request, reply) => {
+    try {
+      const plan=safeReadJson('exports/machine/lan_sync_plan.json');
+      if(!plan) return reply.code(404).send({ok:false,error:'NO_SYNC_PLAN'});
+      return { ok:true, mode:'readonly', plan };
+    } catch(e:any){return reply.code(500).send({ok:false,error:'SYNC_PLAN_FAILED'});}
+  });
+
+  app.get('/api/memory-hub/candidates/keep-review', async (_request, reply) => {
+    try {
+      const {files:cands}=readAllCandidates(['candidates'])[0];
+      const items:any[]=[];
+      for(const c of cands){
+        const vr=safeReadJson(`inbox/candidates/${c.fileName}`);
+        items.push({fileName:c.fileName,title:c.title,project:c.project,level:c.level,confidence:c.confidence,sensitivity:c.sensitivity,visibility:c.visibility,source_type:c.source_type});
+      }
+      return { ok:true, mode:'readonly', keepCount:items.length, items };
+    } catch(e:any){return reply.code(500).send({ok:false,error:'KEEP_REVIEW_FAILED'});}
+  });
 }
