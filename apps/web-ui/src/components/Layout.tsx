@@ -289,6 +289,7 @@ function AppShell() {
                 <NavItem to="/tasks" icon="tasks" label={t.nav.taskOrchestration} />
                 <NavItem to="/cost-routing" icon="route" label={t.nav.costRouting} />
                 <NavItem to="/openaxiom-readonly" icon="label" label="OpenAxiom 只读检查" />
+                <NavItem to="/memory-hub" icon="label" label="Memory Hub 只读查看" />
               </>)}
             </div>
 

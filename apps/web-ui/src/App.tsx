@@ -30,6 +30,7 @@ const ModulePage = lazy(() => import('./pages/ModulePage'));
 const MahjongDebug = lazy(() => import('./pages/MahjongDebug'));
 const OpenAxiomReadonly = lazy(() => import('./pages/OpenAxiomReadonly'));
 const AssistantCenter = lazy(() => import('./pages/AssistantCenter'));
+const MemoryHubReadonly = lazy(() => import('./pages/MemoryHubReadonly'));
 
 function RouteFallback() {
   return (
@@ -123,6 +124,7 @@ const App: React.FC = () => {
             <Route path="api-docs" element={<ModulePage />} />
             <Route path="vision-lab/mahjong-debug" element={<MahjongDebug />} />
             <Route path="openaxiom-readonly" element={<OpenAxiomReadonly />} />
+            <Route path="memory-hub" element={<MemoryHubReadonly />} />
             <Route path="assistant-center" element={<AssistantCenter />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
