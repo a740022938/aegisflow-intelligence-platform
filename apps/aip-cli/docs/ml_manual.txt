@@ -18,7 +18,7 @@
 # npm        10.9.3
 # nvm        v22.19.0
 # OpenClaw   2026.3.23 (ccfeecb)
-# AIP        CLI/Core 7.3.0-rc1
+# AIP        CLI/Core 7.3.0
 
 # 版本检查：
 node -v
@@ -382,7 +382,7 @@ aip ml
 # 功能要求：
 # 1. 新增 aip ml 子命令。
 # 2. 输出内容包含：
-#    - 稳定基线：Node v22.19.0 / npm 10.9.3 / OpenClaw 2026.3.23 / AIP 7.3.0-rc1
+#    - 稳定基线：Node v22.19.0 / npm 10.9.3 / OpenClaw 2026.3.23 / AIP 7.3.0
 #    - AIP 日常命令
 #    - OpenClaw 命令
 #    - Node/npm/nvm 检查命令
@@ -431,4 +431,4 @@ aip restart
 npm install -g openclaw@2026.3.23
 
 # 当前稳定组合：
-# Node v22.19.0 + npm 10.9.3 + OpenClaw 2026.3.23 + AIP 7.3.0-rc1
+# Node v22.19.0 + npm 10.9.3 + OpenClaw 2026.3.23 + AIP 7.3.0

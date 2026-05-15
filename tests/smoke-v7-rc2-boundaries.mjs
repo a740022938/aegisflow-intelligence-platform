@@ -85,7 +85,7 @@ function assertSourceContains(file, checks) {
 }
 
 async function main() {
-  console.log('=== AIP v7.3.0-rc2 Boundary Smoke ===\n');
+  console.log('=== AIP v7.3.0 Boundary Smoke ===\n');
 
   const assistant = await makeAssistantApp();
 

@@ -71,7 +71,8 @@ export function registerComfyRoutes(app: FastifyInstance) {
     const width = Number(body.width) || 1024;
     const height = Number(body.height) || 1024;
     const steps = Number(body.steps) || 20;
-    const seed = Number(body.seed) ?? -1;
+    const seedValue = Number(body.seed);
+    const seed = Number.isFinite(seedValue) ? seedValue : -1;
     const workflow = String(body.workflow ?? 'default');
 
     // Build a minimal ComfyUI graph object for txt2img-like flow

@@ -460,7 +460,7 @@ async function collectStatus() {
       port: 5173,
       pid: aipWebPort.pid,
       path: 'E:\\AIP\\apps\\web-ui',
-      version: aipHealth.data?.version || '7.3.0-rc1',
+      version: aipHealth.data?.version || '7.3.0',
       detail: webHealth.statusCode ? `HTTP ${webHealth.statusCode}` : webHealth.error || '',
       riskLevel: webHealth.ok ? 'low' : 'high',
       suggestedAction: webHealth.ok ? '保持只读观察' : '仅做前端日志取证',
@@ -683,7 +683,7 @@ export function registerAssistantCenterRoutes(app: FastifyInstance) {
   app.get('/api/assistant-center/version', async (_request, _reply) => {
     return {
       ok: true,
-      version: '7.3.0-rc1',
+      version: '7.3.0',
       module: 'assistant-center',
       readonly: true,
       autoFixAllowed: false,
@@ -775,7 +775,7 @@ export function registerAssistantCenterRoutes(app: FastifyInstance) {
     return reply.code(501).send({
       ok: false,
       error: 'AUDIT_SAVE_DISABLED',
-      message: 'Assistant Center rc1 does not save audit logs automatically.',
+      message: 'Assistant Center final release does not save audit logs automatically.',
       readonly: true,
       autoFixAllowed: false,
       requiresHumanApproval: true,

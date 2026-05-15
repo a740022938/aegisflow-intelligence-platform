@@ -21,6 +21,7 @@ export async function generateComfyGraph(graphObject: any, baseUrl: string, clie
       return { ok: false, status, text: text };
     }
   } catch (err: any) {
-    return { ok: false, status: 500, text: err?.message ?? String(err) ?? 'unknown', stack: err?.stack ?? '' };
+    const message = err?.message || String(err || 'unknown');
+    return { ok: false, status: 500, text: message, stack: err?.stack ?? '' };
   }
 }

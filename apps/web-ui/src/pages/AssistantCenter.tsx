@@ -189,7 +189,7 @@ export default function AssistantCenter() {
     <div className="assistant-page">
       <header className="assistant-header">
         <div>
-          <p className="assistant-kicker">AIP v7.3.0-rc1</p>
+          <p className="assistant-kicker">AIP v7.3.0</p>
           <h1>助手中心</h1>
           <p className="assistant-subtitle">只读纳管 AIP、OpenClaw、Claude Proxy、OpenAxiom、报告、备份和安全边界。</p>
         </div>
