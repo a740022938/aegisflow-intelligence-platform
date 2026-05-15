@@ -4,7 +4,18 @@ import '../components/ui/shared.css';
 import './CostRouting.css';
 import { roleClass } from '../theme/colorRoles';
 
-type RouteType = 'local_low_cost' | 'local_balanced' | 'cloud_high_capability';
+type RouteType =
+  | 'local_low_cost'
+  | 'local_balanced'
+  | 'cloud_high_capability'
+  | 'local_cpu'
+  | 'local_gpu'
+  | 'openclaw_stable_2026_3_23'
+  | 'openclaw_sidecar_2026_5_12'
+  | 'comfyui_8000'
+  | 'cloud_reasoning_model'
+  | 'manual_confirm'
+  | 'blocked';
 
 interface RoutePolicy {
   id: string;
@@ -92,6 +103,70 @@ interface RoutingOptimization {
   proposals: OptimizationProposal[];
 }
 
+interface PracticalDecision {
+  selectedRoute: RouteType;
+  costLevel: 'free' | 'low' | 'medium' | 'high' | 'unknown';
+  riskLevel: 'low' | 'medium' | 'high' | 'blocked';
+  needsUserConfirm: boolean;
+  reason: string;
+  rejectedRoutes: Array<{ route: RouteType; reason: string }>;
+  safetyNotes: string[];
+  nextAction: string;
+}
+
+interface PolicyTemplate {
+  id: string;
+  name: string;
+  task_type: string;
+  route_type: RouteType;
+  priority: number;
+  cost_level: string;
+  risk_level: string;
+  description: string;
+}
+
+interface PracticalConfig {
+  policy_templates: PolicyTemplate[];
+  task_types: string[];
+  route_targets: RouteType[];
+  cost_levels: string[];
+  risk_levels: string[];
+  local_capabilities: Record<string, string>;
+}
+
+const SIMULATION_EXAMPLES = [
+  {
+    label: '低预算文本总结',
+    taskType: 'text_inference',
+    taskId: 'sim-low-budget-summary',
+    input: { budget: 'low', prompt: '低预算文本总结', estimated_tokens: 2400 },
+  },
+  {
+    label: 'Mahjong YOLO 小训练',
+    taskType: 'training',
+    taskId: 'sim-mahjong-yolo-train',
+    input: { budget: 'low', gpu_needed: true, target: 'Mahjong YOLO seed training' },
+  },
+  {
+    label: 'ComfyUI 真实海怪生图',
+    taskType: 'image_generation',
+    taskId: 'sim-comfy-sea-monster',
+    input: { budget: 'low', comfy_available: true, prompt: '真实海怪生图' },
+  },
+  {
+    label: 'E 盘清理候选审计',
+    taskType: 'file_cleanup',
+    taskId: 'sim-e-drive-cleanup-audit',
+    input: { budget: 'low', target: 'E:\\ cleanup candidates readonly audit' },
+  },
+  {
+    label: 'GitHub Release 发布',
+    taskType: 'github_release',
+    taskId: 'sim-github-release',
+    input: { budget: 'medium', target: 'create GitHub Release v7.3.1-rc1' },
+  },
+];
+
 function fmt(v?: string) {
   if (!v) return '暂无记录';
   try {
@@ -101,9 +176,56 @@ function fmt(v?: string) {
   }
 }
 
-async function api(path: string, init?: RequestInit) {
-  const res = await fetch(path, init);
-  return res.json();
+const COST_ROUTING_AUTH_TOKEN_KEY = 'aip_auth_token';
+
+function getStoredAuthToken(): string {
+  try {
+    return localStorage.getItem(COST_ROUTING_AUTH_TOKEN_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function setStoredAuthToken(token: string) {
+  try {
+    localStorage.setItem(COST_ROUTING_AUTH_TOKEN_KEY, token);
+  } catch {
+    // Ignore storage failures; the token can still be used for the current request.
+  }
+}
+
+async function loginForCostRouting(): Promise<string> {
+  const res = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'admin', password: 'aip-admin' }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data?.ok || !data?.token) {
+    throw new Error(data?.error || data?.message || '成本路由认证失败');
+  }
+  setStoredAuthToken(data.token);
+  return data.token;
+}
+
+async function api(path: string, init?: RequestInit, retried = false): Promise<any> {
+  let token = getStoredAuthToken();
+  if (!token) token = await loginForCostRouting();
+
+  const headers = new Headers(init?.headers || {});
+  headers.set('Authorization', `Bearer ${token}`);
+  const res = await fetch(path, { ...init, headers });
+  const data = await res.json();
+
+  if (data?._unauthorized && !retried) {
+    token = await loginForCostRouting();
+    const retryHeaders = new Headers(init?.headers || {});
+    retryHeaders.set('Authorization', `Bearer ${token}`);
+    const retryRes = await fetch(path, { ...init, headers: retryHeaders });
+    return retryRes.json();
+  }
+
+  return data;
 }
 
 export default function CostRoutingPage() {
@@ -120,6 +242,8 @@ export default function CostRoutingPage() {
   const [decisions, setDecisions] = useState<RouteDecision[]>([]);
   const [insights, setInsights] = useState<CostRoutingInsights | null>(null);
   const [optimization, setOptimization] = useState<RoutingOptimization | null>(null);
+  const [practicalConfig, setPracticalConfig] = useState<PracticalConfig | null>(null);
+  const [practicalDecision, setPracticalDecision] = useState<PracticalDecision | null>(null);
 
   const [selectedPolicyId, setSelectedPolicyId] = useState('');
   const [selectedPolicy, setSelectedPolicy] = useState<RoutePolicy | null>(null);
@@ -216,7 +340,7 @@ export default function CostRoutingPage() {
     setLoading(true);
     setError('');
     try {
-      await Promise.all([loadPolicies(), loadDecisions(), loadInsights()]);
+      await Promise.all([loadPolicies(), loadDecisions(), loadInsights(), loadPracticalConfig()]);
     } catch (e: any) {
       setError(e.message || '加载失败');
     } finally {
@@ -235,6 +359,12 @@ export default function CostRoutingPage() {
     } finally {
       setLoadingInsights(false);
     }
+  }
+
+  async function loadPracticalConfig() {
+    const res = await api('/api/cost-routing/practical-config');
+    if (!res.ok) throw new Error(res.error || '加载实用路由配置失败');
+    setPracticalConfig(res);
   }
 
   async function handleCreatePolicy(e: React.FormEvent) {
@@ -292,6 +422,7 @@ export default function CostRoutingPage() {
       if (!res.ok) throw new Error(res.error || '路由决策失败');
 
       const d = res.decision;
+      setPracticalDecision(d.input_json?.__routing?.practical_decision || null);
       setMsg(`路由命中: ${d.route_type} | reason: ${d.route_reason}`);
       setSelectedDecisionId(d.id);
       await Promise.all([loadDecisions(), loadDecisionDetail(d.id), loadInsights()]);
@@ -300,6 +431,45 @@ export default function CostRoutingPage() {
     } finally {
       setResolving(false);
     }
+  }
+
+  async function handlePracticalSimulate(e?: React.FormEvent | React.MouseEvent) {
+    e?.preventDefault();
+    setResolving(true);
+    setError('');
+    setMsg('');
+    try {
+      let parsed: any = {};
+      try {
+        parsed = simulateInputJson ? JSON.parse(simulateInputJson) : {};
+      } catch {
+        throw new Error('input_json 不是合法 JSON');
+      }
+      const res = await api('/api/cost-routing/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task_type: simulateTaskType,
+          task_id: simulateTaskId,
+          input_json: parsed,
+        }),
+      });
+      if (!res.ok) throw new Error(res.error || '模拟决策失败');
+      setPracticalDecision(res.decision || null);
+      setMsg(`模拟建议: ${res.decision?.selectedRoute} · risk=${res.decision?.riskLevel}`);
+    } catch (e: any) {
+      setError(e.message || '模拟决策失败');
+    } finally {
+      setResolving(false);
+    }
+  }
+
+  function applyExample(example: typeof SIMULATION_EXAMPLES[number]) {
+    setSimulateTaskType(example.taskType);
+    setSimulateTaskId(example.taskId);
+    setSimulateInputJson(JSON.stringify(example.input, null, 2));
+    setPracticalDecision(null);
+    setMsg(`已填充示例: ${example.label}`);
   }
 
   async function handleAttachFeedback(e: React.FormEvent) {
@@ -387,7 +557,7 @@ export default function CostRoutingPage() {
   return (
     <div className="cost-routing-page page-root">
       <PageHeader
-        title="成本路由 v2（强闭环）"
+        title="成本路由"
         subtitle="多维打分路由 + 决策反馈回填 + 近7天策略洞察"
       />
 
@@ -413,6 +583,38 @@ export default function CostRoutingPage() {
         </div>
       </div>
 
+      <div className="cr-practical-grid">
+        <SectionCard className={`role-card ${roleClass('gov')}`} title="内置策略模板">
+          <div className="cr-template-grid">
+            {(practicalConfig?.policy_templates || []).map((tpl) => (
+              <div className="cr-template-item" key={tpl.id}>
+                <div className="cr-template-head">
+                  <span className="cost-routing-policy-name">{tpl.id}</span>
+                  <span className={`cr-badge risk-${tpl.risk_level}`}>{tpl.risk_level}</span>
+                </div>
+                <div className="cost-routing-policy-meta">{tpl.name} · {tpl.task_type} -&gt; {tpl.route_type}</div>
+                <div className="cost-routing-policy-meta">cost={tpl.cost_level} · priority={tpl.priority}</div>
+                <div className="cr-template-desc">{tpl.description}</div>
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+
+        <SectionCard className={`role-card ${roleClass('exec')}`} title="本机能力感知（只读）">
+          <div className="cr-capability-grid">
+            {Object.entries(practicalConfig?.local_capabilities || {}).map(([key, value]) => (
+              <div className="cr-capability-item" key={key}>
+                <span>{key}</span>
+                <b>{value}</b>
+              </div>
+            ))}
+          </div>
+          <div className="cost-routing-policy-meta">
+            任务类型 {practicalConfig?.task_types?.length || 0} 个 · 路由目标 {practicalConfig?.route_targets?.length || 0} 个
+          </div>
+        </SectionCard>
+      </div>
+
       <div className="cr-top-grid">
         <SectionCard className={`role-card ${roleClass('gov')}`} title="新增路由策略">
         <form onSubmit={handleCreatePolicy} className="cr-form-grid">
@@ -435,13 +637,55 @@ export default function CostRoutingPage() {
         <SectionCard className={`role-card ${roleClass('exec')}`} title="模拟任务路由">
         <form onSubmit={handleResolve} className="cr-form-grid">
           <div className="cr-subtitle">模拟任务路由</div>
+          <div className="cr-example-row">
+            {SIMULATION_EXAMPLES.map((example) => (
+              <button className="ui-btn" type="button" key={example.taskId} onClick={() => applyExample(example)}>
+                {example.label}
+              </button>
+            ))}
+          </div>
           <div className="cr-dual-row">
             <input className="ui-input" value={simulateTaskType} onChange={(e) => setSimulateTaskType(e.target.value)} placeholder="任务类型" required />
             <input className="ui-input" value={simulateTaskId} onChange={(e) => setSimulateTaskId(e.target.value)} placeholder="task_id（模拟）" />
           </div>
           <textarea className="ui-textarea" value={simulateInputJson} onChange={(e) => setSimulateInputJson(e.target.value)} rows={4} placeholder='输入 JSON（input_json）' />
-          <button className="ui-btn ui-btn-primary" type="submit" disabled={resolving}>{resolving ? '决策中...' : '执行路由决策'}</button>
+          <div className="cr-action-row">
+            <button className="ui-btn" type="button" onClick={handlePracticalSimulate} disabled={resolving}>{resolving ? '模拟中...' : '只模拟解释'}</button>
+            <button className="ui-btn ui-btn-primary" type="submit" disabled={resolving}>{resolving ? '决策中...' : '写入路由决策'}</button>
+          </div>
         </form>
+        {practicalDecision ? (
+          <div className={`cr-decision-card risk-${practicalDecision.riskLevel}`}>
+            <div className="cr-decision-card-head">
+              <div>
+                <div className="cost-routing-policy-meta">推荐路线</div>
+                <div className="cr-route-name">{practicalDecision.selectedRoute}</div>
+              </div>
+              <div className="cr-badge-row">
+                <span className="cr-badge">cost={practicalDecision.costLevel}</span>
+                <span className={`cr-badge risk-${practicalDecision.riskLevel}`}>risk={practicalDecision.riskLevel}</span>
+                <span className={`cr-badge ${practicalDecision.needsUserConfirm ? 'risk-high' : 'risk-low'}`}>
+                  {practicalDecision.needsUserConfirm ? '需要确认' : '无需确认'}
+                </span>
+              </div>
+            </div>
+            <div className="cr-template-desc">{practicalDecision.reason}</div>
+            <div className="cr-subtitle">拒绝路线</div>
+            <div className="cr-mini-table">
+              {practicalDecision.rejectedRoutes.map((item) => (
+                <div className="cr-mini-row two-col" key={`${item.route}-${item.reason}`}>
+                  <span>{item.route}</span>
+                  <span>{item.reason}</span>
+                </div>
+              ))}
+            </div>
+            <div className="cr-subtitle">安全提示</div>
+            <ul className="cr-note-list">
+              {practicalDecision.safetyNotes.map((note) => <li key={note}>{note}</li>)}
+            </ul>
+            <div className="cr-next-action">{practicalDecision.nextAction}</div>
+          </div>
+        ) : null}
         </SectionCard>
       </div>
 

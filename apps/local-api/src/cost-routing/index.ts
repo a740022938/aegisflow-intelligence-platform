@@ -1,12 +1,50 @@
 import { FastifyInstance } from 'fastify';
 import { getDatabase } from '../db/builtin-sqlite.js';
 
-type RouteType = 'local_low_cost' | 'local_balanced' | 'cloud_high_capability';
+type RouteType =
+  | 'local_low_cost'
+  | 'local_balanced'
+  | 'cloud_high_capability'
+  | 'local_cpu'
+  | 'local_gpu'
+  | 'openclaw_stable_2026_3_23'
+  | 'openclaw_sidecar_2026_5_12'
+  | 'comfyui_8000'
+  | 'cloud_reasoning_model'
+  | 'manual_confirm'
+  | 'blocked';
 type RuleKind = 'exact' | 'fallback';
 type FeedbackOutcome = 'success' | 'partial' | 'failed' | 'timeout';
 
-const ROUTE_TYPES: RouteType[] = ['local_low_cost', 'local_balanced', 'cloud_high_capability'];
+const ROUTE_TYPES: RouteType[] = [
+  'local_low_cost',
+  'local_balanced',
+  'cloud_high_capability',
+  'local_cpu',
+  'local_gpu',
+  'openclaw_stable_2026_3_23',
+  'openclaw_sidecar_2026_5_12',
+  'comfyui_8000',
+  'cloud_reasoning_model',
+  'manual_confirm',
+  'blocked',
+];
 const STATUS_TYPES = ['active', 'disabled'];
+const PRACTICAL_TASK_TYPES = [
+  'text_inference',
+  'code_analysis',
+  'training',
+  'image_generation',
+  'image_to_video',
+  'readonly_audit',
+  'file_cleanup',
+  'github_release',
+  'memory_update',
+  'dataset_operation',
+] as const;
+type PracticalTaskType = typeof PRACTICAL_TASK_TYPES[number];
+type CostLevel = 'free' | 'low' | 'medium' | 'high' | 'unknown';
+type PracticalRiskLevel = 'low' | 'medium' | 'high' | 'blocked';
 
 type WeightKey = 'cost' | 'capability' | 'latency' | 'risk' | 'reliability' | 'load';
 type RouteWeightSet = Record<WeightKey, number>;
@@ -60,6 +98,17 @@ interface CandidateBreakdown {
   dominant_factors: string[];
 }
 
+interface PracticalDecision {
+  selectedRoute: RouteType;
+  costLevel: CostLevel;
+  riskLevel: PracticalRiskLevel;
+  needsUserConfirm: boolean;
+  reason: string;
+  rejectedRoutes: Array<{ route: RouteType; reason: string }>;
+  safetyNotes: string[];
+  nextAction: string;
+}
+
 const ROUTE_PROFILES: Record<RouteType, RouteProfile> = {
   local_low_cost: {
     route_type: 'local_low_cost',
@@ -91,6 +140,159 @@ const ROUTE_PROFILES: Record<RouteType, RouteProfile> = {
     throughput: 0.95,
     gpu_capacity: true,
   },
+  local_cpu: {
+    route_type: 'local_cpu',
+    cost_index: 0.08,
+    capability_index: 0.42,
+    latency_ms: 950,
+    risk_isolation: 0.94,
+    reliability: 0.86,
+    throughput: 0.58,
+    gpu_capacity: false,
+  },
+  local_gpu: {
+    route_type: 'local_gpu',
+    cost_index: 0.18,
+    capability_index: 0.78,
+    latency_ms: 720,
+    risk_isolation: 0.9,
+    reliability: 0.88,
+    throughput: 0.84,
+    gpu_capacity: true,
+  },
+  openclaw_stable_2026_3_23: {
+    route_type: 'openclaw_stable_2026_3_23',
+    cost_index: 0.12,
+    capability_index: 0.7,
+    latency_ms: 780,
+    risk_isolation: 0.9,
+    reliability: 0.92,
+    throughput: 0.72,
+    gpu_capacity: false,
+  },
+  openclaw_sidecar_2026_5_12: {
+    route_type: 'openclaw_sidecar_2026_5_12',
+    cost_index: 0.16,
+    capability_index: 0.76,
+    latency_ms: 860,
+    risk_isolation: 0.86,
+    reliability: 0.82,
+    throughput: 0.74,
+    gpu_capacity: true,
+  },
+  comfyui_8000: {
+    route_type: 'comfyui_8000',
+    cost_index: 0.14,
+    capability_index: 0.74,
+    latency_ms: 880,
+    risk_isolation: 0.84,
+    reliability: 0.84,
+    throughput: 0.7,
+    gpu_capacity: true,
+  },
+  cloud_reasoning_model: {
+    route_type: 'cloud_reasoning_model',
+    cost_index: 0.85,
+    capability_index: 0.98,
+    latency_ms: 520,
+    risk_isolation: 0.72,
+    reliability: 0.95,
+    throughput: 0.9,
+    gpu_capacity: false,
+  },
+  manual_confirm: {
+    route_type: 'manual_confirm',
+    cost_index: 0,
+    capability_index: 0.5,
+    latency_ms: 0,
+    risk_isolation: 1,
+    reliability: 1,
+    throughput: 0.1,
+    gpu_capacity: false,
+  },
+  blocked: {
+    route_type: 'blocked',
+    cost_index: 0,
+    capability_index: 0,
+    latency_ms: 0,
+    risk_isolation: 1,
+    reliability: 1,
+    throughput: 0,
+    gpu_capacity: false,
+  },
+};
+
+const BUILTIN_POLICY_TEMPLATES = [
+  {
+    id: 'cheap_text_inference',
+    name: '低成本文本推理',
+    task_type: 'text_inference',
+    route_type: 'local_cpu',
+    priority: 180,
+    cost_level: 'free',
+    risk_level: 'low',
+    description: '预算低、风险低的文本摘要、改写和轻量推理优先走本地 CPU 或便宜路线。',
+  },
+  {
+    id: 'strong_reasoning',
+    name: '强推理任务',
+    task_type: 'code_analysis',
+    route_type: 'cloud_reasoning_model',
+    priority: 150,
+    cost_level: 'medium',
+    risk_level: 'medium',
+    description: '复杂代码分析或强推理可建议云端强模型，但默认不自动调用。',
+  },
+  {
+    id: 'local_gpu_training',
+    name: '本地 GPU 训练',
+    task_type: 'training',
+    route_type: 'local_gpu',
+    priority: 170,
+    cost_level: 'low',
+    risk_level: 'medium',
+    description: '需要 GPU 的小训练优先建议 RTX 3060/CUDA 本地路径，必须用户确认。',
+  },
+  {
+    id: 'comfy_image_generation',
+    name: 'ComfyUI 生图',
+    task_type: 'image_generation',
+    route_type: 'openclaw_sidecar_2026_5_12',
+    priority: 165,
+    cost_level: 'low',
+    risk_level: 'medium',
+    description: '生图建议走 OpenClaw sidecar 或 ComfyUI 8000，只给建议不自动执行。',
+  },
+  {
+    id: 'readonly_audit',
+    name: '只读审计',
+    task_type: 'readonly_audit',
+    route_type: 'local_cpu',
+    priority: 190,
+    cost_level: 'free',
+    risk_level: 'low',
+    description: '只读摸底、报告和候选清单优先本地 CPU，禁止隐式写入。',
+  },
+  {
+    id: 'high_risk_manual_confirm',
+    name: '高风险人工确认',
+    task_type: '*',
+    route_type: 'manual_confirm',
+    priority: 200,
+    cost_level: 'unknown',
+    risk_level: 'high',
+    description: '发布、删除、移动、Memory 写入、训练等高风险动作必须先人工确认。',
+  },
+];
+
+const LOCAL_CAPABILITIES = {
+  aip: 'AIP v7.3.0 final',
+  local_gpu_available: 'unknown/mock: RTX 3060 / CUDA available',
+  openclaw_stable: '2026.3.23',
+  openclaw_sidecar: '2026.5.12 / 18799',
+  comfyui: '127.0.0.1:8000',
+  memory_hub: 'readonly',
+  openaxiom: 'readonly',
 };
 
 const DEFAULT_WEIGHTS: RouteWeightSet = {
@@ -686,6 +888,240 @@ function parseBodyInput(input: any): any {
   return {};
 }
 
+function normalizePracticalTaskType(v: any): PracticalTaskType {
+  const raw = String(v || '').trim().toLowerCase();
+  if ((PRACTICAL_TASK_TYPES as readonly string[]).includes(raw)) return raw as PracticalTaskType;
+  if (raw.includes('train')) return 'training';
+  if (raw.includes('image') && raw.includes('video')) return 'image_to_video';
+  if (raw.includes('image')) return 'image_generation';
+  if (raw.includes('cleanup') || raw.includes('delete') || raw.includes('move')) return 'file_cleanup';
+  if (raw.includes('release')) return 'github_release';
+  if (raw.includes('memory')) return 'memory_update';
+  if (raw.includes('audit')) return 'readonly_audit';
+  if (raw.includes('code')) return 'code_analysis';
+  return 'text_inference';
+}
+
+function targetText(input: any): string {
+  return [
+    input?.target,
+    input?.path,
+    input?.project,
+    input?.project_id,
+    input?.description,
+    input?.prompt,
+  ].map((item) => String(item || '').toLowerCase()).join(' ');
+}
+
+function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDecision {
+  const input = rawInput && typeof rawInput === 'object' ? rawInput : {};
+  const taskType = normalizePracticalTaskType(taskTypeRaw);
+  const budget = normalizeBudgetTier(input.budget_tier || input.budget);
+  const text = targetText(input);
+  const comfyAvailable = asBoolean(input.comfy_available, true);
+  const gpuNeeded = asBoolean(input.gpu_needed || input.requires_gpu, taskType === 'training');
+  const rejectedRoutes: PracticalDecision['rejectedRoutes'] = [];
+  const safetyNotes: string[] = [
+    '本接口只返回建议，不执行训练、推理、生图、发布、删除或写入。',
+  ];
+
+  if (text.includes('mahjong_v1_project')) {
+    return {
+      selectedRoute: 'blocked',
+      costLevel: 'unknown',
+      riskLevel: 'blocked',
+      needsUserConfirm: true,
+      reason: '目标命中受保护目录 Mahjong_V1_Project，本轮规则直接阻断。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '保护目录禁止修改、删除或移动。' },
+        { route: 'manual_confirm', reason: '任务包要求 Mahjong_V1_Project 为硬保护目录。' },
+      ],
+      safetyNotes: [...safetyNotes, '禁止修改 Mahjong_V1_Project。'],
+      nextAction: '停止该动作，仅允许生成只读审计报告。',
+    };
+  }
+
+  if (text.includes('openclaw') && (text.includes('2026.3.23') || text.includes('stable') || text.includes('覆盖'))) {
+    return {
+      selectedRoute: 'blocked',
+      costLevel: 'unknown',
+      riskLevel: 'blocked',
+      needsUserConfirm: true,
+      reason: '请求可能覆盖 OpenClaw 2026.3.23 稳定版，按保护规则阻断。',
+      rejectedRoutes: [
+        { route: 'openclaw_stable_2026_3_23', reason: '稳定版只能作为已知能力展示，禁止覆盖。' },
+      ],
+      safetyNotes: [...safetyNotes, '禁止修改全局 OpenClaw 2026.3.23。'],
+      nextAction: '改为 sidecar 或只读检查方案。',
+    };
+  }
+
+  if (taskType === 'github_release') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'unknown',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: 'GitHub Release 属于发布动作，本轮禁止自动创建 Release。',
+      rejectedRoutes: [
+        { route: 'cloud_reasoning_model', reason: '不需要云模型参与发布。' },
+        { route: 'local_cpu', reason: '发布动作需要人工确认和封板复验。' },
+      ],
+      safetyNotes: [...safetyNotes, '禁止 git push/tag/GitHub Release。'],
+      nextAction: '生成发布前检查清单，等待人工确认。',
+    };
+  }
+
+  if (taskType === 'memory_update') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'free',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: 'Memory Hub 写入会改变长期记忆，本轮只允许 readonly 展示。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '本地可分析，但写入需要人工确认。' },
+      ],
+      safetyNotes: [...safetyNotes, 'Memory Hub 当前能力标记为 readonly。'],
+      nextAction: '先生成候选更新说明，不直接写入 Memory Hub。',
+    };
+  }
+
+  if (taskType === 'file_cleanup') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'free',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: '删除/移动文件属于高风险动作，必须先人工确认。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '只可用于生成清理候选，不可直接执行删除/移动。' },
+      ],
+      safetyNotes: [...safetyNotes, '本轮禁止删除/移动 E 盘文件。'],
+      nextAction: '输出只读候选清单和风险说明。',
+    };
+  }
+
+  if (taskType === 'training') {
+    return {
+      selectedRoute: gpuNeeded ? 'local_gpu' : 'local_cpu',
+      costLevel: budget === 'low' ? 'low' : 'medium',
+      riskLevel: 'medium',
+      needsUserConfirm: true,
+      reason: gpuNeeded ? '训练任务需要 GPU，建议本地 RTX 3060/CUDA 路径，但不自动启动训练。' : '训练任务需人工确认后才可执行。',
+      rejectedRoutes: [
+        { route: 'cloud_reasoning_model', reason: '训练会产生额外成本且本轮禁止调用云模型。' },
+        { route: 'local_cpu', reason: gpuNeeded ? 'GPU 需求不适合 CPU 路线。' : 'CPU 训练可能耗时较长。' },
+      ],
+      safetyNotes: [...safetyNotes, '训练任务 needsUserConfirm=true。'],
+      nextAction: '准备训练前检查，不启动训练。',
+    };
+  }
+
+  if (taskType === 'image_generation') {
+    return {
+      selectedRoute: comfyAvailable ? 'openclaw_sidecar_2026_5_12' : 'manual_confirm',
+      costLevel: 'low',
+      riskLevel: 'medium',
+      needsUserConfirm: true,
+      reason: comfyAvailable ? 'ComfyUI 8000 已作为已知能力展示，建议通过 OpenClaw sidecar 2026.5.12 协调。' : '未确认 ComfyUI 可用，需人工确认。',
+      rejectedRoutes: [
+        { route: 'openclaw_stable_2026_3_23', reason: '稳定版不作为生图小盒子，避免影响主力稳定版。' },
+        { route: 'cloud_reasoning_model', reason: '本轮禁止真实云模型费用。' },
+      ],
+      safetyNotes: [...safetyNotes, '生图只给建议，不自动调用 ComfyUI。'],
+      nextAction: '等待用户确认后再进入 sidecar/ComfyUI 执行链。',
+    };
+  }
+
+  if (taskType === 'image_to_video') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'unknown',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: '图生视频成本和资源占用不确定，默认延后或人工确认。',
+      rejectedRoutes: [
+        { route: 'comfyui_8000', reason: '可能触发长耗时生成，本轮禁止图生视频。' },
+        { route: 'cloud_reasoning_model', reason: '禁止真实云模型费用。' },
+      ],
+      safetyNotes: [...safetyNotes, '图生视频不自动执行。'],
+      nextAction: '先确认预算、模型和输出规格。',
+    };
+  }
+
+  if (taskType === 'readonly_audit' || taskType === 'dataset_operation') {
+    return {
+      selectedRoute: 'local_cpu',
+      costLevel: 'free',
+      riskLevel: taskType === 'dataset_operation' ? 'medium' : 'low',
+      needsUserConfirm: taskType === 'dataset_operation',
+      reason: taskType === 'readonly_audit' ? '只读审计适合本地 CPU 路线。' : '数据集操作可能涉及文件写入，先给本地规则建议并要求确认。',
+      rejectedRoutes: [
+        { route: 'cloud_reasoning_model', reason: '本地可完成规则判断，无需产生云成本。' },
+      ],
+      safetyNotes,
+      nextAction: taskType === 'readonly_audit' ? '执行只读扫描并生成报告。' : '确认输出目录和写入范围后再执行。',
+    };
+  }
+
+  if (taskType === 'code_analysis' && budget !== 'low') {
+    return {
+      selectedRoute: 'cloud_reasoning_model',
+      costLevel: 'medium',
+      riskLevel: 'medium',
+      needsUserConfirm: true,
+      reason: '强推理代码分析可建议云端强模型，但本轮只返回建议，不产生费用。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '复杂推理质量可能不足。' },
+      ],
+      safetyNotes: [...safetyNotes, '调用云模型前必须人工确认预算。'],
+      nextAction: '先用本地规则缩小问题范围，再等待确认是否升级强推理。',
+    };
+  }
+
+  return {
+    selectedRoute: 'local_cpu',
+    costLevel: budget === 'low' ? 'free' : 'low',
+    riskLevel: 'low',
+    needsUserConfirm: false,
+    reason: '低风险文本推理优先使用本地 CPU 或便宜路线。',
+    rejectedRoutes: [
+      { route: 'cloud_reasoning_model', reason: '预算低或任务简单，暂不建议产生云成本。' },
+      { route: 'local_gpu', reason: '任务不需要 GPU。' },
+    ],
+    safetyNotes,
+    nextAction: '可直接进入本地 mock/规则验证，不调用外部模型。',
+  };
+}
+
+export function getPracticalConfig() {
+  return {
+    ok: true,
+    engine_version: 'v2-practical-rc1',
+    policy_templates: BUILTIN_POLICY_TEMPLATES,
+    task_types: PRACTICAL_TASK_TYPES,
+    route_targets: ROUTE_TYPES,
+    cost_levels: ['free', 'low', 'medium', 'high', 'unknown'],
+    risk_levels: ['low', 'medium', 'high', 'blocked'],
+    local_capabilities: LOCAL_CAPABILITIES,
+  };
+}
+
+export function simulatePracticalRoute(body: any) {
+  const taskType = String(body.task_type || '').trim();
+  if (!taskType) return { ok: false, error: 'task_type is required' };
+  const rawInput = parseBodyInput(body.input_json || body);
+  const decision = buildPracticalDecision(taskType, rawInput);
+  return {
+    ok: true,
+    engine_version: 'v2-practical-rc1',
+    task_type: normalizePracticalTaskType(taskType),
+    task_id: String(body.task_id || '').trim(),
+    decision,
+  };
+}
+
 export function resolveRoute(body: any) {
   try {
     const db = getDatabase();
@@ -753,6 +1189,7 @@ export function resolveRoute(body: any) {
       engine_version: 'v2',
       resolved_at: ts,
       context,
+      practical_decision: buildPracticalDecision(taskType, rawInput),
       selected: chosen
         ? {
             policy_id: chosen.policy_id,
@@ -1378,6 +1815,8 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
   app.put('/api/route-policies/:id', async (request: any) => updatePolicy(request.params.id, request.body || {}));
 
   app.post('/api/cost-routing/resolve', async (request: any) => resolveRoute(request.body || {}));
+  app.get('/api/cost-routing/practical-config', async () => getPracticalConfig());
+  app.post('/api/cost-routing/simulate', async (request: any) => simulatePracticalRoute(request.body || {}));
   app.get('/api/cost-routing/decisions', async (request: any) => listDecisions(request.query || {}));
   app.get('/api/cost-routing/decisions/:id', async (request: any) => getDecisionById(request.params.id));
   app.post('/api/cost-routing/feedback', async (request: any) => attachDecisionFeedback(request.body || {}));
