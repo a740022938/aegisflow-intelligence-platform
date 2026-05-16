@@ -1907,8 +1907,13 @@ function getTaskLabel(taskType: PracticalTaskType): string {
     readonly_audit: '项目只读巡检',
     file_cleanup: '高风险系统操作',
     github_release: 'Git 发布/版本封板',
+    github_release_prep_preview: 'GitHub 发布准备度预览',
     memory_update: '高风险系统操作',
     dataset_operation: '数据集/YOLO/Mahjong',
+    openaxiom_readonly_observer: 'OpenAxiom 只读状态观察',
+    comfyui_readonly_observer: 'ComfyUI 只读状态观察',
+    openclaw_readonly_observer: 'OpenClaw 只读状态观察',
+    mahjong_readonly_audit_preview: 'Mahjong 只读审计预览',
   };
   return labels[taskType];
 }

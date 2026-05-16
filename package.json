@@ -21,6 +21,8 @@
     "lint:fix": "eslint \"apps/**/*.{ts,tsx}\" --fix",
     "format": "prettier --write \"apps/**/*.{ts,tsx,css,json}\"",
     "format:check": "prettier --check \"apps/**/*.{ts,tsx,css,json}\"",
+    "typecheck": "npm --prefix apps/local-api run typecheck && npm --prefix apps/web-ui run typecheck",
+    "secret:scan": "node scripts/secret-scan.mjs",
     "test": "node tests/smoke-v7.mjs 2>&1 || echo [INFO] Smoke tests require API running at http://127.0.0.1:8787",
     "test:smoke": "node tests/smoke-v7.mjs",
     "test:smoke:rc2": "tsx tests/smoke-v7-rc2-boundaries.mjs",
