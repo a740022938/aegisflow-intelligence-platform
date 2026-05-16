@@ -896,6 +896,35 @@
   border-color: color-mix(in srgb, var(--danger) 50%, var(--border-subtle));
 }
 
+.cr-mh-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.cr-mh-results {
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.cr-mh-summary-row {
+  padding: 8px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+}
+
+.cr-mh-context-box {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+}
+
 .cr-selfcheck-grid {
   display: grid;
   gap: 12px;

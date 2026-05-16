@@ -2091,6 +2091,25 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
     };
   }
 
+  if (taskType === 'memory_update' && (text.includes('查') || text.includes('读') || text.includes('搜索') || text.includes('检索') || text.includes('上下文') || text.includes('记忆') || text.includes('上下文'))) {
+    return {
+      selectedRoute: 'local_cpu',
+      costLevel: 'free',
+      riskLevel: 'low',
+      needsUserConfirm: false,
+      reason: 'Memory Hub 只读上下文查询预览。只返回只读上下文摘要，不写 sqlite、不改 candidate。',
+      rejectedRoutes: [
+        { route: 'manual_confirm', reason: '纯只读查询无需人工确认。' },
+        { route: 'cloud_reasoning_model', reason: '不需要云模型参与上下文查询。' },
+      ],
+      safetyNotes: [
+        'Memory Hub 当前仅 readonly preview，不写数据库、不改 candidate、不同步 LAN_SHARE。',
+        '如需写入 Memory Hub，必须另开明确授权任务。',
+      ],
+      nextAction: '调用 POST /api/cost-routing/context-lookup-preview 获取只读上下文预览。',
+    };
+  }
+
   if (taskType === 'memory_update') {
     return {
       selectedRoute: 'manual_confirm',
@@ -2246,7 +2265,7 @@ const ROUTE_ACTION_TYPES = [
 export function getPracticalConfig() {
   return {
     ok: true,
-    engine_version: 'v7.5.1-status-dashboard-candidate',
+    engine_version: 'v7.6.0-memory-hub-context-candidate',
     policy_templates: BUILTIN_POLICY_TEMPLATES,
     strategy_modes: Object.values(STRATEGY_MODES),
     task_console_types: TASK_CONSOLE_TYPES,
@@ -2292,7 +2311,7 @@ export function simulatePracticalRoute(body: any) {
   const decision = enrichPracticalDecision(buildPracticalDecision(taskType, enrichedInput), normalizedTaskType, enrichedInput);
   return {
     ok: true,
-    engine_version: 'v7.5.1-status-dashboard-candidate',
+    engine_version: 'v7.6.0-memory-hub-context-candidate',
     task_type: normalizedTaskType,
     task_id: String(body.task_id || '').trim(),
     decision,
@@ -3097,6 +3116,84 @@ function selfCheckRoute() {
   };
 }
 
+const MEMORY_HUB_READONLY_CONTRACT = {
+  targetSystem: 'memory_hub',
+  integrationMode: 'readonly_context_lookup_preview',
+  actionType: 'read_only_check',
+  executionMode: 'read_only',
+  persistenceMode: 'preview_only',
+  memoryHubWrite: false,
+  sqliteWrite: false,
+  candidateWrite: false,
+  lanShareSync: false,
+  approveRejectArchive: false,
+  externalMutation: false,
+} as const;
+
+function contextLookupPreview(body: any) {
+  const input = body && typeof body === 'object' ? body : {};
+  const nowStr = now();
+  const forbiddenMemoryActions = [
+    'approve candidate', 'reject candidate', 'archive candidate',
+    'write sqlite', 'sync LAN_SHARE', 'import memory',
+    'delete memory', 'modify candidate', 'batch approve',
+  ];
+  return {
+    ok: true,
+    ...MEMORY_HUB_READONLY_CONTRACT,
+    timestamp: nowStr,
+    lookupStatus: 'preview_ready',
+    querySummary: `查询: ${String(input.query || input.projectHint || '项目上下文')} · 范围: ${String(input.scopeHint || 'general')}`,
+    contextPreview: `Memory Hub readonly 上下文预览（preview_only，不写数据库、不改 Memory Hub）。` +
+      `项目上下文摘要：当前 AIP 成本路由已从 v7.3.2 推进至 v7.5.1，` +
+      `具备 Router Core / Route Registry / Console Expansion / UX Polish / Integration Foundation /` +
+      `Integration Rehearsal / Readonly Self-check / Status Dashboard 能力。` +
+      `Memory Hub 为 readonly 状态。`,
+    candidatePreviewDisabled: true,
+    safetyBoundary: {
+      sqliteWrite: false,
+      candidateWrite: false,
+      approveRejectArchive: false,
+      lanShareSync: false,
+      memoryImport: false,
+      memoryDelete: false,
+    },
+    forbiddenActions: forbiddenMemoryActions,
+    nextSafeStep: '仅展示只读上下文预览。如需写入/审批/同步，必须另开明确授权任务。',
+    auditPreview: {
+      auditSchemaVersion: 'preview-v2',
+      mode: 'preview_only',
+      wouldExecute: false,
+      wouldWriteFiles: false,
+      databaseWrite: false,
+      fileWrite: false,
+      externalWrite: false,
+      timestamp: nowStr,
+      taskSummary: 'Memory Hub readonly context lookup preview',
+      selectedPolicy: 'stable_first',
+      detectedCategory: 'context_lookup',
+      actionType: 'read_only_check',
+      riskLevel: 'low',
+      executionMode: 'read_only',
+      confidence: 'medium',
+      matchedRiskRules: [],
+      recommendedRoute: 'local_cpu',
+      recommendedModelTier: 'local',
+      deniedActions: forbiddenMemoryActions,
+      readOnlyPrechecks: ['确认只读边界', '确认不执行 Memory Hub 写入操作'],
+      nextSafeStep: '输出只读上下文预览',
+      rollbackRequired: false,
+      auditMode: 'preview_only',
+      requiredConfirmations: [],
+      rollbackPlan: ['本轮不执行任何 Memory Hub 写入，无需回滚。'],
+      auditIdPreview: genId('audit-memory-hub'),
+      persistenceMode: 'preview_only' as const,
+      selectedModelRoute: 'local' as ModelTier,
+      selectedToolchainRoute: 'memory_hub_candidate_dry_run',
+    },
+  };
+}
+
 export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/route-policies', async (request: any) => listPolicies(request.query || {}));
   app.get('/api/route-policies/:id', async (request: any) => getPolicyById(request.params.id));
@@ -3113,7 +3210,7 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
   app.post('/api/cost-routing/optimize', async (request: any) => optimizeRouting(request.body || {}));
 
   app.get('/api/cost-routing/self-check', async () => selfCheckRoute());
-
+  app.post('/api/cost-routing/context-lookup-preview', async (request: any) => contextLookupPreview(request.body || {}));
   app.get('/api/cost-routing/route-types', async () => ({
     ok: true,
     engine_version: 'v2',

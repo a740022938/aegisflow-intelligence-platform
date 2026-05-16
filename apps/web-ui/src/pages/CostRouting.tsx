@@ -599,6 +599,8 @@ export default function CostRoutingPage() {
   const [routingModelRoute, setRoutingModelRoute] = useState<string>('');
   const [selfCheckResult, setSelfCheckResult] = useState<any>(null);
   const [selfCheckLoading, setSelfCheckLoading] = useState(false);
+  const [memoryHubPreview, setMemoryHubPreview] = useState<any>(null);
+  const [memoryHubLoading, setMemoryHubLoading] = useState(false);
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
@@ -883,6 +885,26 @@ export default function CostRoutingPage() {
     }
   }
 
+  async function handleMemoryHubPreview() {
+    setMemoryHubLoading(true);
+    setError('');
+    setMsg('');
+    try {
+      const res = await api('/api/cost-routing/context-lookup-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: '项目上下文', projectHint: 'AIP cost-routing', scopeHint: 'general', readonlyOnly: true }),
+      });
+      if (!res.ok) throw new Error(res.error || 'Memory Hub 只读查询预览失败');
+      setMemoryHubPreview(res);
+      setMsg('Memory Hub 只读上下文预览已生成。未写 Memory Hub、未改 candidate。');
+    } catch (e: any) {
+      setError(e.message || 'Memory Hub 预览失败');
+    } finally {
+      setMemoryHubLoading(false);
+    }
+  }
+
   async function runOptimization(mode: 'preview' | 'apply') {
     setOptimizing(true);
     setError('');
@@ -965,27 +987,27 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-            <b>v7.5.1 Readonly Status Dashboard</b>
+            <b>v7.6.0 Memory Hub Readonly Context Preview</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前能力</span>
-            <b>AIP self-check readonly integration + quality gate</b>
+            <b>AIP self-check + Memory Hub readonly context preview</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前模式</span>
-            <b>read_only / quality gate / no repair</b>
+            <b>read_only / preview_only / no write</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">写入 / 外部触碰 / 修复</span>
-            <b>disabled / disabled / disabled</b>
+            <span className="cr-dashboard-key">candidate 动作</span>
+            <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">发布动作</span>
-            <b>manual only</b>
+            <span className="cr-dashboard-key">LAN_SHARE 同步</span>
+            <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">下一步建议</span>
-            <b>先观察状态，再决定是否进入外部系统只读接入</b>
+            <span className="cr-dashboard-key">外部变更</span>
+            <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">策略总数 / 近7天决策 / 回填反馈 / 建议</span>
@@ -1086,6 +1108,47 @@ export default function CostRoutingPage() {
             </div>
           ) : (
             <div className="cost-routing-policy-meta">尚未执行自检。点击"运行 AIP 只读自检"按钮获取状态面板和质量门禁结果。</div>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="Memory Hub 只读上下文查询预览 Memory Hub Context Lookup Preview">
+        <div className="cr-registry-note">仅只读上下文预览。不写 sqlite、不改 candidate、不同步 LAN_SHARE、不 approve/reject/archive。</div>
+        <div className="cr-mh-grid">
+          <div className="cr-selfcheck-controls">
+            <button className="ui-btn ui-btn-primary" type="button" onClick={handleMemoryHubPreview} disabled={memoryHubLoading}>
+              {memoryHubLoading ? '生成中...' : '生成 Memory Hub 只读查询预览'}
+            </button>
+          </div>
+          {memoryHubPreview ? (
+            <div className="cr-mh-results">
+              <div className="cr-selfcheck-header">
+                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{memoryHubPreview.integrationMode}</span>
+                <span className="cr-badge">{memoryHubPreview.actionType}</span>
+                <span className="cr-badge">target: {memoryHubPreview.targetSystem}</span>
+                <span className="cr-badge">{memoryHubPreview.persistenceMode}</span>
+              </div>
+              <div className="cr-mh-summary-row">
+                <span className="cost-routing-policy-meta"><b>查询摘要</b>：{memoryHubPreview.querySummary}</span>
+              </div>
+              <div className="cr-mh-context-box">
+                <div className="cr-subtitle">上下文预览 Context Preview</div>
+                <div className="cr-template-desc">{memoryHubPreview.contextPreview}</div>
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
+              <div className="cr-selfcheck-grid-inner">
+                <div className="cr-pp-item"><span className="cr-pp-key">sqliteWrite</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.sqliteWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">candidateWrite</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.candidateWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">approveRejectArchive</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.approveRejectArchive)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">lanShareSync</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.lanShareSync)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">memoryImport</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.memoryImport)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">memoryDelete</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.memoryDelete)}</b></div>
+              </div>
+              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(memoryHubPreview.forbiddenActions || []).join(' / ')}</div>
+              <div className="cr-next-action" style={{ marginTop: '6px' }}>{memoryHubPreview.nextSafeStep}</div>
+            </div>
+          ) : (
+            <div className="cost-routing-policy-meta">尚未生成 Memory Hub 只读查询预览。点击按钮获取只读上下文预览。</div>
           )}
         </div>
       </SectionCard>
