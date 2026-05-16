@@ -1117,13 +1117,13 @@ export default function CostRoutingPage() {
     <div className="cost-routing-page page-root">
       <PageHeader
         title="AI Router Console / 成本路由策略台"
-        subtitle="AI Task Router Console — 成本路由控制台。当前为 preview_only 模式：只做建议和审计预览，不执行真实操作、不写数据库、不调外部系统。"
+        subtitle="AIP Core v7.3.1 · Cost Routing v7.12.2 · 当前为只读/预览模式，不执行真实操作、不写数据库、不调外部系统。no tag / no push / no release。"
       />
 
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>v7.12.1 cost routing ux compact polish (preview_only)</b>
+          <b>AIP Core v7.3.1 · Cost Routing v7.12.2 (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>

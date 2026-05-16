@@ -173,6 +173,7 @@ export default function AssistantCenter() {
     return {
       total: items.length,
       online: items.filter(item => item.status === 'online').length,
+      offline,
       state: offline > 0 ? 'degraded' : mediumOrHigher > 0 || unknown > 0 ? 'warning' : 'healthy',
       risk: offline > 0 ? 'high' : mediumOrHigher > 0 ? 'medium' : 'low',
     };
@@ -217,6 +218,13 @@ export default function AssistantCenter() {
         <div>
           <span className="assistant-topbar-label">风险等级</span>
           <RiskBadge value={topSummary.risk} />
+          {topSummary.risk !== 'low' && (
+            <div className="cost-routing-policy-meta" style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+              {topSummary.offline > 0
+                ? `${topSummary.offline} 个外部组件离线，风险等级升高。AIP 核心仍在线，不影响核心路由与决策能力。`
+                : '部分外部组件存在中高风险项，反映外部助手生态状态，不代表 AIP 核心健康度。'}
+            </div>
+          )}
         </div>
         <div>
           <span className="assistant-topbar-label">在线项</span>
