@@ -274,6 +274,37 @@ interface PracticalConfig {
   local_capabilities: Record<string, string>;
   model_route_registry?: ModelRouteEntry[];
   toolchain_registry?: ToolchainEntry[];
+  release_readiness_gates?: ReleaseReadinessGate[];
+  external_integrations?: ExternalIntegration[];
+}
+
+interface ReleaseReadinessGate {
+  id: string;
+  label: string;
+  forTask: string;
+  severity: string;
+}
+
+interface ExternalIntegration {
+  id: string;
+  name: string;
+  description: string;
+  integrationStatus: string;
+  note: string;
+}
+
+interface RoutingHistoryEntry {
+  previewId: string;
+  taskSummary: string;
+  selectedPolicy: string;
+  selectedModelRoute: string;
+  selectedToolchainRoute: string;
+  riskLevel: string;
+  confidence: string;
+  executionMode: string;
+  nextSafeStep: string;
+  persistenceMode: 'preview_only';
+  timestamp: string;
 }
 
 interface SimulationExample {
@@ -487,6 +518,9 @@ export default function CostRoutingPage() {
   const [simulateInputJson, setSimulateInputJson] = useState('{"budget":"low","gpu_needed":true}');
   const [strategyMode, setStrategyMode] = useState<StrategyMode>('stable_first');
 
+  const [routingHistory, setRoutingHistory] = useState<RoutingHistoryEntry[]>([]);
+  const [routingModelRoute, setRoutingModelRoute] = useState<string>('');
+
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
   const [feedbackCost, setFeedbackCost] = useState('');
@@ -648,7 +682,9 @@ export default function CostRoutingPage() {
       if (!res.ok) throw new Error(res.error || '路由决策失败');
 
       const d = res.decision;
-      setPracticalDecision(d.input_json?.__routing?.practical_decision || null);
+      const practical = d.input_json?.__routing?.practical_decision || null;
+      setPracticalDecision(practical);
+      if (practical) pushRoutingHistory(practical);
       setMsg(`路由命中: ${d.route_type} | reason: ${d.route_reason}`);
       setSelectedDecisionId(d.id);
       await Promise.all([loadDecisions(), loadDecisionDetail(d.id), loadInsights()]);
@@ -681,13 +717,32 @@ export default function CostRoutingPage() {
         }),
       });
       if (!res.ok) throw new Error(res.error || '模拟决策失败');
-      setPracticalDecision(res.decision || null);
-      setMsg(`模拟建议: ${res.decision?.selectedRoute} · risk=${res.decision?.riskLevel}`);
+      const simDecision = res.decision || null;
+      setPracticalDecision(simDecision);
+      if (simDecision) pushRoutingHistory(simDecision);
+      setMsg(`模拟建议: ${simDecision?.selectedRoute} · risk=${simDecision?.riskLevel}`);
     } catch (e: any) {
       setError(e.message || '模拟决策失败');
     } finally {
       setResolving(false);
     }
+  }
+
+  function pushRoutingHistory(decision: PracticalDecision) {
+    const entry: RoutingHistoryEntry = {
+      previewId: `preview-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+      taskSummary: decision.taskLabel || simulateTaskType,
+      selectedPolicy: decision.strategyMode || strategyMode,
+      selectedModelRoute: decision.recommendedModelTier || 'N/A',
+      selectedToolchainRoute: decision.recommendedToolchain?.primary || 'N/A',
+      riskLevel: decision.riskLevel,
+      confidence: decision.confidence || 'N/A',
+      executionMode: decision.executionMode || 'N/A',
+      nextSafeStep: decision.nextAction,
+      persistenceMode: 'preview_only',
+      timestamp: new Date().toLocaleString('zh-CN'),
+    };
+    setRoutingHistory((prev) => [entry, ...prev].slice(0, 20));
   }
 
   function applyExample(example: SimulationExample) {
@@ -785,13 +840,13 @@ export default function CostRoutingPage() {
     <div className="cost-routing-page page-root">
       <PageHeader
         title="AI Router Console / 成本路由策略台"
-        subtitle="AI Task Router Core v7.3.3，Route Registry + Audit Preview Foundation；当前只做建议、dry-run 和审计预览，不执行真实操作"
+        subtitle="AI Task Router Console v7.3.4，Console Expansion；当前只做建议、dry-run、preview_only，不执行真实操作"
       />
 
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>基线</span>
-          <b>v7.3.3 route-registry candidate</b>
+          <b>v7.3.4 console-expansion candidate</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -810,6 +865,31 @@ export default function CostRoutingPage() {
           <b>不自动 push、删除、训练或覆盖</b>
         </div>
       </div>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="控制台摘要 Console Dashboard">
+        <div className="cr-dashboard-grid">
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">当前模式</span>
+            <b>AI Task Router Console v7.3.4</b>
+          </div>
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">安全状态</span>
+            <b>preview_only / dry-run first / high risk requires human</b>
+          </div>
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">当前能力</span>
+            <b>Router Core / Route Registry / Audit Preview / Release Readiness Preview</b>
+          </div>
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">当前禁止</span>
+            <b>no real execution / no DB write / no external integration call</b>
+          </div>
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">下一步建议</span>
+            <b>先只读检查，再人工确认；高风险任务必须拆为子步骤</b>
+          </div>
+        </div>
+      </SectionCard>
 
       <div className={`cr-registry-disclaimer role-card ${roleClass('warn')}`}>
         <div className="cr-disclaimer-content">
@@ -866,11 +946,27 @@ export default function CostRoutingPage() {
         </SectionCard>
       </div>
 
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="外部系统接入占位 External Integration Preview">
+        <div className="cr-registry-note">均为 planned / preview_only，不实际调用。</div>
+        <div className="cr-external-grid">
+          {(practicalConfig?.external_integrations || []).map((entry) => (
+            <div className="cr-external-card" key={entry.id}>
+              <div className="cr-template-head">
+                <b>{entry.name}</b>
+                <span className="cr-badge">{entry.integrationStatus}</span>
+              </div>
+              <div className="cr-template-desc">{entry.description}</div>
+              <div className="cost-routing-policy-meta">约束：{entry.note}</div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
       <SectionCard className={`role-card ${roleClass('gov')}`} title="策略配置预览 Policy Config Preview">
         <div className="cr-registry-note">当前为策略预览，不写入配置文件，不写数据库。</div>
         <div className="cr-policy-preview-grid">
           <div className="cr-pp-item">
-            <span className="cr-pp-key">当前策略档位</span>
+            <span className="cr-pp-key">defaultPolicy</span>
             <b className="cr-pp-val">{strategyMode}</b>
           </div>
           <div className="cr-pp-item">
@@ -882,20 +978,36 @@ export default function CostRoutingPage() {
             <b className="cr-pp-val">{practicalDecision?.recommendedToolchain?.primary || '待决策'}</b>
           </div>
           <div className="cr-pp-item">
-            <span className="cr-pp-key">风险容忍度</span>
-            <b className="cr-pp-val">{(practicalConfig?.strategy_modes || []).find((m) => m.id === strategyMode)?.riskTolerance || 'low'}</b>
+            <span className="cr-pp-key">allowCloud</span>
+            <b className="cr-pp-val">{practicalDecision?.executionMode === 'cloud_allowed' ? '是' : '否'}</b>
           </div>
           <div className="cr-pp-item">
-            <span className="cr-pp-key">只读优先</span>
-            <b className="cr-pp-val">{practicalDecision?.executionMode === 'read_only' ? '是' : '否'}</b>
+            <span className="cr-pp-key">preferLocal</span>
+            <b className="cr-pp-val">{strategyMode === 'local_first' || strategyMode === 'save_money' ? '是' : '否'}</b>
           </div>
           <div className="cr-pp-item">
-            <span className="cr-pp-key">Dry-Run 优先</span>
+            <span className="cr-pp-key">requireDryRunForMediumRisk</span>
             <b className="cr-pp-val">{practicalDecision?.executionMode === 'dry_run' ? '是' : '否'}</b>
           </div>
           <div className="cr-pp-item">
-            <span className="cr-pp-key">需要人工确认</span>
+            <span className="cr-pp-key">requireHumanForHighRisk</span>
             <b className="cr-pp-val">{practicalDecision?.needsUserConfirm ? '是' : '否'}</b>
+          </div>
+          <div className="cr-pp-item">
+            <span className="cr-pp-key">blockDangerousSystemActions</span>
+            <b className="cr-pp-val">{practicalDecision?.riskLevel === 'blocked' ? '是' : '是（默认）'}</b>
+          </div>
+          <div className="cr-pp-item">
+            <span className="cr-pp-key">auditPreviewOnly</span>
+            <b className="cr-pp-val">是</b>
+          </div>
+          <div className="cr-pp-item">
+            <span className="cr-pp-key">releaseActionsRequireManualApproval</span>
+            <b className="cr-pp-val">{simulateTaskType === 'git_release_seal' || simulateTaskType === 'github_release' ? '是' : '是（默认）'}</b>
+          </div>
+          <div className="cr-pp-item">
+            <span className="cr-pp-key">externalIntegrationsPreviewOnly</span>
+            <b className="cr-pp-val">是（preview_only）</b>
           </div>
           <div className="cr-pp-item">
             <span className="cr-pp-key">失败升级路线</span>
@@ -1460,6 +1572,71 @@ export default function CostRoutingPage() {
               {savingFeedback ? '回填中...' : '提交反馈回填'}
             </button>
           </form>
+        </SectionCard>
+      </div>
+
+      <div className="cr-bottom-grid">
+        <SectionCard className={`role-card ${roleClass('gov')}`} title="发布准备度预览 Release Readiness Preview">
+          <div className="cr-registry-note">只做判断和建议，不执行任何发布动作。禁止自动 tag / push / release。</div>
+          <div className="cr-mini-table">
+            {simulateTaskType === 'git_release_seal' || simulateTaskType === 'github_release' ? (
+              <>
+                <div className="cr-mini-row"><span>发布风险等级</span><span className="cr-badge risk-high">high</span></div>
+                <div className="cr-mini-row"><span>需要人工确认</span><span>是（human_confirm_required）</span></div>
+                <div className="cr-mini-row"><span>推荐前置门禁</span><span>{(practicalConfig?.release_readiness_gates || []).filter((g) => g.forTask === 'github_release').map((g) => g.label).join(' / ')}</span></div>
+                <div className="cr-mini-row"><span>禁止自动执行</span><span>git push / git tag / GitHub Release</span></div>
+                <div className="cr-subtitle" style={{ marginTop: '8px' }}>门禁检查清单</div>
+                {(practicalConfig?.release_readiness_gates || []).filter((g) => g.forTask === 'github_release').map((gate) => (
+                  <div className="cr-mini-row" key={gate.id}>
+                    <span>{gate.label}</span>
+                    <span className={`cr-badge ${gate.severity === 'required' ? 'risk-high' : 'risk-medium'}`}>{gate.severity === 'required' ? '必需' : '推荐'}</span>
+                  </div>
+                ))}
+              </>
+            ) : simulateTaskType === 'high_risk_system_ops' ? (
+              <>
+                <div className="cr-mini-row"><span>发布风险等级</span><span className="cr-badge risk-blocked">blocked</span></div>
+                <div className="cr-mini-row"><span>需要人工确认</span><span>是（human_confirm_required）</span></div>
+                <div className="cr-mini-row"><span>推荐只读检查</span><span>生成清理候选清单 / 确认目标路径</span></div>
+                <div className="cr-mini-row"><span>禁止自动执行</span><span>delete / move / taskkill</span></div>
+              </>
+            ) : (
+              <>
+                <div className="cr-mini-row"><span>发布风险等级</span><span className="cr-badge risk-low">low / medium</span></div>
+                <div className="cr-mini-row"><span>需要人工确认</span><span>{practicalDecision?.needsUserConfirm ? '是' : '否'}</span></div>
+                <div className="cr-mini-row"><span>推荐只读检查</span><span>确认任务范围 / 生成 dry-run 结果</span></div>
+                <div className="cr-mini-row"><span>禁止自动执行</span><span>仅限高风险动作</span></div>
+              </>
+            )}
+          </div>
+        </SectionCard>
+
+        <SectionCard className={`role-card ${roleClass('exec')}`} title="路由历史预览 Routing History Preview">
+          <div className="cr-registry-note">当前为路由历史预览，不写入数据库。仅保留最近 20 条。</div>
+          {routingHistory.length === 0 ? (
+            <div className="cost-routing-policy-meta">暂无历史。执行一次模拟路由即可生成预览记录。</div>
+          ) : (
+            <div className="cr-history-list">
+              {routingHistory.map((entry) => (
+                <div className="cr-history-item" key={entry.previewId}>
+                  <div className="cr-template-head">
+                    <b>{entry.taskSummary}</b>
+                    <span className={`cr-badge risk-${entry.riskLevel}`}>risk={entry.riskLevel}</span>
+                  </div>
+                  <div className="cr-history-meta">
+                    <span>{entry.selectedPolicy}</span>
+                    <span>{entry.executionMode}</span>
+                    <span>{entry.confidence}</span>
+                  </div>
+                  <div className="cr-history-meta">
+                    <span>模型:{entry.selectedModelRoute}</span>
+                    <span>工具链:{entry.selectedToolchainRoute}</span>
+                  </div>
+                  <div className="cost-routing-policy-meta">{entry.timestamp} · {entry.persistenceMode}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </SectionCard>
       </div>
 

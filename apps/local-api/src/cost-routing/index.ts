@@ -703,6 +703,58 @@ const TOOLCHAIN_REGISTRY = [
   },
 ] as const;
 
+const RELEASE_READINESS_GATES = [
+  { id: 'git_diff_check', label: 'git diff --check', forTask: 'github_release', severity: 'required' },
+  { id: 'lint', label: 'lint', forTask: 'github_release', severity: 'required' },
+  { id: 'build', label: 'build', forTask: 'github_release', severity: 'required' },
+  { id: 'smoke_test', label: 'smoke test', forTask: 'github_release', severity: 'required' },
+  { id: 'db_doctor', label: 'db doctor', forTask: 'github_release', severity: 'required' },
+  { id: 'secret_scan', label: 'secret scan', forTask: 'github_release', severity: 'recommended' },
+  { id: 'release_notes', label: 'release notes draft', forTask: 'github_release', severity: 'recommended' },
+  { id: 'human_confirmation', label: 'human confirmation', forTask: 'github_release', severity: 'required' },
+  { id: 'readonly_audit', label: '只读审计', forTask: 'readonly_audit', severity: 'required' },
+  { id: 'risk_firewall_check', label: '风险防火墙检查', forTask: '*', severity: 'required' },
+  { id: 'preview_only_confirm', label: 'preview_only 确认', forTask: '*', severity: 'required' },
+] as const;
+
+const EXTERNAL_INTEGRATIONS = [
+  {
+    id: 'openclaw',
+    name: 'OpenClaw',
+    description: '未来可接任务执行/只读观察；当前 preview_only。',
+    integrationStatus: 'preview_only',
+    note: '不启动、不修改、不覆盖 OpenClaw。',
+  },
+  {
+    id: 'comfyui',
+    name: 'ComfyUI',
+    description: '未来可接生图工作流；当前 preview_only。',
+    integrationStatus: 'preview_only',
+    note: '不启动、不生成图。',
+  },
+  {
+    id: 'memory_hub',
+    name: 'Memory Hub',
+    description: '未来可接知识检索/候选 dry-run；当前 preview_only。',
+    integrationStatus: 'preview_only',
+    note: '不 approve/reject/archive，不写 sqlite。',
+  },
+  {
+    id: 'github',
+    name: 'GitHub',
+    description: '未来可接 release-prep；当前禁止自动 tag/push/release。',
+    integrationStatus: 'preview_only',
+    note: '只做 release-prep / gate check。',
+  },
+  {
+    id: 'mahjong',
+    name: 'Mahjong',
+    description: '未来可接数据集只读审计；当前不扫描、不修改。',
+    integrationStatus: 'preview_only',
+    note: '不扫描大文件、不移动、不删除、不修改。',
+  },
+] as const;
+
 const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: RouteType; modelTier: ModelTier; executionMode: ExecutionMode; note: string }>> = {
   text_inference: {
     save_money: { route: 'local_cpu', modelTier: 'economy', executionMode: 'cloud_allowed', note: '简单问答低风险，可建议 economy/cloud_allowed，但不自动真实调用。' },
@@ -1939,7 +1991,7 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
 export function getPracticalConfig() {
   return {
     ok: true,
-    engine_version: 'v7.3.3-route-registry-candidate',
+    engine_version: 'v7.3.4-console-expansion-candidate',
     policy_templates: BUILTIN_POLICY_TEMPLATES,
     strategy_modes: Object.values(STRATEGY_MODES),
     task_console_types: TASK_CONSOLE_TYPES,
@@ -1967,6 +2019,8 @@ export function getPracticalConfig() {
     local_capabilities: LOCAL_CAPABILITIES,
     model_route_registry: MODEL_ROUTE_REGISTRY,
     toolchain_registry: TOOLCHAIN_REGISTRY,
+    release_readiness_gates: RELEASE_READINESS_GATES,
+    external_integrations: EXTERNAL_INTEGRATIONS,
   };
 }
 
