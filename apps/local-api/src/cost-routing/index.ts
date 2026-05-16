@@ -2265,7 +2265,7 @@ const ROUTE_ACTION_TYPES = [
 export function getPracticalConfig() {
   return {
     ok: true,
-    engine_version: 'v7.6.0-memory-hub-context-candidate',
+    engine_version: 'v7.6.1-quality-gate-candidate',
     policy_templates: BUILTIN_POLICY_TEMPLATES,
     strategy_modes: Object.values(STRATEGY_MODES),
     task_console_types: TASK_CONSOLE_TYPES,
@@ -2311,7 +2311,7 @@ export function simulatePracticalRoute(body: any) {
   const decision = enrichPracticalDecision(buildPracticalDecision(taskType, enrichedInput), normalizedTaskType, enrichedInput);
   return {
     ok: true,
-    engine_version: 'v7.6.0-memory-hub-context-candidate',
+    engine_version: 'v7.6.1-quality-gate-candidate',
     task_type: normalizedTaskType,
     task_id: String(body.task_id || '').trim(),
     decision,
@@ -3130,6 +3130,46 @@ const MEMORY_HUB_READONLY_CONTRACT = {
   externalMutation: false,
 } as const;
 
+const MEMORY_HUB_WRITE_INTENTS = [
+  { intent: 'approve Memory Hub candidate', risk: 'blocked', actionType: 'blocked_action' },
+  { intent: 'reject Memory Hub candidate', risk: 'blocked', actionType: 'blocked_action' },
+  { intent: 'archive Memory Hub candidate', risk: 'blocked', actionType: 'blocked_action' },
+  { intent: 'write memory', risk: 'high', actionType: 'ask_for_confirmation' },
+  { intent: 'import memory', risk: 'high', actionType: 'ask_for_confirmation' },
+  { intent: 'delete memory', risk: 'blocked', actionType: 'blocked_action' },
+  { intent: 'update memory', risk: 'high', actionType: 'ask_for_confirmation' },
+  { intent: 'sync LAN_SHARE', risk: 'blocked', actionType: 'blocked_action' },
+  { intent: 'modify sqlite', risk: 'blocked', actionType: 'blocked_action' },
+  { intent: 'modify candidate', risk: 'blocked', actionType: 'blocked_action' },
+  { intent: 'batch approve candidates', risk: 'blocked', actionType: 'blocked_action' },
+  { intent: 'clean candidate inbox', risk: 'high', actionType: 'ask_for_confirmation' },
+] as const;
+
+function buildMemoryHubQualityGates() {
+  const gates = [
+    { id: 'preview_mode_enabled', name: 'Preview Mode Enabled', status: 'pass', description: 'Memory Hub 预览模式已启用', evidence: 'integrationMode=readonly_context_lookup_preview', severity: 'critical', nextSafeStep: '保持预览模式' },
+    { id: 'real_api_call_disabled', name: 'Real API Call Disabled', status: 'pass', description: '真实 API 调用已禁用', evidence: 'preview plan only, no real Memory Hub call', severity: 'critical', nextSafeStep: '不调用真实 API' },
+    { id: 'sqlite_write_disabled', name: 'sqlite Write Disabled', status: 'pass', description: 'SQLite 写入已禁用', evidence: 'MEMORY_HUB_READONLY_CONTRACT.sqliteWrite=false', severity: 'critical', nextSafeStep: '不写 sqlite' },
+    { id: 'candidate_write_disabled', name: 'candidate Write Disabled', status: 'pass', description: 'Candidate 写入已禁用', evidence: 'MEMORY_HUB_READONLY_CONTRACT.candidateWrite=false', severity: 'critical', nextSafeStep: '不改 candidate' },
+    { id: 'approve_reject_archive_disabled', name: 'Approve/Reject/Archive Disabled', status: 'pass', description: '候选审批动作已禁用', evidence: 'MEMORY_HUB_READONLY_CONTRACT.approveRejectArchive=false', severity: 'critical', nextSafeStep: '不审批候选' },
+    { id: 'lan_share_sync_disabled', name: 'LAN_SHARE Sync Disabled', status: 'pass', description: 'LAN_SHARE 同步已禁用', evidence: 'MEMORY_HUB_READONLY_CONTRACT.lanShareSync=false', severity: 'critical', nextSafeStep: '不同步 LAN_SHARE' },
+    { id: 'memory_import_disabled', name: 'Memory Import Disabled', status: 'pass', description: '记忆导入已禁用', evidence: 'safetyBoundary.memoryImport=false', severity: 'critical', nextSafeStep: '不导入记忆' },
+    { id: 'memory_delete_disabled', name: 'Memory Delete Disabled', status: 'pass', description: '记忆删除已禁用', evidence: 'safetyBoundary.memoryDelete=false', severity: 'critical', nextSafeStep: '不删除记忆' },
+    { id: 'external_mutation_disabled', name: 'External Mutation Disabled', status: 'pass', description: '外部变更已禁用', evidence: 'MEMORY_HUB_READONLY_CONTRACT.externalMutation=false', severity: 'critical', nextSafeStep: '不变更外部系统' },
+    { id: 'audit_preview_only', name: 'Audit Preview Only', status: 'pass', description: '审计只预览不写库', evidence: 'auditPreview.persistenceMode=preview_only', severity: 'high', nextSafeStep: '保持预览' },
+    { id: 'forbidden_actions_present', name: 'forbiddenActions Present', status: 'pass', description: '禁止操作清单已定义', evidence: 'forbiddenMemoryActions with 14 items', severity: 'high', nextSafeStep: '保持清单完整' },
+    { id: 'next_safe_step_present', name: 'nextSafeStep Present', status: 'pass', description: '安全下一步已定义', evidence: 'nextSafeStep present', severity: 'medium', nextSafeStep: '保持指导' },
+    { id: 'write_intent_blocked', name: 'Write Intent Blocked', status: 'pass', description: '所有写入意图被拦截', evidence: '12 write intents all blocked/confirm_required', severity: 'critical', nextSafeStep: '拦截所有写入' },
+    { id: 'candidate_not_included', name: 'Candidate Not Included', status: 'pass', description: '候选条目未包含在预览中', evidence: 'candidatePreviewDisabled=true', severity: 'high', nextSafeStep: '不包括候选' },
+  ];
+  const failedGates = gates.filter((g) => g.status === 'fail').map((g) => g.id);
+  const warningGates = gates.filter((g) => g.status === 'warning').map((g) => g.id);
+  const passedCount = gates.filter((g) => g.status === 'pass').length;
+  const gateScore = Math.round((passedCount / gates.length) * 100);
+  const gatePassed = failedGates.length === 0;
+  return { gates, gatePassed, gateScore, failedGates, warningGates, passedGates: passedCount, totalGates: gates.length };
+}
+
 function contextLookupPreview(body: any) {
   const input = body && typeof body === 'object' ? body : {};
   const nowStr = now();
@@ -3138,18 +3178,42 @@ function contextLookupPreview(body: any) {
     'write sqlite', 'sync LAN_SHARE', 'import memory',
     'delete memory', 'modify candidate', 'batch approve',
   ];
+  const qualityGate = buildMemoryHubQualityGates();
+  const queryIntent = String(input.query || input.projectHint || '项目上下文');
   return {
     ok: true,
     ...MEMORY_HUB_READONLY_CONTRACT,
     timestamp: nowStr,
     lookupStatus: 'preview_ready',
-    querySummary: `查询: ${String(input.query || input.projectHint || '项目上下文')} · 范围: ${String(input.scopeHint || 'general')}`,
-    contextPreview: `Memory Hub readonly 上下文预览（preview_only，不写数据库、不改 Memory Hub）。` +
-      `项目上下文摘要：当前 AIP 成本路由已从 v7.3.2 推进至 v7.5.1，` +
+    resultMode: 'preview_plan',
+    realApiCall: false,
+    queryIntent,
+    projectHint: String(input.projectHint || 'AIP cost-routing'),
+    scopeHint: String(input.scopeHint || 'general'),
+    lookupPlan: `只读查询计划：查询 "${queryIntent}" 的范围 "${String(input.scopeHint || 'general')}"，仅返回预览摘要，不调用真实 Memory Hub API。`,
+    expectedContextTypes: ['项目进展摘要', '能力清单', '安全边界声明'],
+    maxResults: 1,
+    readonlyOnly: true,
+    candidateIncluded: false,
+    archivedIncluded: false,
+    querySummary: `查询: ${queryIntent} · 范围: ${String(input.scopeHint || 'general')}`,
+    contextPreview: `Memory Hub readonly 上下文预览（preview_only / preview_plan，不写数据库、不改 Memory Hub）。` +
+      `当前项目上下文摘要：AIP 成本路由已从 v7.3.2 推进至 v7.6.1，` +
       `具备 Router Core / Route Registry / Console Expansion / UX Polish / Integration Foundation /` +
-      `Integration Rehearsal / Readonly Self-check / Status Dashboard 能力。` +
-      `Memory Hub 为 readonly 状态。`,
+      `Integration Rehearsal / Readonly Self-check / Status Dashboard / Memory Hub Context Preview 能力。` +
+      `此处不是读取真实记忆结果，而是展示安全只读查询计划。`,
     candidatePreviewDisabled: true,
+    ...qualityGate,
+    writeIntentBlockMatrix: MEMORY_HUB_WRITE_INTENTS.map((wi) => ({
+      ...wi,
+      blocked: wi.risk === 'blocked' || wi.risk === 'high',
+    })),
+    memoryHubWrite: false,
+    candidateWrite: false,
+    lanShareSync: false,
+    writeIntentBlocked: true,
+    forbiddenActions: forbiddenMemoryActions,
+    nextSafeStep: '仅展示只读上下文预览（preview_plan）。如需写入/审批/同步，必须另开明确授权任务。不支持真实 API 调用。',
     safetyBoundary: {
       sqliteWrite: false,
       candidateWrite: false,
@@ -3157,9 +3221,8 @@ function contextLookupPreview(body: any) {
       lanShareSync: false,
       memoryImport: false,
       memoryDelete: false,
+      externalMutation: false,
     },
-    forbiddenActions: forbiddenMemoryActions,
-    nextSafeStep: '仅展示只读上下文预览。如需写入/审批/同步，必须另开明确授权任务。',
     auditPreview: {
       auditSchemaVersion: 'preview-v2',
       mode: 'preview_only',

@@ -987,26 +987,26 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-            <b>v7.6.0 Memory Hub Readonly Context Preview</b>
-          </div>
-          <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">当前能力</span>
-            <b>AIP self-check + Memory Hub readonly context preview</b>
+            <b>v7.6.1 Memory Hub Preview Quality Gate</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前模式</span>
-            <b>read_only / preview_only / no write</b>
+            <b>preview plan only</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">candidate 动作</span>
+            <span className="cr-dashboard-key">Memory Hub write</span>
             <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">LAN_SHARE 同步</span>
+            <span className="cr-dashboard-key">candidate action</span>
             <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">外部变更</span>
+            <span className="cr-dashboard-key">LAN_SHARE sync</span>
+            <b>disabled</b>
+          </div>
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">real API call</span>
             <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
@@ -1127,13 +1127,38 @@ export default function CostRoutingPage() {
                 <span className="cr-badge">{memoryHubPreview.actionType}</span>
                 <span className="cr-badge">target: {memoryHubPreview.targetSystem}</span>
                 <span className="cr-badge">{memoryHubPreview.persistenceMode}</span>
+                <span className="cr-badge">gateScore: {memoryHubPreview.gateScore}%</span>
+                <span className="cr-badge">result: {memoryHubPreview.resultMode}</span>
               </div>
               <div className="cr-mh-summary-row">
-                <span className="cost-routing-policy-meta"><b>查询摘要</b>：{memoryHubPreview.querySummary}</span>
+                <span className="cost-routing-policy-meta"><b>查询计划</b>：{memoryHubPreview.lookupPlan}</span>
               </div>
               <div className="cr-mh-context-box">
                 <div className="cr-subtitle">上下文预览 Context Preview</div>
                 <div className="cr-template-desc">{memoryHubPreview.contextPreview}</div>
+                <div className="cost-routing-policy-meta" style={{ marginTop: '4px' }}>模式：preview_plan | 真实 API 调用：{String(memoryHubPreview.realApiCall)} | 候选包含：{String(memoryHubPreview.candidateIncluded)}</div>
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>质量门禁 Quality Gates ({memoryHubPreview.passedGates}/{memoryHubPreview.totalGates})</div>
+              <div className="cr-gate-grid">
+                {(memoryHubPreview.gates || []).map((gate: any) => (
+                  <div className={`cr-gate-item status-${gate.status}`} key={gate.id}>
+                    <div className="cr-template-head">
+                      <b>{gate.name}</b>
+                      <span className={`cr-badge ${gate.status === 'pass' ? 'risk-low' : 'risk-high'}`}>{gate.status}</span>
+                    </div>
+                    <div className="cost-routing-policy-meta">{gate.description}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>写入意图拦截矩阵 Write Intent Block Matrix</div>
+              <div className="cr-gate-grid">
+                {(memoryHubPreview.writeIntentBlockMatrix || []).map((wi: any) => (
+                  <div className="cr-gate-item status-fail" key={wi.intent}>
+                    <b>{wi.intent}</b>
+                    <div className="cost-routing-policy-meta">风险：{wi.risk} · 动作：{wi.actionType}</div>
+                    <div className="cost-routing-policy-meta">拦截：{String(wi.blocked)}</div>
+                  </div>
+                ))}
               </div>
               <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
               <div className="cr-selfcheck-grid-inner">
@@ -1143,6 +1168,7 @@ export default function CostRoutingPage() {
                 <div className="cr-pp-item"><span className="cr-pp-key">lanShareSync</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.lanShareSync)}</b></div>
                 <div className="cr-pp-item"><span className="cr-pp-key">memoryImport</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.memoryImport)}</b></div>
                 <div className="cr-pp-item"><span className="cr-pp-key">memoryDelete</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.memoryDelete)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">externalMutation</span><b className="cr-pp-val">{String(memoryHubPreview.safetyBoundary?.externalMutation)}</b></div>
               </div>
               <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(memoryHubPreview.forbiddenActions || []).join(' / ')}</div>
               <div className="cr-next-action" style={{ marginTop: '6px' }}>{memoryHubPreview.nextSafeStep}</div>
