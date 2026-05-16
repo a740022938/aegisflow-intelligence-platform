@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
+import { APP_VERSION } from '../../version.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -683,7 +684,7 @@ export function registerAssistantCenterRoutes(app: FastifyInstance) {
   app.get('/api/assistant-center/version', async (_request, _reply) => {
     return {
       ok: true,
-      version: '7.3.0',
+      version: APP_VERSION,
       module: 'assistant-center',
       readonly: true,
       autoFixAllowed: false,

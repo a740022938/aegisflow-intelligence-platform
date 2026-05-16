@@ -10,6 +10,7 @@ import type {
   AssistantStatusResponse,
   AssistantTaskPackageResponse,
 } from '../types/assistant-center';
+import { APP_VERSION } from '../constants/appVersion';
 
 const API = '/api/assistant-center';
 
@@ -189,7 +190,7 @@ export default function AssistantCenter() {
     <div className="assistant-page">
       <header className="assistant-header">
         <div>
-          <p className="assistant-kicker">AIP v7.3.0</p>
+          <p className="assistant-kicker">AIP {APP_VERSION}</p>
           <h1>助手中心</h1>
           <p className="assistant-subtitle">只读纳管 AIP、OpenClaw、Claude Proxy、OpenAxiom、报告、备份和安全边界。</p>
         </div>

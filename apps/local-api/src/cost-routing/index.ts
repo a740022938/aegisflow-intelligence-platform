@@ -286,7 +286,7 @@ const BUILTIN_POLICY_TEMPLATES = [
 ];
 
 const LOCAL_CAPABILITIES = {
-  aip: 'AIP v7.3.0 final',
+  aip: 'AIP v7.3.1 local seal',
   local_gpu_available: 'unknown/mock: RTX 3060 / CUDA available',
   openclaw_stable: '2026.3.23',
   openclaw_sidecar: '2026.5.12 / 18799',
