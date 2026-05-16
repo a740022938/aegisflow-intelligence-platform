@@ -172,6 +172,10 @@ interface PracticalDecision {
     auditMode: 'preview_only';
     requiredConfirmations: string[];
     rollbackPlan: string[];
+    auditIdPreview?: string;
+    persistenceMode?: 'preview_only';
+    selectedModelRoute?: ModelTier;
+    selectedToolchainRoute?: string;
   };
 }
 
@@ -509,6 +513,194 @@ const HIGH_RISK_FIREWALL_RULES = [
   { id: 'unconfirmed_cleanup_path', label: '未确认路径的清理操作', patterns: ['cleanup unknown path', '未确认路径', '清理旧文件'] },
   { id: 'auto_candidate_decision', label: '自动 approve/reject/archive candidate', patterns: ['approve candidate', 'reject candidate', 'archive candidate', '自动审批', '自动归档'] },
   { id: 'production_db_write', label: '直接写入生产数据库', patterns: ['write production database', '生产数据库', '直接写库', 'prod db'] },
+] as const;
+
+const MODEL_ROUTE_REGISTRY = [
+  {
+    id: 'economy',
+    name: 'Economy',
+    description: '便宜、快速，适合普通问答、简单总结、低风险任务。',
+    costLevel: 'low',
+    qualityLevel: 0.45,
+    speedLevel: 0.72,
+    riskFit: 'low',
+    recommendedFor: ['普通聊天/问答', '文档总结/改写', '低预算解释任务'],
+    avoidFor: ['强推理代码分析', '发布动作', '高风险操作'],
+    fallbackTo: 'balanced',
+    safetyNotes: ['低成本优先，不做大规模推理。', '仅建议不自动调用。'],
+  },
+  {
+    id: 'balanced',
+    name: 'Balanced',
+    description: '成本和质量均衡，适合常规代码、常规分析、普通工程任务。',
+    costLevel: 'medium',
+    qualityLevel: 0.72,
+    speedLevel: 0.66,
+    riskFit: 'low',
+    recommendedFor: ['常规问答', '代码修改/调试', '项目只读巡检'],
+    avoidFor: ['明确高风险动作', '要求极致质量或极低成本的任务'],
+    fallbackTo: 'economy',
+    safetyNotes: ['默认控制成本，必要时允许中等能力路线。', '所有风险命中降级为人工确认。'],
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    description: '高质量、高成本，适合复杂代码、发布规划、高风险前置分析。',
+    costLevel: 'high',
+    qualityLevel: 0.96,
+    speedLevel: 0.78,
+    riskFit: 'medium',
+    recommendedFor: ['复杂代码分析/调试', '强推理架构审查', '发布前复查'],
+    avoidFor: ['低预算批量任务', '禁止外部调用任务'],
+    fallbackTo: 'balanced',
+    safetyNotes: ['只做建议，不产生真实费用。', '必须人工确认预算后才可升级到 premium。'],
+  },
+  {
+    id: 'local',
+    name: 'Local',
+    description: '本地优先，适合只读检查、本地脚本、本地模型、隐私任务。',
+    costLevel: 'free',
+    qualityLevel: 0.6,
+    speedLevel: 0.58,
+    riskFit: 'low',
+    recommendedFor: ['只读健康检查', '本地数据集检查', '隐私任务'],
+    avoidFor: ['覆盖稳定版 OpenClaw', '直接覆盖模型文件'],
+    fallbackTo: 'economy',
+    safetyNotes: ['优先使用本地资源，避免外部调用和云成本。', '本地写入、训练、删除均需人工确认。'],
+  },
+  {
+    id: 'toolchain',
+    name: 'Toolchain',
+    description: '工具链路线，适合 AIP API、OpenClaw、ComfyUI、Memory Hub、GitHub release-prep 等工具协作任务。',
+    costLevel: 'low',
+    qualityLevel: 0.7,
+    speedLevel: 0.5,
+    riskFit: 'medium',
+    recommendedFor: ['图像生成/ComfyUI', 'Memory Hub 候选管理', 'Git 发布预检'],
+    avoidFor: ['直接覆盖生产系统', '自动 approve/reject candidate'],
+    fallbackTo: 'manual_confirm',
+    safetyNotes: ['工具链执行需要环境和准入确认。', '所有真实写入必须先人工确认。'],
+  },
+  {
+    id: 'blocked',
+    name: 'Blocked',
+    description: '禁止自动执行，适合删除、覆盖、taskkill、写库、发布、训练覆盖模型等高风险任务。',
+    costLevel: 'unknown',
+    qualityLevel: 0,
+    speedLevel: 0,
+    riskFit: 'blocked',
+    recommendedFor: [],
+    avoidFor: ['所有自动执行场景'],
+    fallbackTo: 'manual_confirm',
+    safetyNotes: ['禁止自动执行。', '高风险任务必须先改写为只读检查。', '必须先获取人工确认和回滚方案。'],
+  },
+] as const;
+
+const TOOLCHAIN_REGISTRY = [
+  {
+    id: 'aip_readonly_check',
+    name: 'AIP Readonly Check',
+    description: 'AIP 只读健康检查，检查运行态、源码状态、审计日志。',
+    executionMode: 'read_only',
+    readOnlyFirst: true,
+    dryRunFirst: false,
+    requiresHuman: false,
+    forbiddenActions: ['file_write', 'db_write', 'process_kill'],
+    safePrechecks: ['确认只读边界', '确认报告输出路径'],
+    rollbackRequired: false,
+    integrationStatus: 'preview_only',
+  },
+  {
+    id: 'github_release_prep',
+    name: 'GitHub Release-Prep',
+    description: '只做 release-prep / gate check，不 tag、不 push、不 release。',
+    executionMode: 'dry_run',
+    readOnlyFirst: true,
+    dryRunFirst: true,
+    requiresHuman: true,
+    forbiddenActions: ['git_push', 'git_tag', 'github_release'],
+    safePrechecks: ['确认版本号和发布范围', '确认未提交文件状态', '做 diff check'],
+    rollbackRequired: true,
+    integrationStatus: 'preview_only',
+  },
+  {
+    id: 'openclaw_sidecar_preview',
+    name: 'OpenClaw Sidecar Preview',
+    description: '只作为未来入口说明，不启动、不修改、不覆盖 OpenClaw。',
+    executionMode: 'ask_first',
+    readOnlyFirst: true,
+    dryRunFirst: true,
+    requiresHuman: true,
+    forbiddenActions: ['overwrite_openclaw_stable', 'modify_openclaw_config'],
+    safePrechecks: ['确认当前 OpenClaw 版本', '确认不覆盖稳定版'],
+    rollbackRequired: true,
+    integrationStatus: 'preview_only',
+  },
+  {
+    id: 'comfyui_generation_preview',
+    name: 'ComfyUI Generation Preview',
+    description: '只作为未来入口说明，不启动、不生成图。',
+    executionMode: 'ask_first',
+    readOnlyFirst: true,
+    dryRunFirst: true,
+    requiresHuman: true,
+    forbiddenActions: ['auto_generate_without_confirm', 'start_comfyui'],
+    safePrechecks: ['确认 ComfyUI 端口状态', '确认 prompt 安全'],
+    rollbackRequired: false,
+    integrationStatus: 'preview_only',
+  },
+  {
+    id: 'memory_hub_candidate_dry_run',
+    name: 'Memory Hub Candidate Dry-Run',
+    description: '只作为未来入口说明，不 approve/reject/archive，不写 sqlite。',
+    executionMode: 'dry_run',
+    readOnlyFirst: true,
+    dryRunFirst: true,
+    requiresHuman: true,
+    forbiddenActions: ['sqlite_write', 'approve_candidate', 'reject_candidate', 'archive_candidate'],
+    safePrechecks: ['确认 candidate 当前状态', '生成候选更新说明'],
+    rollbackRequired: true,
+    integrationStatus: 'preview_only',
+  },
+  {
+    id: 'mahjong_dataset_readonly_audit',
+    name: 'Mahjong Dataset Readonly Audit',
+    description: '只读检查说明，不扫描大文件、不移动、不删除、不修改。',
+    executionMode: 'read_only',
+    readOnlyFirst: true,
+    dryRunFirst: false,
+    requiresHuman: false,
+    forbiddenActions: ['delete', 'move', 'modify', 'scan_large_files'],
+    safePrechecks: ['确认目标目录为 Mahjong_V1_Project', '确认只读边界'],
+    rollbackRequired: false,
+    integrationStatus: 'preview_only',
+  },
+  {
+    id: 'local_script_dry_run',
+    name: 'Local Script Dry-Run',
+    description: '本地脚本 dry-run，不真实写入。',
+    executionMode: 'dry_run',
+    readOnlyFirst: true,
+    dryRunFirst: true,
+    requiresHuman: true,
+    forbiddenActions: ['write_to_production', 'delete_files'],
+    safePrechecks: ['确认脚本路径', '确认脚本内容安全'],
+    rollbackRequired: true,
+    integrationStatus: 'preview_only',
+  },
+  {
+    id: 'blocked_system_operation',
+    name: 'Blocked System Operation',
+    description: 'taskkill、删除、覆盖、写库、训练覆盖模型等默认 blocked 或 human_confirm_required。',
+    executionMode: 'blocked',
+    readOnlyFirst: true,
+    dryRunFirst: true,
+    requiresHuman: true,
+    forbiddenActions: ['taskkill', 'delete', 'overwrite', 'db_write', 'train_overwrite'],
+    safePrechecks: ['必须改写为只读检查任务', '获取人工确认和回滚方案'],
+    rollbackRequired: true,
+    integrationStatus: 'preview_only',
+  },
 ] as const;
 
 const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: RouteType; modelTier: ModelTier; executionMode: ExecutionMode; note: string }>> = {
@@ -1550,6 +1742,14 @@ function enrichPracticalDecision(decision: Omit<PracticalDecision,
       auditMode: 'preview_only',
       requiredConfirmations,
       rollbackPlan,
+      auditIdPreview: genId('audit-preview'),
+      persistenceMode: 'preview_only' as const,
+      selectedModelRoute: recommendedModelTier,
+      selectedToolchainRoute: selectedRoute === 'openclaw_sidecar_2026_5_12' ? 'openclaw_sidecar_preview'
+        : selectedRoute === 'comfyui_8000' ? 'comfyui_generation_preview'
+        : selectedRoute === 'openclaw_stable_2026_3_23' ? 'aip_readonly_check'
+        : selectedRoute === 'manual_confirm' ? 'blocked_system_operation'
+        : 'local_script_dry_run',
     },
   };
 }
@@ -1739,7 +1939,7 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
 export function getPracticalConfig() {
   return {
     ok: true,
-    engine_version: 'strategy-console-candidate',
+    engine_version: 'v7.3.3-route-registry-candidate',
     policy_templates: BUILTIN_POLICY_TEMPLATES,
     strategy_modes: Object.values(STRATEGY_MODES),
     task_console_types: TASK_CONSOLE_TYPES,
@@ -1765,6 +1965,8 @@ export function getPracticalConfig() {
     cost_levels: ['free', 'low', 'medium', 'high', 'unknown'],
     risk_levels: ['low', 'medium', 'high', 'blocked'],
     local_capabilities: LOCAL_CAPABILITIES,
+    model_route_registry: MODEL_ROUTE_REGISTRY,
+    toolchain_registry: TOOLCHAIN_REGISTRY,
   };
 }
 
