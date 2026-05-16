@@ -2033,7 +2033,7 @@ export function simulatePracticalRoute(body: any) {
   const decision = enrichPracticalDecision(buildPracticalDecision(taskType, enrichedInput), normalizedTaskType, enrichedInput);
   return {
     ok: true,
-    engine_version: 'strategy-console-candidate',
+    engine_version: 'v7.3.5-ux-refined-candidate',
     task_type: normalizedTaskType,
     task_id: String(body.task_id || '').trim(),
     decision,

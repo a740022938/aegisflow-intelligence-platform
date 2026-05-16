@@ -840,13 +840,13 @@ export default function CostRoutingPage() {
     <div className="cost-routing-page page-root">
       <PageHeader
         title="AI Router Console / 成本路由策略台"
-        subtitle="AI Task Router Console v7.3.4，Console Expansion；当前只做建议、dry-run、preview_only，不执行真实操作"
+        subtitle="AI Task Router Console — 成本路由控制台。当前为 preview_only 模式：只做建议和审计预览，不执行真实操作、不写数据库、不调外部系统。"
       />
 
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
-          <span>基线</span>
-          <b>v7.3.4 console-expansion candidate</b>
+          <span>版本</span>
+          <b>v7.3.5 candidate (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -870,23 +870,27 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前模式</span>
-            <b>AI Task Router Console v7.3.4</b>
+            <b>AI Task Router Console v7.3.5</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">安全状态</span>
-            <b>preview_only / dry-run first / high risk requires human</b>
+            <b>preview_only / dry-run first / 高风险人工确认</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前能力</span>
-            <b>Router Core / Route Registry / Audit Preview / Release Readiness Preview</b>
+            <b>Router Core + Route Registry + Audit Preview + Release Readiness</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前禁止</span>
-            <b>no real execution / no DB write / no external integration call</b>
+            <b>不真实执行 / 不写数据库 / 不调外部系统</b>
+          </div>
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">策略总数 / 近7天决策 / 回填反馈 / 建议</span>
+            <b>{stats.policyTotal} / {stats.decisionTotal} / {stats.feedbackCount} / {stats.recommendationCount}</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">下一步建议</span>
-            <b>先只读检查，再人工确认；高风险任务必须拆为子步骤</b>
+            <b>先只读检查，再人工确认；高风险必须拆为子步骤</b>
           </div>
         </div>
       </SectionCard>
@@ -1016,27 +1020,7 @@ export default function CostRoutingPage() {
         </div>
       </SectionCard>
 
-      <div className={`cr-summary-panel role-card ${roleClass('gov')}`}>
-        <div className="cr-summary-title">策略概览</div>
-        <div className="cr-summary-grid">
-          <div className="cr-summary-item">
-            <span className="cr-summary-key">策略总数</span>
-            <span className="cr-summary-val">{stats.policyTotal}</span>
-          </div>
-          <div className="cr-summary-item">
-            <span className="cr-summary-key">近7天决策</span>
-            <span className="cr-summary-val">{stats.decisionTotal}</span>
-          </div>
-          <div className="cr-summary-item">
-            <span className="cr-summary-key">回填反馈数</span>
-            <span className="cr-summary-val">{stats.feedbackCount}</span>
-          </div>
-          <div className="cr-summary-item">
-            <span className="cr-summary-key">建议条数</span>
-            <span className="cr-summary-val">{stats.recommendationCount}</span>
-          </div>
-        </div>
-      </div>
+
 
       <div className="cr-practical-grid">
         <SectionCard className={`role-card ${roleClass('gov')}`} title="策略档位">
@@ -1449,7 +1433,7 @@ export default function CostRoutingPage() {
                     <div><b>路由:</b> <StatusBadge s={selectedDecision.route_type} size="xs" /></div>
                     <div><b>原因:</b> {selectedDecision.route_reason}</div>
                     <div><b>创建时间:</b> {fmt(selectedDecision.created_at)}</div>
-                    <div><b>引擎:</b> {selectedDecision.input_json?.__routing?.engine_version || 'v1'}</div>
+                    <div><b>引擎版本:</b> {selectedDecision.input_json?.__routing?.engine_version || 'v7.3.x'}</div>
                     <div><b>评分:</b> {selectedDecision.input_json?.__routing?.selected?.score_total ?? 'N/A'}</div>
                     <div><b>主因子:</b> {(selectedDecision.input_json?.__routing?.selected?.dominant_factors || []).join(', ') || 'N/A'}</div>
                     {selectedDecision.input_json?.__feedback?.latest ? (

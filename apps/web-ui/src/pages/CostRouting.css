@@ -704,6 +704,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.cr-dashboard-item:last-child {
+  grid-column: 1 / -1;
+}
+
 .cr-dashboard-item {
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
