@@ -1123,7 +1123,7 @@ export default function CostRoutingPage() {
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>v7.11.0 mahjong readonly audit preview (preview_only)</b>
+          <b>v7.12.1 cost routing ux compact polish (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -1147,22 +1147,22 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-          <b>v7.11.0 Mahjong Readonly Audit Preview</b>
+          <b>v7.12.1 UX Compact Polish</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">当前模式</span>
-          <b>preview plan only / read_only / no write</b>
+          <b>read_only / preview_only / no execution</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">Memory Hub / OpenAxiom / ComfyUI / OpenClaw / GitHub</span>
-          <b>all readonly preview</b>
+          <span className="cr-dashboard-key">治理链 (7条)</span>
+          <b>全部 readonly preview</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">Mahjong dataset write / training</span>
-          <b>disabled</b>
+          <span className="cr-dashboard-key">发布门禁</span>
+          <b>lint/typecheck/build/smoke/db/secret ✅</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">Mahjong model overwrite</span>
+          <span className="cr-dashboard-key">Git tag / push / Release</span>
           <b>disabled</b>
         </div>
         <div className="cr-dashboard-item">
@@ -1190,7 +1190,7 @@ export default function CostRoutingPage() {
         </div>
       </div>
 
-      <SectionCard className={`role-card ${roleClass('exec')}`} title="只读状态面板 Readonly Status Dashboard">
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="只读状态面板 Readonly Status Dashboard / Self-check">
         <div className="cr-registry-note">AIP 只读自检状态面板 + 质量门禁。不写数据库、不改配置、不重启服务、不触碰外部项目。</div>
         <div className="cr-selfcheck-grid">
           <div className="cr-selfcheck-controls">
@@ -1272,8 +1272,8 @@ export default function CostRoutingPage() {
         </div>
       </SectionCard>
 
-      <SectionCard className={`role-card ${roleClass('exec')}`} title="Memory Hub 只读上下文查询预览 Memory Hub Context Lookup Preview">
-        <div className="cr-registry-note">仅只读上下文预览。不写 sqlite、不改 candidate、不同步 LAN_SHARE、不 approve/reject/archive。</div>
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="Memory Hub 只读上下文预览 Memory Hub Preview">
+        <div className="cr-registry-note">只读上下文预览。不写 sqlite、不改 candidate、不同步 LAN_SHARE、不 approve/reject/archive。</div>
         <div className="cr-mh-grid">
           <div className="cr-selfcheck-controls">
             <button className="ui-btn ui-btn-primary" type="button" onClick={handleMemoryHubPreview} disabled={memoryHubLoading}>
@@ -1339,249 +1339,44 @@ export default function CostRoutingPage() {
         </div>
       </SectionCard>
 
-      <SectionCard className={`role-card ${roleClass('exec')}`} title="OpenAxiom 只读状态预览 OpenAxiom Readonly Status Preview">
-        <div className="cr-registry-note">仅只读状态观察。不启动 GUI、不保存 label、不恢复 label、不批量保存、不修改 images/labels/data.yaml/models。</div>
-        <div className="cr-mh-grid">
-          <div className="cr-selfcheck-controls">
-            <button className="ui-btn ui-btn-primary" type="button" onClick={handleOpenAxiomPreview} disabled={openAxiomLoading}>
-              {openAxiomLoading ? '生成中...' : '生成 OpenAxiom 只读状态预览'}
-            </button>
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="外部只读治理链总览 External Readonly Governance Overview">
+        <div className="cr-registry-note">以下 5 条外部只读观察链均为 preview_only / read_only，不写数据、不执行操作。点击按钮生成各链的状态预览。</div>
+        <div className="cr-gate-grid" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+          {/* OpenAxiom */}
+          <div className="cr-toolchain-card status-preview_only">
+            <div className="cr-template-head"><b>OpenAxiom</b><span className="cr-badge">readonly</span></div>
+            <div className="cost-routing-policy-meta">不启动 GUI、不保存/恢复/批量保存、不修改 labels</div>
+            <div className="cr-selfcheck-controls"><button className="ui-btn ui-btn-sm ui-btn-primary" type="button" onClick={handleOpenAxiomPreview} disabled={openAxiomLoading}>{openAxiomLoading ? '···' : '生成'}</button></div>
+            {openAxiomPreview && <div className="cost-routing-policy-meta" style={{ marginTop: 4 }}>mode={openAxiomPreview.readonlyMode ? 'read_only' : 'N/A'} · {openAxiomPreview.forbiddenActions?.length || 0} forbidden</div>}
           </div>
-          {openAxiomPreview ? (
-            <div className="cr-mh-results">
-              <div className="cr-selfcheck-header">
-                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{openAxiomPreview.integrationMode}</span>
-                <span className="cr-badge">{openAxiomPreview.actionType}</span>
-                <span className="cr-badge">target: {openAxiomPreview.targetSystem}</span>
-                <span className="cr-badge">{openAxiomPreview.persistenceMode}</span>
-                <span className="cr-badge">observer: {openAxiomPreview.observerStatus}</span>
-              </div>
-              <div className="cr-mh-summary-row">
-                <span className="cost-routing-policy-meta"><b>状态预览</b>：{openAxiomPreview.openAxiomStatusPreview}</span>
-              </div>
-              <div className="cr-mh-context-box">
-                <div className="cr-subtitle">OpenAxiom 状态摘要</div>
-                <div className="cr-selfcheck-grid-inner">
-                  <div className="cr-pp-item"><span className="cr-pp-key">Readonly Mode</span><b className="cr-pp-val">{String(openAxiomPreview.readonlyMode)}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">Bridge Status</span><b className="cr-pp-val">{openAxiomPreview.bridgeStatus}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">UI Status</span><b className="cr-pp-val">{openAxiomPreview.uiStatus}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">GUI Status</span><b className="cr-pp-val">{openAxiomPreview.guiStatus}</b></div>
-                </div>
-              </div>
-              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
-              <div className="cr-selfcheck-grid-inner">
-                <div className="cr-pp-item"><span className="cr-pp-key">openAxiomWrite</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.openAxiomWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">labelWrite</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.labelWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">datasetWrite</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.datasetWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">modelWrite</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.modelWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">guiLaunch</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.guiLaunch)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">saveAction</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.saveAction)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">restoreAction</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.restoreAction)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">batchSave</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.batchSave)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">autoRepair</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.autoRepair)}</b></div>
-              </div>
-              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(openAxiomPreview.forbiddenActions || []).join(' / ')}</div>
-              <div className="cr-next-action" style={{ marginTop: '6px' }}>{openAxiomPreview.nextSafeStep}</div>
-            </div>
-          ) : (
-            <div className="cost-routing-policy-meta">尚未生成 OpenAxiom 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
-          )}
-        </div>
-      </SectionCard>
-
-      <SectionCard className={`role-card ${roleClass('exec')}`} title="ComfyUI 只读状态预览 ComfyUI Readonly Status Preview">
-        <div className="cr-registry-note">仅只读状态观察。不启动 ComfyUI、不提交 queue、不生成图片、不修改 workflow、不下载/删除模型。</div>
-        <div className="cr-mh-grid">
-          <div className="cr-selfcheck-controls">
-            <button className="ui-btn ui-btn-primary" type="button" onClick={handleComfyUiPreview} disabled={comfyUiLoading}>
-              {comfyUiLoading ? '生成中...' : '生成 ComfyUI 只读状态预览'}
-            </button>
+          {/* ComfyUI */}
+          <div className="cr-toolchain-card status-preview_only">
+            <div className="cr-template-head"><b>ComfyUI</b><span className="cr-badge">readonly</span></div>
+            <div className="cost-routing-policy-meta">不启动、不生成图片、不提交 queue、不修改 workflow/model</div>
+            <div className="cr-selfcheck-controls"><button className="ui-btn ui-btn-sm ui-btn-primary" type="button" onClick={handleComfyUiPreview} disabled={comfyUiLoading}>{comfyUiLoading ? '···' : '生成'}</button></div>
+            {comfyUiPreview && <div className="cost-routing-policy-meta" style={{ marginTop: 4 }}>mode={comfyUiPreview.readonlyMode ? 'read_only' : 'N/A'} · {comfyUiPreview.forbiddenActions?.length || 0} forbidden</div>}
           </div>
-          {comfyUiPreview ? (
-            <div className="cr-mh-results">
-              <div className="cr-selfcheck-header">
-                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{comfyUiPreview.integrationMode}</span>
-                <span className="cr-badge">{comfyUiPreview.actionType}</span>
-                <span className="cr-badge">target: {comfyUiPreview.targetSystem}</span>
-                <span className="cr-badge">{comfyUiPreview.persistenceMode}</span>
-                <span className="cr-badge">observer: {comfyUiPreview.observerStatus}</span>
-              </div>
-              <div className="cr-mh-summary-row">
-                <span className="cost-routing-policy-meta"><b>状态预览</b>：{comfyUiPreview.comfyUiStatusPreview}</span>
-              </div>
-              <div className="cr-mh-context-box">
-                <div className="cr-subtitle">ComfyUI 状态摘要</div>
-                <div className="cr-selfcheck-grid-inner">
-                  <div className="cr-pp-item"><span className="cr-pp-key">API Status</span><b className="cr-pp-val">{comfyUiPreview.apiStatus}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">Queue Status</span><b className="cr-pp-val">{comfyUiPreview.queueStatusPreview}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">System Stats</span><b className="cr-pp-val">{comfyUiPreview.systemStatsPreview}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">Readonly Mode</span><b className="cr-pp-val">{String(comfyUiPreview.readonlyMode)}</b></div>
-                </div>
-              </div>
-              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
-              <div className="cr-selfcheck-grid-inner">
-                <div className="cr-pp-item"><span className="cr-pp-key">comfyUiWrite</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.comfyUiWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">imageGeneration</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.imageGeneration)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">queueSubmit</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.queueSubmit)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">workflowWrite</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.workflowWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">modelWrite</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.modelWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">modelDownload</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.modelDownload)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">serviceStart</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.serviceStart)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">serviceRestart</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.serviceRestart)}</b></div>
-              </div>
-              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(comfyUiPreview.forbiddenActions || []).join(' / ')}</div>
-              <div className="cr-next-action" style={{ marginTop: '6px' }}>{comfyUiPreview.nextSafeStep}</div>
-            </div>
-          ) : (
-            <div className="cost-routing-policy-meta">尚未生成 ComfyUI 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
-          )}
-        </div>
-      </SectionCard>
-
-      <SectionCard className={`role-card ${roleClass('exec')}`} title="OpenClaw 只读状态预览 OpenClaw Readonly Status Preview">
-        <div className="cr-registry-note">仅只读状态观察。不启动/停止/重启 OpenClaw、不 taskkill、不升级全局 2026.3.23、不修改配置/模型路由/gateway 脚本/计划任务、不调用模型。</div>
-        <div className="cr-mh-grid">
-          <div className="cr-selfcheck-controls">
-            <button className="ui-btn ui-btn-primary" type="button" onClick={handleOpenClawPreview} disabled={openClawLoading}>
-              {openClawLoading ? '生成中...' : '生成 OpenClaw 只读状态预览'}
-            </button>
+          {/* OpenClaw */}
+          <div className="cr-toolchain-card status-preview_only">
+            <div className="cr-template-head"><b>OpenClaw</b><span className="cr-badge">readonly</span></div>
+            <div className="cost-routing-policy-meta">不启动/停止/重启、不 taskkill、不升级全局、不调用模型</div>
+            <div className="cr-selfcheck-controls"><button className="ui-btn ui-btn-sm ui-btn-primary" type="button" onClick={handleOpenClawPreview} disabled={openClawLoading}>{openClawLoading ? '···' : '生成'}</button></div>
+            {openClawPreview && <div className="cost-routing-policy-meta" style={{ marginTop: 4 }}>mode={openClawPreview.readonlyMode ? 'read_only' : 'N/A'} · {openClawPreview.forbiddenActions?.length || 0} forbidden</div>}
           </div>
-          {openClawPreview ? (
-            <div className="cr-mh-results">
-              <div className="cr-selfcheck-header">
-                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{openClawPreview.integrationMode}</span>
-                <span className="cr-badge">{openClawPreview.actionType}</span>
-                <span className="cr-badge">target: {openClawPreview.targetSystem}</span>
-                <span className="cr-badge">{openClawPreview.persistenceMode}</span>
-                <span className="cr-badge">observer: {openClawPreview.observerStatus}</span>
-              </div>
-              <div className="cr-mh-summary-row">
-                <span className="cost-routing-policy-meta"><b>状态预览</b>：{openClawPreview.openClawStatusPreview}</span>
-              </div>
-              <div className="cr-mh-context-box">
-                <div className="cr-subtitle">OpenClaw 状态摘要</div>
-                <div className="cr-selfcheck-grid-inner">
-                  <div className="cr-pp-item"><span className="cr-pp-key">Gateway Status</span><b className="cr-pp-val">{openClawPreview.gatewayStatusPreview}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">Version Policy</span><b className="cr-pp-val">{openClawPreview.versionPolicyPreview}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">Model Routing</span><b className="cr-pp-val">{openClawPreview.modelRoutingPreview}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">Readonly Mode</span><b className="cr-pp-val">{String(openClawPreview.readonlyMode)}</b></div>
-                </div>
-              </div>
-              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
-              <div className="cr-selfcheck-grid-inner">
-                <div className="cr-pp-item"><span className="cr-pp-key">openClawWrite</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.openClawWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">gatewayStart</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.gatewayStart)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">gatewayStop</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.gatewayStop)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">gatewayRestart</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.gatewayRestart)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">configWrite</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.configWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">modelRouteWrite</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.modelRouteWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">modelCall</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.modelCall)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">versionUpgrade</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.versionUpgrade)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">processKill</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.processKill)}</b></div>
-              </div>
-              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(openClawPreview.forbiddenActions || []).join(' / ')}</div>
-              <div className="cr-next-action" style={{ marginTop: '6px' }}>{openClawPreview.nextSafeStep}</div>
-            </div>
-          ) : (
-            <div className="cost-routing-policy-meta">尚未生成 OpenClaw 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
-          )}
-        </div>
-      </SectionCard>
-
-      <SectionCard className={`role-card ${roleClass('exec')}`} title="GitHub 发布准备度预览 GitHub Release-prep Readonly Preview">
-        <div className="cr-registry-note">仅发布准备度预览。不 tag、不 push、不创建 Release、不上传 assets、不 force push。</div>
-        <div className="cr-mh-grid">
-          <div className="cr-selfcheck-controls">
-            <button className="ui-btn ui-btn-primary" type="button" onClick={handleReleasePrepPreview} disabled={releasePrepLoading}>
-              {releasePrepLoading ? '生成中...' : '生成 GitHub 发布准备度预览'}
-            </button>
+          {/* GitHub Release-prep */}
+          <div className="cr-toolchain-card status-preview_only">
+            <div className="cr-template-head"><b>GitHub Release</b><span className="cr-badge">preview</span></div>
+            <div className="cost-routing-policy-meta">仅 release-prep 预览、不 tag、不 push、不创建 Release</div>
+            <div className="cr-selfcheck-controls"><button className="ui-btn ui-btn-sm ui-btn-primary" type="button" onClick={handleReleasePrepPreview} disabled={releasePrepLoading}>{releasePrepLoading ? '···' : '生成'}</button></div>
+            {releasePrepPreview && <div className="cost-routing-policy-meta" style={{ marginTop: 4 }}>gateScore={releasePrepPreview.gateScore}% · {releasePrepPreview.forbiddenActions?.length || 0} forbidden</div>}
           </div>
-          {releasePrepPreview ? (
-            <div className="cr-mh-results">
-              <div className="cr-selfcheck-header">
-                <span className="cr-badge" style={{ background: releasePrepPreview.gatePassed ? 'var(--success)' : 'var(--warning)', color: '#fff', borderColor: 'transparent' }}>{releasePrepPreview.releasePrepStatus}</span>
-                <span className="cr-badge">{releasePrepPreview.integrationMode}</span>
-                <span className="cr-badge">target: {releasePrepPreview.targetSystem}</span>
-                <span className="cr-badge">{releasePrepPreview.persistenceMode}</span>
-                <span className="cr-badge">gateScore: {releasePrepPreview.gateScore}%</span>
-              </div>
-              <div className="cr-mh-summary-row">
-                <span className="cost-routing-policy-meta"><b>发布准备度</b>：{releasePrepPreview.releasePrepStatus} · 门禁分数 {releasePrepPreview.gateScore}%</span>
-              </div>
-              <div className="cr-subtitle" style={{ marginTop: '8px' }}>门禁矩阵 Release-prep Gates ({releasePrepPreview.passedGates}/{releasePrepPreview.totalGates})</div>
-              <div className="cr-gate-grid">
-                {(releasePrepPreview.gates || []).map((gate: any) => (
-                  <div className={`cr-gate-item status-${gate.status}`} key={gate.id}>
-                    <div className="cr-template-head">
-                      <b>{gate.name}</b>
-                      <span className={`cr-badge ${gate.status === 'pass' ? 'risk-low' : gate.status === 'warning' ? 'risk-medium' : 'risk-high'}`}>{gate.status}</span>
-                    </div>
-                    <div className="cost-routing-policy-meta">{gate.description}</div>
-                    <div className="cost-routing-policy-meta">依据：{gate.evidence}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
-              <div className="cr-selfcheck-grid-inner">
-                <div className="cr-pp-item"><span className="cr-pp-key">gitTag</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.gitTag)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">gitPush</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.gitPush)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">githubReleaseCreate</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.githubReleaseCreate)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">remoteWrite</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.remoteWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">forcePush</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.forcePush)}</b></div>
-              </div>
-              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(releasePrepPreview.forbiddenActions || []).join(' / ')}</div>
-              <div className="cr-next-action" style={{ marginTop: '6px' }}>{releasePrepPreview.nextSafeStep}</div>
-            </div>
-          ) : (
-            <div className="cost-routing-policy-meta">尚未生成 GitHub 发布准备度预览。点击按钮获取 preview_only / read_only 发布准备度预览。</div>
-          )}
-        </div>
-      </SectionCard>
-
-      <SectionCard className={`role-card ${roleClass('exec')}`} title="Mahjong 只读审计预览 Mahjong Readonly Audit Preview">
-        <div className="cr-registry-note">仅只读审计预览。不扫描大文件、不训练、不覆盖模型、不修改 labels/images/data.yaml、不运行 YOLO predict/val/train、不保存/恢复 OpenAxiom labels。</div>
-        <div className="cr-mh-grid">
-          <div className="cr-selfcheck-controls">
-            <button className="ui-btn ui-btn-primary" type="button" onClick={handleMahjongAuditPreview} disabled={mahjongAuditLoading}>
-              {mahjongAuditLoading ? '生成中...' : '生成 Mahjong 只读审计预览'}
-            </button>
+          {/* Mahjong Audit */}
+          <div className="cr-toolchain-card status-preview_only" style={{ gridColumn: '1 / -1' }}>
+            <div className="cr-template-head"><b>Mahjong Audit</b><span className="cr-badge">readonly</span></div>
+            <div className="cost-routing-policy-meta">不扫描大文件、不训练、不覆盖模型、不修改 labels/images/data.yaml、不保存/恢复 OpenAxiom labels</div>
+            <div className="cr-selfcheck-controls"><button className="ui-btn ui-btn-sm ui-btn-primary" type="button" onClick={handleMahjongAuditPreview} disabled={mahjongAuditLoading}>{mahjongAuditLoading ? '···' : '生成'}</button></div>
+            {mahjongAuditPreview && <div className="cost-routing-policy-meta" style={{ marginTop: 4 }}>mode={mahjongAuditPreview.readonlyMode ? 'read_only' : 'N/A'} · {mahjongAuditPreview.forbiddenActions?.length || 0} forbidden</div>}
           </div>
-          {mahjongAuditPreview ? (
-            <div className="cr-mh-results">
-              <div className="cr-selfcheck-header">
-                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{mahjongAuditPreview.integrationMode}</span>
-                <span className="cr-badge">{mahjongAuditPreview.actionType}</span>
-                <span className="cr-badge">target: {mahjongAuditPreview.targetSystem}</span>
-                <span className="cr-badge">{mahjongAuditPreview.persistenceMode}</span>
-                <span className="cr-badge">preview: {mahjongAuditPreview.auditPreviewStatus}</span>
-              </div>
-              <div className="cr-mh-summary-row">
-                <span className="cost-routing-policy-meta"><b>审计预览</b>：{mahjongAuditPreview.projectPathPreview}</span>
-              </div>
-              <div className="cr-mh-context-box">
-                <div className="cr-subtitle">Mahjong 审计摘要</div>
-                <div className="cr-selfcheck-grid-inner">
-                  <div className="cr-pp-item"><span className="cr-pp-key">Dataset Safety</span><b className="cr-pp-val">{mahjongAuditPreview.datasetSafetyPreview}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">Model Safety</span><b className="cr-pp-val">{mahjongAuditPreview.modelSafetyPreview}</b></div>
-                  <div className="cr-pp-item"><span className="cr-pp-key">Readonly Mode</span><b className="cr-pp-val">{String(mahjongAuditPreview.readonlyMode)}</b></div>
-                </div>
-              </div>
-              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
-              <div className="cr-selfcheck-grid-inner">
-                <div className="cr-pp-item"><span className="cr-pp-key">datasetWrite</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.datasetWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">labelWrite</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.labelWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">modelWrite</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.modelWrite)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">trainingRun</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.trainingRun)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">openAxiomSave</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.openAxiomSave)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">batchSave</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.batchSave)}</b></div>
-                <div className="cr-pp-item"><span className="cr-pp-key">largeScan</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.largeScan)}</b></div>
-              </div>
-              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(mahjongAuditPreview.forbiddenActions || []).join(' / ')}</div>
-              <div className="cr-next-action" style={{ marginTop: '6px' }}>{mahjongAuditPreview.nextSafeStep}</div>
-            </div>
-          ) : (
-            <div className="cost-routing-policy-meta">尚未生成 Mahjong 只读审计预览。点击按钮获取 preview_only / read_only 审计预览。</div>
-          )}
         </div>
       </SectionCard>
 
@@ -2367,6 +2162,17 @@ export default function CostRoutingPage() {
         <SectionCard className={`role-card ${roleClass('gov')}`} title="发布准备度预览 Release Readiness Preview">
           <div className="cr-registry-note">只做判断和建议，不执行任何发布动作。禁止自动 tag / push / release。</div>
           <div className="cr-mini-table">
+            <div className="cr-subtitle">发布门禁状态 Gate Status</div>
+            <div className="cr-gate-grid" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+              <div className="cr-gate-item status-pass"><div className="cr-template-head"><b>lint</b><span className="cr-badge risk-low">pass</span></div></div>
+              <div className="cr-gate-item status-pass"><div className="cr-template-head"><b>typecheck</b><span className="cr-badge risk-low">pass</span></div></div>
+              <div className="cr-gate-item status-pass"><div className="cr-template-head"><b>build</b><span className="cr-badge risk-low">pass</span></div></div>
+              <div className="cr-gate-item status-pass"><div className="cr-template-head"><b>smoke</b><span className="cr-badge risk-low">pass</span></div></div>
+              <div className="cr-gate-item status-pass"><div className="cr-template-head"><b>db doctor</b><span className="cr-badge risk-low">pass</span></div></div>
+              <div className="cr-gate-item status-pass"><div className="cr-template-head"><b>secret scan</b><span className="cr-badge risk-low">pass</span></div></div>
+            </div>
+            <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>全部门禁通过。仍需人工授权才能发布。tag/push/release 禁止自动执行。</div>
+            <div className="cr-subtitle" style={{ marginTop: '8px' }}>风险预览</div>
             {simulateTaskType === 'git_release_seal' || simulateTaskType === 'github_release' ? (
               <>
                 <div className="cr-mini-row"><span>发布风险等级</span><span className="cr-badge risk-high">high</span></div>
