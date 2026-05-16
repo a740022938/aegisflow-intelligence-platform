@@ -43,6 +43,7 @@ const PRACTICAL_TASK_TYPES = [
   'dataset_operation',
   'openaxiom_readonly_observer',
   'comfyui_readonly_observer',
+  'openclaw_readonly_observer',
 ] as const;
 type PracticalTaskType = typeof PRACTICAL_TASK_TYPES[number];
 type CostLevel = 'free' | 'low' | 'medium' | 'high' | 'unknown';
@@ -556,6 +557,17 @@ const HIGH_RISK_FIREWALL_RULES = [
   { id: 'comfyui_download_model', label: 'ComfyUI 下载模型', patterns: ['comfyui download', 'comfyui 下载', 'comfyui model', '下载模型 comfyui'] },
   { id: 'comfyui_delete_model', label: 'ComfyUI 删除模型', patterns: ['comfyui delete model', 'comfyui 删除模型'] },
   { id: 'comfyui_auto_repair', label: 'ComfyUI 自动修复', patterns: ['comfyui repair', 'comfyui fix', 'comfyui 修复'] },
+  { id: 'openclaw_start', label: '启动 OpenClaw', patterns: ['openclaw start', '启动 openclaw', 'openclaw 启动'] },
+  { id: 'openclaw_stop', label: '停止 OpenClaw', patterns: ['openclaw stop', '停止 openclaw', 'openclaw 停止'] },
+  { id: 'openclaw_restart', label: '重启 OpenClaw', patterns: ['openclaw restart', '重启 openclaw', 'openclaw 重启'] },
+  { id: 'openclaw_taskkill', label: 'taskkill OpenClaw', patterns: ['taskkill openclaw', 'kill openclaw'] },
+  { id: 'openclaw_upgrade', label: '升级/覆盖 OpenClaw', patterns: ['openclaw upgrade', 'upgrade openclaw', '覆盖 openclaw 2026.3.23', 'openclaw 2026.3.23 升级'] },
+  { id: 'openclaw_modify_config', label: '修改 OpenClaw 配置', patterns: ['openclaw config', '修改 openclaw 配置', 'openclaw 配置'] },
+  { id: 'openclaw_modify_model_route', label: '修改 OpenClaw 模型路由', patterns: ['openclaw model route', 'openclaw 模型路由', '修改模型路由'] },
+  { id: 'openclaw_call_model', label: '调用 OpenClaw 模型', patterns: ['openclaw call', 'openclaw 调用', 'openclaw 模型'] },
+  { id: 'openclaw_doctor_fix', label: 'OpenClaw doctor --fix', patterns: ['openclaw doctor', 'openclaw fix', 'doctor --fix', 'openclaw 修复'] },
+  { id: 'openclaw_modify_gateway', label: '修改 OpenClaw gateway 脚本', patterns: ['openclaw gateway', 'gateway 脚本', 'openclaw 脚本'] },
+  { id: 'openclaw_modify_scheduled_task', label: '修改 OpenClaw 计划任务', patterns: ['openclaw scheduled', 'openclaw 计划任务'] },
 ] as const;
 
 const MODEL_ROUTE_REGISTRY = [
@@ -747,6 +759,20 @@ const TOOLCHAIN_REGISTRY = [
     integrationStatus: 'preview_only',
     note: '不启动 ComfyUI、不提交 queue、不生成图片、不修改 workflow、不下载/删除模型、不改配置。',
   },
+  {
+    id: 'openclaw_readonly_observer',
+    name: 'OpenClaw Readonly Status Observer',
+    description: 'OpenClaw 只读状态观察，检查服务状态、网关状态、版本策略和模型路由。',
+    executionMode: 'read_only',
+    readOnlyFirst: true,
+    dryRunFirst: false,
+    requiresHuman: false,
+    forbiddenActions: ['start_openclaw', 'stop_openclaw', 'restart_openclaw', 'taskkill_openclaw', 'upgrade_global', 'modify_config', 'modify_model_route', 'call_model', 'doctor_fix', 'modify_gateway_script', 'modify_scheduled_task'],
+    safePrechecks: ['确认只读观察模式', '确认不启动/停止/重启 OpenClaw', '确认不 taskkill', '确认不修改配置/模型路由'],
+    rollbackRequired: false,
+    integrationStatus: 'preview_only',
+    note: '不启动/停止/重启 OpenClaw、不 taskkill、不升级全局 2026.3.23、不修改配置/模型路由/gateway 脚本/计划任务、不调用模型。',
+  },
 ] as const;
 
 const RELEASE_READINESS_GATES = [
@@ -857,6 +883,12 @@ const INTEGRATION_READINESS_MATRIX = [
     safePrechecks: ['确认只读观察模式', '确认不启动 ComfyUI'], requiredConfirmations: ['确认不生成图片/提交 queue'],
     rollbackRequired: false, nextMilestone: 'planned / preview_only', integrationRisk: 'low',
   },
+  {
+    id: 'openclaw_readonly_observer', name: 'OpenClaw Readonly Status Observer', status: 'preview_only', allowedModes: ['read_only'],
+    forbiddenActions: ['start_openclaw', 'stop_openclaw', 'restart_openclaw', 'taskkill_openclaw', 'upgrade_global', 'modify_config', 'modify_model_route', 'call_model', 'doctor_fix', 'modify_gateway_script', 'modify_scheduled_task'],
+    safePrechecks: ['确认只读观察模式', '确认不启动/停止/重启 OpenClaw'], requiredConfirmations: ['确认不 taskkill/升级/修改配置'],
+    rollbackRequired: false, nextMilestone: 'planned / preview_only', integrationRisk: 'low',
+  },
 ] as const;
 
 const INTEGRATION_REHEARSAL_MATRIX = [
@@ -930,6 +962,15 @@ const INTEGRATION_REHEARSAL_MATRIX = [
     rollbackPlanPreview: '只读观察，无需回滚。', nextSafeStep: '输出 ComfyUI 只读状态预览。',
     blockedRealActions: ['start_comfyui', 'generate_image', 'submit_queue', 'modify_workflow', 'download_model', 'delete_model', 'modify_config'],
   },
+  {
+    id: 'openclaw_readonly_observer_rehearsal', name: 'OpenClaw Readonly Observer Rehearsal', targetSystem: 'OpenClaw',
+    actionType: 'read_only_check', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认只读观察模式', '确认不启动/停止/重启 OpenClaw', '确认不 taskkill'],
+    requiredConfirmations: ['确认不升级/修改配置/模型路由/调用模型'],
+    rollbackPlanPreview: '只读观察，无需回滚。', nextSafeStep: '输出 OpenClaw 只读状态预览。',
+    blockedRealActions: ['start_openclaw', 'stop_openclaw', 'restart_openclaw', 'taskkill_openclaw', 'upgrade_global', 'modify_config', 'modify_model_route', 'call_model', 'doctor_fix', 'modify_gateway_script', 'modify_scheduled_task'],
+  },
 ] as const;
 
 const STOP_CONDITIONS = [
@@ -947,6 +988,8 @@ const STOP_CONDITIONS = [
   { id: 'openaxiom_dataset_model_modify', label: '涉及 OpenAxiom 数据集/模型修改', description: '涉及 OpenAxiom images/labels/data.yaml/models 修改时必须停止。' },
   { id: 'comfyui_generate_or_queue', label: '涉及 ComfyUI 生图/queue', description: '涉及 ComfyUI 图片生成、queue 提交、workflow 执行时必须停止。' },
   { id: 'comfyui_start_or_model', label: '涉及 ComfyUI 启动/模型操作', description: '涉及 ComfyUI 启动、下载模型、删除模型、修改配置时必须停止。' },
+  { id: 'openclaw_process_or_upgrade', label: '涉及 OpenClaw 进程/升级', description: '涉及 OpenClaw 启动、停止、重启、taskkill、升级全局版本时必须停止。' },
+  { id: 'openclaw_config_or_model', label: '涉及 OpenClaw 配置/模型路由', description: '涉及 OpenClaw 修改配置、修改模型路由、调用模型、修改 gateway 脚本、修改计划任务时必须停止。' },
 ] as const;
 
 function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMode, riskLevel: PracticalRiskLevel, deniedActions: string[]) {
@@ -988,6 +1031,10 @@ function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMo
     allowedSteps.push('ComfyUI 只读状态检查', '确认只读观察模式');
     forbiddenSteps.push('start_comfyui', 'generate_image', 'submit_queue', 'modify_workflow', 'download_model', 'delete_model', 'modify_config');
     stopConditions.push('涉及 ComfyUI 生图/queue', '涉及 ComfyUI 启动/模型操作');
+  } else if (taskType === 'openclaw_readonly_observer') {
+    allowedSteps.push('OpenClaw 只读状态检查', '确认只读观察模式');
+    forbiddenSteps.push('start_openclaw', 'stop_openclaw', 'restart_openclaw', 'taskkill_openclaw', 'upgrade_global', 'modify_config', 'modify_model_route', 'call_model', 'doctor_fix', 'modify_gateway_script', 'modify_scheduled_task');
+    stopConditions.push('涉及 OpenClaw 进程/升级', '涉及 OpenClaw 配置/模型路由');
   } else {
     allowedSteps.push('生成 dry-run 结果', '输出审计预览');
     stopConditions.push('路径不明确', '用户未明确授权');
@@ -1097,6 +1144,13 @@ const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: Rout
     local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读优先。' },
     balanced: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '平衡只读观察。' },
   },
+  openclaw_readonly_observer: {
+    save_money: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '只读状态观察适合本地低成本。' },
+    stable_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '稳定只读状态检查。' },
+    quality_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '只读观察不需要高质量模型。' },
+    local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读优先。' },
+    balanced: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '平衡只读观察。' },
+  },
 };
 
 const CASE_MATRIX = [
@@ -1119,6 +1173,8 @@ const CASE_MATRIX = [
   { label: '保存 OpenAxiom label', taskType: 'openaxiom_save_label', mode: 'stable_first', input: { target: '保存 OpenAxiom label' }, expectedCategory: 'openaxiom_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '写入类操作必须人工确认，当前 preview_only' },
   { label: 'ComfyUI 只读状态检查', taskType: 'comfyui_readonly_check', mode: 'stable_first', input: { target: '检查 ComfyUI 状态' }, expectedCategory: 'comfyui_readonly_observer', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读状态观察，不启动/不生图/不提交 queue' },
   { label: 'ComfyUI 生成图片', taskType: 'comfyui_generate_image', mode: 'stable_first', input: { target: 'ComfyUI 生成图片' }, expectedCategory: 'comfyui_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '生图操作必须人工确认，当前 preview_only' },
+  { label: 'OpenClaw 只读状态检查', taskType: 'openclaw_readonly_check', mode: 'stable_first', input: { target: '检查 OpenClaw 状态' }, expectedCategory: 'openclaw_readonly_observer', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读状态观察，不启动/停止/重启/taskkill/升级/改配置/调用模型' },
+  { label: '启动 OpenClaw', taskType: 'openclaw_start_service', mode: 'stable_first', input: { target: '启动 OpenClaw' }, expectedCategory: 'openclaw_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '进程操作必须人工确认，当前 preview_only' },
 ] as const;
 
 const DEFAULT_WEIGHTS: RouteWeightSet = {
@@ -2217,6 +2273,39 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
       ],
       safetyNotes: [...safetyNotes, 'ComfyUI 当前能力标记为 readonly，禁止启动、生图、提交 queue、修改 workflow/model。'],
       nextAction: '先生成只读状态预览，不直接操作 ComfyUI。',
+    };
+  }
+
+  if (taskType === 'openclaw_readonly_observer' && (text.includes('查') || text.includes('读') || text.includes('状态') || text.includes('status') || text.includes('检查') || text.includes('check') || text.includes('观察') || text.includes('可用') || text.includes('版本'))) {
+    return {
+      selectedRoute: 'local_cpu',
+      costLevel: 'free',
+      riskLevel: 'low',
+      needsUserConfirm: false,
+      reason: 'OpenClaw 只读状态观察。只返回只读状态预览，不启动/停止/重启 OpenClaw、不 taskkill、不升级全局版本、不修改配置/模型路由、不调用模型。',
+      rejectedRoutes: [
+        { route: 'manual_confirm', reason: '纯只读状态观察无需人工确认。' },
+      ],
+      safetyNotes: [
+        'OpenClaw 当前仅 readonly observer，不启动/停止/重启、不 taskkill、不升级全局 2026.3.23、不修改配置/模型路由/gateway 脚本/计划任务、不调用模型。',
+        '如需启动/停止/升级/修复，必须另开明确授权任务。',
+      ],
+      nextAction: '调用 GET /api/cost-routing/openclaw-status-preview 获取只读状态预览。',
+    };
+  }
+
+  if (taskType === 'openclaw_readonly_observer') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'free',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: 'OpenClaw 进程/配置/模型操作会改变系统状态，本轮只允许 readonly 展示。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '本地可分析，但进程/配置操作需要人工确认。' },
+      ],
+      safetyNotes: [...safetyNotes, 'OpenClaw 当前能力标记为 readonly，禁止启动/停止/重启/taskkill/升级/改配置/模型路由/调用模型。'],
+      nextAction: '先生成只读状态预览，不直接操作 OpenClaw。',
     };
   }
 
@@ -3425,6 +3514,93 @@ function buildComfyUiStatusPreview() {
   };
 }
 
+const OPENCLAW_READONLY_STATUS_CONTRACT = {
+  targetSystem: 'openclaw',
+  integrationMode: 'readonly_status_observer',
+  actionType: 'read_only_check',
+  executionMode: 'read_only',
+  persistenceMode: 'preview_only',
+  openClawWrite: false,
+  gatewayStart: false,
+  gatewayStop: false,
+  gatewayRestart: false,
+  configWrite: false,
+  modelRouteWrite: false,
+  modelCall: false,
+  versionUpgrade: false,
+  globalInstallTouch: false,
+  processKill: false,
+  scheduledTaskWrite: false,
+  externalMutation: false,
+} as const;
+
+function buildOpenClawStatusPreview() {
+  const nowStr = now();
+  const forbiddenOpenClawActions = [
+    'start OpenClaw', 'stop OpenClaw', 'restart OpenClaw', 'taskkill OpenClaw',
+    'upgrade global OpenClaw 2026.3.23', 'modify config', 'modify model route',
+    'call model', 'doctor --fix', 'modify gateway script', 'modify scheduled task',
+    'auto repair',
+  ];
+  return {
+    ok: true,
+    ...OPENCLAW_READONLY_STATUS_CONTRACT,
+    timestamp: nowStr,
+    observerStatus: 'preview_ready',
+    openClawStatusPreview: 'OpenClaw 只读状态观察：当前 preview_only / read_only 模式，不启动/停止/重启 OpenClaw，不 taskkill，不升级全局 2026.3.23，不修改配置/模型路由/gateway 脚本/计划任务，不调用模型。',
+    gatewayStatusPreview: 'readonly (status check only, no gateway control)',
+    versionPolicyPreview: 'readonly (stable 2026.3.23 protected, no upgrade)',
+    modelRoutingPreview: 'readonly (no model route modification, no model call)',
+    readonlyMode: true,
+    safetyBoundary: {
+      openClawWrite: false,
+      gatewayStart: false,
+      gatewayStop: false,
+      gatewayRestart: false,
+      configWrite: false,
+      modelRouteWrite: false,
+      modelCall: false,
+      versionUpgrade: false,
+      globalInstallTouch: false,
+      processKill: false,
+      scheduledTaskWrite: false,
+    },
+    forbiddenActions: forbiddenOpenClawActions,
+    nextSafeStep: '仅展示只读状态预览（preview_plan）。如需启动/停止/重启/升级/修复 OpenClaw，必须另开明确授权任务。不支持真实 OpenClaw API 调用。',
+    auditPreview: {
+      auditSchemaVersion: 'preview-v2',
+      mode: 'preview_only',
+      wouldExecute: false,
+      wouldWriteFiles: false,
+      databaseWrite: false,
+      fileWrite: false,
+      externalWrite: false,
+      timestamp: nowStr,
+      taskSummary: 'OpenClaw readonly status observer preview',
+      selectedPolicy: 'stable_first',
+      detectedCategory: 'openclaw_readonly_observer',
+      actionType: 'read_only_check',
+      riskLevel: 'low',
+      executionMode: 'read_only',
+      confidence: 'medium',
+      matchedRiskRules: [],
+      recommendedRoute: 'local_cpu',
+      recommendedModelTier: 'local',
+      deniedActions: forbiddenOpenClawActions,
+      readOnlyPrechecks: ['确认只读观察模式', '确认不启动/停止/重启 OpenClaw', '确认不 taskkill', '确认不修改配置/模型路由'],
+      nextSafeStep: '输出 OpenClaw 只读状态预览',
+      rollbackRequired: false,
+      auditMode: 'preview_only',
+      requiredConfirmations: [],
+      rollbackPlan: ['本轮不执行任何 OpenClaw 进程/配置/模型/升级操作，无需回滚。'],
+      auditIdPreview: genId('audit-openclaw'),
+      persistenceMode: 'preview_only' as const,
+      selectedModelRoute: 'local' as ModelTier,
+      selectedToolchainRoute: 'openclaw_readonly_observer',
+    },
+  };
+}
+
 const MEMORY_HUB_READONLY_CONTRACT = {
   targetSystem: 'memory_hub',
   integrationMode: 'readonly_context_lookup_preview',
@@ -3585,6 +3761,7 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
   app.post('/api/cost-routing/context-lookup-preview', async (request: any) => contextLookupPreview(request.body || {}));
   app.get('/api/cost-routing/openaxiom-status-preview', async () => buildOpenAxiomStatusPreview());
   app.get('/api/cost-routing/comfyui-status-preview', async () => buildComfyUiStatusPreview());
+  app.get('/api/cost-routing/openclaw-status-preview', async () => buildOpenClawStatusPreview());
   app.get('/api/cost-routing/route-types', async () => ({
     ok: true,
     engine_version: 'v2',

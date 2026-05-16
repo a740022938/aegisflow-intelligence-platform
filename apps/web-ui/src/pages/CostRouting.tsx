@@ -526,6 +526,20 @@ const SIMULATION_EXAMPLES: SimulationExample[] = [
     taskId: 'sim-comfyui-generate',
     input: { target: 'ComfyUI 生成图片' },
   },
+  {
+    label: 'OpenClaw 只读状态检查',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'openclaw_readonly_observer',
+    taskId: 'sim-openclaw-readonly',
+    input: { target: '检查 OpenClaw 状态' },
+  },
+  {
+    label: '启动 OpenClaw',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'openclaw_readonly_observer',
+    taskId: 'sim-openclaw-start',
+    input: { target: '启动 OpenClaw' },
+  },
 ];
 
 function fmt(v?: string) {
@@ -633,6 +647,8 @@ export default function CostRoutingPage() {
   const [openAxiomLoading, setOpenAxiomLoading] = useState(false);
   const [comfyUiPreview, setComfyUiPreview] = useState<any>(null);
   const [comfyUiLoading, setComfyUiLoading] = useState(false);
+  const [openClawPreview, setOpenClawPreview] = useState<any>(null);
+  const [openClawLoading, setOpenClawLoading] = useState(false);
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
@@ -949,6 +965,22 @@ export default function CostRoutingPage() {
     }
   }
 
+  async function handleOpenClawPreview() {
+    setOpenClawLoading(true);
+    setError('');
+    setMsg('');
+    try {
+      const res = await api('/api/cost-routing/openclaw-status-preview');
+      if (!res.ok) throw new Error(res.error || 'OpenClaw 只读状态预览失败');
+      setOpenClawPreview(res);
+      setMsg('OpenClaw 只读状态预览已生成。未启动/停止/重启 OpenClaw、未 taskkill、未升级全局版本、未修改配置/模型路由/调用模型。');
+    } catch (e: any) {
+      setError(e.message || 'OpenClaw 预览失败');
+    } finally {
+      setOpenClawLoading(false);
+    }
+  }
+
   async function handleMemoryHubPreview() {
     setMemoryHubLoading(true);
     setError('');
@@ -1027,7 +1059,7 @@ export default function CostRoutingPage() {
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>v7.8.0 comfyui readonly status observer (preview_only)</b>
+          <b>v7.9.0 openclaw readonly status observer (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -1051,22 +1083,22 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-          <b>v7.8.0 ComfyUI Readonly Status Observer</b>
+          <b>v7.9.0 OpenClaw Readonly Status Observer</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">当前模式</span>
           <b>preview plan only / read_only / no write</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">Memory Hub write</span>
+          <span className="cr-dashboard-key">Memory Hub/OpenAxiom/ComfyUI</span>
+          <b>all readonly preview</b>
+        </div>
+        <div className="cr-dashboard-item">
+          <span className="cr-dashboard-key">OpenClaw gateway control</span>
           <b>disabled</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">OpenAxiom GUI</span>
-          <b>disabled</b>
-        </div>
-        <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">ComfyUI start/generate</span>
+          <span className="cr-dashboard-key">OpenClaw model call</span>
           <b>disabled</b>
         </div>
         <div className="cr-dashboard-item">
@@ -1338,6 +1370,56 @@ export default function CostRoutingPage() {
             </div>
           ) : (
             <div className="cost-routing-policy-meta">尚未生成 ComfyUI 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="OpenClaw 只读状态预览 OpenClaw Readonly Status Preview">
+        <div className="cr-registry-note">仅只读状态观察。不启动/停止/重启 OpenClaw、不 taskkill、不升级全局 2026.3.23、不修改配置/模型路由/gateway 脚本/计划任务、不调用模型。</div>
+        <div className="cr-mh-grid">
+          <div className="cr-selfcheck-controls">
+            <button className="ui-btn ui-btn-primary" type="button" onClick={handleOpenClawPreview} disabled={openClawLoading}>
+              {openClawLoading ? '生成中...' : '生成 OpenClaw 只读状态预览'}
+            </button>
+          </div>
+          {openClawPreview ? (
+            <div className="cr-mh-results">
+              <div className="cr-selfcheck-header">
+                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{openClawPreview.integrationMode}</span>
+                <span className="cr-badge">{openClawPreview.actionType}</span>
+                <span className="cr-badge">target: {openClawPreview.targetSystem}</span>
+                <span className="cr-badge">{openClawPreview.persistenceMode}</span>
+                <span className="cr-badge">observer: {openClawPreview.observerStatus}</span>
+              </div>
+              <div className="cr-mh-summary-row">
+                <span className="cost-routing-policy-meta"><b>状态预览</b>：{openClawPreview.openClawStatusPreview}</span>
+              </div>
+              <div className="cr-mh-context-box">
+                <div className="cr-subtitle">OpenClaw 状态摘要</div>
+                <div className="cr-selfcheck-grid-inner">
+                  <div className="cr-pp-item"><span className="cr-pp-key">Gateway Status</span><b className="cr-pp-val">{openClawPreview.gatewayStatusPreview}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">Version Policy</span><b className="cr-pp-val">{openClawPreview.versionPolicyPreview}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">Model Routing</span><b className="cr-pp-val">{openClawPreview.modelRoutingPreview}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">Readonly Mode</span><b className="cr-pp-val">{String(openClawPreview.readonlyMode)}</b></div>
+                </div>
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
+              <div className="cr-selfcheck-grid-inner">
+                <div className="cr-pp-item"><span className="cr-pp-key">openClawWrite</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.openClawWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">gatewayStart</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.gatewayStart)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">gatewayStop</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.gatewayStop)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">gatewayRestart</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.gatewayRestart)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">configWrite</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.configWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">modelRouteWrite</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.modelRouteWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">modelCall</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.modelCall)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">versionUpgrade</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.versionUpgrade)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">processKill</span><b className="cr-pp-val">{String(openClawPreview.safetyBoundary?.processKill)}</b></div>
+              </div>
+              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(openClawPreview.forbiddenActions || []).join(' / ')}</div>
+              <div className="cr-next-action" style={{ marginTop: '6px' }}>{openClawPreview.nextSafeStep}</div>
+            </div>
+          ) : (
+            <div className="cost-routing-policy-meta">尚未生成 OpenClaw 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
           )}
         </div>
       </SectionCard>
