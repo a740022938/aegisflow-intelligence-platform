@@ -597,6 +597,8 @@ export default function CostRoutingPage() {
 
   const [routingHistory, setRoutingHistory] = useState<RoutingHistoryEntry[]>([]);
   const [routingModelRoute, setRoutingModelRoute] = useState<string>('');
+  const [selfCheckResult, setSelfCheckResult] = useState<any>(null);
+  const [selfCheckLoading, setSelfCheckLoading] = useState(false);
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
@@ -865,6 +867,22 @@ export default function CostRoutingPage() {
     }
   }
 
+  async function handleSelfCheck() {
+    setSelfCheckLoading(true);
+    setError('');
+    setMsg('');
+    try {
+      const res = await api('/api/cost-routing/self-check');
+      if (!res.ok) throw new Error(res.error || '只读自检失败');
+      setSelfCheckResult(res);
+      setMsg('AIP 只读自检完成。未写数据库、未改配置、未重启服务。');
+    } catch (e: any) {
+      setError(e.message || '自检失败');
+    } finally {
+      setSelfCheckLoading(false);
+    }
+  }
+
   async function runOptimization(mode: 'preview' | 'apply') {
     setOptimizing(true);
     setError('');
@@ -947,23 +965,27 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-            <b>v7.4.1 Integration Rehearsal</b>
+            <b>v7.5.0 Readonly Self-check Integration</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前模式</span>
-            <b>dry-run rehearsal only</b>
+            <b>first real readonly integration</b>
+          </div>
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">写入状态</span>
+            <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">外部调用</span>
             <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">写入</span>
+            <span className="cr-dashboard-key">修复动作</span>
             <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">发布</span>
-            <b>manual only</b>
+            <span className="cr-dashboard-key">当前试点</span>
+            <b>AIP self-check only</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">策略总数 / 近7天决策 / 回填反馈 / 建议</span>
@@ -985,6 +1007,65 @@ export default function CostRoutingPage() {
           </span>
         </div>
       </div>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="AIP 只读自检 Readonly Self-check">
+        <div className="cr-registry-note">真实只读接入试点。调用 AIP 自身只读 health/status，不写数据库、不改配置、不重启服务。</div>
+        <div className="cr-selfcheck-grid">
+          <div className="cr-selfcheck-controls">
+            <button className="ui-btn ui-btn-primary" type="button" onClick={handleSelfCheck} disabled={selfCheckLoading}>
+              {selfCheckLoading ? '自检中...' : '运行 AIP 只读自检'}
+            </button>
+          </div>
+          {selfCheckResult ? (
+            <div className="cr-selfcheck-results">
+              <div className="cr-selfcheck-header">
+                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'var(--success)' }}>{selfCheckResult.mode}</span>
+                <span className="cr-badge">{selfCheckResult.actionType}</span>
+                <span className="cr-badge">target: {selfCheckResult.targetSystem}</span>
+              </div>
+              <div className="cr-selfcheck-grid-inner">
+                <div className="cr-pp-item">
+                  <span className="cr-pp-key">API Health</span>
+                  <b className="cr-pp-val">{selfCheckResult.apiHealth}</b>
+                </div>
+                <div className="cr-pp-item">
+                  <span className="cr-pp-key">AIP Status</span>
+                  <b className="cr-pp-val">{selfCheckResult.aipStatus?.version} / {selfCheckResult.aipStatus?.mode}</b>
+                </div>
+                <div className="cr-pp-item">
+                  <span className="cr-pp-key">Cost Routing Status</span>
+                  <b className="cr-pp-val">{selfCheckResult.costRoutingStatus}</b>
+                </div>
+                <div className="cr-pp-item">
+                  <span className="cr-pp-key">Database Write</span>
+                  <b className="cr-pp-val">{String(selfCheckResult.databaseWrite)}</b>
+                </div>
+                <div className="cr-pp-item">
+                  <span className="cr-pp-key">File Write</span>
+                  <b className="cr-pp-val">{String(selfCheckResult.fileWrite)}</b>
+                </div>
+                <div className="cr-pp-item">
+                  <span className="cr-pp-key">Service Restart</span>
+                  <b className="cr-pp-val">{String(selfCheckResult.serviceRestart)}</b>
+                </div>
+                <div className="cr-pp-item">
+                  <span className="cr-pp-key">Process Kill</span>
+                  <b className="cr-pp-val">{String(selfCheckResult.processKill)}</b>
+                </div>
+                <div className="cr-pp-item">
+                  <span className="cr-pp-key">External Write</span>
+                  <b className="cr-pp-val">{String(selfCheckResult.externalWrite)}</b>
+                </div>
+              </div>
+              <div className="cr-template-desc" style={{ marginTop: '8px' }}>安全边界：不写数据库 / 不写文件 / 不改配置 / 不重启服务 / 不触碰外部项目。</div>
+              <div className="cost-routing-policy-meta">禁止操作：{(selfCheckResult.forbiddenActions || []).join(' / ')}</div>
+              <div className="cr-next-action" style={{ marginTop: '6px' }}>{selfCheckResult.nextSafeStep}</div>
+            </div>
+          ) : (
+            <div className="cost-routing-policy-meta">尚未执行自检。点击按钮运行 AIP 只读自检。</div>
+          )}
+        </div>
+      </SectionCard>
 
       <div className="cr-practical-grid">
         <SectionCard className={`role-card ${roleClass('gov')}`} title="模型线路表 Model Route Registry">

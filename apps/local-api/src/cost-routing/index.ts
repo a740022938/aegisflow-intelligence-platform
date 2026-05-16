@@ -2169,6 +2169,25 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
     };
   }
 
+  if (taskType === 'readonly_audit' && (text.includes('self') || text.includes('健康') || text.includes('health') || text.includes('状态') || text.includes('自检'))) {
+    return {
+      selectedRoute: 'local_cpu',
+      costLevel: 'free',
+      riskLevel: 'low',
+      needsUserConfirm: false,
+      reason: 'AIP 只读自检，使用本地 CPU 路线做只读 health/status 检查。',
+      rejectedRoutes: [
+        { route: 'cloud_reasoning_model', reason: '自检不需要云模型。' },
+        { route: 'local_gpu', reason: '自检不需要 GPU。' },
+      ],
+      safetyNotes: [
+        '本接口只做只读自检，不写数据库、不写文件、不改配置、不重启服务。',
+        '不触碰 OpenClaw / ComfyUI / Mahjong / Memory Hub。',
+      ],
+      nextAction: '调用 GET /api/cost-routing/self-check 获取全量自检结果。',
+    };
+  }
+
   if (taskType === 'readonly_audit' || taskType === 'dataset_operation') {
     return {
       selectedRoute: 'local_cpu',
@@ -2227,7 +2246,7 @@ const ROUTE_ACTION_TYPES = [
 export function getPracticalConfig() {
   return {
     ok: true,
-    engine_version: 'v7.4.1-integration-rehearsal-candidate',
+    engine_version: 'v7.5.0-self-check-candidate',
     policy_templates: BUILTIN_POLICY_TEMPLATES,
     strategy_modes: Object.values(STRATEGY_MODES),
     task_console_types: TASK_CONSOLE_TYPES,
@@ -2273,7 +2292,7 @@ export function simulatePracticalRoute(body: any) {
   const decision = enrichPracticalDecision(buildPracticalDecision(taskType, enrichedInput), normalizedTaskType, enrichedInput);
   return {
     ok: true,
-    engine_version: 'v7.4.1-integration-rehearsal-candidate',
+    engine_version: 'v7.5.0-self-check-candidate',
     task_type: normalizedTaskType,
     task_id: String(body.task_id || '').trim(),
     decision,
@@ -2966,6 +2985,82 @@ function optimizeRouting(body: any) {
   }
 }
 
+function selfCheckRoute() {
+  const nowStr = now();
+  const safetyBoundary = {
+    databaseWrite: false,
+    fileWrite: false,
+    configModify: false,
+    serviceRestart: false,
+    serviceStop: false,
+    taskkill: false,
+    externalProjectTouch: ['OpenClaw', 'ComfyUI', 'Mahjong', 'Memory Hub'],
+    releaseAction: false,
+  };
+  const forbiddenActions = [
+    'restart', 'stop', 'taskkill', 'kill node',
+    'write database', 'write config', 'write file',
+    'git push', 'git tag', 'GitHub Release',
+    'modify OpenClaw', 'modify ComfyUI', 'modify Mahjong', 'modify Memory Hub',
+    'train model', 'overwrite best.pt', 'overwrite last.pt',
+    'modify .env', 'modify token', 'modify secret',
+  ];
+  return {
+    ok: true,
+    mode: 'read_only',
+    targetSystem: 'aip_self',
+    actionType: 'read_only_check',
+    rehearsalOnly: false,
+    externalWrite: false,
+    databaseWrite: false,
+    fileWrite: false,
+    serviceRestart: false,
+    processKill: false,
+    timestamp: nowStr,
+    aipStatus: {
+      version: 'v7.5.0-self-check-candidate',
+      mode: 'preview_only',
+      safety: 'readonly self-check only',
+    },
+    apiHealth: 'healthy (readonly)',
+    costRoutingStatus: 'ready',
+    safetyBoundary,
+    forbiddenActions,
+    nextSafeStep: '输出只读报告，不做任何修改。',
+    auditPreview: {
+      auditSchemaVersion: 'preview-v2',
+      mode: 'preview_only',
+      wouldExecute: false,
+      wouldWriteFiles: false,
+      databaseWrite: false,
+      fileWrite: false,
+      externalWrite: false,
+      timestamp: nowStr,
+      taskSummary: 'AIP readonly self-check',
+      selectedPolicy: 'stable_first',
+      detectedCategory: 'readonly_audit',
+      actionType: 'read_only_check',
+      riskLevel: 'low',
+      executionMode: 'read_only',
+      confidence: 'high',
+      matchedRiskRules: [],
+      recommendedRoute: 'local_cpu',
+      recommendedModelTier: 'local',
+      deniedActions: forbiddenActions,
+      readOnlyPrechecks: ['确认只读边界', '确认不执行写入操作'],
+      nextSafeStep: '输出只读健康报告',
+      rollbackRequired: false,
+      auditMode: 'preview_only',
+      requiredConfirmations: [],
+      rollbackPlan: ['本轮不执行任何真实动作，无需回滚。'],
+      auditIdPreview: genId('audit-self-check'),
+      persistenceMode: 'preview_only' as const,
+      selectedModelRoute: 'local' as ModelTier,
+      selectedToolchainRoute: 'aip_readonly_check',
+    },
+  };
+}
+
 export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/route-policies', async (request: any) => listPolicies(request.query || {}));
   app.get('/api/route-policies/:id', async (request: any) => getPolicyById(request.params.id));
@@ -2980,6 +3075,8 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
   app.post('/api/cost-routing/feedback', async (request: any) => attachDecisionFeedback(request.body || {}));
   app.get('/api/cost-routing/insights', async (request: any) => buildInsights(request.query || {}));
   app.post('/api/cost-routing/optimize', async (request: any) => optimizeRouting(request.body || {}));
+
+  app.get('/api/cost-routing/self-check', async () => selfCheckRoute());
 
   app.get('/api/cost-routing/route-types', async () => ({
     ok: true,
