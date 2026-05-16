@@ -498,6 +498,20 @@ const SIMULATION_EXAMPLES: SimulationExample[] = [
     taskId: 'sim-env-token',
     input: { target: '帮我改 .env token' },
   },
+  {
+    label: 'OpenAxiom 只读状态检查',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'openaxiom_readonly_observer',
+    taskId: 'sim-openaxiom-readonly',
+    input: { target: '检查 OpenAxiom 状态' },
+  },
+  {
+    label: '保存 OpenAxiom label',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'openaxiom_readonly_observer',
+    taskId: 'sim-openaxiom-save',
+    input: { target: '保存 OpenAxiom label' },
+  },
 ];
 
 function fmt(v?: string) {
@@ -601,6 +615,8 @@ export default function CostRoutingPage() {
   const [selfCheckLoading, setSelfCheckLoading] = useState(false);
   const [memoryHubPreview, setMemoryHubPreview] = useState<any>(null);
   const [memoryHubLoading, setMemoryHubLoading] = useState(false);
+  const [openAxiomPreview, setOpenAxiomPreview] = useState<any>(null);
+  const [openAxiomLoading, setOpenAxiomLoading] = useState(false);
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
@@ -885,6 +901,22 @@ export default function CostRoutingPage() {
     }
   }
 
+  async function handleOpenAxiomPreview() {
+    setOpenAxiomLoading(true);
+    setError('');
+    setMsg('');
+    try {
+      const res = await api('/api/cost-routing/openaxiom-status-preview');
+      if (!res.ok) throw new Error(res.error || 'OpenAxiom 只读状态预览失败');
+      setOpenAxiomPreview(res);
+      setMsg('OpenAxiom 只读状态预览已生成。未启动 GUI、未保存/恢复/批量保存、未修改 labels/images/data.yaml/models。');
+    } catch (e: any) {
+      setError(e.message || 'OpenAxiom 预览失败');
+    } finally {
+      setOpenAxiomLoading(false);
+    }
+  }
+
   async function handleMemoryHubPreview() {
     setMemoryHubLoading(true);
     setError('');
@@ -963,7 +995,7 @@ export default function CostRoutingPage() {
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>v7.3.5 candidate (preview_only)</b>
+          <b>v7.7.0 openaxiom readonly status observer (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -987,22 +1019,22 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-            <b>v7.6.1 Memory Hub Preview Quality Gate</b>
+            <b>v7.7.0 OpenAxiom Readonly Status Observer</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前模式</span>
-            <b>preview plan only</b>
+            <b>preview plan only / read_only / no write</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">Memory Hub write</span>
             <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">candidate action</span>
+            <span className="cr-dashboard-key">OpenAxiom GUI</span>
             <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">LAN_SHARE sync</span>
+            <span className="cr-dashboard-key">OpenAxiom label/save</span>
             <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
@@ -1015,7 +1047,7 @@ export default function CostRoutingPage() {
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">下一步建议</span>
-            <b>先只读检查，再人工确认；高风险必须拆为子步骤</b>
+            <b>先只读状态观察，再人工确认；OpenAxiom 写入/GUI 必须另开授权任务</b>
           </div>
         </div>
       </SectionCard>
@@ -1175,6 +1207,56 @@ export default function CostRoutingPage() {
             </div>
           ) : (
             <div className="cost-routing-policy-meta">尚未生成 Memory Hub 只读查询预览。点击按钮获取只读上下文预览。</div>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="OpenAxiom 只读状态预览 OpenAxiom Readonly Status Preview">
+        <div className="cr-registry-note">仅只读状态观察。不启动 GUI、不保存 label、不恢复 label、不批量保存、不修改 images/labels/data.yaml/models。</div>
+        <div className="cr-mh-grid">
+          <div className="cr-selfcheck-controls">
+            <button className="ui-btn ui-btn-primary" type="button" onClick={handleOpenAxiomPreview} disabled={openAxiomLoading}>
+              {openAxiomLoading ? '生成中...' : '生成 OpenAxiom 只读状态预览'}
+            </button>
+          </div>
+          {openAxiomPreview ? (
+            <div className="cr-mh-results">
+              <div className="cr-selfcheck-header">
+                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{openAxiomPreview.integrationMode}</span>
+                <span className="cr-badge">{openAxiomPreview.actionType}</span>
+                <span className="cr-badge">target: {openAxiomPreview.targetSystem}</span>
+                <span className="cr-badge">{openAxiomPreview.persistenceMode}</span>
+                <span className="cr-badge">observer: {openAxiomPreview.observerStatus}</span>
+              </div>
+              <div className="cr-mh-summary-row">
+                <span className="cost-routing-policy-meta"><b>状态预览</b>：{openAxiomPreview.openAxiomStatusPreview}</span>
+              </div>
+              <div className="cr-mh-context-box">
+                <div className="cr-subtitle">OpenAxiom 状态摘要</div>
+                <div className="cr-selfcheck-grid-inner">
+                  <div className="cr-pp-item"><span className="cr-pp-key">Readonly Mode</span><b className="cr-pp-val">{String(openAxiomPreview.readonlyMode)}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">Bridge Status</span><b className="cr-pp-val">{openAxiomPreview.bridgeStatus}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">UI Status</span><b className="cr-pp-val">{openAxiomPreview.uiStatus}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">GUI Status</span><b className="cr-pp-val">{openAxiomPreview.guiStatus}</b></div>
+                </div>
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
+              <div className="cr-selfcheck-grid-inner">
+                <div className="cr-pp-item"><span className="cr-pp-key">openAxiomWrite</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.openAxiomWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">labelWrite</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.labelWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">datasetWrite</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.datasetWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">modelWrite</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.modelWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">guiLaunch</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.guiLaunch)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">saveAction</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.saveAction)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">restoreAction</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.restoreAction)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">batchSave</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.batchSave)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">autoRepair</span><b className="cr-pp-val">{String(openAxiomPreview.safetyBoundary?.autoRepair)}</b></div>
+              </div>
+              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(openAxiomPreview.forbiddenActions || []).join(' / ')}</div>
+              <div className="cr-next-action" style={{ marginTop: '6px' }}>{openAxiomPreview.nextSafeStep}</div>
+            </div>
+          ) : (
+            <div className="cost-routing-policy-meta">尚未生成 OpenAxiom 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
           )}
         </div>
       </SectionCard>

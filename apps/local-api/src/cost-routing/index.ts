@@ -41,6 +41,7 @@ const PRACTICAL_TASK_TYPES = [
   'github_release',
   'memory_update',
   'dataset_operation',
+  'openaxiom_readonly_observer',
 ] as const;
 type PracticalTaskType = typeof PRACTICAL_TASK_TYPES[number];
 type CostLevel = 'free' | 'low' | 'medium' | 'high' | 'unknown';
@@ -540,6 +541,13 @@ const HIGH_RISK_FIREWALL_RULES = [
   { id: 'unconfirmed_cleanup_path', label: '未确认路径的清理操作', patterns: ['cleanup unknown path', '未确认路径', '清理旧文件'] },
   { id: 'auto_candidate_decision', label: '自动 approve/reject/archive candidate', patterns: ['approve candidate', 'reject candidate', 'archive candidate', '自动审批', '自动归档'] },
   { id: 'production_db_write', label: '直接写入生产数据库', patterns: ['write production database', '生产数据库', '直接写库', 'prod db'] },
+  { id: 'openaxiom_save_label', label: 'OpenAxiom 保存 label', patterns: ['openaxiom save', 'openax save', '保存 label', '保存标注'] },
+  { id: 'openaxiom_restore_label', label: 'OpenAxiom 恢复 label', patterns: ['openaxiom restore', 'openax restore', '恢复 label', '恢复标注'] },
+  { id: 'openaxiom_batch_save', label: 'OpenAxiom 批量保存', patterns: ['openaxiom batch', 'openax batch', '批量保存', '全部保存'] },
+  { id: 'openaxiom_modify_dataset', label: 'OpenAxiom 修改 images/labels/data.yaml', patterns: ['openaxiom modify', 'openax modify', '修改 images', '修改 labels', '修改 data.yaml'] },
+  { id: 'openaxiom_train_model', label: 'OpenAxiom 训练模型', patterns: ['openaxiom train', 'openax train', 'openaxiom 训练', 'openax 训练'] },
+  { id: 'openaxiom_gui_launch', label: '启动 OpenAxiom GUI', patterns: ['openaxiom gui', 'openax gui', '启动 openaxiom', '启动 openax'] },
+  { id: 'openaxiom_auto_repair', label: 'OpenAxiom 自动修复', patterns: ['openaxiom repair', 'openax repair', 'openaxiom fix', 'openax fix', '自动修复 openaxiom'] },
 ] as const;
 
 const MODEL_ROUTE_REGISTRY = [
@@ -692,41 +700,30 @@ const TOOLCHAIN_REGISTRY = [
   {
     id: 'mahjong_dataset_readonly_audit',
     name: 'Mahjong Dataset Readonly Audit',
-    description: '只读检查说明，不扫描大文件、不移动、不删除、不修改。',
+    description: 'Mahjong 数据集只读审计，只检查目录、文件名和 YOLO 格式。',
     executionMode: 'read_only',
     readOnlyFirst: true,
     dryRunFirst: false,
     requiresHuman: false,
-    forbiddenActions: ['delete', 'move', 'modify', 'scan_large_files'],
+    forbiddenActions: ['scan_large_files', 'modify', 'delete', 'move', 'train', 'overwrite_model'],
     safePrechecks: ['确认目标目录为 Mahjong_V1_Project', '确认只读边界'],
     rollbackRequired: false,
     integrationStatus: 'preview_only',
+    note: '不扫描大文件、不移动、不删除、不修改。',
   },
   {
-    id: 'local_script_dry_run',
-    name: 'Local Script Dry-Run',
-    description: '本地脚本 dry-run，不真实写入。',
-    executionMode: 'dry_run',
+    id: 'openaxiom_readonly_observer',
+    name: 'OpenAxiom Readonly Status Observer',
+    description: 'OpenAxiom 只读状态观察，检查服务状态、只读模式和可用性。',
+    executionMode: 'read_only',
     readOnlyFirst: true,
-    dryRunFirst: true,
-    requiresHuman: true,
-    forbiddenActions: ['write_to_production', 'delete_files'],
-    safePrechecks: ['确认脚本路径', '确认脚本内容安全'],
-    rollbackRequired: true,
+    dryRunFirst: false,
+    requiresHuman: false,
+    forbiddenActions: ['launch_gui', 'save_label', 'restore_label', 'batch_save', 'modify_images', 'modify_labels', 'modify_data_yaml', 'modify_model', 'train', 'auto_repair'],
+    safePrechecks: ['确认只读观察模式', '确认不启动 GUI', '确认不保存/恢复/批量保存'],
+    rollbackRequired: false,
     integrationStatus: 'preview_only',
-  },
-  {
-    id: 'blocked_system_operation',
-    name: 'Blocked System Operation',
-    description: 'taskkill、删除、覆盖、写库、训练覆盖模型等默认 blocked 或 human_confirm_required。',
-    executionMode: 'blocked',
-    readOnlyFirst: true,
-    dryRunFirst: true,
-    requiresHuman: true,
-    forbiddenActions: ['taskkill', 'delete', 'overwrite', 'db_write', 'train_overwrite'],
-    safePrechecks: ['必须改写为只读检查任务', '获取人工确认和回滚方案'],
-    rollbackRequired: true,
-    integrationStatus: 'preview_only',
+    note: '不启动 GUI、不保存 label、不恢复 label、不批量保存、不修改 images/labels/data.yaml/models。',
   },
 ] as const;
 
@@ -826,6 +823,12 @@ const INTEGRATION_READINESS_MATRIX = [
     safePrechecks: ['改写为只读检查', '获取人工确认和回滚方案'], requiredConfirmations: ['人工确认', '回滚方案确认'],
     rollbackRequired: true, nextMilestone: 'blocked / human_confirm_required', integrationRisk: 'critical',
   },
+  {
+    id: 'openaxiom_readonly_observer', name: 'OpenAxiom Readonly Status Observer', status: 'preview_only', allowedModes: ['read_only'],
+    forbiddenActions: ['launch_gui', 'save_label', 'restore_label', 'batch_save', 'modify_images', 'modify_labels', 'modify_data_yaml', 'modify_model', 'train', 'auto_repair'],
+    safePrechecks: ['确认只读观察模式', '确认不启动 GUI'], requiredConfirmations: ['确认不保存/恢复/批量保存'],
+    rollbackRequired: false, nextMilestone: 'planned / preview_only', integrationRisk: 'low',
+  },
 ] as const;
 
 const INTEGRATION_REHEARSAL_MATRIX = [
@@ -881,6 +884,15 @@ const INTEGRATION_REHEARSAL_MATRIX = [
     rollbackPlanPreview: '只读审计，无需回滚。', nextSafeStep: '输出数据集只读报告。',
     blockedRealActions: ['scan_large_files', 'move', 'delete', 'modify', 'train', 'overwrite_model'],
   },
+  {
+    id: 'openaxiom_readonly_observer_rehearsal', name: 'OpenAxiom Readonly Observer Rehearsal', targetSystem: 'OpenAxiom',
+    actionType: 'read_only_check', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认只读观察模式', '确认不启动 GUI', '确认不保存/恢复/批量保存'],
+    requiredConfirmations: ['确认不修改 labels/images/data.yaml/models'],
+    rollbackPlanPreview: '只读观察，无需回滚。', nextSafeStep: '输出 OpenAxiom 只读状态预览。',
+    blockedRealActions: ['launch_gui', 'save_label', 'restore_label', 'batch_save', 'modify_images', 'modify_labels', 'modify_data_yaml', 'modify_model', 'train', 'auto_repair'],
+  },
 ] as const;
 
 const STOP_CONDITIONS = [
@@ -894,6 +906,8 @@ const STOP_CONDITIONS = [
   { id: 'train_overwrite_model', label: '涉及训练并覆盖模型', description: '涉及训练并覆盖 best.pt/last.pt 时必须停止。' },
   { id: 'secret_token_env_risk', label: '检测到 secret/token/.env 风险', description: '检测到敏感配置暴露风险时必须停止。' },
   { id: 'user_not_authorized', label: '用户未明确授权', description: '用户未明确授权时必须停止，不执行任何动作。' },
+  { id: 'openaxiom_gui_or_write', label: '涉及 OpenAxiom GUI/保存/恢复', description: '涉及 OpenAxiom GUI 启动、保存 label、恢复 label、批量保存时必须停止。' },
+  { id: 'openaxiom_dataset_model_modify', label: '涉及 OpenAxiom 数据集/模型修改', description: '涉及 OpenAxiom images/labels/data.yaml/models 修改时必须停止。' },
 ] as const;
 
 function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMode, riskLevel: PracticalRiskLevel, deniedActions: string[]) {
@@ -927,6 +941,10 @@ function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMo
     allowedSteps.push('数据集路径确认', '只读计数预览');
     forbiddenSteps.push('scan_large_files', 'modify', 'train');
     stopConditions.push('涉及 Mahjong 数据集修改');
+  } else if (taskType === 'openaxiom_readonly_observer') {
+    allowedSteps.push('OpenAxiom 只读状态检查', '确认只读观察模式');
+    forbiddenSteps.push('launch_gui', 'save_label', 'restore_label', 'batch_save', 'modify_images', 'modify_labels', 'modify_data_yaml', 'modify_model', 'train', 'auto_repair');
+    stopConditions.push('涉及 OpenAxiom GUI/保存/恢复', '涉及 OpenAxiom 数据集/模型修改');
   } else {
     allowedSteps.push('生成 dry-run 结果', '输出审计预览');
     stopConditions.push('路径不明确', '用户未明确授权');
@@ -1022,6 +1040,13 @@ const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: Rout
     local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读检查优先。' },
     balanced: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'dry_run', note: '平衡路线先预检。' },
   },
+  openaxiom_readonly_observer: {
+    save_money: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '只读状态观察适合本地低成本。' },
+    stable_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '稳定只读状态检查。' },
+    quality_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '只读观察不需要高质量模型。' },
+    local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读优先。' },
+    balanced: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '平衡只读观察。' },
+  },
 };
 
 const CASE_MATRIX = [
@@ -1040,6 +1065,8 @@ const CASE_MATRIX = [
   { label: '模糊任务', taskType: 'text_inference', mode: 'balanced', input: { target: '帮我弄一下' }, expectedCategory: 'text_inference', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'balanced', expectedSafetyBehavior: '低置信度并要求补充信息' },
   { label: '依赖安装', taskType: 'code_debug', mode: 'stable_first', input: { target: 'pnpm install 一堆新依赖' }, expectedCategory: 'code_analysis', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '大范围依赖变更必须人工确认' },
   { label: '修改 .env token', taskType: 'high_risk_system_ops', mode: 'stable_first', input: { target: '帮我改 .env token' }, expectedCategory: 'file_cleanup', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '敏感配置和密钥风险必须人工确认' },
+  { label: 'OpenAxiom 只读状态检查', taskType: 'openaxiom_readonly_check', mode: 'stable_first', input: { target: '检查 OpenAxiom 状态' }, expectedCategory: 'openaxiom_readonly_observer', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读状态观察，不启动 GUI、不保存/恢复/批量保存' },
+  { label: '保存 OpenAxiom label', taskType: 'openaxiom_save_label', mode: 'stable_first', input: { target: '保存 OpenAxiom label' }, expectedCategory: 'openaxiom_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '写入类操作必须人工确认，当前 preview_only' },
 ] as const;
 
 const DEFAULT_WEIGHTS: RouteWeightSet = {
@@ -2072,6 +2099,39 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
       ],
       safetyNotes: [...safetyNotes, '禁止修改全局 OpenClaw 2026.3.23。'],
       nextAction: '先做只读现状检查和 sidecar 旁路方案，不覆盖稳定版。',
+    };
+  }
+
+  if (taskType === 'openaxiom_readonly_observer' && (text.includes('查') || text.includes('读') || text.includes('状态') || text.includes('status') || text.includes('检查') || text.includes('check') || text.includes('观察'))) {
+    return {
+      selectedRoute: 'local_cpu',
+      costLevel: 'free',
+      riskLevel: 'low',
+      needsUserConfirm: false,
+      reason: 'OpenAxiom 只读状态观察。只返回只读状态预览，不启动 GUI、不保存/恢复/批量保存、不改 labels/images/data.yaml/models。',
+      rejectedRoutes: [
+        { route: 'manual_confirm', reason: '纯只读状态观察无需人工确认。' },
+      ],
+      safetyNotes: [
+        'OpenAxiom 当前仅 readonly observer，不启动 GUI、不保存/恢复/批量保存、不修改 labels/images/data.yaml/models。',
+        '如需写入/保存/GUI 操作，必须另开明确授权任务。',
+      ],
+      nextAction: '调用 GET /api/cost-routing/openaxiom-status-preview 获取只读状态预览。',
+    };
+  }
+
+  if (taskType === 'openaxiom_readonly_observer') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'free',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: 'OpenAxiom 写入/保存/GUI 操作会改变状态，本轮只允许 readonly 展示。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '本地可分析，但写入/GUI 需要人工确认。' },
+      ],
+      safetyNotes: [...safetyNotes, 'OpenAxiom 当前能力标记为 readonly，禁止 GUI 启动、保存/恢复/批量保存、修改数据。'],
+      nextAction: '先生成只读状态预览，不直接操作 OpenAxiom。',
     };
   }
 
@@ -3116,6 +3176,90 @@ function selfCheckRoute() {
   };
 }
 
+const OPENAXIOM_READONLY_STATUS_CONTRACT = {
+  targetSystem: 'openaxiom',
+  integrationMode: 'readonly_status_observer',
+  actionType: 'read_only_check',
+  executionMode: 'read_only',
+  persistenceMode: 'preview_only',
+  openAxiomWrite: false,
+  labelWrite: false,
+  datasetWrite: false,
+  modelWrite: false,
+  guiLaunch: false,
+  saveAction: false,
+  restoreAction: false,
+  batchSave: false,
+  autoRepair: false,
+  externalMutation: false,
+} as const;
+
+function buildOpenAxiomStatusPreview() {
+  const nowStr = now();
+  const forbiddenOpenAxiomActions = [
+    'launch GUI', 'save label', 'restore label', 'batch save',
+    'modify images', 'modify labels', 'modify data.yaml', 'modify model',
+    'train model', 'overwrite best.pt', 'overwrite last.pt',
+    'modify E:\\Axiom mainline', 'modify E:\\Mahjong_V1_Project',
+    'auto repair',
+  ];
+  return {
+    ok: true,
+    ...OPENAXIOM_READONLY_STATUS_CONTRACT,
+    timestamp: nowStr,
+    observerStatus: 'preview_ready',
+    openAxiomStatusPreview: 'OpenAxiom 只读状态观察：当前 preview_only / read_only 模式，不启动 GUI，不保存/恢复/批量保存，不修改 labels/images/data.yaml/models。',
+    readonlyMode: true,
+    bridgeStatus: 'readonly (available for status check)',
+    uiStatus: 'readonly (status preview only)',
+    guiStatus: 'disabled (no launch)',
+    safetyBoundary: {
+      openAxiomWrite: false,
+      labelWrite: false,
+      datasetWrite: false,
+      modelWrite: false,
+      guiLaunch: false,
+      saveAction: false,
+      restoreAction: false,
+      batchSave: false,
+      autoRepair: false,
+    },
+    forbiddenActions: forbiddenOpenAxiomActions,
+    nextSafeStep: '仅展示只读状态预览（preview_plan）。如需保存/恢复/批量保存/GUI/修复，必须另开明确授权任务。不支持真实 OpenAxiom API 调用。',
+    auditPreview: {
+      auditSchemaVersion: 'preview-v2',
+      mode: 'preview_only',
+      wouldExecute: false,
+      wouldWriteFiles: false,
+      databaseWrite: false,
+      fileWrite: false,
+      externalWrite: false,
+      timestamp: nowStr,
+      taskSummary: 'OpenAxiom readonly status observer preview',
+      selectedPolicy: 'stable_first',
+      detectedCategory: 'openaxiom_readonly_observer',
+      actionType: 'read_only_check',
+      riskLevel: 'low',
+      executionMode: 'read_only',
+      confidence: 'medium',
+      matchedRiskRules: [],
+      recommendedRoute: 'local_cpu',
+      recommendedModelTier: 'local',
+      deniedActions: forbiddenOpenAxiomActions,
+      readOnlyPrechecks: ['确认只读观察模式', '确认不启动 GUI', '确认不保存/恢复/批量保存'],
+      nextSafeStep: '输出 OpenAxiom 只读状态预览',
+      rollbackRequired: false,
+      auditMode: 'preview_only',
+      requiredConfirmations: [],
+      rollbackPlan: ['本轮不执行任何 OpenAxiom 写入/GUI/保存操作，无需回滚。'],
+      auditIdPreview: genId('audit-openaxiom'),
+      persistenceMode: 'preview_only' as const,
+      selectedModelRoute: 'local' as ModelTier,
+      selectedToolchainRoute: 'openaxiom_readonly_observer',
+    },
+  };
+}
+
 const MEMORY_HUB_READONLY_CONTRACT = {
   targetSystem: 'memory_hub',
   integrationMode: 'readonly_context_lookup_preview',
@@ -3274,6 +3418,7 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
 
   app.get('/api/cost-routing/self-check', async () => selfCheckRoute());
   app.post('/api/cost-routing/context-lookup-preview', async (request: any) => contextLookupPreview(request.body || {}));
+  app.get('/api/cost-routing/openaxiom-status-preview', async () => buildOpenAxiomStatusPreview());
   app.get('/api/cost-routing/route-types', async () => ({
     ok: true,
     engine_version: 'v2',
