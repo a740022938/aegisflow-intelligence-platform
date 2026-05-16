@@ -150,15 +150,30 @@ interface PracticalDecision {
   missingInformation?: string[];
   whyThisRoute?: string;
   escalationPlan?: string[];
+  actionType?: string;
+  actionLabel?: string;
+  actionExplanation?: string;
+  allowedNextStep?: string;
+  forbiddenNextSteps?: string[];
+  requiresHumanConfirmation?: boolean;
+  persistenceMode?: string;
+  humanGateRequired?: boolean;
+  confirmationReason?: string;
+  noAutomaticExecution?: boolean;
   auditPreview?: {
+    auditSchemaVersion: string;
     mode: 'preview_only';
     wouldExecute: false;
     wouldWriteFiles: false;
+    databaseWrite: false;
+    fileWrite: false;
+    externalWrite: false;
     timestamp: string;
     taskSummary: string;
     rawInput: Record<string, unknown>;
     selectedPolicy: StrategyMode;
     detectedCategory: string;
+    actionType: string;
     riskLevel: PracticalRiskLevel;
     executionMode: ExecutionMode;
     confidence: ConfidenceLevel;
@@ -172,10 +187,10 @@ interface PracticalDecision {
     auditMode: 'preview_only';
     requiredConfirmations: string[];
     rollbackPlan: string[];
-    auditIdPreview?: string;
-    persistenceMode?: 'preview_only';
-    selectedModelRoute?: ModelTier;
-    selectedToolchainRoute?: string;
+    auditIdPreview: string;
+    persistenceMode: 'preview_only';
+    selectedModelRoute: ModelTier;
+    selectedToolchainRoute: string;
   };
 }
 
@@ -752,6 +767,52 @@ const EXTERNAL_INTEGRATIONS = [
     description: '未来可接数据集只读审计；当前不扫描、不修改。',
     integrationStatus: 'preview_only',
     note: '不扫描大文件、不移动、不删除、不修改。',
+  },
+] as const;
+
+const INTEGRATION_READINESS_MATRIX = [
+  {
+    id: 'aip_readonly_api', name: 'AIP Readonly API', status: 'ready', allowedModes: ['read_only', 'dry_run'],
+    forbiddenActions: ['write_db', 'delete', 'restart', 'train'], safePrechecks: ['health check', 'status check'],
+    requiredConfirmations: [], rollbackRequired: false, nextMilestone: '已就绪', integrationRisk: 'low',
+  },
+  {
+    id: 'github_release_prep', name: 'GitHub Release-Prep', status: 'guarded', allowedModes: ['read_only', 'dry_run'],
+    forbiddenActions: ['git_push', 'git_tag', 'github_release'], safePrechecks: ['diff check', 'lint', 'build', 'smoke', 'release notes draft'],
+    requiredConfirmations: ['确认版本号', '确认发布范围'], rollbackRequired: true, nextMilestone: 'guarded（release-prep only）', integrationRisk: 'high',
+  },
+  {
+    id: 'openclaw_sidecar', name: 'OpenClaw Sidecar', status: 'preview_only', allowedModes: ['read_only'],
+    forbiddenActions: ['start', 'overwrite', 'upgrade_global'], safePrechecks: ['确认当前版本', '确认不覆盖稳定版'],
+    requiredConfirmations: ['确认不覆盖 OpenClaw'], rollbackRequired: true, nextMilestone: 'planned', integrationRisk: 'medium',
+  },
+  {
+    id: 'comfyui_workflow', name: 'ComfyUI Workflow', status: 'preview_only', allowedModes: ['read_only'],
+    forbiddenActions: ['start', 'invoke', 'generate', 'modify_model'], safePrechecks: ['确认端口状态'],
+    requiredConfirmations: ['确认不自动生图'], rollbackRequired: false, nextMilestone: 'planned', integrationRisk: 'medium',
+  },
+  {
+    id: 'memory_hub', name: 'Memory Hub', status: 'dry_run_only', allowedModes: ['dry_run'],
+    forbiddenActions: ['sqlite_write', 'approve_candidate', 'reject_candidate', 'archive_candidate', 'sync_lan_share'],
+    safePrechecks: ['确认 candidate 状态', '确认只读边界'], requiredConfirmations: ['确认不写 sqlite'],
+    rollbackRequired: true, nextMilestone: 'dry_run_only', integrationRisk: 'high',
+  },
+  {
+    id: 'mahjong_dataset', name: 'Mahjong Dataset', status: 'protected', allowedModes: ['read_only'],
+    forbiddenActions: ['scan_large_files', 'move', 'delete', 'modify', 'train', 'overwrite_model'],
+    safePrechecks: ['确认目标目录', '确认只读边界'], requiredConfirmations: ['确认不修改 Mahjong_V1_Project'],
+    rollbackRequired: false, nextMilestone: 'protected / readonly_only', integrationRisk: 'high',
+  },
+  {
+    id: 'local_script_dry_run', name: 'Local Script Dry-Run', status: 'dry_run_only', allowedModes: ['dry_run'],
+    forbiddenActions: ['write_to_production', 'delete_files', 'overwrite'], safePrechecks: ['确认脚本路径', '确认脚本内容安全'],
+    requiredConfirmations: ['确认不真实写入'], rollbackRequired: true, nextMilestone: 'planned', integrationRisk: 'medium',
+  },
+  {
+    id: 'system_operations', name: 'System Operations', status: 'blocked', allowedModes: ['blocked'],
+    forbiddenActions: ['taskkill', 'kill_node', 'delete_backup', 'modify_env', 'write_db', 'overwrite_model'],
+    safePrechecks: ['改写为只读检查', '获取人工确认和回滚方案'], requiredConfirmations: ['人工确认', '回滚方案确认'],
+    rollbackRequired: true, nextMilestone: 'blocked / human_confirm_required', integrationRisk: 'critical',
   },
 ] as const;
 
@@ -1772,15 +1833,44 @@ function enrichPracticalDecision(decision: Omit<PracticalDecision,
       `失败切换出口：${routeDisplayName(fallback.fallbackRoute)}`,
       highRiskFirewall ? '高风险命中时先只读检查，再生成回滚方案，最后等待人工确认。' : '低风险任务可先 dry-run，再根据质量结果升级。',
     ],
+    actionType: selectedRoute === 'blocked' || riskLevel === 'blocked' ? 'blocked_action'
+      : executionMode === 'human_confirm_required' ? 'ask_for_confirmation'
+      : executionMode === 'blocked' ? 'blocked_action'
+      : taskType === 'github_release' ? 'manual_release_prep'
+      : executionMode === 'dry_run' ? 'dry_run_plan'
+      : executionMode === 'read_only' ? 'read_only_check'
+      : executionMode === 'ask_first' ? 'ask_for_confirmation'
+      : 'local_safe_suggestion',
+    actionLabel: routeDisplayName(selectedRoute),
+    actionExplanation: decision.reason,
+    allowedNextStep: decision.nextAction,
+    forbiddenNextSteps: deniedActions,
+    requiresHumanConfirmation: needsUserConfirm,
+    persistenceMode: 'preview_only',
+    humanGateRequired: needsUserConfirm || riskLevel === 'high' || riskLevel === 'blocked' || firewallHits.length > 0,
+    confirmationReason: needsUserConfirm ? '高风险任务需人工确认后才能继续。' : '',
+    noAutomaticExecution: executionMode === 'human_confirm_required' || executionMode === 'blocked',
     auditPreview: {
+      auditSchemaVersion: 'preview-v2',
       mode: 'preview_only',
       wouldExecute: false,
       wouldWriteFiles: false,
+      databaseWrite: false,
+      fileWrite: false,
+      externalWrite: false,
       timestamp: now(),
       taskSummary: targetText(input) || getTaskLabel(taskType),
       rawInput: input && typeof input === 'object' ? input : {},
       selectedPolicy: strategy.id,
       detectedCategory: category.id,
+      actionType: selectedRoute === 'blocked' || riskLevel === 'blocked' ? 'blocked_action'
+        : executionMode === 'human_confirm_required' ? 'ask_for_confirmation'
+        : executionMode === 'blocked' ? 'blocked_action'
+        : taskType === 'github_release' ? 'manual_release_prep'
+        : executionMode === 'dry_run' ? 'dry_run_plan'
+        : executionMode === 'read_only' ? 'read_only_check'
+        : executionMode === 'ask_first' ? 'ask_for_confirmation'
+        : 'local_safe_suggestion',
       riskLevel,
       executionMode,
       confidence: confidence.confidence,
@@ -1795,7 +1885,7 @@ function enrichPracticalDecision(decision: Omit<PracticalDecision,
       requiredConfirmations,
       rollbackPlan,
       auditIdPreview: genId('audit-preview'),
-      persistenceMode: 'preview_only' as const,
+      persistenceMode: 'preview_only',
       selectedModelRoute: recommendedModelTier,
       selectedToolchainRoute: selectedRoute === 'openclaw_sidecar_2026_5_12' ? 'openclaw_sidecar_preview'
         : selectedRoute === 'comfyui_8000' ? 'comfyui_generation_preview'
@@ -1988,10 +2078,20 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
   };
 }
 
+const ROUTE_ACTION_TYPES = [
+  { id: 'preview_only', label: '仅预览', description: '不执行任何真实动作，仅展示建议。' },
+  { id: 'read_only_check', label: '只读检查', description: '执行只读检查，不写数据、不改文件。' },
+  { id: 'dry_run_plan', label: 'Dry-Run 计划', description: '模拟执行流程，不产生真实影响。' },
+  { id: 'ask_for_confirmation', label: '请求人工确认', description: '需要用户确认后才能继续。' },
+  { id: 'manual_release_prep', label: '手工发布准备', description: '只做 release-prep，不自动发布。' },
+  { id: 'local_safe_suggestion', label: '本地安全建议', description: '仅给出本地可执行的建议。' },
+  { id: 'blocked_action', label: '阻断动作', description: '高风险动作，禁止自动执行。' },
+] as const;
+
 export function getPracticalConfig() {
   return {
     ok: true,
-    engine_version: 'v7.3.4-console-expansion-candidate',
+    engine_version: 'v7.4.0-integration-foundation-candidate',
     policy_templates: BUILTIN_POLICY_TEMPLATES,
     strategy_modes: Object.values(STRATEGY_MODES),
     task_console_types: TASK_CONSOLE_TYPES,
@@ -2021,6 +2121,8 @@ export function getPracticalConfig() {
     toolchain_registry: TOOLCHAIN_REGISTRY,
     release_readiness_gates: RELEASE_READINESS_GATES,
     external_integrations: EXTERNAL_INTEGRATIONS,
+    integration_readiness_matrix: INTEGRATION_READINESS_MATRIX,
+    route_action_types: ROUTE_ACTION_TYPES,
   };
 }
 
@@ -2033,7 +2135,7 @@ export function simulatePracticalRoute(body: any) {
   const decision = enrichPracticalDecision(buildPracticalDecision(taskType, enrichedInput), normalizedTaskType, enrichedInput);
   return {
     ok: true,
-    engine_version: 'v7.3.5-ux-refined-candidate',
+    engine_version: 'v7.4.0-integration-foundation-candidate',
     task_type: normalizedTaskType,
     task_id: String(body.task_id || '').trim(),
     decision,

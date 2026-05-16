@@ -151,15 +151,30 @@ interface PracticalDecision {
   missingInformation?: string[];
   whyThisRoute?: string;
   escalationPlan?: string[];
+  actionType?: string;
+  actionLabel?: string;
+  actionExplanation?: string;
+  allowedNextStep?: string;
+  forbiddenNextSteps?: string[];
+  requiresHumanConfirmation?: boolean;
+  persistenceMode?: string;
+  humanGateRequired?: boolean;
+  confirmationReason?: string;
+  noAutomaticExecution?: boolean;
   auditPreview?: {
+    auditSchemaVersion?: string;
     mode: 'preview_only';
     wouldExecute: false;
     wouldWriteFiles: false;
+    databaseWrite?: false;
+    fileWrite?: false;
+    externalWrite?: false;
     timestamp?: string;
     taskSummary?: string;
     rawInput?: Record<string, unknown>;
     selectedPolicy?: string;
     detectedCategory?: string;
+    actionType?: string;
     riskLevel?: string;
     executionMode?: string;
     confidence?: string;
@@ -173,6 +188,10 @@ interface PracticalDecision {
     auditMode?: string;
     requiredConfirmations: string[];
     rollbackPlan: string[];
+    auditIdPreview?: string;
+    persistenceMode?: string;
+    selectedModelRoute?: string;
+    selectedToolchainRoute?: string;
   };
 }
 
@@ -276,6 +295,27 @@ interface PracticalConfig {
   toolchain_registry?: ToolchainEntry[];
   release_readiness_gates?: ReleaseReadinessGate[];
   external_integrations?: ExternalIntegration[];
+  integration_readiness_matrix?: IntegrationReadinessEntry[];
+  route_action_types?: RouteActionType[];
+}
+
+interface IntegrationReadinessEntry {
+  id: string;
+  name: string;
+  status: string;
+  allowedModes: string[];
+  forbiddenActions: string[];
+  safePrechecks: string[];
+  requiredConfirmations: string[];
+  rollbackRequired: boolean;
+  nextMilestone: string;
+  integrationRisk: string;
+}
+
+interface RouteActionType {
+  id: string;
+  label: string;
+  description: string;
 }
 
 interface ReleaseReadinessGate {
@@ -869,16 +909,20 @@ export default function CostRoutingPage() {
       <SectionCard className={`role-card ${roleClass('exec')}`} title="控制台摘要 Console Dashboard">
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">当前模式</span>
-            <b>AI Task Router Console v7.3.5</b>
+            <span className="cr-dashboard-key">当前阶段</span>
+            <b>v7.4.0 Integration Foundation</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">安全状态</span>
-            <b>preview_only / dry-run first / 高风险人工确认</b>
+            <span className="cr-dashboard-key">当前模式</span>
+            <b>preview_only / read_only / dry_run first</b>
+          </div>
+          <div className="cr-dashboard-item">
+            <span className="cr-dashboard-key">安全口径</span>
+            <b>external writes disabled</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前能力</span>
-            <b>Router Core + Route Registry + Audit Preview + Release Readiness</b>
+            <b>Router Core + Route Registry + Audit Preview v2 + Integration Matrix</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前禁止</span>
@@ -966,6 +1010,28 @@ export default function CostRoutingPage() {
         </div>
       </SectionCard>
 
+      <SectionCard className={`role-card ${roleClass('gov')}`} title="集成准备度矩阵 Integration Readiness Matrix">
+        <div className="cr-registry-note">反映各外部系统的当前集成准备状态。不写数据库、不调用外部系统。</div>
+        <div className="cr-integration-grid">
+          {(practicalConfig?.integration_readiness_matrix || []).map((entry) => {
+            const riskColor = entry.integrationRisk === 'critical' ? 'risk-blocked' : entry.integrationRisk === 'high' ? 'risk-high' : entry.integrationRisk === 'medium' ? 'risk-medium' : 'risk-low';
+            return (
+              <div className={`cr-integration-card status-${entry.status}`} key={entry.id}>
+                <div className="cr-template-head">
+                  <b>{entry.name}</b>
+                  <span className={`cr-badge ${riskColor}`}>{entry.status}</span>
+                </div>
+                <div className="cost-routing-policy-meta">允许模式：{entry.allowedModes.join(' / ')}</div>
+                <div className="cost-routing-policy-meta">禁止操作：{entry.forbiddenActions.join(' / ')}</div>
+                <div className="cost-routing-policy-meta">预检：{entry.safePrechecks.join(' / ')}</div>
+                <div className="cost-routing-policy-meta">风险：{entry.integrationRisk} · 回滚：{entry.rollbackRequired ? '是' : '否'}</div>
+                <div className="cost-routing-policy-meta">下一里程碑：{entry.nextMilestone}</div>
+              </div>
+            );
+          })}
+        </div>
+      </SectionCard>
+
       <SectionCard className={`role-card ${roleClass('gov')}`} title="策略配置预览 Policy Config Preview">
         <div className="cr-registry-note">当前为策略预览，不写入配置文件，不写数据库。</div>
         <div className="cr-policy-preview-grid">
@@ -1017,6 +1083,25 @@ export default function CostRoutingPage() {
             <span className="cr-pp-key">失败升级路线</span>
             <b className="cr-pp-val">{practicalDecision?.fallbackPlan || 'manual_confirm'}</b>
           </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('gov')}`} title="策略画像预览 Policy Profile Preview">
+        <div className="cr-registry-note">展示未来可配置的策略画像。不保存偏好、不写配置文件、不写数据库。</div>
+        <div className="cr-policy-preview-grid">
+          <div className="cr-pp-item"><span className="cr-pp-key">defaultPolicy</span><b className="cr-pp-val">{strategyMode}</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">modelRoutePreference</span><b className="cr-pp-val">{practicalDecision?.recommendedModelTier || 'auto'}</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">toolchainPreference</span><b className="cr-pp-val">{practicalDecision?.recommendedToolchain?.primary || 'auto'}</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">cloudAllowed</span><b className="cr-pp-val">{practicalDecision?.executionMode === 'cloud_allowed' ? '是' : '否'}</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">localPreferred</span><b className="cr-pp-val">{strategyMode === 'local_first' || strategyMode === 'save_money' ? '是' : '否'}</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">dryRunRequiredForMediumRisk</span><b className="cr-pp-val">{practicalDecision?.executionMode === 'dry_run' ? '是' : '否'}</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">humanRequiredForHighRisk</span><b className="cr-pp-val">{practicalDecision?.needsUserConfirm ? '是' : '是（默认）'}</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">releaseActionsManualOnly</span><b className="cr-pp-val">是</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">memoryHubWriteDisabled</span><b className="cr-pp-val">是</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">mahjongProtected</span><b className="cr-pp-val">是</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">openclawGlobalProtected</span><b className="cr-pp-val">是</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">externalIntegrationsPreviewOnly</span><b className="cr-pp-val">是（preview_only）</b></div>
+          <div className="cr-pp-item"><span className="cr-pp-key">auditPersistenceMode</span><b className="cr-pp-val">preview_only</b></div>
         </div>
       </SectionCard>
 
@@ -1333,14 +1418,40 @@ export default function CostRoutingPage() {
               </>
             ) : null}
             {practicalDecision.fallbackPlan ? <div className="cr-template-desc">失败后升级路线：{practicalDecision.fallbackPlan}</div> : null}
+            {practicalDecision.actionType ? (
+              <>
+                <div className="cr-subtitle">路由动作契约 Route Action Contract</div>
+                <div className="cr-audit-preview">
+                  <div><span>actionType</span><b>{practicalDecision.actionType}</b></div>
+                  <div><span>actionLabel</span><b>{practicalDecision.actionLabel || practicalDecision.selectedRoute}</b></div>
+                  <div><span>allowedNextStep</span><b>{practicalDecision.allowedNextStep || practicalDecision.nextAction}</b></div>
+                  <div><span>requiresHumanConfirmation</span><b>{practicalDecision.requiresHumanConfirmation ? '是' : '否'}</b></div>
+                  <div><span>persistenceMode</span><b>{practicalDecision.persistenceMode || 'preview_only'}</b></div>
+                  <div><span>forbiddenNextSteps</span><b>{(practicalDecision.forbiddenNextSteps || []).join(' / ') || '无'}</b></div>
+                </div>
+              </>
+            ) : null}
+            {practicalDecision.humanGateRequired ? (
+              <div className={`cr-human-gate risk-${practicalDecision.riskLevel}`}>
+                <div className="cr-subtitle">人工确认门 Human Confirmation Gate</div>
+                <div className="cost-routing-policy-meta"><b>humanGateRequired</b>：true</div>
+                <div className="cost-routing-policy-meta"><b>confirmationReason</b>：{practicalDecision.confirmationReason || '高风险任务需人工确认'}</div>
+                <div className="cost-routing-policy-meta"><b>requiredConfirmations</b>：{(practicalDecision.requiredConfirmations || []).join(' / ') || '确认任务范围、确认允许动作、确认回滚方式'}</div>
+                <div className="cost-routing-policy-meta"><b>readOnlyPrechecks</b>：{(practicalDecision.readOnlyPrechecks || []).join(' / ')}</div>
+                <div className="cost-routing-policy-meta"><b>rollbackPlan</b>：{(practicalDecision.rollbackPlan || []).join(' → ')}</div>
+                <div className="cost-routing-policy-meta"><b>noAutomaticExecution</b>：{practicalDecision.noAutomaticExecution !== false ? 'true' : 'false'}</div>
+              </div>
+            ) : null}
             {practicalDecision.auditPreview ? (
               <>
-                <div className="cr-subtitle">审计预览</div>
+                <div className="cr-subtitle">审计预览 Audit Schema Preview v2</div>
                 <div className="cr-audit-preview">
+                  <div><span>auditSchemaVersion</span><b>{practicalDecision.auditPreview.auditSchemaVersion || 'preview-v2'}</b></div>
                   <div><span>auditMode</span><b>{practicalDecision.auditPreview.auditMode || practicalDecision.auditPreview.mode}</b></div>
-                  <div><span>timestamp</span><b>{practicalDecision.auditPreview.timestamp || 'preview'}</b></div>
                   <div><span>auditIdPreview</span><b>{practicalDecision.auditPreview.auditIdPreview || 'N/A'}</b></div>
                   <div><span>persistenceMode</span><b>{practicalDecision.auditPreview.persistenceMode || 'preview_only'}</b></div>
+                  <div><span>actionType</span><b>{practicalDecision.auditPreview.actionType || practicalDecision.actionType}</b></div>
+                  <div><span>timestamp</span><b>{practicalDecision.auditPreview.timestamp || 'preview'}</b></div>
                   <div><span>policy</span><b>{practicalDecision.auditPreview.selectedPolicy || practicalDecision.strategyMode}</b></div>
                   <div><span>category</span><b>{practicalDecision.auditPreview.detectedCategory || practicalDecision.detectedCategory}</b></div>
                   <div><span>route</span><b>{practicalDecision.auditPreview.recommendedRoute || practicalDecision.selectedRoute}</b></div>
@@ -1348,14 +1459,18 @@ export default function CostRoutingPage() {
                   <div><span>toolchainRoute</span><b>{practicalDecision.auditPreview.selectedToolchainRoute || 'N/A'}</b></div>
                   <div><span>modelTier</span><b>{practicalDecision.auditPreview.recommendedModelTier || practicalDecision.recommendedModelTier}</b></div>
                   <div><span>confidence</span><b>{practicalDecision.auditPreview.confidence || practicalDecision.confidence}</b></div>
+                  <div><span>riskLevel</span><b>{practicalDecision.auditPreview.riskLevel}</b></div>
                   <div><span>rollbackRequired</span><b>{String(practicalDecision.auditPreview.rollbackRequired ?? false)}</b></div>
                   <div><span>wouldExecute</span><b>{String(practicalDecision.auditPreview.wouldExecute)}</b></div>
                   <div><span>wouldWriteFiles</span><b>{String(practicalDecision.auditPreview.wouldWriteFiles)}</b></div>
+                  <div><span>databaseWrite</span><b>{String(practicalDecision.auditPreview.databaseWrite ?? false)}</b></div>
+                  <div><span>fileWrite</span><b>{String(practicalDecision.auditPreview.fileWrite ?? false)}</b></div>
+                  <div><span>externalWrite</span><b>{String(practicalDecision.auditPreview.externalWrite ?? false)}</b></div>
                   <div><span>confirmations</span><b>{practicalDecision.auditPreview.requiredConfirmations.join(' / ') || 'none'}</b></div>
                   <div><span>nextSafeStep</span><b>{practicalDecision.auditPreview.nextSafeStep || practicalDecision.nextAction}</b></div>
                   <div><span>taskSummary</span><b>{practicalDecision.auditPreview.taskSummary || 'N/A'}</b></div>
                 </div>
-                <div className="cr-template-desc">当前仅为 preview，不写入数据库、不写入文件、不写入 Memory Hub、不写入 LAN_SHARE。</div>
+                <div className="cr-template-desc">当前为 Audit Schema Preview v2，不写入数据库、不写入文件、不写入 Memory Hub、不写入 LAN_SHARE。</div>
                 <ul className="cr-note-list">
                   {practicalDecision.auditPreview.rollbackPlan.map((item) => <li key={item}>{item}</li>)}
                 </ul>
