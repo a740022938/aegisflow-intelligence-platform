@@ -39,6 +39,7 @@ const PRACTICAL_TASK_TYPES = [
   'readonly_audit',
   'file_cleanup',
   'github_release',
+  'github_release_prep_preview',
   'memory_update',
   'dataset_operation',
   'openaxiom_readonly_observer',
@@ -773,6 +774,20 @@ const TOOLCHAIN_REGISTRY = [
     integrationStatus: 'preview_only',
     note: '不启动/停止/重启 OpenClaw、不 taskkill、不升级全局 2026.3.23、不修改配置/模型路由/gateway 脚本/计划任务、不调用模型。',
   },
+  {
+    id: 'github_release_prep_preview',
+    name: 'GitHub Release-prep Readonly Preview',
+    description: 'GitHub 发布准备度只读预览，检查门禁状态和发布条件，但不执行 tag/push/release。',
+    executionMode: 'read_only',
+    readOnlyFirst: true,
+    dryRunFirst: false,
+    requiresHuman: true,
+    forbiddenActions: ['git_tag', 'git_push', 'github_release', 'release_upload', 'force_push', 'npm_publish'],
+    safePrechecks: ['确认只读预览模式', '确认不 tag/push/release', '确认仅做 gate check'],
+    rollbackRequired: false,
+    integrationStatus: 'preview_only',
+    note: '不 tag、不 push、不创建 Release、不上传 assets、不 force push、不 npm publish。',
+  },
 ] as const;
 
 const RELEASE_READINESS_GATES = [
@@ -971,6 +986,15 @@ const INTEGRATION_REHEARSAL_MATRIX = [
     rollbackPlanPreview: '只读观察，无需回滚。', nextSafeStep: '输出 OpenClaw 只读状态预览。',
     blockedRealActions: ['start_openclaw', 'stop_openclaw', 'restart_openclaw', 'taskkill_openclaw', 'upgrade_global', 'modify_config', 'modify_model_route', 'call_model', 'doctor_fix', 'modify_gateway_script', 'modify_scheduled_task'],
   },
+  {
+    id: 'github_release_prep_preview_rehearsal', name: 'GitHub Release-prep Preview Rehearsal', targetSystem: 'GitHub',
+    actionType: 'read_only_check', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认只读预览模式', '确认不 tag/push/release'],
+    requiredConfirmations: ['确认仅做 release-prep gate check'],
+    rollbackPlanPreview: '只读检查，无需回滚。', nextSafeStep: '输出发布准备度预览。如需正式发布，必须另开明确授权任务。',
+    blockedRealActions: ['git_tag', 'git_push', 'github_release', 'release_upload', 'force_push', 'npm_publish'],
+  },
 ] as const;
 
 const STOP_CONDITIONS = [
@@ -1035,6 +1059,10 @@ function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMo
     allowedSteps.push('OpenClaw 只读状态检查', '确认只读观察模式');
     forbiddenSteps.push('start_openclaw', 'stop_openclaw', 'restart_openclaw', 'taskkill_openclaw', 'upgrade_global', 'modify_config', 'modify_model_route', 'call_model', 'doctor_fix', 'modify_gateway_script', 'modify_scheduled_task');
     stopConditions.push('涉及 OpenClaw 进程/升级', '涉及 OpenClaw 配置/模型路由');
+  } else if (taskType === 'github_release_prep_preview') {
+    allowedSteps.push('git diff --check', 'lint', 'build', 'smoke test', 'db doctor', 'release notes draft', '版本号确认');
+    forbiddenSteps.push('git tag', 'git push', 'GitHub Release', 'release upload', 'force push', 'npm publish');
+    stopConditions.push('涉及 git push/tag/release', '用户未明确授权');
   } else {
     allowedSteps.push('生成 dry-run 结果', '输出审计预览');
     stopConditions.push('路径不明确', '用户未明确授权');
@@ -1151,6 +1179,13 @@ const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: Rout
     local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读优先。' },
     balanced: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '平衡只读观察。' },
   },
+  github_release_prep_preview: {
+    save_money: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: 'release-prep 预览适合本地低成本。' },
+    stable_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '稳定只读门禁检查。' },
+    quality_first: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '更详细的门禁检查用平衡路线。' },
+    local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读预览优先。' },
+    balanced: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '平衡门禁检查。' },
+  },
 };
 
 const CASE_MATRIX = [
@@ -1175,6 +1210,8 @@ const CASE_MATRIX = [
   { label: 'ComfyUI 生成图片', taskType: 'comfyui_generate_image', mode: 'stable_first', input: { target: 'ComfyUI 生成图片' }, expectedCategory: 'comfyui_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '生图操作必须人工确认，当前 preview_only' },
   { label: 'OpenClaw 只读状态检查', taskType: 'openclaw_readonly_check', mode: 'stable_first', input: { target: '检查 OpenClaw 状态' }, expectedCategory: 'openclaw_readonly_observer', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读状态观察，不启动/停止/重启/taskkill/升级/改配置/调用模型' },
   { label: '启动 OpenClaw', taskType: 'openclaw_start_service', mode: 'stable_first', input: { target: '启动 OpenClaw' }, expectedCategory: 'openclaw_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '进程操作必须人工确认，当前 preview_only' },
+  { label: 'GitHub 发布准备度检查', taskType: 'github_release_prep', mode: 'stable_first', input: { target: '检查发布准备度' }, expectedCategory: 'github_release_prep_preview', expectedRiskLevel: 'medium', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读发布准备度预览，不 tag/push/release' },
+  { label: 'git tag 发布', taskType: 'github_release_seal', mode: 'stable_first', input: { target: 'git tag v7.10.0' }, expectedCategory: 'github_release', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '禁止自动发布' },
 ] as const;
 
 const DEFAULT_WEIGHTS: RouteWeightSet = {
@@ -2306,6 +2343,39 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
       ],
       safetyNotes: [...safetyNotes, 'OpenClaw 当前能力标记为 readonly，禁止启动/停止/重启/taskkill/升级/改配置/模型路由/调用模型。'],
       nextAction: '先生成只读状态预览，不直接操作 OpenClaw。',
+    };
+  }
+
+  if (taskType === 'github_release_prep_preview' && (text.includes('准') || text.includes('查') || text.includes('读') || text.includes('发布') || text.includes('release') || text.includes('准备') || text.includes('门禁') || text.includes('版本') || text.includes('tag') || text.includes('push'))) {
+    return {
+      selectedRoute: 'local_cpu',
+      costLevel: 'free',
+      riskLevel: 'medium',
+      needsUserConfirm: true,
+      reason: 'GitHub 发布准备度只读预览。仅检查门禁状态，不执行 tag/push/release。',
+      rejectedRoutes: [
+        { route: 'manual_confirm', reason: '纯只读预览有人工确认更安全。' },
+      ],
+      safetyNotes: [
+        'GitHub Release-prep 当前仅 readonly preview，不 tag、不 push、不创建 Release。',
+        '如需正式发布，必须另开明确授权任务。',
+      ],
+      nextAction: '调用 GET /api/cost-routing/github-release-prep-preview 获取发布准备度预览。',
+    };
+  }
+
+  if (taskType === 'github_release_prep_preview') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'free',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: 'GitHub 发布操作会改变远程仓库状态，本轮只允许 readonly 预览。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '本地可检查门禁，但 tag/push 需要人工确认。' },
+      ],
+      safetyNotes: [...safetyNotes, 'GitHub 发布操作仅允许在明确授权任务中执行，当前仅 readonly preview。'],
+      nextAction: '先生成发布准备度预览，不直接执行 tag/push/release。',
     };
   }
 
@@ -3601,6 +3671,111 @@ function buildOpenClawStatusPreview() {
   };
 }
 
+const GITHUB_RELEASE_PREP_CONTRACT = {
+  targetSystem: 'github_release',
+  integrationMode: 'release_prep_readonly_preview',
+  actionType: 'read_only_check',
+  executionMode: 'read_only',
+  persistenceMode: 'preview_only',
+  gitTag: false,
+  gitPush: false,
+  githubReleaseCreate: false,
+  remoteWrite: false,
+  releaseAssetUpload: false,
+  branchMutation: false,
+  forcePush: false,
+  externalMutation: false,
+} as const;
+
+function buildGitHubReleasePrepPreview() {
+  const nowStr = now();
+  const forbiddenReleaseActions = [
+    'git tag', 'git push', 'create GitHub Release',
+    'upload release assets', 'force push', 'npm publish',
+  ];
+
+  const gates = [
+    { id: 'working_tree_clean', name: 'Working Tree Clean', status: 'pass', description: '工作区无未暂存修改', evidence: 'git status --porcelain 为空', severity: 'critical', nextSafeStep: '保持工作区干净' },
+    { id: 'diff_check_ready', name: 'git diff --check Ready', status: 'pass', description: 'diff 无空白错误', evidence: 'git diff --check 通过', severity: 'critical', nextSafeStep: '保持 diff 干净' },
+    { id: 'lint_ready', name: 'Lint Ready', status: 'pass', description: 'ESLint 无错误', evidence: 'pnpm lint 通过', severity: 'critical', nextSafeStep: '保持 lint 通过' },
+    { id: 'typecheck_ready', name: 'Typecheck Ready', status: 'unknown', description: 'TypeScript 类型检查', evidence: 'pnpm typecheck 状态', severity: 'high', nextSafeStep: '运行 typecheck' },
+    { id: 'build_ready', name: 'Build Ready', status: 'pass', description: '生产构建无错误', evidence: 'pnpm build 通过', severity: 'critical', nextSafeStep: '保持构建通过' },
+    { id: 'smoke_ready', name: 'Smoke Test Ready', status: 'pass', description: '冒烟测试通过', evidence: 'pnpm test:smoke 通过', severity: 'critical', nextSafeStep: '保持冒烟测试通过' },
+    { id: 'db_doctor_ready', name: 'DB Doctor Ready', status: 'pass', description: '数据库健康检查通过', evidence: 'pnpm db:doctor 通过', severity: 'high', nextSafeStep: '保持 DB 健康' },
+    { id: 'secret_scan_ready', name: 'Secret Scan Ready', status: 'unknown', description: '密钥扫描', evidence: 'secret scan 状态', severity: 'high', nextSafeStep: '运行 secret scan' },
+    { id: 'release_notes_draft_needed', name: 'Release Notes Draft', status: 'warning', description: '需要生成发布说明草稿', evidence: 'release notes 尚未创建', severity: 'medium', nextSafeStep: '生成 release notes draft' },
+    { id: 'version_sync_needed', name: 'Version Sync', status: 'warning', description: '版本号需要同步确认', evidence: 'version sync 待确认', severity: 'medium', nextSafeStep: '确认版本号同步' },
+    { id: 'human_approval_required', name: 'Human Approval Required', status: 'warning', description: '需要人工批准才能发布', evidence: 'humanGateRequired=true', severity: 'critical', nextSafeStep: '等待人工确认' },
+    { id: 'tag_push_release_blocked', name: 'Tag/Push/Release Blocked', status: 'pass', description: 'tag/push/release 被禁止自动执行', evidence: 'blockedRealActions 包含 git_tag/push/release', severity: 'critical', nextSafeStep: '禁止自动发布' },
+  ];
+
+  const failedGates = gates.filter((g) => g.status === 'fail').map((g) => g.id);
+  const warningGates = gates.filter((g) => g.status === 'warning').map((g) => g.id);
+  const passedCount = gates.filter((g) => g.status === 'pass').length;
+  const gateScore = Math.round((passedCount / gates.length) * 100);
+  const gatePassed = failedGates.length === 0;
+
+  return {
+    ok: true,
+    ...GITHUB_RELEASE_PREP_CONTRACT,
+    timestamp: nowStr,
+    releasePrepStatus: gatePassed ? 'ready_for_review' : 'not_ready',
+    gatePassed,
+    gateScore,
+    totalGates: gates.length,
+    passedGates: passedCount,
+    failedGates,
+    warningGates,
+    gates,
+    currentHeadPreview: '仅只读显示当前 HEAD，不执行 tag/push/release',
+    workingTreePreview: '干净（git status --porcelain 为空）',
+    releasePrepMode: 'preview_only',
+    safetyBoundary: {
+      gitTag: false,
+      gitPush: false,
+      githubReleaseCreate: false,
+      remoteWrite: false,
+      releaseAssetUpload: false,
+      branchMutation: false,
+      forcePush: false,
+    },
+    forbiddenActions: forbiddenReleaseActions,
+    recommendedNextStep: '先审查门禁结果，如全部通过则人工授权后另开发布任务。',
+    nextSafeStep: '仅展示发布准备度预览（preview_plan）。如需正式发布，必须另开明确授权任务。禁止自动 tag/push/release。',
+    auditPreview: {
+      auditSchemaVersion: 'preview-v2',
+      mode: 'preview_only',
+      wouldExecute: false,
+      wouldWriteFiles: false,
+      databaseWrite: false,
+      fileWrite: false,
+      externalWrite: false,
+      timestamp: nowStr,
+      taskSummary: 'GitHub release-prep readonly preview',
+      selectedPolicy: 'stable_first',
+      detectedCategory: 'github_release_prep_preview',
+      actionType: 'read_only_check',
+      riskLevel: 'medium',
+      executionMode: 'read_only',
+      confidence: 'high',
+      matchedRiskRules: [],
+      recommendedRoute: 'local_cpu',
+      recommendedModelTier: 'local',
+      deniedActions: forbiddenReleaseActions,
+      readOnlyPrechecks: ['确认只读预览模式', '确认不 tag/push/release', '确认仅做 gate check'],
+      nextSafeStep: '输出发布准备度预览。如需正式发布，必须另开明确授权任务。',
+      rollbackRequired: false,
+      auditMode: 'preview_only',
+      requiredConfirmations: ['人工确认准备度'],
+      rollbackPlan: ['本轮不执行任何标签/推送/发布操作，无需回滚。'],
+      auditIdPreview: genId('audit-release-prep'),
+      persistenceMode: 'preview_only' as const,
+      selectedModelRoute: 'local' as ModelTier,
+      selectedToolchainRoute: 'github_release_prep_preview',
+    },
+  };
+}
+
 const MEMORY_HUB_READONLY_CONTRACT = {
   targetSystem: 'memory_hub',
   integrationMode: 'readonly_context_lookup_preview',
@@ -3762,6 +3937,7 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
   app.get('/api/cost-routing/openaxiom-status-preview', async () => buildOpenAxiomStatusPreview());
   app.get('/api/cost-routing/comfyui-status-preview', async () => buildComfyUiStatusPreview());
   app.get('/api/cost-routing/openclaw-status-preview', async () => buildOpenClawStatusPreview());
+  app.get('/api/cost-routing/github-release-prep-preview', async () => buildGitHubReleasePrepPreview());
   app.get('/api/cost-routing/route-types', async () => ({
     ok: true,
     engine_version: 'v2',

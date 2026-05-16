@@ -540,6 +540,20 @@ const SIMULATION_EXAMPLES: SimulationExample[] = [
     taskId: 'sim-openclaw-start',
     input: { target: '启动 OpenClaw' },
   },
+  {
+    label: 'GitHub 发布准备度检查',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'github_release_prep_preview',
+    taskId: 'sim-release-prep',
+    input: { target: '检查发布准备度' },
+  },
+  {
+    label: 'git tag 发布',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'github_release',
+    taskId: 'sim-git-tag',
+    input: { target: 'git tag v7.10.0' },
+  },
 ];
 
 function fmt(v?: string) {
@@ -649,6 +663,8 @@ export default function CostRoutingPage() {
   const [comfyUiLoading, setComfyUiLoading] = useState(false);
   const [openClawPreview, setOpenClawPreview] = useState<any>(null);
   const [openClawLoading, setOpenClawLoading] = useState(false);
+  const [releasePrepPreview, setReleasePrepPreview] = useState<any>(null);
+  const [releasePrepLoading, setReleasePrepLoading] = useState(false);
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
@@ -981,6 +997,22 @@ export default function CostRoutingPage() {
     }
   }
 
+  async function handleReleasePrepPreview() {
+    setReleasePrepLoading(true);
+    setError('');
+    setMsg('');
+    try {
+      const res = await api('/api/cost-routing/github-release-prep-preview');
+      if (!res.ok) throw new Error(res.error || 'GitHub 发布准备度预览失败');
+      setReleasePrepPreview(res);
+      setMsg('GitHub 发布准备度预览已生成。未 tag、未 push、未创建 Release。');
+    } catch (e: any) {
+      setError(e.message || 'GitHub 发布准备度预览失败');
+    } finally {
+      setReleasePrepLoading(false);
+    }
+  }
+
   async function handleMemoryHubPreview() {
     setMemoryHubLoading(true);
     setError('');
@@ -1059,7 +1091,7 @@ export default function CostRoutingPage() {
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>v7.9.0 openclaw readonly status observer (preview_only)</b>
+          <b>v7.10.0 github release prep readonly preview (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -1083,23 +1115,23 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-          <b>v7.9.0 OpenClaw Readonly Status Observer</b>
+          <b>v7.10.0 GitHub Release-prep Readonly Preview</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">当前模式</span>
-          <b>preview plan only / read_only / no write</b>
+          <b>preview plan only / read_only / no remote write</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">Memory Hub/OpenAxiom/ComfyUI</span>
+          <span className="cr-dashboard-key">Memory Hub / OpenAxiom / ComfyUI / OpenClaw</span>
           <b>all readonly preview</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">OpenClaw gateway control</span>
+          <span className="cr-dashboard-key">Git tag / push / Release</span>
           <b>disabled</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">OpenClaw model call</span>
-          <b>disabled</b>
+          <span className="cr-dashboard-key">GitHub 发布准备度</span>
+          <b>preview only</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">real API call</span>
@@ -1420,6 +1452,56 @@ export default function CostRoutingPage() {
             </div>
           ) : (
             <div className="cost-routing-policy-meta">尚未生成 OpenClaw 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="GitHub 发布准备度预览 GitHub Release-prep Readonly Preview">
+        <div className="cr-registry-note">仅发布准备度预览。不 tag、不 push、不创建 Release、不上传 assets、不 force push。</div>
+        <div className="cr-mh-grid">
+          <div className="cr-selfcheck-controls">
+            <button className="ui-btn ui-btn-primary" type="button" onClick={handleReleasePrepPreview} disabled={releasePrepLoading}>
+              {releasePrepLoading ? '生成中...' : '生成 GitHub 发布准备度预览'}
+            </button>
+          </div>
+          {releasePrepPreview ? (
+            <div className="cr-mh-results">
+              <div className="cr-selfcheck-header">
+                <span className="cr-badge" style={{ background: releasePrepPreview.gatePassed ? 'var(--success)' : 'var(--warning)', color: '#fff', borderColor: 'transparent' }}>{releasePrepPreview.releasePrepStatus}</span>
+                <span className="cr-badge">{releasePrepPreview.integrationMode}</span>
+                <span className="cr-badge">target: {releasePrepPreview.targetSystem}</span>
+                <span className="cr-badge">{releasePrepPreview.persistenceMode}</span>
+                <span className="cr-badge">gateScore: {releasePrepPreview.gateScore}%</span>
+              </div>
+              <div className="cr-mh-summary-row">
+                <span className="cost-routing-policy-meta"><b>发布准备度</b>：{releasePrepPreview.releasePrepStatus} · 门禁分数 {releasePrepPreview.gateScore}%</span>
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>门禁矩阵 Release-prep Gates ({releasePrepPreview.passedGates}/{releasePrepPreview.totalGates})</div>
+              <div className="cr-gate-grid">
+                {(releasePrepPreview.gates || []).map((gate: any) => (
+                  <div className={`cr-gate-item status-${gate.status}`} key={gate.id}>
+                    <div className="cr-template-head">
+                      <b>{gate.name}</b>
+                      <span className={`cr-badge ${gate.status === 'pass' ? 'risk-low' : gate.status === 'warning' ? 'risk-medium' : 'risk-high'}`}>{gate.status}</span>
+                    </div>
+                    <div className="cost-routing-policy-meta">{gate.description}</div>
+                    <div className="cost-routing-policy-meta">依据：{gate.evidence}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
+              <div className="cr-selfcheck-grid-inner">
+                <div className="cr-pp-item"><span className="cr-pp-key">gitTag</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.gitTag)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">gitPush</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.gitPush)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">githubReleaseCreate</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.githubReleaseCreate)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">remoteWrite</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.remoteWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">forcePush</span><b className="cr-pp-val">{String(releasePrepPreview.safetyBoundary?.forcePush)}</b></div>
+              </div>
+              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(releasePrepPreview.forbiddenActions || []).join(' / ')}</div>
+              <div className="cr-next-action" style={{ marginTop: '6px' }}>{releasePrepPreview.nextSafeStep}</div>
+            </div>
+          ) : (
+            <div className="cost-routing-policy-meta">尚未生成 GitHub 发布准备度预览。点击按钮获取 preview_only / read_only 发布准备度预览。</div>
           )}
         </div>
       </SectionCard>
