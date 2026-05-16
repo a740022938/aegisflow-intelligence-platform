@@ -45,6 +45,10 @@ const PRACTICAL_TASK_TYPES = [
 type PracticalTaskType = typeof PRACTICAL_TASK_TYPES[number];
 type CostLevel = 'free' | 'low' | 'medium' | 'high' | 'unknown';
 type PracticalRiskLevel = 'low' | 'medium' | 'high' | 'blocked';
+type StrategyMode = 'save_money' | 'stable_first' | 'quality_first' | 'local_first' | 'balanced';
+type ExecutionMode = 'read_only' | 'ask_first' | 'dry_run' | 'human_confirm_required' | 'local_only' | 'cloud_allowed' | 'blocked';
+type ModelTier = 'economy' | 'balanced' | 'premium' | 'local' | 'toolchain' | 'blocked';
+type ConfidenceLevel = 'low' | 'medium' | 'high';
 
 type WeightKey = 'cost' | 'capability' | 'latency' | 'risk' | 'reliability' | 'load';
 type RouteWeightSet = Record<WeightKey, number>;
@@ -107,6 +111,68 @@ interface PracticalDecision {
   rejectedRoutes: Array<{ route: RouteType; reason: string }>;
   safetyNotes: string[];
   nextAction: string;
+  strategyMode?: StrategyMode;
+  taskLabel?: string;
+  recommendedChannel?: string;
+  costScore?: number;
+  qualityScore?: number;
+  speedScore?: number;
+  riskScore?: number;
+  scoreExplanation?: string;
+  fallbackRoute?: RouteType;
+  fallbackPlan?: string;
+  humanReadableExplanation?: string;
+  firewallHits?: string[];
+  selectedPolicy?: string;
+  detectedCategory?: string;
+  routeName?: string;
+  recommendedModelTier?: ModelTier;
+  tierReason?: string;
+  whyNotOtherTiers?: string[];
+  recommendedToolchain?: {
+    primary: string;
+    secondary: string[];
+    requiresHuman: boolean;
+    readOnlyFirst: boolean;
+    dryRunFirst: boolean;
+    forbiddenActions: string[];
+    suggestedPrechecks: string[];
+    rollbackRequired: boolean;
+  };
+  executionMode?: ExecutionMode;
+  matchedRules?: string[];
+  requiredConfirmations?: string[];
+  readOnlyPrechecks?: string[];
+  rollbackPlan?: string[];
+  deniedActions?: string[];
+  confidence?: ConfidenceLevel;
+  confidenceReason?: string;
+  missingInformation?: string[];
+  whyThisRoute?: string;
+  escalationPlan?: string[];
+  auditPreview?: {
+    mode: 'preview_only';
+    wouldExecute: false;
+    wouldWriteFiles: false;
+    timestamp: string;
+    taskSummary: string;
+    rawInput: Record<string, unknown>;
+    selectedPolicy: StrategyMode;
+    detectedCategory: string;
+    riskLevel: PracticalRiskLevel;
+    executionMode: ExecutionMode;
+    confidence: ConfidenceLevel;
+    matchedRiskRules: string[];
+    recommendedRoute: RouteType;
+    recommendedModelTier: ModelTier;
+    deniedActions: string[];
+    readOnlyPrechecks: string[];
+    nextSafeStep: string;
+    rollbackRequired: boolean;
+    auditMode: 'preview_only';
+    requiredConfirmations: string[];
+    rollbackPlan: string[];
+  };
 }
 
 const ROUTE_PROFILES: Record<RouteType, RouteProfile> = {
@@ -294,6 +360,247 @@ const LOCAL_CAPABILITIES = {
   memory_hub: 'readonly',
   openaxiom: 'readonly',
 };
+
+const STRATEGY_MODES: Record<StrategyMode, {
+  id: StrategyMode;
+  name: string;
+  description: string;
+  costBias: number;
+  qualityBias: number;
+  speedBias: number;
+  localBias: number;
+  riskTolerance: 'low' | 'medium' | 'high';
+  suitable_for: string;
+  recommendedFor: string[];
+  avoidFor: string[];
+  recommended_channel: string;
+  cost_bias: string;
+  risk_control: string;
+  fallback_plan: string;
+  fallbackPlan: string;
+}> = {
+  save_money: {
+    id: 'save_money',
+    name: '省钱优先',
+    description: '把预算和本地低成本路线放在第一位，适合可容忍普通质量的轻量任务。',
+    costBias: 0.95,
+    qualityBias: 0.45,
+    speedBias: 0.55,
+    localBias: 0.9,
+    riskTolerance: 'low',
+    suitable_for: '普通聊天、摘要改写、只读巡检、低预算解释任务。',
+    recommendedFor: ['普通聊天/问答', '文档总结/改写', '项目只读巡检'],
+    avoidFor: ['强推理代码调试', '发布动作', '覆盖文件'],
+    recommended_channel: 'local_cpu / local_low_cost / openclaw_stable_2026_3_23',
+    cost_bias: '优先免费或低成本，本地可完成时不建议云端强模型。',
+    risk_control: '仅建议低风险本地路线，高风险动作转人工确认。',
+    fallback_plan: '质量不足时升级到 stable_first，再考虑 quality_first。',
+    fallbackPlan: '低成本路线失败后先升稳定优先，不直接切到真实执行。',
+  },
+  stable_first: {
+    id: 'stable_first',
+    name: '稳定优先',
+    description: '优先选择成熟、可回滚、可解释的路线，适合封板和生产前检查。',
+    costBias: 0.62,
+    qualityBias: 0.68,
+    speedBias: 0.6,
+    localBias: 0.75,
+    riskTolerance: 'low',
+    suitable_for: '封板检查、版本基线、可靠性优先的生产前验证。',
+    recommendedFor: ['项目只读巡检', 'Git 发布/版本封板', 'AIP 运行态验证'],
+    avoidFor: ['实验 sidecar 覆盖', '全局进程操作'],
+    recommended_channel: 'local_balanced / openclaw_stable_2026_3_23',
+    cost_bias: '接受少量成本换稳定，不优先使用实验 sidecar。',
+    risk_control: '稳定版只读使用，不覆盖全局 OpenClaw，不自动发布。',
+    fallback_plan: '稳定路线失败时转 manual_confirm，由人工决定是否升级。',
+    fallbackPlan: '稳定路线失败后进入人工确认和回滚方案生成。',
+  },
+  quality_first: {
+    id: 'quality_first',
+    name: '质量优先',
+    description: '优先解决复杂推理和高质量要求，允许建议强模型，但不自动产生费用。',
+    costBias: 0.35,
+    qualityBias: 0.96,
+    speedBias: 0.72,
+    localBias: 0.35,
+    riskTolerance: 'medium',
+    suitable_for: '复杂代码调试、架构审查、高质量生成和强推理任务。',
+    recommendedFor: ['代码修改/调试', '复杂方案评审', '高质量文档生成'],
+    avoidFor: ['低预算批量任务', '禁止外部调用任务'],
+    recommended_channel: 'cloud_reasoning_model / cloud_high_capability',
+    cost_bias: '可接受中高成本，但必须先解释预算和人工确认。',
+    risk_control: '云端或高能力路线只做建议，不自动产生费用或执行发布。',
+    fallback_plan: '强模型不可用时退回 stable_first 的本地平衡路线。',
+    fallbackPlan: '强模型不可用时退回本地平衡路线，并保留人工确认。',
+  },
+  local_first: {
+    id: 'local_first',
+    name: '本地优先',
+    description: '优先使用本机和本地工具链，适合本地文件、数据、GPU 和 sidecar 能力。',
+    costBias: 0.82,
+    qualityBias: 0.68,
+    speedBias: 0.58,
+    localBias: 0.98,
+    riskTolerance: 'medium',
+    suitable_for: '涉及本机文件、数据集、训练准备、ComfyUI/OpenClaw 本地能力的任务。',
+    recommendedFor: ['图像生成/ComfyUI', '数据集/YOLO/Mahjong', '本地只读检查'],
+    avoidFor: ['覆盖稳定版 OpenClaw', '直接覆盖模型文件'],
+    recommended_channel: 'local_cpu / local_gpu / comfyui_8000 / openclaw_sidecar_2026_5_12',
+    cost_bias: '优先本地资源，避免外部调用和云成本。',
+    risk_control: '本地写入、训练、删除、覆盖均需人工确认。',
+    fallback_plan: '本地能力不足时只建议人工升级，不自动切云端。',
+    fallbackPlan: '本地能力不足时只输出人工升级建议，不自动调用外部服务。',
+  },
+  balanced: {
+    id: 'balanced',
+    name: '平衡模式',
+    description: '在成本、质量、速度和风险之间取中位路线，适合没有明显偏好的常规任务。',
+    costBias: 0.68,
+    qualityBias: 0.72,
+    speedBias: 0.66,
+    localBias: 0.72,
+    riskTolerance: 'medium',
+    suitable_for: '常规问答、普通代码分析、轻量任务编排和一般巡检。',
+    recommendedFor: ['普通聊天/问答', '代码修改/调试', '项目只读巡检'],
+    avoidFor: ['明确高风险动作', '要求极致质量或极低成本的任务'],
+    recommended_channel: 'local_balanced / local_cpu',
+    cost_bias: '默认控制成本，必要时允许中等能力路线。',
+    risk_control: '所有风险命中均降级为人工确认。',
+    fallback_plan: '失败后根据原因分别转省钱优先、质量优先或人工确认。',
+    fallbackPlan: '平衡路线失败后按失败原因选择低成本、本地或强推理建议。',
+  },
+};
+
+const TASK_CONSOLE_TYPES = [
+  { id: 'chat_qa', label: '普通聊天/问答', maps_to: 'text_inference', default_strategy: 'save_money', description: '轻量问答和解释任务。', defaultRisk: 'low', suggestedRoute: 'local_cpu', forbiddenAutoActions: [], recommendedPolicy: 'save_money' },
+  { id: 'document_summary', label: '文档总结/改写', maps_to: 'text_inference', default_strategy: 'save_money', description: '文档摘要、改写和结构化提炼。', defaultRisk: 'low', suggestedRoute: 'local_cpu', forbiddenAutoActions: [], recommendedPolicy: 'save_money' },
+  { id: 'code_debug', label: '代码修改/调试', maps_to: 'code_analysis', default_strategy: 'quality_first', description: '复杂代码分析、调试和修复建议。', defaultRisk: 'medium', suggestedRoute: 'cloud_reasoning_model', forbiddenAutoActions: ['auto_apply_without_review'], recommendedPolicy: 'quality_first' },
+  { id: 'readonly_project_audit', label: '项目只读巡检', maps_to: 'readonly_audit', default_strategy: 'stable_first', description: '只读检查运行态、源码状态和报告。', defaultRisk: 'low', suggestedRoute: 'local_cpu', forbiddenAutoActions: ['file_write'], recommendedPolicy: 'stable_first' },
+  { id: 'git_release_seal', label: 'Git 发布/版本封板', maps_to: 'github_release', default_strategy: 'stable_first', description: 'commit、tag、push、release 前的封板建议。', defaultRisk: 'high', suggestedRoute: 'manual_confirm', forbiddenAutoActions: ['git_push', 'git_tag', 'github_release'], recommendedPolicy: 'stable_first' },
+  { id: 'image_comfyui', label: '图像生成/ComfyUI', maps_to: 'image_generation', default_strategy: 'local_first', description: '生图链路建议和本地工具选择。', defaultRisk: 'medium', suggestedRoute: 'openclaw_sidecar_2026_5_12', forbiddenAutoActions: ['auto_generate_without_confirm'], recommendedPolicy: 'local_first' },
+  { id: 'dataset_yolo_mahjong', label: '数据集/YOLO/Mahjong', maps_to: 'dataset_operation', default_strategy: 'local_first', description: '数据集、YOLO、Mahjong 相关检查和训练准备。', defaultRisk: 'high', suggestedRoute: 'local_cpu', forbiddenAutoActions: ['overwrite_model', 'touch_protected_project'], recommendedPolicy: 'local_first' },
+  { id: 'high_risk_system_ops', label: '高风险系统操作', maps_to: 'file_cleanup', default_strategy: 'stable_first', description: '删除、移动、杀进程、覆盖文件等危险动作。', defaultRisk: 'high', suggestedRoute: 'manual_confirm', forbiddenAutoActions: ['delete', 'move', 'taskkill', 'overwrite'], recommendedPolicy: 'stable_first' },
+  { id: 'memory_hub_knowledge', label: 'Memory Hub / 知识检索', maps_to: 'memory_update', default_strategy: 'stable_first', description: '长期记忆和知识检索建议。', defaultRisk: 'high', suggestedRoute: 'manual_confirm', forbiddenAutoActions: ['memory_write', 'sqlite_write'], recommendedPolicy: 'stable_first' },
+  { id: 'openclaw_agent_task', label: 'OpenClaw 代理任务', maps_to: 'code_analysis', default_strategy: 'local_first', description: 'OpenClaw 能力选择和代理路线建议。', defaultRisk: 'medium', suggestedRoute: 'openclaw_stable_2026_3_23', forbiddenAutoActions: ['overwrite_openclaw_stable'], recommendedPolicy: 'local_first' },
+] as const;
+
+const HIGH_RISK_FIREWALL_RULES = [
+  { id: 'git_push', label: 'git push', patterns: ['git push'] },
+  { id: 'git_tag', label: 'git tag', patterns: ['git tag'] },
+  { id: 'github_release', label: 'GitHub Release', patterns: ['github release', 'release', '发布'] },
+  { id: 'delete_files', label: '删除文件', patterns: ['delete', 'remove', '删除'] },
+  { id: 'move_files', label: '移动文件', patterns: ['move', '移动'] },
+  { id: 'overwrite_files', label: '覆盖文件', patterns: ['overwrite', '覆盖', 'replace file'] },
+  { id: 'taskkill', label: 'taskkill', patterns: ['taskkill', 'stop-process'] },
+  { id: 'kill_node', label: 'kill node', patterns: ['kill node', '杀 node', '全局杀'] },
+  { id: 'sqlite_write', label: '修改 sqlite', patterns: ['sqlite'] },
+  { id: 'candidate_write', label: '修改 candidate', patterns: ['candidate'] },
+  { id: 'lan_share_write', label: '修改 LAN_SHARE', patterns: ['lan_share'] },
+  { id: 'mahjong_project_touch', label: '修改 Mahjong_V1_Project', patterns: ['mahjong_v1_project'] },
+  { id: 'openclaw_stable_override', label: '覆盖 OpenClaw 稳定版', patterns: ['openclaw 2026.3.23', '覆盖 openclaw', 'upgrade openclaw'] },
+  { id: 'start_training', label: '启动训练', patterns: ['train', 'training', '训练'] },
+  { id: 'overwrite_model_weights', label: '覆盖 best.pt / last.pt', patterns: ['best.pt', 'last.pt', 'overwrite model', '覆盖模型'] },
+  { id: 'env_write', label: '修改 .env', patterns: ['.env'] },
+  { id: 'secret_leak', label: 'token / secret / key 泄漏', patterns: ['token', 'secret', 'api key', 'key 泄漏'] },
+  { id: 'large_dependency_change', label: 'npm/pnpm install 大范围依赖变更', patterns: ['npm install', 'pnpm install', '大依赖', '大型依赖'] },
+  { id: 'large_dataset_scan', label: '数据集大扫描', patterns: ['scan dataset', '数据集大扫描', '全量扫描'] },
+  { id: 'backup_delete', label: '备份目录删除', patterns: ['delete backup', '删除备份', '备份目录删除'] },
+  { id: 'model_file_delete', label: '模型文件删除', patterns: ['delete model', '删除模型', '删除 .pt', 'remove .pt'] },
+  { id: 'unconfirmed_cleanup_path', label: '未确认路径的清理操作', patterns: ['cleanup unknown path', '未确认路径', '清理旧文件'] },
+  { id: 'auto_candidate_decision', label: '自动 approve/reject/archive candidate', patterns: ['approve candidate', 'reject candidate', 'archive candidate', '自动审批', '自动归档'] },
+  { id: 'production_db_write', label: '直接写入生产数据库', patterns: ['write production database', '生产数据库', '直接写库', 'prod db'] },
+] as const;
+
+const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: RouteType; modelTier: ModelTier; executionMode: ExecutionMode; note: string }>> = {
+  text_inference: {
+    save_money: { route: 'local_cpu', modelTier: 'economy', executionMode: 'cloud_allowed', note: '简单问答低风险，可建议 economy/cloud_allowed，但不自动真实调用。' },
+    stable_first: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '稳定优先时使用本地平衡路线。' },
+    quality_first: { route: 'cloud_reasoning_model', modelTier: 'premium', executionMode: 'cloud_allowed', note: '高质量文本推理可建议强推理，但只做建议。' },
+    local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地优先时避免外部调用。' },
+    balanced: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '默认平衡成本和质量。' },
+  },
+  code_analysis: {
+    save_money: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'dry_run', note: '先用本地规则缩小问题。' },
+    stable_first: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'dry_run', note: '稳定路线先审查再改动。' },
+    quality_first: { route: 'cloud_reasoning_model', modelTier: 'premium', executionMode: 'ask_first', note: '复杂代码可建议强推理，但必须先确认。' },
+    local_first: { route: 'openclaw_stable_2026_3_23', modelTier: 'toolchain', executionMode: 'local_only', note: '本地工具链优先但不覆盖稳定版。' },
+    balanced: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'dry_run', note: '常规调试走平衡路线。' },
+  },
+  training: {
+    save_money: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '训练必须人工确认。' },
+    stable_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '训练先做只读预检。' },
+    quality_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '训练不能自动启动。' },
+    local_first: { route: 'manual_confirm', modelTier: 'toolchain', executionMode: 'human_confirm_required', note: '本地 GPU 训练需要确认输出目录。' },
+    balanced: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '训练动作默认拦截。' },
+  },
+  image_generation: {
+    save_money: { route: 'manual_confirm', modelTier: 'toolchain', executionMode: 'human_confirm_required', note: '生图有资源占用，先确认。' },
+    stable_first: { route: 'manual_confirm', modelTier: 'toolchain', executionMode: 'human_confirm_required', note: '不触碰稳定 OpenClaw。' },
+    quality_first: { route: 'manual_confirm', modelTier: 'toolchain', executionMode: 'human_confirm_required', note: '高质量生图仍需确认。' },
+    local_first: { route: 'openclaw_sidecar_2026_5_12', modelTier: 'toolchain', executionMode: 'ask_first', note: '推荐 sidecar/ComfyUI 路线但不自动执行。' },
+    balanced: { route: 'manual_confirm', modelTier: 'toolchain', executionMode: 'human_confirm_required', note: '默认人工确认。' },
+  },
+  image_to_video: {
+    save_money: { route: 'blocked', modelTier: 'blocked', executionMode: 'blocked', note: '高成本长任务默认阻断。' },
+    stable_first: { route: 'blocked', modelTier: 'blocked', executionMode: 'blocked', note: '资源占用不确定。' },
+    quality_first: { route: 'manual_confirm', modelTier: 'premium', executionMode: 'human_confirm_required', note: '必须先确认预算和规格。' },
+    local_first: { route: 'manual_confirm', modelTier: 'toolchain', executionMode: 'human_confirm_required', note: '本地长任务必须确认。' },
+    balanced: { route: 'blocked', modelTier: 'blocked', executionMode: 'blocked', note: '默认不自动执行。' },
+  },
+  readonly_audit: {
+    save_money: { route: 'local_cpu', modelTier: 'economy', executionMode: 'read_only', note: '只读检查适合本地低成本。' },
+    stable_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '稳定只读检查。' },
+    quality_first: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '更详细报告用平衡路线。' },
+    local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读优先。' },
+    balanced: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '平衡扫描和解释。' },
+  },
+  file_cleanup: {
+    save_money: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '删除移动必须确认。' },
+    stable_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '先只读候选清单。' },
+    quality_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '高风险动作不因质量优先放行。' },
+    local_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '本地文件风险仍需确认。' },
+    balanced: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '默认人工确认。' },
+  },
+  github_release: {
+    save_money: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '发布链必须人工确认。' },
+    stable_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '先 release-prep/gate-check。' },
+    quality_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '强模型不能替代发布确认。' },
+    local_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '本地封板也不可自动 push/tag/release。' },
+    balanced: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '发布默认人工确认。' },
+  },
+  memory_update: {
+    save_money: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '记忆写入必须确认。' },
+    stable_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '先只读候选审批。' },
+    quality_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '长期记忆不自动写。' },
+    local_first: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '本地 sqlite 仍需确认。' },
+    balanced: { route: 'manual_confirm', modelTier: 'blocked', executionMode: 'human_confirm_required', note: '默认人工审批。' },
+  },
+  dataset_operation: {
+    save_money: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '只读数据集检查可本地执行。' },
+    stable_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '先扫描清单，不写入。' },
+    quality_first: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'dry_run', note: '更高质量分析仍先 dry-run。' },
+    local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读检查优先。' },
+    balanced: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'dry_run', note: '平衡路线先预检。' },
+  },
+};
+
+const CASE_MATRIX = [
+  { label: '普通问答', taskType: 'chat_qa', mode: 'save_money', input: { budget: 'low', prompt: '普通问答：解释 AIP 当前状态' }, expectedCategory: 'text_inference', expectedRiskLevel: 'low', expectedExecutionMode: 'cloud_allowed', expectedModelTier: 'economy', expectedSafetyBehavior: '推荐低成本本地路线' },
+  { label: '文档总结', taskType: 'document_summary', mode: 'save_money', input: { budget: 'low', prompt: '总结这份文档' }, expectedCategory: 'text_inference', expectedRiskLevel: 'low', expectedExecutionMode: 'cloud_allowed', expectedModelTier: 'economy', expectedSafetyBehavior: '低风险 economy/balanced 建议，不自动真实执行' },
+  { label: '代码调试', taskType: 'code_debug', mode: 'quality_first', input: { budget: 'medium', target: '复杂代码调试' }, expectedCategory: 'code_analysis', expectedRiskLevel: 'medium', expectedExecutionMode: 'ask_first', expectedModelTier: 'premium', expectedSafetyBehavior: '预算确认后才可升级' },
+  { label: 'AIP 只读健康检查', taskType: 'readonly_project_audit', mode: 'stable_first', input: { budget: 'low', target: 'AIP health readonly check' }, expectedCategory: 'readonly_audit', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读检查' },
+  { label: 'GitHub Release 发布', taskType: 'git_release_seal', mode: 'stable_first', input: { target: 'git push git tag GitHub Release' }, expectedCategory: 'github_release', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '禁止自动发布' },
+  { label: '删除旧备份', taskType: 'high_risk_system_ops', mode: 'stable_first', input: { target: '删除旧备份目录' }, expectedCategory: 'file_cleanup', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '只生成候选清单' },
+  { label: 'taskkill node', taskType: 'high_risk_system_ops', mode: 'stable_first', input: { target: 'taskkill /IM node.exe' }, expectedCategory: 'file_cleanup', expectedRiskLevel: 'blocked', expectedExecutionMode: 'blocked', expectedModelTier: 'blocked', expectedSafetyBehavior: '禁止全局杀 node' },
+  { label: '启动 ComfyUI 生图', taskType: 'image_comfyui', mode: 'local_first', input: { comfy_available: true, prompt: '启动 ComfyUI 生图' }, expectedCategory: 'image_generation', expectedRiskLevel: 'medium', expectedExecutionMode: 'ask_first', expectedModelTier: 'toolchain', expectedSafetyBehavior: '推荐 sidecar 但不自动执行' },
+  { label: 'Mahjong 数据集只读检查', taskType: 'dataset_yolo_mahjong', mode: 'local_first', input: { target: 'Mahjong dataset readonly check' }, expectedCategory: 'dataset_operation', expectedRiskLevel: 'medium', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '不扫描受保护目录' },
+  { label: '训练 Mahjong 模型并覆盖 best.pt', taskType: 'training', mode: 'local_first', input: { target: '训练 Mahjong 模型并覆盖 best.pt', gpu_needed: true }, expectedCategory: 'training', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'toolchain', expectedSafetyBehavior: '禁止自动训练和覆盖权重' },
+  { label: 'Memory Hub 候选审批', taskType: 'memory_hub_knowledge', mode: 'stable_first', input: { target: '修改 candidate sqlite' }, expectedCategory: 'memory_update', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '只读候选审批' },
+  { label: 'OpenClaw 稳定版升级/覆盖', taskType: 'openclaw_agent_task', mode: 'local_first', input: { target: '覆盖 OpenClaw 2026.3.23 稳定版' }, expectedCategory: 'code_analysis', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '要求旁路验证和回滚，不覆盖稳定版' },
+  { label: '模糊任务', taskType: 'text_inference', mode: 'balanced', input: { target: '帮我弄一下' }, expectedCategory: 'text_inference', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'balanced', expectedSafetyBehavior: '低置信度并要求补充信息' },
+  { label: '依赖安装', taskType: 'code_debug', mode: 'stable_first', input: { target: 'pnpm install 一堆新依赖' }, expectedCategory: 'code_analysis', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '大范围依赖变更必须人工确认' },
+  { label: '修改 .env token', taskType: 'high_risk_system_ops', mode: 'stable_first', input: { target: '帮我改 .env token' }, expectedCategory: 'file_cleanup', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '敏感配置和密钥风险必须人工确认' },
+] as const;
 
 const DEFAULT_WEIGHTS: RouteWeightSet = {
   cost: 0.26,
@@ -891,15 +1198,34 @@ function parseBodyInput(input: any): any {
 function normalizePracticalTaskType(v: any): PracticalTaskType {
   const raw = String(v || '').trim().toLowerCase();
   if ((PRACTICAL_TASK_TYPES as readonly string[]).includes(raw)) return raw as PracticalTaskType;
+  const mapped = TASK_CONSOLE_TYPES.find((item) => item.id === raw || item.label.toLowerCase() === raw);
+  if (mapped) return mapped.maps_to as PracticalTaskType;
+  if (raw.includes('chat') || raw.includes('问答') || raw.includes('聊天')) return 'text_inference';
+  if (raw.includes('document') || raw.includes('summary') || raw.includes('文档') || raw.includes('总结') || raw.includes('改写')) return 'text_inference';
   if (raw.includes('train')) return 'training';
   if (raw.includes('image') && raw.includes('video')) return 'image_to_video';
   if (raw.includes('image')) return 'image_generation';
+  if (raw.includes('comfy')) return 'image_generation';
+  if (raw.includes('dataset') || raw.includes('yolo') || raw.includes('mahjong') || raw.includes('数据集')) return 'dataset_operation';
   if (raw.includes('cleanup') || raw.includes('delete') || raw.includes('move')) return 'file_cleanup';
-  if (raw.includes('release')) return 'github_release';
+  if (raw.includes('release') || raw.includes('封板') || raw.includes('发布')) return 'github_release';
   if (raw.includes('memory')) return 'memory_update';
   if (raw.includes('audit')) return 'readonly_audit';
-  if (raw.includes('code')) return 'code_analysis';
+  if (raw.includes('巡检') || raw.includes('只读')) return 'readonly_audit';
+  if (raw.includes('code') || raw.includes('代码') || raw.includes('debug') || raw.includes('调试')) return 'code_analysis';
+  if (raw.includes('risk') || raw.includes('高风险') || raw.includes('system')) return 'file_cleanup';
   return 'text_inference';
+}
+
+function normalizeStrategyMode(v: any, taskType: PracticalTaskType): StrategyMode {
+  const raw = String(v || '').trim().toLowerCase();
+  if (raw === 'save_money' || raw.includes('省钱')) return 'save_money';
+  if (raw === 'stable_first' || raw.includes('稳定')) return 'stable_first';
+  if (raw === 'quality_first' || raw.includes('质量')) return 'quality_first';
+  if (raw === 'local_first' || raw.includes('本地')) return 'local_first';
+  if (raw === 'balanced' || raw.includes('平衡')) return 'balanced';
+  const matched = TASK_CONSOLE_TYPES.find((item) => item.maps_to === taskType);
+  return (matched?.default_strategy as StrategyMode | undefined) || 'stable_first';
 }
 
 function targetText(input: any): string {
@@ -911,6 +1237,321 @@ function targetText(input: any): string {
     input?.description,
     input?.prompt,
   ].map((item) => String(item || '').toLowerCase()).join(' ');
+}
+
+function getTaskLabel(taskType: PracticalTaskType): string {
+  const matched = TASK_CONSOLE_TYPES.find((item) => item.maps_to === taskType);
+  if (matched) return matched.label;
+  const labels: Record<PracticalTaskType, string> = {
+    text_inference: '普通聊天/问答',
+    code_analysis: '代码修改/调试',
+    training: '数据集/YOLO/Mahjong',
+    image_generation: '图像生成/ComfyUI',
+    image_to_video: '高成本视频生成',
+    readonly_audit: '项目只读巡检',
+    file_cleanup: '高风险系统操作',
+    github_release: 'Git 发布/版本封板',
+    memory_update: '高风险系统操作',
+    dataset_operation: '数据集/YOLO/Mahjong',
+  };
+  return labels[taskType];
+}
+
+function getTaskCategoryMeta(taskType: PracticalTaskType, input?: any) {
+  const raw = String(input?.__raw_task_type || '').trim();
+  const exact = TASK_CONSOLE_TYPES.find((item) => item.id === raw);
+  if (exact) return exact;
+  const matched = TASK_CONSOLE_TYPES.find((item) => item.maps_to === taskType);
+  return matched || TASK_CONSOLE_TYPES[0];
+}
+
+function findFirewallHits(taskType: PracticalTaskType, input: any): string[] {
+  const text = `${taskType} ${targetText(input)} ${JSON.stringify(input || {})}`.toLowerCase();
+  return HIGH_RISK_FIREWALL_RULES
+    .filter((rule) => rule.patterns.some((pattern) => text.includes(pattern)))
+    .map((rule) => rule.label);
+}
+
+function routeQualityBase(route: RouteType): number {
+  return ROUTE_PROFILES[route]?.capability_index ?? 0.5;
+}
+
+function routeSpeedBase(route: RouteType): number {
+  const latency = ROUTE_PROFILES[route]?.latency_ms ?? 800;
+  return clamp(1 - latency / 1600, 0.25, 1);
+}
+
+function routeCostBase(route: RouteType): number {
+  const cost = ROUTE_PROFILES[route]?.cost_index ?? 0.5;
+  return clamp(1 - cost, 0, 1);
+}
+
+function routeRiskBase(route: RouteType): number {
+  return ROUTE_PROFILES[route]?.risk_isolation ?? 0.75;
+}
+
+function scorePracticalDecision(
+  route: RouteType,
+  taskType: PracticalTaskType,
+  strategyMode: StrategyMode,
+  riskLevel: PracticalRiskLevel,
+  needsUserConfirm: boolean,
+) {
+  const qualityNeed = taskType === 'code_analysis' || strategyMode === 'quality_first' ? 0.92
+    : taskType === 'image_generation' || taskType === 'training' || taskType === 'dataset_operation' ? 0.78
+      : 0.55;
+  const speedNeed = taskType === 'text_inference' ? 0.72 : strategyMode === 'stable_first' ? 0.62 : 0.55;
+  const riskPenalty = riskLevel === 'blocked' ? 0.95 : riskLevel === 'high' ? 0.72 : riskLevel === 'medium' ? 0.42 : 0.12;
+  const confirmPenalty = needsUserConfirm ? 0.12 : 0;
+  const costScoreValue = route === 'blocked' ? 0 : Math.round(routeCostBase(route) * 100);
+  const qualityScoreValue = Math.round((1 - Math.abs(routeQualityBase(route) - qualityNeed)) * 100);
+  const speedScoreValue = Math.round((1 - Math.abs(routeSpeedBase(route) - speedNeed)) * 100);
+  const riskScoreValue = Math.round(clamp(routeRiskBase(route) - riskPenalty - confirmPenalty + 0.18, 0, 1) * 100);
+  return {
+    costScore: costScoreValue,
+    qualityScore: clamp(qualityScoreValue, 0, 100),
+    speedScore: clamp(speedScoreValue, 0, 100),
+    riskScore: clamp(riskScoreValue, 0, 100),
+  };
+}
+
+function fallbackFor(route: RouteType, strategyMode: StrategyMode, blocked: boolean): { fallbackRoute: RouteType; fallbackPlan: string } {
+  if (blocked) {
+    return { fallbackRoute: 'manual_confirm', fallbackPlan: '保持阻断状态，先输出只读报告，由人工拆分为安全子任务。' };
+  }
+  if (route === 'manual_confirm') {
+    return { fallbackRoute: strategyMode === 'quality_first' ? 'local_balanced' : 'local_cpu', fallbackPlan: '人工确认后先走只读预检，再按确认范围升级执行准备。' };
+  }
+  if (strategyMode === 'quality_first') {
+    return { fallbackRoute: 'cloud_reasoning_model', fallbackPlan: '本地或稳定路线质量不足时，升级到强推理路线，但必须确认预算。' };
+  }
+  if (strategyMode === 'local_first') {
+    return { fallbackRoute: 'manual_confirm', fallbackPlan: '本地能力不足时停止自动升级，改为人工确认 sidecar 或云端方案。' };
+  }
+  if (strategyMode === 'balanced') {
+    return { fallbackRoute: 'local_balanced', fallbackPlan: '平衡路线失败后先做 dry-run 复核，再决定是否升级质量优先或人工确认。' };
+  }
+  return { fallbackRoute: 'local_balanced', fallbackPlan: '低成本路线失败后升级到本地平衡路线，仍不自动发布或写入。' };
+}
+
+function executionModeFor(taskType: PracticalTaskType, route: RouteType, riskLevel: PracticalRiskLevel, needsUserConfirm: boolean, firewallHits: string[]): ExecutionMode {
+  if (route === 'blocked' || riskLevel === 'blocked') return 'blocked';
+  if (firewallHits.some((hit) => hit === 'taskkill' || hit === 'kill node')) return 'blocked';
+  if (firewallHits.length > 0 || riskLevel === 'high') return 'human_confirm_required';
+  if (needsUserConfirm) return 'ask_first';
+  if (taskType === 'readonly_audit' || taskType === 'text_inference') return 'read_only';
+  if (route === 'cloud_reasoning_model' || route === 'cloud_high_capability') return 'cloud_allowed';
+  if (route.startsWith('local') || route.startsWith('openclaw') || route === 'comfyui_8000') return 'local_only';
+  return 'dry_run';
+}
+
+function routeDisplayName(route: RouteType): string {
+  const names: Record<RouteType, string> = {
+    local_low_cost: '本地低成本出口',
+    local_balanced: '本地平衡出口',
+    cloud_high_capability: '云端高能力出口',
+    local_cpu: '本地 CPU 出口',
+    local_gpu: '本地 GPU 出口',
+    openclaw_stable_2026_3_23: 'OpenClaw 稳定出口',
+    openclaw_sidecar_2026_5_12: 'OpenClaw 小盒子出口',
+    comfyui_8000: 'ComfyUI 8000 出口',
+    cloud_reasoning_model: '云端强推理出口',
+    manual_confirm: '人工确认出口',
+    blocked: '阻断出口',
+  };
+  return names[route];
+}
+
+function modelTierFor(route: RouteType, taskType: PracticalTaskType, strategyMode: StrategyMode): ModelTier {
+  if (route === 'blocked') return 'blocked';
+  if (route === 'manual_confirm' && (taskType === 'training' || taskType === 'image_generation' || taskType === 'dataset_operation')) return 'toolchain';
+  if (route === 'manual_confirm') return 'blocked';
+  const matrixTier = ROUTE_MATRIX[taskType]?.[strategyMode]?.modelTier;
+  if (matrixTier) return matrixTier;
+  if (route === 'cloud_reasoning_model' || route === 'cloud_high_capability') return 'premium';
+  if (route === 'local_gpu' || route === 'local_cpu' || route === 'local_low_cost' || route === 'local_balanced') return 'local';
+  if (route === 'openclaw_sidecar_2026_5_12' || route === 'comfyui_8000' || route === 'openclaw_stable_2026_3_23') return 'toolchain';
+  return taskType === 'text_inference' ? 'economy' : 'balanced';
+}
+
+function deniedActionsFor(taskType: PracticalTaskType, firewallHits: string[]): string[] {
+  const denied = new Set<string>();
+  for (const hit of firewallHits) denied.add(hit);
+  if (taskType === 'github_release') ['git push', 'git tag', 'GitHub Release without confirmation'].forEach((item) => denied.add(item));
+  if (taskType === 'file_cleanup') ['delete files', 'move files', 'delete backups'].forEach((item) => denied.add(item));
+  if (taskType === 'training') ['start training', 'overwrite best.pt', 'overwrite last.pt'].forEach((item) => denied.add(item));
+  if (taskType === 'memory_update') ['write sqlite', 'modify candidate', 'modify LAN_SHARE'].forEach((item) => denied.add(item));
+  return Array.from(denied);
+}
+
+function toolchainFor(route: RouteType, taskType: PracticalTaskType, executionMode: ExecutionMode, deniedActions: string[]) {
+  const basePrechecks = ['确认任务范围', '确认目标路径', '生成 preview/dry-run 结果'];
+  const rollbackRequired = executionMode === 'human_confirm_required' || executionMode === 'blocked' || deniedActions.length > 0;
+  if (taskType === 'github_release') {
+    return { primary: 'release-prep / gate-check', secondary: ['status audit', 'diff check', 'human approval'], requiresHuman: true, readOnlyFirst: true, dryRunFirst: true, forbiddenActions: deniedActions, suggestedPrechecks: [...basePrechecks, '确认版本号和发布范围'], rollbackRequired: true };
+  }
+  if (taskType === 'image_generation') {
+    return { primary: route === 'openclaw_sidecar_2026_5_12' ? 'OpenClaw sidecar 2026.5.12' : 'ComfyUI route proposal', secondary: ['prompt audit', 'resource check'], requiresHuman: true, readOnlyFirst: true, dryRunFirst: true, forbiddenActions: deniedActions, suggestedPrechecks: [...basePrechecks, '确认不会启动或修改 ComfyUI'], rollbackRequired };
+  }
+  if (taskType === 'dataset_operation' || taskType === 'training') {
+    return { primary: 'local dataset audit', secondary: ['YOLO preflight', 'new output directory check'], requiresHuman: executionMode !== 'read_only', readOnlyFirst: true, dryRunFirst: true, forbiddenActions: deniedActions, suggestedPrechecks: [...basePrechecks, '确认数据集路径和新输出目录'], rollbackRequired };
+  }
+  if (taskType === 'readonly_audit') {
+    return { primary: 'read-only scanner', secondary: ['health probe', 'report writer'], requiresHuman: false, readOnlyFirst: true, dryRunFirst: false, forbiddenActions: deniedActions, suggestedPrechecks: ['确认只读边界', '确认报告输出路径'], rollbackRequired: false };
+  }
+  if (route === 'cloud_reasoning_model') {
+    return { primary: 'premium reasoning proposal', secondary: ['local pre-triage', 'budget confirmation'], requiresHuman: true, readOnlyFirst: true, dryRunFirst: true, forbiddenActions: deniedActions, suggestedPrechecks: [...basePrechecks, '确认预算和外部调用许可'], rollbackRequired };
+  }
+  return { primary: 'local rules engine', secondary: ['audit preview'], requiresHuman: executionMode !== 'read_only', readOnlyFirst: true, dryRunFirst: executionMode !== 'read_only', forbiddenActions: deniedActions, suggestedPrechecks: basePrechecks, rollbackRequired };
+}
+
+function tierExplanation(tier: ModelTier, taskType: PracticalTaskType): { tierReason: string; whyNotOtherTiers: string[] } {
+  const reasons: Record<ModelTier, string> = {
+    economy: '任务低风险且成本敏感，适合便宜快速路线。',
+    balanced: '任务需要比 economy 更稳的综合能力，但还不需要 premium。',
+    premium: '任务需要复杂推理或高质量判断，但只建议不自动调用。',
+    local: '任务可在本地只读或规则检查中完成，优先避免外部调用。',
+    toolchain: '任务依赖 AIP/API/脚本/OpenClaw/ComfyUI/Memory Hub/GitHub 等工具链编排。',
+    blocked: '任务命中高风险或保护边界，禁止自动执行。',
+  };
+  const whyNot: Record<ModelTier, string[]> = {
+    economy: ['balanced/premium 成本更高，当前任务不需要。', 'toolchain/local 不是必要执行路径。'],
+    balanced: ['economy 可能解释能力不足。', 'premium 成本更高，暂不直接升级。'],
+    premium: ['economy/balanced 对复杂任务可能质量不足。', 'local/toolchain 只能先做预检或辅助。'],
+    local: ['cloud/premium 会引入外部调用和成本。', 'blocked 不适用于低风险只读任务。'],
+    toolchain: ['纯模型层不能代表本地工具链动作。', '真实工具执行仍需确认或 dry-run。'],
+    blocked: ['其他模型层不应绕过风险防火墙。', '必须先改写为只读检查或取得人工确认。'],
+  };
+  return {
+    tierReason: `${reasons[tier]} 任务类型=${taskType}。`,
+    whyNotOtherTiers: whyNot[tier],
+  };
+}
+
+function confidenceFor(taskTypeRaw: string, taskType: PracticalTaskType, input: any, riskLevel: PracticalRiskLevel): { confidence: ConfidenceLevel; confidenceReason: string; missingInformation: string[] } {
+  const text = targetText(input);
+  const missing: string[] = [];
+  const vague = ['弄一下', '处理一下', '搞一下', 'fix it', 'help'].some((item) => text.includes(item));
+  if (!taskTypeRaw || vague || text.length < 6) missing.push('任务目标不够具体');
+  if (riskLevel === 'high' || riskLevel === 'blocked') missing.push('高风险任务需要确认允许动作和回滚边界');
+  if (taskType === 'training') missing.push('需要确认数据集路径、输出目录、是否允许覆盖权重');
+  if (taskType === 'github_release') missing.push('需要确认目标版本、提交范围、是否允许 tag/push/release');
+  if (taskType === 'image_generation') missing.push('需要确认是否允许启动 ComfyUI/sidecar 真实执行');
+  if (missing.length === 0) return { confidence: 'high', confidenceReason: '任务类型、策略档位和风险边界都清楚。', missingInformation: [] };
+  if (riskLevel === 'high' || riskLevel === 'blocked') return { confidence: 'medium', confidenceReason: '分类明确，但高风险动作缺少人工确认。', missingInformation: missing };
+  return { confidence: 'low', confidenceReason: '输入过于笼统，路由只能给低置信度建议。', missingInformation: missing };
+}
+
+function enrichPracticalDecision(decision: Omit<PracticalDecision,
+  'strategyMode' | 'taskLabel' | 'recommendedChannel' | 'costScore' | 'qualityScore' | 'speedScore' | 'riskScore' |
+  'scoreExplanation' | 'fallbackRoute' | 'fallbackPlan' | 'humanReadableExplanation' | 'firewallHits'
+>, taskType: PracticalTaskType, input: any): PracticalDecision {
+  const strategyMode = normalizeStrategyMode(input.strategy_mode || input.strategyMode, taskType);
+  const strategy = STRATEGY_MODES[strategyMode];
+  const matrix = ROUTE_MATRIX[taskType]?.[strategyMode];
+  const category = getTaskCategoryMeta(taskType, input);
+  const firewallHits = findFirewallHits(taskType, input);
+  const highRiskFirewall = firewallHits.length > 0 && (
+    taskType === 'github_release' ||
+    taskType === 'file_cleanup' ||
+    taskType === 'memory_update' ||
+    decision.riskLevel === 'blocked' ||
+    firewallHits.some((hit) => hit !== '训练/覆盖模型')
+  );
+  const processKillBlocked = firewallHits.some((hit) => hit === 'taskkill' || hit === 'kill node');
+  const selectedRoute = processKillBlocked ? 'blocked' : (highRiskFirewall ? 'manual_confirm' : (matrix?.route || decision.selectedRoute));
+  const riskLevel = processKillBlocked ? 'blocked' : (highRiskFirewall && decision.riskLevel !== 'blocked' ? 'high' : decision.riskLevel);
+  const needsUserConfirm = highRiskFirewall || decision.needsUserConfirm;
+  const blocked = selectedRoute === 'blocked' || riskLevel === 'blocked';
+  const scores = scorePracticalDecision(selectedRoute, taskType, strategyMode, riskLevel, needsUserConfirm);
+  const fallback = fallbackFor(selectedRoute, strategyMode, blocked);
+  const executionMode = highRiskFirewall ? executionModeFor(taskType, selectedRoute, riskLevel, needsUserConfirm, firewallHits) : (matrix?.executionMode || executionModeFor(taskType, selectedRoute, riskLevel, needsUserConfirm, firewallHits));
+  const deniedActions = deniedActionsFor(taskType, firewallHits);
+  const confidence = confidenceFor(String(input.__raw_task_type || ''), taskType, input, riskLevel);
+  const recommendedModelTier = modelTierFor(selectedRoute, taskType, strategyMode);
+  const tier = tierExplanation(recommendedModelTier, taskType);
+  const readOnlyPrechecks = [
+    '确认 git status 和当前差异范围',
+    '确认目标路径属于允许范围',
+    '生成 dry-run / preview 结果',
+  ];
+  const rollbackPlan = [
+    '本轮不执行真实动作，因此默认无需文件级回滚。',
+    '若后续进入执行阶段，必须先记录精确路径、生成备份或 revert 方案。',
+    '高风险动作必须拆成只读检查、人工确认、执行、复核四步。',
+  ];
+  const requiredConfirmations = needsUserConfirm || firewallHits.length > 0
+    ? ['确认任务范围', '确认允许动作', '确认回滚方式']
+    : [];
+  const safetyNotes = Array.from(new Set([
+    ...decision.safetyNotes,
+    ...firewallHits.map((hit) => `风险防火墙命中：${hit}，只能建议人工确认。`),
+    executionMode === 'human_confirm_required' ? '执行模式为 human_confirm_required，不允许自动执行。' : '',
+    executionMode === 'blocked' ? '执行模式为 blocked，必须先改写为只读检查任务。' : '',
+    'auditPreview 标记 wouldExecute=false，本轮仅做建议和预览。',
+  ].filter(Boolean)));
+
+  return {
+    ...decision,
+    selectedRoute,
+    riskLevel,
+    needsUserConfirm,
+    safetyNotes,
+    strategyMode,
+    taskLabel: getTaskLabel(taskType),
+    recommendedChannel: strategy.recommended_channel,
+    ...scores,
+    scoreExplanation: `策略档位=${strategy.name}；成本=${scores.costScore}，质量=${scores.qualityScore}，速度=${scores.speedScore}，风险控制=${scores.riskScore}。`,
+    fallbackRoute: fallback.fallbackRoute,
+    fallbackPlan: fallback.fallbackPlan,
+    humanReadableExplanation: `${strategy.name}适合：${strategy.suitable_for} 当前任务识别为“${getTaskLabel(taskType)}”，推荐 ${selectedRoute}，原因是：${decision.reason}`,
+    firewallHits,
+    selectedPolicy: strategy.id,
+    detectedCategory: category.id,
+    routeName: routeDisplayName(selectedRoute),
+    recommendedModelTier,
+    tierReason: tier.tierReason,
+    whyNotOtherTiers: tier.whyNotOtherTiers,
+    recommendedToolchain: toolchainFor(selectedRoute, taskType, executionMode, deniedActions),
+    executionMode,
+    matchedRules: firewallHits,
+    requiredConfirmations,
+    readOnlyPrechecks,
+    rollbackPlan,
+    deniedActions,
+    confidence: confidence.confidence,
+    confidenceReason: confidence.confidenceReason,
+    missingInformation: confidence.missingInformation,
+    whyThisRoute: `${strategy.name}下，${getTaskLabel(taskType)}优先走${routeDisplayName(selectedRoute)}；风险等级=${riskLevel}，确认要求=${needsUserConfirm ? '需要人工确认' : '无需人工确认'}。`,
+    escalationPlan: [
+      fallback.fallbackPlan,
+      `失败切换出口：${routeDisplayName(fallback.fallbackRoute)}`,
+      highRiskFirewall ? '高风险命中时先只读检查，再生成回滚方案，最后等待人工确认。' : '低风险任务可先 dry-run，再根据质量结果升级。',
+    ],
+    auditPreview: {
+      mode: 'preview_only',
+      wouldExecute: false,
+      wouldWriteFiles: false,
+      timestamp: now(),
+      taskSummary: targetText(input) || getTaskLabel(taskType),
+      rawInput: input && typeof input === 'object' ? input : {},
+      selectedPolicy: strategy.id,
+      detectedCategory: category.id,
+      riskLevel,
+      executionMode,
+      confidence: confidence.confidence,
+      matchedRiskRules: firewallHits,
+      recommendedRoute: selectedRoute,
+      recommendedModelTier,
+      deniedActions,
+      readOnlyPrechecks,
+      nextSafeStep: decision.nextAction,
+      rollbackRequired: deniedActions.length > 0 || executionMode === 'human_confirm_required' || executionMode === 'blocked',
+      auditMode: 'preview_only',
+      requiredConfirmations,
+      rollbackPlan,
+    },
+  };
 }
 
 function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDecision {
@@ -943,16 +1584,16 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
 
   if (text.includes('openclaw') && (text.includes('2026.3.23') || text.includes('stable') || text.includes('覆盖'))) {
     return {
-      selectedRoute: 'blocked',
+      selectedRoute: 'manual_confirm',
       costLevel: 'unknown',
-      riskLevel: 'blocked',
+      riskLevel: 'high',
       needsUserConfirm: true,
-      reason: '请求可能覆盖 OpenClaw 2026.3.23 稳定版，按保护规则阻断。',
+      reason: '请求可能覆盖 OpenClaw 2026.3.23 稳定版，必须人工确认、旁路验证和回滚方案。',
       rejectedRoutes: [
         { route: 'openclaw_stable_2026_3_23', reason: '稳定版只能作为已知能力展示，禁止覆盖。' },
       ],
       safetyNotes: [...safetyNotes, '禁止修改全局 OpenClaw 2026.3.23。'],
-      nextAction: '改为 sidecar 或只读检查方案。',
+      nextAction: '先做只读现状检查和 sidecar 旁路方案，不覆盖稳定版。',
     };
   }
 
@@ -1065,7 +1706,7 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
     };
   }
 
-  if (taskType === 'code_analysis' && budget !== 'low') {
+  if (taskType === 'code_analysis' && (budget !== 'low' || normalizeStrategyMode(input.strategy_mode || input.strategyMode, taskType) === 'quality_first')) {
     return {
       selectedRoute: 'cloud_reasoning_model',
       costLevel: 'medium',
@@ -1098,8 +1739,27 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
 export function getPracticalConfig() {
   return {
     ok: true,
-    engine_version: 'v2-practical-rc1',
+    engine_version: 'strategy-console-candidate',
     policy_templates: BUILTIN_POLICY_TEMPLATES,
+    strategy_modes: Object.values(STRATEGY_MODES),
+    task_console_types: TASK_CONSOLE_TYPES,
+    firewall_rules: HIGH_RISK_FIREWALL_RULES.map((rule) => ({ id: rule.id, label: rule.label, patterns: rule.patterns })),
+    route_matrix: ROUTE_MATRIX,
+    case_matrix: CASE_MATRIX,
+    decision_pipeline: [
+      'normalizeInput',
+      'detectTaskCategory',
+      'selectPolicyPreset',
+      'evaluateRiskFirewall',
+      'computeScores',
+      'chooseRoute',
+      'buildRejectedRoutes',
+      'buildEscalationPlan',
+      'buildSafetyNotes',
+      'buildAuditPreview',
+      'returnDecision',
+    ],
+    execution_modes: ['read_only', 'ask_first', 'dry_run', 'human_confirm_required', 'local_only', 'cloud_allowed', 'blocked'],
     task_types: PRACTICAL_TASK_TYPES,
     route_targets: ROUTE_TYPES,
     cost_levels: ['free', 'low', 'medium', 'high', 'unknown'],
@@ -1112,11 +1772,13 @@ export function simulatePracticalRoute(body: any) {
   const taskType = String(body.task_type || '').trim();
   if (!taskType) return { ok: false, error: 'task_type is required' };
   const rawInput = parseBodyInput(body.input_json || body);
-  const decision = buildPracticalDecision(taskType, rawInput);
+  const enrichedInput = { ...rawInput, __raw_task_type: taskType };
+  const normalizedTaskType = normalizePracticalTaskType(taskType);
+  const decision = enrichPracticalDecision(buildPracticalDecision(taskType, enrichedInput), normalizedTaskType, enrichedInput);
   return {
     ok: true,
-    engine_version: 'v2-practical-rc1',
-    task_type: normalizePracticalTaskType(taskType),
+    engine_version: 'strategy-console-candidate',
+    task_type: normalizedTaskType,
     task_id: String(body.task_id || '').trim(),
     decision,
   };
@@ -1189,7 +1851,7 @@ export function resolveRoute(body: any) {
       engine_version: 'v2',
       resolved_at: ts,
       context,
-      practical_decision: buildPracticalDecision(taskType, rawInput),
+      practical_decision: enrichPracticalDecision(buildPracticalDecision(taskType, { ...rawInput, __raw_task_type: taskType }), normalizePracticalTaskType(taskType), { ...rawInput, __raw_task_type: taskType }),
       selected: chosen
         ? {
             policy_id: chosen.policy_id,

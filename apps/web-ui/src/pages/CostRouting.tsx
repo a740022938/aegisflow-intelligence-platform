@@ -112,6 +112,101 @@ interface PracticalDecision {
   rejectedRoutes: Array<{ route: RouteType; reason: string }>;
   safetyNotes: string[];
   nextAction: string;
+  strategyMode?: StrategyMode;
+  taskLabel?: string;
+  recommendedChannel?: string;
+  costScore?: number;
+  qualityScore?: number;
+  speedScore?: number;
+  riskScore?: number;
+  scoreExplanation?: string;
+  fallbackRoute?: RouteType;
+  fallbackPlan?: string;
+  humanReadableExplanation?: string;
+  firewallHits?: string[];
+  selectedPolicy?: string;
+  detectedCategory?: string;
+  routeName?: string;
+  recommendedModelTier?: string;
+  tierReason?: string;
+  whyNotOtherTiers?: string[];
+  recommendedToolchain?: {
+    primary: string;
+    secondary: string[];
+    requiresHuman: boolean;
+    readOnlyFirst: boolean;
+    dryRunFirst: boolean;
+    forbiddenActions: string[];
+    suggestedPrechecks: string[];
+    rollbackRequired: boolean;
+  };
+  executionMode?: 'read_only' | 'ask_first' | 'dry_run' | 'human_confirm_required' | 'local_only' | 'cloud_allowed' | 'blocked';
+  matchedRules?: string[];
+  requiredConfirmations?: string[];
+  readOnlyPrechecks?: string[];
+  rollbackPlan?: string[];
+  deniedActions?: string[];
+  confidence?: 'low' | 'medium' | 'high';
+  confidenceReason?: string;
+  missingInformation?: string[];
+  whyThisRoute?: string;
+  escalationPlan?: string[];
+  auditPreview?: {
+    mode: 'preview_only';
+    wouldExecute: false;
+    wouldWriteFiles: false;
+    timestamp?: string;
+    taskSummary?: string;
+    rawInput?: Record<string, unknown>;
+    selectedPolicy?: string;
+    detectedCategory?: string;
+    riskLevel?: string;
+    executionMode?: string;
+    confidence?: string;
+    matchedRiskRules?: string[];
+    recommendedRoute?: string;
+    recommendedModelTier?: string;
+    deniedActions?: string[];
+    readOnlyPrechecks?: string[];
+    nextSafeStep?: string;
+    rollbackRequired?: boolean;
+    auditMode?: string;
+    requiredConfirmations: string[];
+    rollbackPlan: string[];
+  };
+}
+
+type StrategyMode = 'save_money' | 'stable_first' | 'quality_first' | 'local_first' | 'balanced';
+
+interface StrategyModeConfig {
+  id: StrategyMode;
+  name: string;
+  description: string;
+  costBias: number;
+  qualityBias: number;
+  speedBias: number;
+  localBias: number;
+  riskTolerance: string;
+  suitable_for: string;
+  recommendedFor: string[];
+  avoidFor: string[];
+  recommended_channel: string;
+  cost_bias: string;
+  risk_control: string;
+  fallback_plan: string;
+  fallbackPlan: string;
+}
+
+interface TaskConsoleType {
+  id: string;
+  label: string;
+  maps_to: string;
+  default_strategy: StrategyMode;
+  description?: string;
+  defaultRisk?: string;
+  suggestedRoute?: string;
+  forbiddenAutoActions?: string[];
+  recommendedPolicy?: string;
 }
 
 interface PolicyTemplate {
@@ -127,6 +222,23 @@ interface PolicyTemplate {
 
 interface PracticalConfig {
   policy_templates: PolicyTemplate[];
+  strategy_modes: StrategyModeConfig[];
+  task_console_types: TaskConsoleType[];
+  firewall_rules: Array<{ id: string; label: string; patterns?: string[] }>;
+  route_matrix?: Record<string, Record<string, { route: RouteType; modelTier: string; executionMode: string; note: string }>>;
+  case_matrix?: Array<{
+    label: string;
+    taskType: string;
+    mode: StrategyMode;
+    input: Record<string, unknown>;
+    expectedCategory: string;
+    expectedRiskLevel: string;
+    expectedExecutionMode: string;
+    expectedModelTier: string;
+    expectedSafetyBehavior: string;
+  }>;
+  decision_pipeline?: string[];
+  execution_modes: string[];
   task_types: string[];
   route_targets: RouteType[];
   cost_levels: string[];
@@ -134,36 +246,119 @@ interface PracticalConfig {
   local_capabilities: Record<string, string>;
 }
 
-const SIMULATION_EXAMPLES = [
+interface SimulationExample {
+  label: string;
+  mode: StrategyMode;
+  taskType: string;
+  taskId: string;
+  input: Record<string, unknown>;
+}
+
+const SIMULATION_EXAMPLES: SimulationExample[] = [
   {
-    label: '低预算文本总结',
+    label: '普通聊天/问答',
+    mode: 'save_money' as StrategyMode,
+    taskType: 'chat_qa',
+    taskId: 'sim-chat-qa',
+    input: { budget: 'low', prompt: '普通问答：解释 AIP 当前状态' },
+  },
+  {
+    label: '文档总结/改写',
+    mode: 'save_money' as StrategyMode,
     taskType: 'text_inference',
     taskId: 'sim-low-budget-summary',
     input: { budget: 'low', prompt: '低预算文本总结', estimated_tokens: 2400 },
   },
   {
-    label: 'Mahjong YOLO 小训练',
+    label: '代码修改/调试',
+    mode: 'quality_first' as StrategyMode,
+    taskType: 'code_debug',
+    taskId: 'sim-code-debug',
+    input: { budget: 'medium', quality_priority: 'high', target: '复杂代码调试和根因分析' },
+  },
+  {
+    label: 'AIP 只读健康检查',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'readonly_project_audit',
+    taskId: 'sim-readonly-audit',
+    input: { budget: 'low', target: 'AIP project readonly audit' },
+  },
+  {
+    label: 'Git 发布/版本封板',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'git_release_seal',
+    taskId: 'sim-git-release-seal',
+    input: { budget: 'medium', target: 'git push tag release v7.3.2' },
+  },
+  {
+    label: '删除旧备份',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'high_risk_system_ops',
+    taskId: 'sim-delete-backups',
+    input: { budget: 'low', target: '删除旧备份目录' },
+  },
+  {
+    label: 'taskkill node',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'high_risk_system_ops',
+    taskId: 'sim-taskkill-node',
+    input: { budget: 'low', target: 'taskkill /IM node.exe' },
+  },
+  {
+    label: '启动 ComfyUI 生图',
+    mode: 'local_first' as StrategyMode,
+    taskType: 'image_comfyui',
+    taskId: 'sim-comfy-image',
+    input: { budget: 'low', comfy_available: true, prompt: 'ComfyUI 真实海怪生图' },
+  },
+  {
+    label: 'Mahjong 数据集只读检查',
+    mode: 'local_first' as StrategyMode,
+    taskType: 'dataset_yolo_mahjong',
+    taskId: 'sim-mahjong-yolo-dataset',
+    input: { budget: 'low', gpu_needed: true, target: 'YOLO Mahjong dataset quality check' },
+  },
+  {
+    label: '训练并覆盖 best.pt',
+    mode: 'local_first' as StrategyMode,
     taskType: 'training',
-    taskId: 'sim-mahjong-yolo-train',
-    input: { budget: 'low', gpu_needed: true, target: 'Mahjong YOLO seed training' },
+    taskId: 'sim-train-overwrite-best',
+    input: { budget: 'low', gpu_needed: true, target: '训练 Mahjong 模型并覆盖 best.pt' },
   },
   {
-    label: 'ComfyUI 真实海怪生图',
-    taskType: 'image_generation',
-    taskId: 'sim-comfy-sea-monster',
-    input: { budget: 'low', comfy_available: true, prompt: '真实海怪生图' },
+    label: 'Memory Hub 候选审批',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'memory_hub_knowledge',
+    taskId: 'sim-memory-hub',
+    input: { budget: 'low', target: '修改 candidate sqlite' },
   },
   {
-    label: 'E 盘清理候选审计',
-    taskType: 'file_cleanup',
-    taskId: 'sim-e-drive-cleanup-audit',
-    input: { budget: 'low', target: 'E:\\ cleanup candidates readonly audit' },
+    label: 'OpenClaw 稳定版升级/覆盖',
+    mode: 'local_first' as StrategyMode,
+    taskType: 'openclaw_agent_task',
+    taskId: 'sim-openclaw-agent',
+    input: { budget: 'low', target: '覆盖 OpenClaw 2026.3.23 稳定版' },
   },
   {
-    label: 'GitHub Release 发布',
-    taskType: 'github_release',
-    taskId: 'sim-github-release',
-    input: { budget: 'medium', target: 'create GitHub Release v7.3.1-rc1' },
+    label: '模糊任务',
+    mode: 'balanced' as StrategyMode,
+    taskType: 'text_inference',
+    taskId: 'sim-vague-task',
+    input: { target: '帮我弄一下' },
+  },
+  {
+    label: '依赖安装',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'code_debug',
+    taskId: 'sim-dependency-install',
+    input: { target: 'pnpm install 一堆新依赖' },
+  },
+  {
+    label: '修改 .env token',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'high_risk_system_ops',
+    taskId: 'sim-env-token',
+    input: { target: '帮我改 .env token' },
   },
 ];
 
@@ -260,6 +455,7 @@ export default function CostRoutingPage() {
   const [simulateTaskType, setSimulateTaskType] = useState('training');
   const [simulateTaskId, setSimulateTaskId] = useState('sim-task-v640-001');
   const [simulateInputJson, setSimulateInputJson] = useState('{"budget":"low","gpu_needed":true}');
+  const [strategyMode, setStrategyMode] = useState<StrategyMode>('stable_first');
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
@@ -416,7 +612,7 @@ export default function CostRoutingPage() {
         body: JSON.stringify({
           task_type: simulateTaskType,
           task_id: simulateTaskId,
-          input_json: parsed,
+          input_json: { ...parsed, strategy_mode: strategyMode },
         }),
       });
       if (!res.ok) throw new Error(res.error || '路由决策失败');
@@ -451,7 +647,7 @@ export default function CostRoutingPage() {
         body: JSON.stringify({
           task_type: simulateTaskType,
           task_id: simulateTaskId,
-          input_json: parsed,
+          input_json: { ...parsed, strategy_mode: strategyMode },
         }),
       });
       if (!res.ok) throw new Error(res.error || '模拟决策失败');
@@ -464,10 +660,11 @@ export default function CostRoutingPage() {
     }
   }
 
-  function applyExample(example: typeof SIMULATION_EXAMPLES[number]) {
+  function applyExample(example: SimulationExample) {
     setSimulateTaskType(example.taskType);
     setSimulateTaskId(example.taskId);
-    setSimulateInputJson(JSON.stringify(example.input, null, 2));
+    setStrategyMode(example.mode);
+    setSimulateInputJson(JSON.stringify({ ...example.input, strategy_mode: example.mode }, null, 2));
     setPracticalDecision(null);
     setMsg(`已填充示例: ${example.label}`);
   }
@@ -557,9 +754,32 @@ export default function CostRoutingPage() {
   return (
     <div className="cost-routing-page page-root">
       <PageHeader
-        title="成本路由"
-        subtitle="多维打分路由 + 决策反馈回填 + 近7天策略洞察"
+        title="AI Router Console / 成本路由策略台"
+        subtitle="AI Task Router Core，成本/风险/质量调度中心；当前只做建议、dry-run 和审计预览，不执行真实操作"
       />
+
+      <div className={`cr-router-status role-card ${roleClass('exec')}`}>
+        <div>
+          <span>基线</span>
+          <b>v7.3.2 candidate</b>
+        </div>
+        <div>
+          <span>当前模式</span>
+          <b>建议 / dry-run / preview only</b>
+        </div>
+        <div>
+          <span>安全状态</span>
+          <b>高风险任务默认人工确认</b>
+        </div>
+        <div>
+          <span>出口路线</span>
+          <b>本地 / 强推理 / 工具链 / 人工确认</b>
+        </div>
+        <div>
+          <span>执行承诺</span>
+          <b>不自动 push、删除、训练或覆盖</b>
+        </div>
+      </div>
 
       <div className={`cr-summary-panel role-card ${roleClass('gov')}`}>
         <div className="cr-summary-title">策略概览</div>
@@ -581,6 +801,98 @@ export default function CostRoutingPage() {
             <span className="cr-summary-val">{stats.recommendationCount}</span>
           </div>
         </div>
+      </div>
+
+      <div className="cr-practical-grid">
+        <SectionCard className={`role-card ${roleClass('gov')}`} title="策略档位">
+          <div className="cr-mode-grid">
+            {(practicalConfig?.strategy_modes || []).map((mode) => (
+              <button
+                type="button"
+                key={mode.id}
+                className={`cr-mode-item ${strategyMode === mode.id ? 'selected' : ''}`}
+                onClick={() => setStrategyMode(mode.id)}
+              >
+                <div className="cr-template-head">
+                  <span className="cost-routing-policy-name">{mode.name}</span>
+                  <span className="cr-badge">{mode.id}</span>
+                </div>
+                <div className="cr-template-desc">{mode.description || mode.suitable_for}</div>
+                <div className="cost-routing-policy-meta">通道：{mode.recommended_channel}</div>
+                <div className="cost-routing-policy-meta">倾向：成本 {mode.costBias ?? '-'} · 质量 {mode.qualityBias ?? '-'} · 速度 {mode.speedBias ?? '-'} · 本地 {mode.localBias ?? '-'}</div>
+                <div className="cost-routing-policy-meta">风控：{mode.risk_control}</div>
+                <div className="cost-routing-policy-meta">失败切换：{mode.fallbackPlan || mode.fallback_plan}</div>
+              </button>
+            ))}
+          </div>
+        </SectionCard>
+
+        <SectionCard className={`role-card ${roleClass('exec')}`} title="路由矩阵">
+          <div className="cr-mini-table">
+            {[
+              ['低风险 + 省钱优先', 'text_inference', 'save_money'],
+              ['代码/复杂任务 + 质量优先', 'code_analysis', 'quality_first'],
+              ['本地优先 + 可本地处理', 'readonly_audit', 'local_first'],
+              ['发布/删除/覆盖/训练', 'github_release', 'stable_first'],
+            ].map(([label, task, mode]) => {
+              const item = practicalConfig?.route_matrix?.[task]?.[mode];
+              return (
+                <div className="cr-mini-row" key={`${task}-${mode}`}>
+                  <span>{label}</span>
+                  <span>{item?.route || 'manual_confirm'}</span>
+                  <span>{item?.modelTier || 'blocked'}</span>
+                  <span>{item?.executionMode || 'human_confirm_required'}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="cr-template-desc">
+            Pipeline：{(practicalConfig?.decision_pipeline || []).join(' -> ') || '加载中'}
+          </div>
+        </SectionCard>
+      </div>
+
+      <div className="cr-practical-grid">
+        <SectionCard className={`role-card ${roleClass('exec')}`} title="任务类型识别">
+          <div className="cr-task-grid">
+            {(practicalConfig?.task_console_types || []).map((item) => (
+              <button
+                type="button"
+                key={item.id}
+                className={`cr-task-item ${simulateTaskType === item.id ? 'selected' : ''}`}
+                onClick={() => {
+                  setSimulateTaskType(item.id);
+                  setStrategyMode(item.default_strategy);
+                  setSimulateTaskId(`sim-${item.id}`);
+                  setSimulateInputJson(JSON.stringify({ budget: 'low', target: item.label, strategy_mode: item.default_strategy }, null, 2));
+                  setPracticalDecision(null);
+                }}
+              >
+                <b>{item.label}</b>
+                <span>{item.id} -&gt; {item.maps_to}</span>
+                <span>风险 {item.defaultRisk || 'medium'} · 推荐 {item.suggestedRoute || item.maps_to}</span>
+              </button>
+            ))}
+          </div>
+        </SectionCard>
+
+        <SectionCard className={`role-card ${roleClass('gov')}`} title="Case Matrix">
+          <div className="cr-case-grid">
+            {(practicalConfig?.case_matrix || []).map((item) => (
+              <button className="cr-case-item" type="button" key={item.label} onClick={() => applyExample({
+                label: item.label,
+                mode: item.mode,
+                taskType: item.taskType,
+                taskId: `case-${item.taskType}`,
+                input: item.input,
+              })}>
+                <b>{item.label}</b>
+                <span>{item.expectedCategory} / {item.expectedRiskLevel} / {item.expectedExecutionMode}</span>
+                <span>{item.expectedModelTier} · {item.expectedSafetyBehavior}</span>
+              </button>
+            ))}
+          </div>
+        </SectionCard>
       </div>
 
       <div className="cr-practical-grid">
@@ -612,6 +924,12 @@ export default function CostRoutingPage() {
           <div className="cost-routing-policy-meta">
             任务类型 {practicalConfig?.task_types?.length || 0} 个 · 路由目标 {practicalConfig?.route_targets?.length || 0} 个
           </div>
+          <div className="cr-template-desc">
+            风险防火墙：{(practicalConfig?.firewall_rules || []).map((rule) => rule.label).join(' / ') || '加载中'}
+          </div>
+          <div className="cr-template-desc">
+            执行模式：{(practicalConfig?.execution_modes || []).join(' / ') || '加载中'}
+          </div>
         </SectionCard>
       </div>
 
@@ -637,6 +955,18 @@ export default function CostRoutingPage() {
         <SectionCard className={`role-card ${roleClass('exec')}`} title="模拟任务路由">
         <form onSubmit={handleResolve} className="cr-form-grid">
           <div className="cr-subtitle">模拟任务路由</div>
+          <div className="cr-mode-strip">
+            {(practicalConfig?.strategy_modes || []).map((mode) => (
+              <button
+                className={`ui-btn ${strategyMode === mode.id ? 'ui-btn-primary' : ''}`}
+                type="button"
+                key={mode.id}
+                onClick={() => setStrategyMode(mode.id)}
+              >
+                {mode.name}
+              </button>
+            ))}
+          </div>
           <div className="cr-example-row">
             {SIMULATION_EXAMPLES.map((example) => (
               <button className="ui-btn" type="button" key={example.taskId} onClick={() => applyExample(example)}>
@@ -670,6 +1000,84 @@ export default function CostRoutingPage() {
               </div>
             </div>
             <div className="cr-template-desc">{practicalDecision.reason}</div>
+            <div className="cr-console-grid">
+              <div>
+                <span>任务识别</span>
+                <b>{practicalDecision.taskLabel || simulateTaskType}</b>
+              </div>
+              <div>
+                <span>策略档位</span>
+                <b>{practicalDecision.strategyMode || strategyMode}</b>
+              </div>
+              <div>
+                <span>推荐通道</span>
+                <b>{practicalDecision.recommendedChannel || practicalDecision.selectedRoute}</b>
+              </div>
+              <div>
+                <span>执行模式</span>
+                <b>{practicalDecision.executionMode || 'dry_run'}</b>
+              </div>
+            </div>
+            <div className="cr-console-grid">
+              <div>
+                <span>出口路线</span>
+                <b>{practicalDecision.routeName || practicalDecision.selectedRoute}</b>
+              </div>
+              <div>
+                <span>模型层级</span>
+                <b>{practicalDecision.recommendedModelTier || 'low_cost_local_tier'}</b>
+              </div>
+              <div>
+                <span>检测分类</span>
+                <b>{practicalDecision.detectedCategory || simulateTaskType}</b>
+              </div>
+              <div>
+                <span>失败切换</span>
+                <b>{practicalDecision.fallbackRoute || 'manual_confirm'}</b>
+              </div>
+            </div>
+            {practicalDecision.tierReason ? (
+              <div className="cr-template-desc">
+                模型层级原因：{practicalDecision.tierReason} 不选其他层级：{(practicalDecision.whyNotOtherTiers || []).join('；') || 'N/A'}
+              </div>
+            ) : null}
+            <div className="cr-score-grid">
+              <div><span>costScore</span><b>{practicalDecision.costScore ?? 'N/A'}</b></div>
+              <div><span>qualityScore</span><b>{practicalDecision.qualityScore ?? 'N/A'}</b></div>
+              <div><span>speedScore</span><b>{practicalDecision.speedScore ?? 'N/A'}</b></div>
+              <div><span>riskScore</span><b>{practicalDecision.riskScore ?? 'N/A'}</b></div>
+            </div>
+            {practicalDecision.scoreExplanation ? <div className="cr-template-desc">{practicalDecision.scoreExplanation}</div> : null}
+            {practicalDecision.whyThisRoute ? <div className="cr-template-desc">{practicalDecision.whyThisRoute}</div> : null}
+            {practicalDecision.humanReadableExplanation ? <div className="cr-next-action">{practicalDecision.humanReadableExplanation}</div> : null}
+            {practicalDecision.confidence ? (
+              <>
+                <div className="cr-subtitle">决策置信度</div>
+                <div className="cr-console-grid">
+                  <div><span>confidence</span><b>{practicalDecision.confidence}</b></div>
+                  <div><span>reason</span><b>{practicalDecision.confidenceReason || 'N/A'}</b></div>
+                  <div><span>missing</span><b>{(practicalDecision.missingInformation || []).join(' / ') || 'none'}</b></div>
+                  <div><span>readOnlyPrechecks</span><b>{(practicalDecision.readOnlyPrechecks || []).length}</b></div>
+                </div>
+              </>
+            ) : null}
+            {practicalDecision.recommendedToolchain ? (
+              <>
+                <div className="cr-subtitle">推荐工具链</div>
+                <div className="cr-console-grid">
+                  <div><span>primary</span><b>{practicalDecision.recommendedToolchain.primary}</b></div>
+                  <div><span>requiresHuman</span><b>{String(practicalDecision.recommendedToolchain.requiresHuman)}</b></div>
+                  <div><span>readOnlyFirst</span><b>{String(practicalDecision.recommendedToolchain.readOnlyFirst)}</b></div>
+                  <div><span>dryRunFirst</span><b>{String(practicalDecision.recommendedToolchain.dryRunFirst)}</b></div>
+                  <div><span>rollbackRequired</span><b>{String(practicalDecision.recommendedToolchain.rollbackRequired)}</b></div>
+                  <div><span>suggestedPrechecks</span><b>{practicalDecision.recommendedToolchain.suggestedPrechecks.join(' / ') || 'none'}</b></div>
+                </div>
+                <div className="cr-firewall-row">
+                  {practicalDecision.recommendedToolchain.secondary.map((tool) => <span className="cr-badge" key={tool}>{tool}</span>)}
+                  {practicalDecision.recommendedToolchain.forbiddenActions.map((action) => <span className="cr-badge risk-high" key={action}>{action}</span>)}
+                </div>
+              </>
+            ) : null}
             <div className="cr-subtitle">拒绝路线</div>
             <div className="cr-mini-table">
               {practicalDecision.rejectedRoutes.map((item) => (
@@ -683,6 +1091,52 @@ export default function CostRoutingPage() {
             <ul className="cr-note-list">
               {practicalDecision.safetyNotes.map((note) => <li key={note}>{note}</li>)}
             </ul>
+            {(practicalDecision.firewallHits || []).length > 0 ? (
+              <>
+                <div className="cr-subtitle">风险防火墙</div>
+                <div className="cr-firewall-row">
+                  {(practicalDecision.firewallHits || []).map((hit) => <span className="cr-badge risk-high" key={hit}>{hit}</span>)}
+                </div>
+                <div className="cr-console-grid">
+                  <div><span>requiredConfirmations</span><b>{(practicalDecision.requiredConfirmations || []).join(' / ') || 'none'}</b></div>
+                  <div><span>deniedActions</span><b>{(practicalDecision.deniedActions || []).join(' / ') || 'none'}</b></div>
+                  <div><span>rollbackPlan</span><b>{(practicalDecision.rollbackPlan || []).length} steps</b></div>
+                  <div><span>matchedRules</span><b>{(practicalDecision.matchedRules || []).length}</b></div>
+                </div>
+              </>
+            ) : null}
+            {(practicalDecision.escalationPlan || []).length > 0 ? (
+              <>
+                <div className="cr-subtitle">失败升级路线</div>
+                <ul className="cr-note-list">
+                  {(practicalDecision.escalationPlan || []).map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </>
+            ) : null}
+            {practicalDecision.fallbackPlan ? <div className="cr-template-desc">失败后升级路线：{practicalDecision.fallbackPlan}</div> : null}
+            {practicalDecision.auditPreview ? (
+              <>
+                <div className="cr-subtitle">审计预览</div>
+                <div className="cr-audit-preview">
+                  <div><span>auditMode</span><b>{practicalDecision.auditPreview.auditMode || practicalDecision.auditPreview.mode}</b></div>
+                  <div><span>timestamp</span><b>{practicalDecision.auditPreview.timestamp || 'preview'}</b></div>
+                  <div><span>policy</span><b>{practicalDecision.auditPreview.selectedPolicy || practicalDecision.strategyMode}</b></div>
+                  <div><span>category</span><b>{practicalDecision.auditPreview.detectedCategory || practicalDecision.detectedCategory}</b></div>
+                  <div><span>route</span><b>{practicalDecision.auditPreview.recommendedRoute || practicalDecision.selectedRoute}</b></div>
+                  <div><span>modelTier</span><b>{practicalDecision.auditPreview.recommendedModelTier || practicalDecision.recommendedModelTier}</b></div>
+                  <div><span>confidence</span><b>{practicalDecision.auditPreview.confidence || practicalDecision.confidence}</b></div>
+                  <div><span>rollbackRequired</span><b>{String(practicalDecision.auditPreview.rollbackRequired ?? false)}</b></div>
+                  <div><span>wouldExecute</span><b>{String(practicalDecision.auditPreview.wouldExecute)}</b></div>
+                  <div><span>wouldWriteFiles</span><b>{String(practicalDecision.auditPreview.wouldWriteFiles)}</b></div>
+                  <div><span>confirmations</span><b>{practicalDecision.auditPreview.requiredConfirmations.join(' / ') || 'none'}</b></div>
+                  <div><span>nextSafeStep</span><b>{practicalDecision.auditPreview.nextSafeStep || practicalDecision.nextAction}</b></div>
+                </div>
+                <div className="cr-template-desc">当前仅为 preview，不写入数据库。</div>
+                <ul className="cr-note-list">
+                  {practicalDecision.auditPreview.rollbackPlan.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </>
+            ) : null}
             <div className="cr-next-action">{practicalDecision.nextAction}</div>
           </div>
         ) : null}
