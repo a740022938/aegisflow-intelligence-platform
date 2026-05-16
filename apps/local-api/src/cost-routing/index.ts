@@ -160,6 +160,18 @@ interface PracticalDecision {
   humanGateRequired?: boolean;
   confirmationReason?: string;
   noAutomaticExecution?: boolean;
+  dryRunPlan?: {
+    planId: string;
+    planTitle: string;
+    planMode: string;
+    steps: string[];
+    allowedSteps: string[];
+    forbiddenSteps: string[];
+    humanApprovalRequired: boolean;
+    stopConditions: string[];
+    rollbackPreview: string;
+    expectedOutputs: string[];
+  };
   auditPreview?: {
     auditSchemaVersion: string;
     mode: 'preview_only';
@@ -815,6 +827,129 @@ const INTEGRATION_READINESS_MATRIX = [
     rollbackRequired: true, nextMilestone: 'blocked / human_confirm_required', integrationRisk: 'critical',
   },
 ] as const;
+
+const INTEGRATION_REHEARSAL_MATRIX = [
+  {
+    id: 'aip_readonly_rehearsal', name: 'AIP Readonly Check Rehearsal', targetSystem: 'AIP Readonly API',
+    actionType: 'read_only_check', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['health check', 'status check'], requiredConfirmations: [],
+    rollbackPlanPreview: '不操作任何数据，无需回滚。', nextSafeStep: '输出只读报告。',
+    blockedRealActions: ['write_db', 'delete', 'restart', 'train'],
+  },
+  {
+    id: 'github_release_prep_rehearsal', name: 'GitHub Release-Prep Rehearsal', targetSystem: 'GitHub',
+    actionType: 'manual_release_prep', executionMode: 'dry_run', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['diff check', 'lint', 'build', 'smoke', 'secret scan', 'human confirmation'],
+    requiredConfirmations: ['确认版本号', '确认发布范围'],
+    rollbackPlanPreview: '仅做门禁检查，无回滚要求。', nextSafeStep: '生成 release notes draft，等待人工确认。',
+    blockedRealActions: ['git push', 'git tag', 'github_release'],
+  },
+  {
+    id: 'openclaw_sidecar_rehearsal', name: 'OpenClaw Sidecar Rehearsal', targetSystem: 'OpenClaw Sidecar',
+    actionType: 'read_only_check', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认当前 OpenClaw 版本', '确认不覆盖稳定版'],
+    requiredConfirmations: ['确认不覆盖 OpenClaw'],
+    rollbackPlanPreview: '不启动、不修改、不覆盖。', nextSafeStep: '输出只读观察报告。',
+    blockedRealActions: ['start', 'overwrite', 'upgrade_global'],
+  },
+  {
+    id: 'comfyui_workflow_rehearsal', name: 'ComfyUI Workflow Rehearsal', targetSystem: 'ComfyUI',
+    actionType: 'local_safe_suggestion', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认 ComfyUI 端口状态'], requiredConfirmations: ['确认不自动生图'],
+    rollbackPlanPreview: '不启动、不调用、不生成图。', nextSafeStep: '输出生图工作流建议。',
+    blockedRealActions: ['start', 'invoke', 'generate', 'modify_model'],
+  },
+  {
+    id: 'memory_hub_dry_run_rehearsal', name: 'Memory Hub Dry-Run Rehearsal', targetSystem: 'Memory Hub',
+    actionType: 'dry_run_plan', executionMode: 'dry_run', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认 candidate 状态', '确认只读边界'],
+    requiredConfirmations: ['确认不写 sqlite', '确认不 approve/reject/archive'],
+    rollbackPlanPreview: '不做任何持久化操作。', nextSafeStep: '生成候选更新说明（仅预览）。',
+    blockedRealActions: ['sqlite_write', 'approve_candidate', 'reject_candidate', 'archive_candidate', 'sync_lan_share'],
+  },
+  {
+    id: 'mahjong_readonly_audit_rehearsal', name: 'Mahjong Readonly Audit Rehearsal', targetSystem: 'Mahjong Dataset',
+    actionType: 'read_only_check', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认目标目录为 Mahjong_V1_Project', '确认只读边界'],
+    requiredConfirmations: ['确认不修改 Mahjong_V1_Project', '确认不扫描大文件'],
+    rollbackPlanPreview: '只读审计，无需回滚。', nextSafeStep: '输出数据集只读报告。',
+    blockedRealActions: ['scan_large_files', 'move', 'delete', 'modify', 'train', 'overwrite_model'],
+  },
+] as const;
+
+const STOP_CONDITIONS = [
+  { id: 'unclear_path', label: '路径不明确', description: '目标路径不明确时停止并请求澄清。' },
+  { id: 'delete_overwrite_write_db', label: '涉及删除/覆盖/写库', description: '涉及删除、覆盖、写库操作时必须停止并请求确认。' },
+  { id: 'git_push_tag_release', label: '涉及 git push/tag/release', description: '涉及发布操作时必须停止，禁止自动执行。' },
+  { id: 'taskkill_kill_node', label: '涉及 taskkill/kill node', description: '涉及进程终止操作时必须停止。' },
+  { id: 'openclaw_global_override', label: '涉及 OpenClaw 全局覆盖', description: '涉及 OpenClaw 稳定版覆盖时必须停止。' },
+  { id: 'memory_hub_sqlite_write', label: '涉及 Memory Hub sqlite 写入', description: '涉及 Memory Hub 持久化写入时必须停止。' },
+  { id: 'mahjong_dataset_modify', label: '涉及 Mahjong 数据集修改', description: '涉及 Mahjong 数据集修改/移动/删除时必须停止。' },
+  { id: 'train_overwrite_model', label: '涉及训练并覆盖模型', description: '涉及训练并覆盖 best.pt/last.pt 时必须停止。' },
+  { id: 'secret_token_env_risk', label: '检测到 secret/token/.env 风险', description: '检测到敏感配置暴露风险时必须停止。' },
+  { id: 'user_not_authorized', label: '用户未明确授权', description: '用户未明确授权时必须停止，不执行任何动作。' },
+] as const;
+
+function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMode, riskLevel: PracticalRiskLevel, deniedActions: string[]) {
+  const isHighRisk = riskLevel === 'high' || riskLevel === 'blocked' || executionMode === 'blocked' || executionMode === 'human_confirm_required';
+  const planId = `plan-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  const allowedSteps: string[] = ['确认任务范围', '确认目标路径'];
+  const forbiddenSteps: string[] = [...deniedActions];
+  const stopConditions: string[] = [];
+
+  if (taskType === 'github_release') {
+    allowedSteps.push('git diff --check', 'lint', 'build', 'smoke test', 'release notes draft');
+    forbiddenSteps.push('git tag', 'git push', 'GitHub Release');
+    stopConditions.push('涉及 git push/tag/release', '用户未明确授权');
+  } else if (taskType === 'file_cleanup') {
+    allowedSteps.push('生成清理候选清单', '路径确认');
+    forbiddenSteps.push('delete', 'move', 'taskkill');
+    stopConditions.push('涉及删除/覆盖/写库', '涉及 taskkill/kill node');
+  } else if (taskType === 'training') {
+    allowedSteps.push('训练准备检查', '输出目录确认');
+    forbiddenSteps.push('start training', 'overwrite model');
+    stopConditions.push('涉及训练并覆盖模型', '用户未明确授权');
+  } else if (taskType === 'memory_update') {
+    allowedSteps.push('候选状态检查');
+    forbiddenSteps.push('sqlite_write', 'approve', 'reject', 'archive');
+    stopConditions.push('涉及 Memory Hub sqlite 写入');
+  } else if (taskType === 'image_generation') {
+    allowedSteps.push('prompt 安全确认', '资源检查');
+    forbiddenSteps.push('auto_generate', 'start comfyui');
+    stopConditions.push('用户未明确授权');
+  } else if (taskType === 'dataset_operation') {
+    allowedSteps.push('数据集路径确认', '只读计数预览');
+    forbiddenSteps.push('scan_large_files', 'modify', 'train');
+    stopConditions.push('涉及 Mahjong 数据集修改');
+  } else {
+    allowedSteps.push('生成 dry-run 结果', '输出审计预览');
+    stopConditions.push('路径不明确', '用户未明确授权');
+  }
+
+  if (isHighRisk) {
+    forbiddenSteps.push('any automatic execution without confirmation');
+    stopConditions.push('涉及删除/覆盖/写库');
+  }
+
+  return {
+    planId,
+    planTitle: `${taskType} dry-run plan`,
+    planMode: isHighRisk ? 'read_only_first' : 'dry_run_only',
+    steps: allowedSteps,
+    allowedSteps,
+    forbiddenSteps,
+    humanApprovalRequired: isHighRisk,
+    stopConditions,
+    rollbackPreview: isHighRisk ? '必须先获取人工确认和回滚方案，再执行只读预检。' : '低风险 dry-run 无需回滚，仅做预览。',
+    expectedOutputs: isHighRisk ? ['只读审计报告', '风险清单', '人工确认请求'] : ['dry-run 结果', '审计预览'],
+  };
+}
 
 const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: RouteType; modelTier: ModelTier; executionMode: ExecutionMode; note: string }>> = {
   text_inference: {
@@ -1893,6 +2028,7 @@ function enrichPracticalDecision(decision: Omit<PracticalDecision,
         : selectedRoute === 'manual_confirm' ? 'blocked_system_operation'
         : 'local_script_dry_run',
     },
+    dryRunPlan: buildDryRunPlan(taskType, executionMode, riskLevel, deniedActions),
   };
 }
 
@@ -2091,7 +2227,7 @@ const ROUTE_ACTION_TYPES = [
 export function getPracticalConfig() {
   return {
     ok: true,
-    engine_version: 'v7.4.0-integration-foundation-candidate',
+    engine_version: 'v7.4.1-integration-rehearsal-candidate',
     policy_templates: BUILTIN_POLICY_TEMPLATES,
     strategy_modes: Object.values(STRATEGY_MODES),
     task_console_types: TASK_CONSOLE_TYPES,
@@ -2123,6 +2259,8 @@ export function getPracticalConfig() {
     external_integrations: EXTERNAL_INTEGRATIONS,
     integration_readiness_matrix: INTEGRATION_READINESS_MATRIX,
     route_action_types: ROUTE_ACTION_TYPES,
+    integration_rehearsal_matrix: INTEGRATION_REHEARSAL_MATRIX,
+    stop_conditions: STOP_CONDITIONS,
   };
 }
 
@@ -2135,7 +2273,7 @@ export function simulatePracticalRoute(body: any) {
   const decision = enrichPracticalDecision(buildPracticalDecision(taskType, enrichedInput), normalizedTaskType, enrichedInput);
   return {
     ok: true,
-    engine_version: 'v7.4.0-integration-foundation-candidate',
+    engine_version: 'v7.4.1-integration-rehearsal-candidate',
     task_type: normalizedTaskType,
     task_id: String(body.task_id || '').trim(),
     decision,

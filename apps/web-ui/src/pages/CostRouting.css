@@ -820,9 +820,66 @@
   color: var(--danger);
 }
 
+.cr-rehearsal-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cr-rehearsal-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.cr-rehearsal-card .cr-badge {
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border-color: var(--primary);
+}
+
+.cr-stop-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.cr-stop-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-elevated);
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.cr-dryrun-card {
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cr-dryrun-card .cr-template-head {
+  margin-bottom: 4px;
+}
+
 @media (max-width: 1180px) {
   .cr-integration-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cr-rehearsal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cr-stop-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .cr-summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -917,6 +974,14 @@
   }
 
   .cr-integration-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-rehearsal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-stop-grid {
     grid-template-columns: 1fr;
   }
 

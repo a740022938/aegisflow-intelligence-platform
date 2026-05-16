@@ -161,6 +161,18 @@ interface PracticalDecision {
   humanGateRequired?: boolean;
   confirmationReason?: string;
   noAutomaticExecution?: boolean;
+  dryRunPlan?: {
+    planId: string;
+    planTitle: string;
+    planMode: string;
+    steps: string[];
+    allowedSteps: string[];
+    forbiddenSteps: string[];
+    humanApprovalRequired: boolean;
+    stopConditions: string[];
+    rollbackPreview: string;
+    expectedOutputs: string[];
+  };
   auditPreview?: {
     auditSchemaVersion?: string;
     mode: 'preview_only';
@@ -297,6 +309,8 @@ interface PracticalConfig {
   external_integrations?: ExternalIntegration[];
   integration_readiness_matrix?: IntegrationReadinessEntry[];
   route_action_types?: RouteActionType[];
+  integration_rehearsal_matrix?: RehearsalEntry[];
+  stop_conditions?: StopCondition[];
 }
 
 interface IntegrationReadinessEntry {
@@ -313,6 +327,29 @@ interface IntegrationReadinessEntry {
 }
 
 interface RouteActionType {
+  id: string;
+  label: string;
+  description: string;
+}
+
+interface RehearsalEntry {
+  id: string;
+  name: string;
+  targetSystem: string;
+  actionType: string;
+  executionMode: string;
+  rehearsalOnly: boolean;
+  externalCall: boolean;
+  databaseWrite: boolean;
+  fileWrite: boolean;
+  requiredPrechecks: string[];
+  requiredConfirmations: string[];
+  rollbackPlanPreview: string;
+  nextSafeStep: string;
+  blockedRealActions: string[];
+}
+
+interface StopCondition {
   id: string;
   label: string;
   description: string;
@@ -910,23 +947,23 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-            <b>v7.4.0 Integration Foundation</b>
+            <b>v7.4.1 Integration Rehearsal</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前模式</span>
-            <b>preview_only / read_only / dry_run first</b>
+            <b>dry-run rehearsal only</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">安全口径</span>
-            <b>external writes disabled</b>
+            <span className="cr-dashboard-key">外部调用</span>
+            <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">当前能力</span>
-            <b>Router Core + Route Registry + Audit Preview v2 + Integration Matrix</b>
+            <span className="cr-dashboard-key">写入</span>
+            <b>disabled</b>
           </div>
           <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">当前禁止</span>
-            <b>不真实执行 / 不写数据库 / 不调外部系统</b>
+            <span className="cr-dashboard-key">发布</span>
+            <b>manual only</b>
           </div>
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">策略总数 / 近7天决策 / 回填反馈 / 建议</span>
@@ -1029,6 +1066,41 @@ export default function CostRoutingPage() {
               </div>
             );
           })}
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="集成演练矩阵 Integration Rehearsal Matrix">
+        <div className="cr-registry-note">全部 rehearsalOnly / preview_only。不真实调用外部系统，不写数据库。</div>
+        <div className="cr-rehearsal-grid">
+          {(practicalConfig?.integration_rehearsal_matrix || []).map((entry) => (
+            <div className="cr-rehearsal-card" key={entry.id}>
+              <div className="cr-template-head">
+                <b>{entry.name}</b>
+                <span className="cr-badge">{entry.actionType}</span>
+              </div>
+              <div className="cr-template-desc">目标系统：{entry.targetSystem} · 模式：{entry.executionMode}</div>
+              <div className="cost-routing-policy-meta">预检：{entry.requiredPrechecks.join(' / ')}</div>
+              <div className="cost-routing-policy-meta">确认：{entry.requiredConfirmations.join(' / ') || '无'}</div>
+              <div className="cost-routing-policy-meta">回滚预览：{entry.rollbackPlanPreview}</div>
+              <div className="cost-routing-policy-meta">下一步：{entry.nextSafeStep}</div>
+              <div className="cost-routing-policy-meta">禁止操作：{entry.blockedRealActions.join(' / ')}</div>
+              <div className="cr-safety-line">rehearsalOnly={String(entry.rehearsalOnly)} · externalCall={String(entry.externalCall)} · dbWrite={String(entry.databaseWrite)} · fileWrite={String(entry.fileWrite)}</div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('warn')}`} title="安全停止条件 Safety Stop Conditions">
+        <div className="cr-registry-note">遇到以下情况时建议停止，不继续执行。</div>
+        <div className="cr-stop-grid">
+          {(practicalConfig?.stop_conditions || []).map((cond) => (
+            <div className="cr-stop-item" key={cond.id}>
+              <div className="cr-template-head">
+                <b>{cond.label}</b>
+              </div>
+              <div className="cr-template-desc">{cond.description}</div>
+            </div>
+          ))}
         </div>
       </SectionCard>
 
@@ -1428,6 +1500,24 @@ export default function CostRoutingPage() {
                   <div><span>requiresHumanConfirmation</span><b>{practicalDecision.requiresHumanConfirmation ? '是' : '否'}</b></div>
                   <div><span>persistenceMode</span><b>{practicalDecision.persistenceMode || 'preview_only'}</b></div>
                   <div><span>forbiddenNextSteps</span><b>{(practicalDecision.forbiddenNextSteps || []).join(' / ') || '无'}</b></div>
+                </div>
+              </>
+            ) : null}
+            {practicalDecision.dryRunPlan ? (
+              <>
+                <div className="cr-subtitle">Dry-Run Action Plan</div>
+                <div className="cr-dryrun-card">
+                  <div className="cr-template-head">
+                    <b>{practicalDecision.dryRunPlan.planTitle}</b>
+                    <span className="cr-badge">{practicalDecision.dryRunPlan.planMode}</span>
+                  </div>
+                  <div className="cost-routing-policy-meta">planId：{practicalDecision.dryRunPlan.planId}</div>
+                  <div className="cost-routing-policy-meta">允许步骤：{practicalDecision.dryRunPlan.allowedSteps.join(' → ')}</div>
+                  <div className="cost-routing-policy-meta">禁止步骤：{practicalDecision.dryRunPlan.forbiddenSteps.join(' / ') || '无'}</div>
+                  <div className="cost-routing-policy-meta">需人工审批：{practicalDecision.dryRunPlan.humanApprovalRequired ? '是' : '否'}</div>
+                  <div className="cost-routing-policy-meta">停止条件：{practicalDecision.dryRunPlan.stopConditions.join(' / ')}</div>
+                  <div className="cost-routing-policy-meta">回滚预览：{practicalDecision.dryRunPlan.rollbackPreview}</div>
+                  <div className="cost-routing-policy-meta">预期产出：{practicalDecision.dryRunPlan.expectedOutputs.join(' / ')}</div>
                 </div>
               </>
             ) : null}
