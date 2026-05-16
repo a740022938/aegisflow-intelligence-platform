@@ -42,6 +42,7 @@ const PRACTICAL_TASK_TYPES = [
   'memory_update',
   'dataset_operation',
   'openaxiom_readonly_observer',
+  'comfyui_readonly_observer',
 ] as const;
 type PracticalTaskType = typeof PRACTICAL_TASK_TYPES[number];
 type CostLevel = 'free' | 'low' | 'medium' | 'high' | 'unknown';
@@ -548,6 +549,13 @@ const HIGH_RISK_FIREWALL_RULES = [
   { id: 'openaxiom_train_model', label: 'OpenAxiom 训练模型', patterns: ['openaxiom train', 'openax train', 'openaxiom 训练', 'openax 训练'] },
   { id: 'openaxiom_gui_launch', label: '启动 OpenAxiom GUI', patterns: ['openaxiom gui', 'openax gui', '启动 openaxiom', '启动 openax'] },
   { id: 'openaxiom_auto_repair', label: 'OpenAxiom 自动修复', patterns: ['openaxiom repair', 'openax repair', 'openaxiom fix', 'openax fix', '自动修复 openaxiom'] },
+  { id: 'comfyui_generate_image', label: 'ComfyUI 生成图片', patterns: ['comfyui generate', 'comfyui 生图', '生成图片', 'comfyui 生成'] },
+  { id: 'comfyui_submit_queue', label: 'ComfyUI 提交 queue', patterns: ['comfyui queue', 'comfyui 提交', 'submit workflow', '提交工作流'] },
+  { id: 'comfyui_modify_workflow', label: 'ComfyUI 修改 workflow', patterns: ['comfyui workflow', '修改 workflow', 'comfyui 工作流', '修改工作流'] },
+  { id: 'comfyui_start', label: '启动 ComfyUI', patterns: ['comfyui start', '启动 comfyui', 'comfyui 启动'] },
+  { id: 'comfyui_download_model', label: 'ComfyUI 下载模型', patterns: ['comfyui download', 'comfyui 下载', 'comfyui model', '下载模型 comfyui'] },
+  { id: 'comfyui_delete_model', label: 'ComfyUI 删除模型', patterns: ['comfyui delete model', 'comfyui 删除模型'] },
+  { id: 'comfyui_auto_repair', label: 'ComfyUI 自动修复', patterns: ['comfyui repair', 'comfyui fix', 'comfyui 修复'] },
 ] as const;
 
 const MODEL_ROUTE_REGISTRY = [
@@ -725,6 +733,20 @@ const TOOLCHAIN_REGISTRY = [
     integrationStatus: 'preview_only',
     note: '不启动 GUI、不保存 label、不恢复 label、不批量保存、不修改 images/labels/data.yaml/models。',
   },
+  {
+    id: 'comfyui_readonly_observer',
+    name: 'ComfyUI Readonly Status Observer',
+    description: 'ComfyUI 只读状态观察，检查服务状态、工作流状态和系统状态。',
+    executionMode: 'read_only',
+    readOnlyFirst: true,
+    dryRunFirst: false,
+    requiresHuman: false,
+    forbiddenActions: ['start_comfyui', 'generate_image', 'submit_queue', 'modify_workflow', 'download_model', 'delete_model', 'modify_config'],
+    safePrechecks: ['确认只读观察模式', '确认不启动 ComfyUI', '确认不生成图片', '确认不提交 queue'],
+    rollbackRequired: false,
+    integrationStatus: 'preview_only',
+    note: '不启动 ComfyUI、不提交 queue、不生成图片、不修改 workflow、不下载/删除模型、不改配置。',
+  },
 ] as const;
 
 const RELEASE_READINESS_GATES = [
@@ -829,6 +851,12 @@ const INTEGRATION_READINESS_MATRIX = [
     safePrechecks: ['确认只读观察模式', '确认不启动 GUI'], requiredConfirmations: ['确认不保存/恢复/批量保存'],
     rollbackRequired: false, nextMilestone: 'planned / preview_only', integrationRisk: 'low',
   },
+  {
+    id: 'comfyui_readonly_observer', name: 'ComfyUI Readonly Status Observer', status: 'preview_only', allowedModes: ['read_only'],
+    forbiddenActions: ['start_comfyui', 'generate_image', 'submit_queue', 'modify_workflow', 'download_model', 'delete_model', 'modify_config'],
+    safePrechecks: ['确认只读观察模式', '确认不启动 ComfyUI'], requiredConfirmations: ['确认不生成图片/提交 queue'],
+    rollbackRequired: false, nextMilestone: 'planned / preview_only', integrationRisk: 'low',
+  },
 ] as const;
 
 const INTEGRATION_REHEARSAL_MATRIX = [
@@ -893,6 +921,15 @@ const INTEGRATION_REHEARSAL_MATRIX = [
     rollbackPlanPreview: '只读观察，无需回滚。', nextSafeStep: '输出 OpenAxiom 只读状态预览。',
     blockedRealActions: ['launch_gui', 'save_label', 'restore_label', 'batch_save', 'modify_images', 'modify_labels', 'modify_data_yaml', 'modify_model', 'train', 'auto_repair'],
   },
+  {
+    id: 'comfyui_readonly_observer_rehearsal', name: 'ComfyUI Readonly Observer Rehearsal', targetSystem: 'ComfyUI',
+    actionType: 'read_only_check', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认只读观察模式', '确认不启动 ComfyUI', '确认不提交 queue'],
+    requiredConfirmations: ['确认不生成图片/修改 workflow/下载模型'],
+    rollbackPlanPreview: '只读观察，无需回滚。', nextSafeStep: '输出 ComfyUI 只读状态预览。',
+    blockedRealActions: ['start_comfyui', 'generate_image', 'submit_queue', 'modify_workflow', 'download_model', 'delete_model', 'modify_config'],
+  },
 ] as const;
 
 const STOP_CONDITIONS = [
@@ -908,6 +945,8 @@ const STOP_CONDITIONS = [
   { id: 'user_not_authorized', label: '用户未明确授权', description: '用户未明确授权时必须停止，不执行任何动作。' },
   { id: 'openaxiom_gui_or_write', label: '涉及 OpenAxiom GUI/保存/恢复', description: '涉及 OpenAxiom GUI 启动、保存 label、恢复 label、批量保存时必须停止。' },
   { id: 'openaxiom_dataset_model_modify', label: '涉及 OpenAxiom 数据集/模型修改', description: '涉及 OpenAxiom images/labels/data.yaml/models 修改时必须停止。' },
+  { id: 'comfyui_generate_or_queue', label: '涉及 ComfyUI 生图/queue', description: '涉及 ComfyUI 图片生成、queue 提交、workflow 执行时必须停止。' },
+  { id: 'comfyui_start_or_model', label: '涉及 ComfyUI 启动/模型操作', description: '涉及 ComfyUI 启动、下载模型、删除模型、修改配置时必须停止。' },
 ] as const;
 
 function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMode, riskLevel: PracticalRiskLevel, deniedActions: string[]) {
@@ -945,6 +984,10 @@ function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMo
     allowedSteps.push('OpenAxiom 只读状态检查', '确认只读观察模式');
     forbiddenSteps.push('launch_gui', 'save_label', 'restore_label', 'batch_save', 'modify_images', 'modify_labels', 'modify_data_yaml', 'modify_model', 'train', 'auto_repair');
     stopConditions.push('涉及 OpenAxiom GUI/保存/恢复', '涉及 OpenAxiom 数据集/模型修改');
+  } else if (taskType === 'comfyui_readonly_observer') {
+    allowedSteps.push('ComfyUI 只读状态检查', '确认只读观察模式');
+    forbiddenSteps.push('start_comfyui', 'generate_image', 'submit_queue', 'modify_workflow', 'download_model', 'delete_model', 'modify_config');
+    stopConditions.push('涉及 ComfyUI 生图/queue', '涉及 ComfyUI 启动/模型操作');
   } else {
     allowedSteps.push('生成 dry-run 结果', '输出审计预览');
     stopConditions.push('路径不明确', '用户未明确授权');
@@ -1047,6 +1090,13 @@ const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: Rout
     local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读优先。' },
     balanced: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '平衡只读观察。' },
   },
+  comfyui_readonly_observer: {
+    save_money: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '只读状态观察适合本地低成本。' },
+    stable_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '稳定只读状态检查。' },
+    quality_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '只读观察不需要高质量模型。' },
+    local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读优先。' },
+    balanced: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '平衡只读观察。' },
+  },
 };
 
 const CASE_MATRIX = [
@@ -1067,6 +1117,8 @@ const CASE_MATRIX = [
   { label: '修改 .env token', taskType: 'high_risk_system_ops', mode: 'stable_first', input: { target: '帮我改 .env token' }, expectedCategory: 'file_cleanup', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '敏感配置和密钥风险必须人工确认' },
   { label: 'OpenAxiom 只读状态检查', taskType: 'openaxiom_readonly_check', mode: 'stable_first', input: { target: '检查 OpenAxiom 状态' }, expectedCategory: 'openaxiom_readonly_observer', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读状态观察，不启动 GUI、不保存/恢复/批量保存' },
   { label: '保存 OpenAxiom label', taskType: 'openaxiom_save_label', mode: 'stable_first', input: { target: '保存 OpenAxiom label' }, expectedCategory: 'openaxiom_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '写入类操作必须人工确认，当前 preview_only' },
+  { label: 'ComfyUI 只读状态检查', taskType: 'comfyui_readonly_check', mode: 'stable_first', input: { target: '检查 ComfyUI 状态' }, expectedCategory: 'comfyui_readonly_observer', expectedRiskLevel: 'low', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读状态观察，不启动/不生图/不提交 queue' },
+  { label: 'ComfyUI 生成图片', taskType: 'comfyui_generate_image', mode: 'stable_first', input: { target: 'ComfyUI 生成图片' }, expectedCategory: 'comfyui_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '生图操作必须人工确认，当前 preview_only' },
 ] as const;
 
 const DEFAULT_WEIGHTS: RouteWeightSet = {
@@ -2132,6 +2184,39 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
       ],
       safetyNotes: [...safetyNotes, 'OpenAxiom 当前能力标记为 readonly，禁止 GUI 启动、保存/恢复/批量保存、修改数据。'],
       nextAction: '先生成只读状态预览，不直接操作 OpenAxiom。',
+    };
+  }
+
+  if (taskType === 'comfyui_readonly_observer' && (text.includes('查') || text.includes('读') || text.includes('状态') || text.includes('status') || text.includes('检查') || text.includes('check') || text.includes('观察') || text.includes('可用'))) {
+    return {
+      selectedRoute: 'local_cpu',
+      costLevel: 'free',
+      riskLevel: 'low',
+      needsUserConfirm: false,
+      reason: 'ComfyUI 只读状态观察。只返回只读状态预览，不启动 ComfyUI、不提交 queue、不生成图片、不修改 workflow/model。',
+      rejectedRoutes: [
+        { route: 'manual_confirm', reason: '纯只读状态观察无需人工确认。' },
+      ],
+      safetyNotes: [
+        'ComfyUI 当前仅 readonly observer，不启动、不提交 queue、不生成图片、不修改 workflow/model。',
+        '如需生图/启动 ComfyUI，必须另开明确授权任务。',
+      ],
+      nextAction: '调用 GET /api/cost-routing/comfyui-status-preview 获取只读状态预览。',
+    };
+  }
+
+  if (taskType === 'comfyui_readonly_observer') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'free',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: 'ComfyUI 生图/启动/模型操作会改变状态，本轮只允许 readonly 展示。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '本地可分析，但生图/启动需要人工确认。' },
+      ],
+      safetyNotes: [...safetyNotes, 'ComfyUI 当前能力标记为 readonly，禁止启动、生图、提交 queue、修改 workflow/model。'],
+      nextAction: '先生成只读状态预览，不直接操作 ComfyUI。',
     };
   }
 
@@ -3260,6 +3345,86 @@ function buildOpenAxiomStatusPreview() {
   };
 }
 
+const COMFYUI_READONLY_STATUS_CONTRACT = {
+  targetSystem: 'comfyui',
+  integrationMode: 'readonly_status_observer',
+  actionType: 'read_only_check',
+  executionMode: 'read_only',
+  persistenceMode: 'preview_only',
+  comfyUiWrite: false,
+  workflowWrite: false,
+  queueSubmit: false,
+  imageGeneration: false,
+  modelWrite: false,
+  modelDownload: false,
+  serviceStart: false,
+  serviceRestart: false,
+  externalMutation: false,
+} as const;
+
+function buildComfyUiStatusPreview() {
+  const nowStr = now();
+  const forbiddenComfyUiActions = [
+    'start ComfyUI', 'submit queue', 'generate image', 'modify workflow',
+    'download model', 'delete model', 'move model', 'modify config',
+    'auto repair',
+  ];
+  return {
+    ok: true,
+    ...COMFYUI_READONLY_STATUS_CONTRACT,
+    timestamp: nowStr,
+    observerStatus: 'preview_ready',
+    comfyUiStatusPreview: 'ComfyUI 只读状态观察：当前 preview_only / read_only 模式，不启动 ComfyUI，不提交 queue，不生成图片，不修改 workflow，不下载/删除模型。',
+    apiStatus: 'readonly (status check only, no generation)',
+    queueStatusPreview: 'idle (no queue submission)',
+    systemStatsPreview: 'readonly (no model/system modification)',
+    readonlyMode: true,
+    safetyBoundary: {
+      comfyUiWrite: false,
+      workflowWrite: false,
+      queueSubmit: false,
+      imageGeneration: false,
+      modelWrite: false,
+      modelDownload: false,
+      serviceStart: false,
+      serviceRestart: false,
+    },
+    forbiddenActions: forbiddenComfyUiActions,
+    nextSafeStep: '仅展示只读状态预览（preview_plan）。如需生图/执行 workflow/启动 ComfyUI，必须另开明确授权任务。不支持真实 ComfyUI API 调用。',
+    auditPreview: {
+      auditSchemaVersion: 'preview-v2',
+      mode: 'preview_only',
+      wouldExecute: false,
+      wouldWriteFiles: false,
+      databaseWrite: false,
+      fileWrite: false,
+      externalWrite: false,
+      timestamp: nowStr,
+      taskSummary: 'ComfyUI readonly status observer preview',
+      selectedPolicy: 'stable_first',
+      detectedCategory: 'comfyui_readonly_observer',
+      actionType: 'read_only_check',
+      riskLevel: 'low',
+      executionMode: 'read_only',
+      confidence: 'medium',
+      matchedRiskRules: [],
+      recommendedRoute: 'local_cpu',
+      recommendedModelTier: 'local',
+      deniedActions: forbiddenComfyUiActions,
+      readOnlyPrechecks: ['确认只读观察模式', '确认不启动 ComfyUI', '确认不生成图片', '确认不提交 queue'],
+      nextSafeStep: '输出 ComfyUI 只读状态预览',
+      rollbackRequired: false,
+      auditMode: 'preview_only',
+      requiredConfirmations: [],
+      rollbackPlan: ['本轮不执行任何 ComfyUI 启动/生图/queue/模型操作，无需回滚。'],
+      auditIdPreview: genId('audit-comfyui'),
+      persistenceMode: 'preview_only' as const,
+      selectedModelRoute: 'local' as ModelTier,
+      selectedToolchainRoute: 'comfyui_readonly_observer',
+    },
+  };
+}
+
 const MEMORY_HUB_READONLY_CONTRACT = {
   targetSystem: 'memory_hub',
   integrationMode: 'readonly_context_lookup_preview',
@@ -3419,6 +3584,7 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
   app.get('/api/cost-routing/self-check', async () => selfCheckRoute());
   app.post('/api/cost-routing/context-lookup-preview', async (request: any) => contextLookupPreview(request.body || {}));
   app.get('/api/cost-routing/openaxiom-status-preview', async () => buildOpenAxiomStatusPreview());
+  app.get('/api/cost-routing/comfyui-status-preview', async () => buildComfyUiStatusPreview());
   app.get('/api/cost-routing/route-types', async () => ({
     ok: true,
     engine_version: 'v2',

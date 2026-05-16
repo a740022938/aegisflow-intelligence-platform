@@ -512,6 +512,20 @@ const SIMULATION_EXAMPLES: SimulationExample[] = [
     taskId: 'sim-openaxiom-save',
     input: { target: '保存 OpenAxiom label' },
   },
+  {
+    label: 'ComfyUI 只读状态检查',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'comfyui_readonly_observer',
+    taskId: 'sim-comfyui-readonly',
+    input: { target: '检查 ComfyUI 状态' },
+  },
+  {
+    label: 'ComfyUI 生成图片',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'comfyui_readonly_observer',
+    taskId: 'sim-comfyui-generate',
+    input: { target: 'ComfyUI 生成图片' },
+  },
 ];
 
 function fmt(v?: string) {
@@ -617,6 +631,8 @@ export default function CostRoutingPage() {
   const [memoryHubLoading, setMemoryHubLoading] = useState(false);
   const [openAxiomPreview, setOpenAxiomPreview] = useState<any>(null);
   const [openAxiomLoading, setOpenAxiomLoading] = useState(false);
+  const [comfyUiPreview, setComfyUiPreview] = useState<any>(null);
+  const [comfyUiLoading, setComfyUiLoading] = useState(false);
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
@@ -917,6 +933,22 @@ export default function CostRoutingPage() {
     }
   }
 
+  async function handleComfyUiPreview() {
+    setComfyUiLoading(true);
+    setError('');
+    setMsg('');
+    try {
+      const res = await api('/api/cost-routing/comfyui-status-preview');
+      if (!res.ok) throw new Error(res.error || 'ComfyUI 只读状态预览失败');
+      setComfyUiPreview(res);
+      setMsg('ComfyUI 只读状态预览已生成。未启动 ComfyUI、未提交 queue、未生成图片、未修改 workflow/model。');
+    } catch (e: any) {
+      setError(e.message || 'ComfyUI 预览失败');
+    } finally {
+      setComfyUiLoading(false);
+    }
+  }
+
   async function handleMemoryHubPreview() {
     setMemoryHubLoading(true);
     setError('');
@@ -995,7 +1027,7 @@ export default function CostRoutingPage() {
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>v7.7.0 openaxiom readonly status observer (preview_only)</b>
+          <b>v7.8.0 comfyui readonly status observer (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -1019,36 +1051,36 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-            <b>v7.7.0 OpenAxiom Readonly Status Observer</b>
-          </div>
-          <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">当前模式</span>
-            <b>preview plan only / read_only / no write</b>
-          </div>
-          <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">Memory Hub write</span>
-            <b>disabled</b>
-          </div>
-          <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">OpenAxiom GUI</span>
-            <b>disabled</b>
-          </div>
-          <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">OpenAxiom label/save</span>
-            <b>disabled</b>
-          </div>
-          <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">real API call</span>
-            <b>disabled</b>
-          </div>
-          <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">策略总数 / 近7天决策 / 回填反馈 / 建议</span>
-            <b>{stats.policyTotal} / {stats.decisionTotal} / {stats.feedbackCount} / {stats.recommendationCount}</b>
-          </div>
-          <div className="cr-dashboard-item">
-            <span className="cr-dashboard-key">下一步建议</span>
-            <b>先只读状态观察，再人工确认；OpenAxiom 写入/GUI 必须另开授权任务</b>
-          </div>
+          <b>v7.8.0 ComfyUI Readonly Status Observer</b>
+        </div>
+        <div className="cr-dashboard-item">
+          <span className="cr-dashboard-key">当前模式</span>
+          <b>preview plan only / read_only / no write</b>
+        </div>
+        <div className="cr-dashboard-item">
+          <span className="cr-dashboard-key">Memory Hub write</span>
+          <b>disabled</b>
+        </div>
+        <div className="cr-dashboard-item">
+          <span className="cr-dashboard-key">OpenAxiom GUI</span>
+          <b>disabled</b>
+        </div>
+        <div className="cr-dashboard-item">
+          <span className="cr-dashboard-key">ComfyUI start/generate</span>
+          <b>disabled</b>
+        </div>
+        <div className="cr-dashboard-item">
+          <span className="cr-dashboard-key">real API call</span>
+          <b>disabled</b>
+        </div>
+        <div className="cr-dashboard-item">
+          <span className="cr-dashboard-key">策略总数 / 近7天决策 / 回填反馈 / 建议</span>
+          <b>{stats.policyTotal} / {stats.decisionTotal} / {stats.feedbackCount} / {stats.recommendationCount}</b>
+        </div>
+        <div className="cr-dashboard-item">
+          <span className="cr-dashboard-key">下一步建议</span>
+          <b>先只读状态观察，再人工确认；所有写入/生图/执行必须另开授权任务</b>
+        </div>
         </div>
       </SectionCard>
 
@@ -1257,6 +1289,55 @@ export default function CostRoutingPage() {
             </div>
           ) : (
             <div className="cost-routing-policy-meta">尚未生成 OpenAxiom 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="ComfyUI 只读状态预览 ComfyUI Readonly Status Preview">
+        <div className="cr-registry-note">仅只读状态观察。不启动 ComfyUI、不提交 queue、不生成图片、不修改 workflow、不下载/删除模型。</div>
+        <div className="cr-mh-grid">
+          <div className="cr-selfcheck-controls">
+            <button className="ui-btn ui-btn-primary" type="button" onClick={handleComfyUiPreview} disabled={comfyUiLoading}>
+              {comfyUiLoading ? '生成中...' : '生成 ComfyUI 只读状态预览'}
+            </button>
+          </div>
+          {comfyUiPreview ? (
+            <div className="cr-mh-results">
+              <div className="cr-selfcheck-header">
+                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{comfyUiPreview.integrationMode}</span>
+                <span className="cr-badge">{comfyUiPreview.actionType}</span>
+                <span className="cr-badge">target: {comfyUiPreview.targetSystem}</span>
+                <span className="cr-badge">{comfyUiPreview.persistenceMode}</span>
+                <span className="cr-badge">observer: {comfyUiPreview.observerStatus}</span>
+              </div>
+              <div className="cr-mh-summary-row">
+                <span className="cost-routing-policy-meta"><b>状态预览</b>：{comfyUiPreview.comfyUiStatusPreview}</span>
+              </div>
+              <div className="cr-mh-context-box">
+                <div className="cr-subtitle">ComfyUI 状态摘要</div>
+                <div className="cr-selfcheck-grid-inner">
+                  <div className="cr-pp-item"><span className="cr-pp-key">API Status</span><b className="cr-pp-val">{comfyUiPreview.apiStatus}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">Queue Status</span><b className="cr-pp-val">{comfyUiPreview.queueStatusPreview}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">System Stats</span><b className="cr-pp-val">{comfyUiPreview.systemStatsPreview}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">Readonly Mode</span><b className="cr-pp-val">{String(comfyUiPreview.readonlyMode)}</b></div>
+                </div>
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
+              <div className="cr-selfcheck-grid-inner">
+                <div className="cr-pp-item"><span className="cr-pp-key">comfyUiWrite</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.comfyUiWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">imageGeneration</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.imageGeneration)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">queueSubmit</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.queueSubmit)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">workflowWrite</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.workflowWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">modelWrite</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.modelWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">modelDownload</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.modelDownload)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">serviceStart</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.serviceStart)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">serviceRestart</span><b className="cr-pp-val">{String(comfyUiPreview.safetyBoundary?.serviceRestart)}</b></div>
+              </div>
+              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(comfyUiPreview.forbiddenActions || []).join(' / ')}</div>
+              <div className="cr-next-action" style={{ marginTop: '6px' }}>{comfyUiPreview.nextSafeStep}</div>
+            </div>
+          ) : (
+            <div className="cost-routing-policy-meta">尚未生成 ComfyUI 只读状态预览。点击按钮获取 preview_only / read_only 状态预览。</div>
           )}
         </div>
       </SectionCard>
