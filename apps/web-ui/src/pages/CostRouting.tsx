@@ -554,6 +554,20 @@ const SIMULATION_EXAMPLES: SimulationExample[] = [
     taskId: 'sim-git-tag',
     input: { target: 'git tag v7.10.0' },
   },
+  {
+    label: 'Mahjong 只读审计预览',
+    mode: 'stable_first' as StrategyMode,
+    taskType: 'mahjong_readonly_audit_preview',
+    taskId: 'sim-mahjong-audit',
+    input: { target: '检查 Mahjong 数据集' },
+  },
+  {
+    label: '训练 Mahjong 模型',
+    mode: 'local_first' as StrategyMode,
+    taskType: 'mahjong_readonly_audit_preview',
+    taskId: 'sim-mahjong-train',
+    input: { target: '训练 Mahjong 模型' },
+  },
 ];
 
 function fmt(v?: string) {
@@ -665,6 +679,8 @@ export default function CostRoutingPage() {
   const [openClawLoading, setOpenClawLoading] = useState(false);
   const [releasePrepPreview, setReleasePrepPreview] = useState<any>(null);
   const [releasePrepLoading, setReleasePrepLoading] = useState(false);
+  const [mahjongAuditPreview, setMahjongAuditPreview] = useState<any>(null);
+  const [mahjongAuditLoading, setMahjongAuditLoading] = useState(false);
 
   const [decisionRouteFilter, setDecisionRouteFilter] = useState('');
   const [feedbackOutcome, setFeedbackOutcome] = useState<'success' | 'partial' | 'failed' | 'timeout'>('success');
@@ -1013,6 +1029,22 @@ export default function CostRoutingPage() {
     }
   }
 
+  async function handleMahjongAuditPreview() {
+    setMahjongAuditLoading(true);
+    setError('');
+    setMsg('');
+    try {
+      const res = await api('/api/cost-routing/mahjong-audit-preview');
+      if (!res.ok) throw new Error(res.error || 'Mahjong 只读审计预览失败');
+      setMahjongAuditPreview(res);
+      setMsg('Mahjong 只读审计预览已生成。未扫描大文件、未训练、未覆盖模型、未修改 labels/images/data.yaml。');
+    } catch (e: any) {
+      setError(e.message || 'Mahjong 审计预览失败');
+    } finally {
+      setMahjongAuditLoading(false);
+    }
+  }
+
   async function handleMemoryHubPreview() {
     setMemoryHubLoading(true);
     setError('');
@@ -1091,7 +1123,7 @@ export default function CostRoutingPage() {
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>v7.10.0 github release prep readonly preview (preview_only)</b>
+          <b>v7.11.0 mahjong readonly audit preview (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -1115,23 +1147,23 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-          <b>v7.10.0 GitHub Release-prep Readonly Preview</b>
+          <b>v7.11.0 Mahjong Readonly Audit Preview</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">当前模式</span>
-          <b>preview plan only / read_only / no remote write</b>
+          <b>preview plan only / read_only / no write</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">Memory Hub / OpenAxiom / ComfyUI / OpenClaw</span>
+          <span className="cr-dashboard-key">Memory Hub / OpenAxiom / ComfyUI / OpenClaw / GitHub</span>
           <b>all readonly preview</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">Git tag / push / Release</span>
+          <span className="cr-dashboard-key">Mahjong dataset write / training</span>
           <b>disabled</b>
         </div>
         <div className="cr-dashboard-item">
-          <span className="cr-dashboard-key">GitHub 发布准备度</span>
-          <b>preview only</b>
+          <span className="cr-dashboard-key">Mahjong model overwrite</span>
+          <b>disabled</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">real API call</span>
@@ -1502,6 +1534,53 @@ export default function CostRoutingPage() {
             </div>
           ) : (
             <div className="cost-routing-policy-meta">尚未生成 GitHub 发布准备度预览。点击按钮获取 preview_only / read_only 发布准备度预览。</div>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard className={`role-card ${roleClass('exec')}`} title="Mahjong 只读审计预览 Mahjong Readonly Audit Preview">
+        <div className="cr-registry-note">仅只读审计预览。不扫描大文件、不训练、不覆盖模型、不修改 labels/images/data.yaml、不运行 YOLO predict/val/train、不保存/恢复 OpenAxiom labels。</div>
+        <div className="cr-mh-grid">
+          <div className="cr-selfcheck-controls">
+            <button className="ui-btn ui-btn-primary" type="button" onClick={handleMahjongAuditPreview} disabled={mahjongAuditLoading}>
+              {mahjongAuditLoading ? '生成中...' : '生成 Mahjong 只读审计预览'}
+            </button>
+          </div>
+          {mahjongAuditPreview ? (
+            <div className="cr-mh-results">
+              <div className="cr-selfcheck-header">
+                <span className="cr-badge" style={{ background: 'var(--success)', color: '#fff', borderColor: 'transparent' }}>{mahjongAuditPreview.integrationMode}</span>
+                <span className="cr-badge">{mahjongAuditPreview.actionType}</span>
+                <span className="cr-badge">target: {mahjongAuditPreview.targetSystem}</span>
+                <span className="cr-badge">{mahjongAuditPreview.persistenceMode}</span>
+                <span className="cr-badge">preview: {mahjongAuditPreview.auditPreviewStatus}</span>
+              </div>
+              <div className="cr-mh-summary-row">
+                <span className="cost-routing-policy-meta"><b>审计预览</b>：{mahjongAuditPreview.projectPathPreview}</span>
+              </div>
+              <div className="cr-mh-context-box">
+                <div className="cr-subtitle">Mahjong 审计摘要</div>
+                <div className="cr-selfcheck-grid-inner">
+                  <div className="cr-pp-item"><span className="cr-pp-key">Dataset Safety</span><b className="cr-pp-val">{mahjongAuditPreview.datasetSafetyPreview}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">Model Safety</span><b className="cr-pp-val">{mahjongAuditPreview.modelSafetyPreview}</b></div>
+                  <div className="cr-pp-item"><span className="cr-pp-key">Readonly Mode</span><b className="cr-pp-val">{String(mahjongAuditPreview.readonlyMode)}</b></div>
+                </div>
+              </div>
+              <div className="cr-subtitle" style={{ marginTop: '8px' }}>安全边界 Safety Boundary</div>
+              <div className="cr-selfcheck-grid-inner">
+                <div className="cr-pp-item"><span className="cr-pp-key">datasetWrite</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.datasetWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">labelWrite</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.labelWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">modelWrite</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.modelWrite)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">trainingRun</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.trainingRun)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">openAxiomSave</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.openAxiomSave)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">batchSave</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.batchSave)}</b></div>
+                <div className="cr-pp-item"><span className="cr-pp-key">largeScan</span><b className="cr-pp-val">{String(mahjongAuditPreview.safetyBoundary?.largeScan)}</b></div>
+              </div>
+              <div className="cost-routing-policy-meta" style={{ marginTop: '6px' }}>禁止操作：{(mahjongAuditPreview.forbiddenActions || []).join(' / ')}</div>
+              <div className="cr-next-action" style={{ marginTop: '6px' }}>{mahjongAuditPreview.nextSafeStep}</div>
+            </div>
+          ) : (
+            <div className="cost-routing-policy-meta">尚未生成 Mahjong 只读审计预览。点击按钮获取 preview_only / read_only 审计预览。</div>
           )}
         </div>
       </SectionCard>

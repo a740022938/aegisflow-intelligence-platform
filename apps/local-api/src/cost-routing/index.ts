@@ -45,6 +45,7 @@ const PRACTICAL_TASK_TYPES = [
   'openaxiom_readonly_observer',
   'comfyui_readonly_observer',
   'openclaw_readonly_observer',
+  'mahjong_readonly_audit_preview',
 ] as const;
 type PracticalTaskType = typeof PRACTICAL_TASK_TYPES[number];
 type CostLevel = 'free' | 'low' | 'medium' | 'high' | 'unknown';
@@ -788,6 +789,20 @@ const TOOLCHAIN_REGISTRY = [
     integrationStatus: 'preview_only',
     note: '不 tag、不 push、不创建 Release、不上传 assets、不 force push、不 npm publish。',
   },
+  {
+    id: 'mahjong_readonly_audit_preview',
+    name: 'Mahjong Readonly Audit Preview',
+    description: 'Mahjong 项目只读审计预览，检查项目路径状态、数据集安全和模型安全，不扫描大文件、不训练。',
+    executionMode: 'read_only',
+    readOnlyFirst: true,
+    dryRunFirst: false,
+    requiresHuman: false,
+    forbiddenActions: ['train_model', 'overwrite_best_pt', 'modify_labels', 'modify_images', 'modify_data_yaml', 'delete_files', 'yolo_predict', 'yolo_val', 'yolo_train', 'openaxiom_save', 'openaxiom_batch_save', 'large_scan'],
+    safePrechecks: ['确认只读审计模式', '确认不扫描大文件', '确认不训练/覆盖模型'],
+    rollbackRequired: false,
+    integrationStatus: 'preview_only',
+    note: '不扫描大文件、不修改 images/labels/data.yaml、不训练、不覆盖模型、不运行 YOLO predict/val/train、不保存/恢复 OpenAxiom labels。',
+  },
 ] as const;
 
 const RELEASE_READINESS_GATES = [
@@ -904,6 +919,12 @@ const INTEGRATION_READINESS_MATRIX = [
     safePrechecks: ['确认只读观察模式', '确认不启动/停止/重启 OpenClaw'], requiredConfirmations: ['确认不 taskkill/升级/修改配置'],
     rollbackRequired: false, nextMilestone: 'planned / preview_only', integrationRisk: 'low',
   },
+  {
+    id: 'mahjong_readonly_audit_preview', name: 'Mahjong Readonly Audit Preview', status: 'preview_only', allowedModes: ['read_only'],
+    forbiddenActions: ['train_model', 'overwrite_best_pt', 'modify_labels', 'modify_images', 'modify_data_yaml', 'delete_files', 'yolo_predict', 'yolo_val', 'yolo_train', 'openaxiom_save', 'openaxiom_batch_save', 'large_scan'],
+    safePrechecks: ['确认只读审计模式', '确认不扫描大文件'], requiredConfirmations: ['确认不训练/覆盖模型'],
+    rollbackRequired: false, nextMilestone: 'planned / preview_only', integrationRisk: 'low',
+  },
 ] as const;
 
 const INTEGRATION_REHEARSAL_MATRIX = [
@@ -995,6 +1016,15 @@ const INTEGRATION_REHEARSAL_MATRIX = [
     rollbackPlanPreview: '只读检查，无需回滚。', nextSafeStep: '输出发布准备度预览。如需正式发布，必须另开明确授权任务。',
     blockedRealActions: ['git_tag', 'git_push', 'github_release', 'release_upload', 'force_push', 'npm_publish'],
   },
+  {
+    id: 'mahjong_readonly_audit_preview_rehearsal', name: 'Mahjong Readonly Audit Preview Rehearsal', targetSystem: 'Mahjong Dataset',
+    actionType: 'read_only_check', executionMode: 'read_only', rehearsalOnly: true, externalCall: false,
+    databaseWrite: false, fileWrite: false,
+    requiredPrechecks: ['确认只读审计模式', '确认不扫描大文件', '确认不训练/覆盖模型'],
+    requiredConfirmations: ['确认不修改 labels/images/data.yaml', '确认不保存/恢复 OpenAxiom labels'],
+    rollbackPlanPreview: '只读审计，无需回滚。', nextSafeStep: '输出 Mahjong 只读审计预览。',
+    blockedRealActions: ['train_model', 'overwrite_best_pt', 'modify_labels', 'modify_images', 'modify_data_yaml', 'delete_files', 'yolo_predict', 'yolo_val', 'yolo_train', 'openaxiom_save', 'openaxiom_batch_save', 'large_scan'],
+  },
 ] as const;
 
 const STOP_CONDITIONS = [
@@ -1014,6 +1044,7 @@ const STOP_CONDITIONS = [
   { id: 'comfyui_start_or_model', label: '涉及 ComfyUI 启动/模型操作', description: '涉及 ComfyUI 启动、下载模型、删除模型、修改配置时必须停止。' },
   { id: 'openclaw_process_or_upgrade', label: '涉及 OpenClaw 进程/升级', description: '涉及 OpenClaw 启动、停止、重启、taskkill、升级全局版本时必须停止。' },
   { id: 'openclaw_config_or_model', label: '涉及 OpenClaw 配置/模型路由', description: '涉及 OpenClaw 修改配置、修改模型路由、调用模型、修改 gateway 脚本、修改计划任务时必须停止。' },
+  { id: 'mahjong_training_or_overwrite', label: '涉及 Mahjong 训练/覆盖模型', description: '涉及 Mahjong 训练、覆盖 best.pt/last.pt、修改 labels/images/data.yaml、YOLO predict/val/train、保存/恢复 OpenAxiom labels 时必须停止。' },
 ] as const;
 
 function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMode, riskLevel: PracticalRiskLevel, deniedActions: string[]) {
@@ -1063,6 +1094,10 @@ function buildDryRunPlan(taskType: PracticalTaskType, executionMode: ExecutionMo
     allowedSteps.push('git diff --check', 'lint', 'build', 'smoke test', 'db doctor', 'release notes draft', '版本号确认');
     forbiddenSteps.push('git tag', 'git push', 'GitHub Release', 'release upload', 'force push', 'npm publish');
     stopConditions.push('涉及 git push/tag/release', '用户未明确授权');
+  } else if (taskType === 'mahjong_readonly_audit_preview') {
+    allowedSteps.push('Mahjong 项目路径确认', '数据集计数预览', '模型文件检查');
+    forbiddenSteps.push('train_model', 'overwrite_best_pt', 'modify_labels', 'modify_images', 'modify_data_yaml', 'delete_files', 'yolo_predict', 'yolo_val', 'yolo_train', 'openaxiom_save', 'openaxiom_batch_save', 'large_scan');
+    stopConditions.push('涉及 Mahjong 训练/覆盖模型', '用户未明确授权');
   } else {
     allowedSteps.push('生成 dry-run 结果', '输出审计预览');
     stopConditions.push('路径不明确', '用户未明确授权');
@@ -1186,6 +1221,13 @@ const ROUTE_MATRIX: Record<PracticalTaskType, Record<StrategyMode, { route: Rout
     local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读预览优先。' },
     balanced: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '平衡门禁检查。' },
   },
+  mahjong_readonly_audit_preview: {
+    save_money: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '只读审计预览适合本地低成本。' },
+    stable_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '稳定只读审计。' },
+    quality_first: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '更详细审计用平衡路线。' },
+    local_first: { route: 'local_cpu', modelTier: 'local', executionMode: 'read_only', note: '本地只读审计优先。' },
+    balanced: { route: 'local_balanced', modelTier: 'balanced', executionMode: 'read_only', note: '平衡只读审计。' },
+  },
 };
 
 const CASE_MATRIX = [
@@ -1212,6 +1254,8 @@ const CASE_MATRIX = [
   { label: '启动 OpenClaw', taskType: 'openclaw_start_service', mode: 'stable_first', input: { target: '启动 OpenClaw' }, expectedCategory: 'openclaw_readonly_observer', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '进程操作必须人工确认，当前 preview_only' },
   { label: 'GitHub 发布准备度检查', taskType: 'github_release_prep', mode: 'stable_first', input: { target: '检查发布准备度' }, expectedCategory: 'github_release_prep_preview', expectedRiskLevel: 'medium', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读发布准备度预览，不 tag/push/release' },
   { label: 'git tag 发布', taskType: 'github_release_seal', mode: 'stable_first', input: { target: 'git tag v7.10.0' }, expectedCategory: 'github_release', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'blocked', expectedSafetyBehavior: '禁止自动发布' },
+  { label: 'Mahjong 只读审计预览', taskType: 'mahjong_audit_preview', mode: 'stable_first', input: { target: '检查 Mahjong 数据集' }, expectedCategory: 'mahjong_readonly_audit_preview', expectedRiskLevel: 'medium', expectedExecutionMode: 'read_only', expectedModelTier: 'local', expectedSafetyBehavior: '只读审计预览，不扫描大文件、不训练、不覆盖模型' },
+  { label: '训练 Mahjong 模型', taskType: 'mahjong_training', mode: 'local_first', input: { target: '训练 Mahjong 模型' }, expectedCategory: 'mahjong_readonly_audit_preview', expectedRiskLevel: 'high', expectedExecutionMode: 'human_confirm_required', expectedModelTier: 'toolchain', expectedSafetyBehavior: '训练操作必须人工确认，当前 preview_only' },
 ] as const;
 
 const DEFAULT_WEIGHTS: RouteWeightSet = {
@@ -2376,6 +2420,39 @@ function buildPracticalDecision(taskTypeRaw: string, rawInput: any): PracticalDe
       ],
       safetyNotes: [...safetyNotes, 'GitHub 发布操作仅允许在明确授权任务中执行，当前仅 readonly preview。'],
       nextAction: '先生成发布准备度预览，不直接执行 tag/push/release。',
+    };
+  }
+
+  if (taskType === 'mahjong_readonly_audit_preview' && (text.includes('查') || text.includes('读') || text.includes('审计') || text.includes('audit') || text.includes('检查') || text.includes('check') || text.includes('数据集') || text.includes('麻将') || text.includes('标注'))) {
+    return {
+      selectedRoute: 'local_cpu',
+      costLevel: 'free',
+      riskLevel: 'medium',
+      needsUserConfirm: false,
+      reason: 'Mahjong 只读审计预览。仅检查项目路径状态和数据集安全边界，不扫描大文件、不训练、不覆盖模型。',
+      rejectedRoutes: [
+        { route: 'manual_confirm', reason: '纯只读审计无需人工确认。' },
+      ],
+      safetyNotes: [
+        'Mahjong 当前仅 readonly audit preview，不扫描大文件、不训练、不覆盖模型、不修改 labels/images/data.yaml。',
+        '如需训练/覆盖/修改，必须另开明确授权任务。',
+      ],
+      nextAction: '调用 GET /api/cost-routing/mahjong-audit-preview 获取只读审计预览。',
+    };
+  }
+
+  if (taskType === 'mahjong_readonly_audit_preview') {
+    return {
+      selectedRoute: 'manual_confirm',
+      costLevel: 'free',
+      riskLevel: 'high',
+      needsUserConfirm: true,
+      reason: 'Mahjong 训练/覆盖/修改操作会改变项目状态，本轮只允许 readonly 审计。',
+      rejectedRoutes: [
+        { route: 'local_cpu', reason: '本地可审计，但训练/覆盖需要人工确认。' },
+      ],
+      safetyNotes: [...safetyNotes, 'Mahjong 数据集为受保护项目，禁止自动训练、覆盖、修改。'],
+      nextAction: '先生成只读审计预览，不直接操作 Mahjong 项目。',
     };
   }
 
@@ -3776,6 +3853,89 @@ function buildGitHubReleasePrepPreview() {
   };
 }
 
+const MAHJONG_READONLY_AUDIT_CONTRACT = {
+  targetSystem: 'mahjong_project',
+  integrationMode: 'readonly_audit_preview',
+  actionType: 'read_only_check',
+  executionMode: 'read_only',
+  persistenceMode: 'preview_only',
+  datasetWrite: false,
+  labelWrite: false,
+  imageWrite: false,
+  modelWrite: false,
+  trainingRun: false,
+  yoloPredictRun: false,
+  openAxiomSave: false,
+  batchSave: false,
+  largeScan: false,
+  externalMutation: false,
+} as const;
+
+function buildMahjongAuditPreview() {
+  const nowStr = now();
+  const forbiddenMahjongActions = [
+    'train model', 'overwrite best.pt', 'overwrite last.pt',
+    'modify labels', 'modify images', 'modify data.yaml',
+    'delete files', 'run YOLO predict', 'run YOLO val', 'run YOLO train',
+    'OpenAxiom save', 'OpenAxiom restore', 'OpenAxiom batch save',
+    'batch save', 'auto repair', 'large dataset scan',
+  ];
+  return {
+    ok: true,
+    ...MAHJONG_READONLY_AUDIT_CONTRACT,
+    timestamp: nowStr,
+    auditPreviewStatus: 'preview_ready',
+    projectPathPreview: 'E:\\Mahjong_V1_Project (只读路径，不扫描)',
+    datasetSafetyPreview: 'readonly (no image/label/data.yaml modification)',
+    modelSafetyPreview: 'readonly (no training, no model overwrite)',
+    readonlyMode: true,
+    safetyBoundary: {
+      datasetWrite: false,
+      labelWrite: false,
+      imageWrite: false,
+      modelWrite: false,
+      trainingRun: false,
+      yoloPredictRun: false,
+      openAxiomSave: false,
+      batchSave: false,
+      largeScan: false,
+    },
+    forbiddenActions: forbiddenMahjongActions,
+    nextSafeStep: '仅展示只读审计预览（preview_plan）。如需训练/覆盖/修改/保存，必须另开明确授权任务。不支持真实 YOLO/OpenAxiom API 调用。',
+    auditPreview: {
+      auditSchemaVersion: 'preview-v2',
+      mode: 'preview_only',
+      wouldExecute: false,
+      wouldWriteFiles: false,
+      databaseWrite: false,
+      fileWrite: false,
+      externalWrite: false,
+      timestamp: nowStr,
+      taskSummary: 'Mahjong readonly audit preview',
+      selectedPolicy: 'stable_first',
+      detectedCategory: 'mahjong_readonly_audit_preview',
+      actionType: 'read_only_check',
+      riskLevel: 'medium',
+      executionMode: 'read_only',
+      confidence: 'medium',
+      matchedRiskRules: [],
+      recommendedRoute: 'local_cpu',
+      recommendedModelTier: 'local',
+      deniedActions: forbiddenMahjongActions,
+      readOnlyPrechecks: ['确认只读审计模式', '确认不扫描大文件', '确认不训练/覆盖模型'],
+      nextSafeStep: '输出 Mahjong 只读审计预览',
+      rollbackRequired: false,
+      auditMode: 'preview_only',
+      requiredConfirmations: [],
+      rollbackPlan: ['本轮不执行任何 Mahjong 训练/覆盖/修改/保存操作，无需回滚。'],
+      auditIdPreview: genId('audit-mahjong'),
+      persistenceMode: 'preview_only' as const,
+      selectedModelRoute: 'local' as ModelTier,
+      selectedToolchainRoute: 'mahjong_readonly_audit_preview',
+    },
+  };
+}
+
 const MEMORY_HUB_READONLY_CONTRACT = {
   targetSystem: 'memory_hub',
   integrationMode: 'readonly_context_lookup_preview',
@@ -3938,6 +4098,7 @@ export async function registerCostRoutingRoutes(app: FastifyInstance): Promise<v
   app.get('/api/cost-routing/comfyui-status-preview', async () => buildComfyUiStatusPreview());
   app.get('/api/cost-routing/openclaw-status-preview', async () => buildOpenClawStatusPreview());
   app.get('/api/cost-routing/github-release-prep-preview', async () => buildGitHubReleasePrepPreview());
+  app.get('/api/cost-routing/mahjong-audit-preview', async () => buildMahjongAuditPreview());
   app.get('/api/cost-routing/route-types', async () => ({
     ok: true,
     engine_version: 'v2',
