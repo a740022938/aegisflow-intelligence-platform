@@ -753,6 +753,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     notes: 'P2 added as hidden direct-route. Not in sidebar. No real connector control.',
   },
 
+  // Lab Center read-only hub
+  {
+    id: 'lab-center-readonly',
+    path: '/lab-center-readonly',
+    label: 'Lab Center Readonly',
+    component: 'LabCenterReadonly',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'lab_mode',
+    recommendation: 'move_to_lab',
+    risk: 'low',
+    gates: ['readonly_only', 'lab_mode'],
+    reason: 'Readonly Lab Center page. Displays lab items, vision debug tools, prototype modules, and experimental features. Not added to left menu. No training, inference, labeling, or dataset writes. Safe to expose behind lab_mode flag.',
+    allowedNow: false,
+    source: 'route',
+    notes: 'P3 added as hidden direct-route. Not in sidebar. No real execution.',
+  },
+
   // Governance Center hub
   {
     id: 'governance-center',

@@ -40,6 +40,7 @@ const GovernanceCenter = lazy(() => import('./pages/GovernanceCenter'));
 const AdvancedModeReadonly = lazy(() => import('./pages/AdvancedModeReadonly'));
 const NavigationPreviewReadonly = lazy(() => import('./pages/NavigationPreviewReadonly'));
 const ConnectorCenterReadonly = lazy(() => import('./pages/ConnectorCenterReadonly'));
+const LabCenterReadonly = lazy(() => import('./pages/LabCenterReadonly'));
 
 function RouteFallback() {
   return (
@@ -144,6 +145,7 @@ const App: React.FC = () => {
             <Route path="advanced-mode-readonly" element={<AdvancedModeReadonly />} />
             <Route path="navigation-preview-readonly" element={<NavigationPreviewReadonly />} />
             <Route path="connector-center-readonly" element={<ConnectorCenterReadonly />} />
+            <Route path="lab-center-readonly" element={<LabCenterReadonly />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
