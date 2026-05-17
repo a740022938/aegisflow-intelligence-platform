@@ -21,6 +21,9 @@ import {
   getCenterAccessConnectorStatusSummary,
   getCenterAccessSidebarVisibleCount,
   getCenterAccessHiddenDirectCount,
+  getCenterAccessQualityGateSummary,
+  getCenterAccessBySidebarState,
+  getCenterAccessByOperationalMode,
 } from '../registry/center-access-registry';
 import {
   ADVANCED_PLACEHOLDER_REGISTRY,
@@ -28,6 +31,22 @@ import {
   getAdvancedPlaceholderHoldReviewItems,
   getAdvancedPlaceholdersByRisk,
 } from '../registry/advanced-placeholder-registry';
+import {
+  getConnectorRegistryCount,
+  getConnectorRegistryByCategory,
+  getConnectorRegistryByRisk as getConnectorRisk,
+  getConnectorRegistryQualityGateSummary,
+} from '../registry/connector-registry';
+import {
+  getLabRegistryCount,
+  getLabRegistryAvailableRoutes,
+  getLabRegistryHoldReviewItems as getLabHoldReview,
+  getLabRegistryFutureItems as getLabFuture,
+  getLabRegistryQualityGateSummary,
+} from '../registry/lab-registry';
+import {
+  getNavigationExposureSafetySummary,
+} from '../registry/navigation-exposure-registry';
 import type { NavigationExposureEntry, NavigationExposureLevel, NavigationExposureRisk } from '../registry/navigation-exposure-registry';
 import type { CenterAccessItem, CenterAccessKind, CenterAccessRisk } from '../registry/center-access-registry';
 import type { AdvancedPlaceholderItem, AdvancedPlaceholderDecision } from '../registry/advanced-placeholder-registry';
@@ -137,6 +156,18 @@ export default function AdvancedModeReadonly() {
   const connectorStatus = useMemo(() => getCenterAccessConnectorStatusSummary(), []);
   const sidebarVisibleCount = useMemo(() => getCenterAccessSidebarVisibleCount(), []);
   const hiddenDirectCount = useMemo(() => getCenterAccessHiddenDirectCount(), []);
+  const centerQualityGate = useMemo(() => getCenterAccessQualityGateSummary(), []);
+  const connectorTotal = useMemo(() => getConnectorRegistryCount(), []);
+  const connectorActive = useMemo(() => getConnectorRegistryByCategory('active'), []);
+  const connectorFuture = useMemo(() => getConnectorRegistryByCategory('future'), []);
+  const connectorHighRisk = useMemo(() => getConnectorRisk('high'), []);
+  const connectorQuality = useMemo(() => getConnectorRegistryQualityGateSummary(), []);
+  const labTotal = useMemo(() => getLabRegistryCount(), []);
+  const labActive = useMemo(() => getLabRegistryAvailableRoutes(), []);
+  const labHold = useMemo(() => getLabHoldReview(), []);
+  const labFuture = useMemo(() => getLabFuture(), []);
+  const labQuality = useMemo(() => getLabRegistryQualityGateSummary(), []);
+  const safetySummary = useMemo(() => getNavigationExposureSafetySummary(), []);
 
   return (
     <PageShell
@@ -158,6 +189,52 @@ export default function AdvancedModeReadonly() {
         <KpiCard label="未开放" value={String(stats.allowedNowFalseCount)} color="var(--warning)" />
         <KpiCard label="高风险" value={String(stats.highRiskCount)} color="var(--danger)" />
       </div>
+
+      {/* ── A1. Cross-Center Operations Overview ── */}
+      <SectionCard title="跨中心运营概览" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="总中心" value={String(centerItems.length)} color="var(--primary)" />
+          <KpiCard label="已入菜单" value={String(sidebarVisibleCount)} color="var(--success)" />
+          <KpiCard label="隐藏直达" value={String(hiddenDirectCount)} color="var(--warning)" />
+          <KpiCard label="Quality全过" value={String(centerQualityGate.passedAll)} color="var(--success)" />
+          <KpiCard label="Connector" value={String(connectorTotal)} color="#22C55E" />
+          <KpiCard label="Lab" value={String(labTotal)} color="#3B82F6" />
+        </div>
+      </SectionCard>
+
+      {/* ── A2. Cross-Center Safety Matrix ── */}
+      <SectionCard title="跨中心安全矩阵" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8, fontSize: 10 }}>
+          {centerItems.map(c => <div key={c.id} style={{ padding: '8px 10px', borderRadius: 6, background: 'var(--bg-surface)', border: `1px solid ${c.visibleInSidebar ? 'var(--success)' : 'var(--warning)'}`, fontSize: 10 }}>
+            <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>{c.name}</div>
+            {[
+              ['只读', String(c.qualityGate.readonly)],
+              ['无写DB', String(c.qualityGate.noDbWrite)],
+              ['无外部控制', String(c.qualityGate.noExternalControl)],
+              ['无Stage C', String(c.qualityGate.noStageC)],
+              ['已入菜单', String(c.visibleInSidebar)],
+              ['可开放', String(c.allowedNow)],
+            ].map(([label, val]) => <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '1px 0' }}>
+              <span style={{ color: 'var(--text-muted)' }}>{label}</span>
+              <span style={{ color: val === 'true' ? 'var(--success)' : 'var(--danger)', fontWeight: 600 }}>{val === 'true' ? '✅' : '❌'}</span>
+            </div>)}
+          </div>)}
+        </div>
+      </SectionCard>
+
+      {/* ── A3. Connector / Lab Snapshot ── */}
+      <SectionCard title="Connector / Lab 快照" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Connector总数" value={String(connectorTotal)} color="var(--primary)" />
+          <KpiCard label="Active" value={String(connectorActive.length)} color="var(--success)" />
+          <KpiCard label="Future" value={String(connectorFuture.length)} color="var(--warning)" />
+          <KpiCard label="高风险" value={String(connectorHighRisk.length)} color="var(--danger)" />
+          <KpiCard label="Lab总数" value={String(labTotal)} color="#3B82F6" />
+          <KpiCard label="Active" value={String(labActive.length)} color="var(--success)" />
+          <KpiCard label="待复核" value={String(labHold.length)} color="var(--warning)" />
+          <KpiCard label="Future" value={String(labFuture.length)} color="#6B7280" />
+        </div>
+      </SectionCard>
 
       {/* ── A. Center Readiness Dashboard ── */}
       <SectionCard title="中心就绪仪表板" style={{ marginBottom: 20 }}>

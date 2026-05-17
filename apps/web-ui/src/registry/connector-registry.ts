@@ -18,6 +18,16 @@ export type ConnectorCategory = 'active' | 'future' | 'hold_review';
 export type ConnectorReadiness = 'ready' | 'preview_ready' | 'planned' | 'hold_review' | 'blocked';
 export type ConnectorExposure = 'sidebar' | 'advanced_hub' | 'hidden_direct' | 'future';
 export type ConnectorHealthLabel = 'ok' | 'watch' | 'unknown' | 'blocked';
+export type ConnectorSafetyStatus = 'safe' | 'watch' | 'risky' | 'blocked';
+export type ConnectorReviewStatus = 'passed' | 'preview_ok' | 'hold_review' | 'future_review';
+
+export interface ConnectorQualityGate {
+  readonly: boolean;
+  noDbWrite: boolean;
+  noExternalControl: boolean;
+  noStageC: boolean;
+  noDangerousActions: boolean;
+}
 
 export interface ConnectorRegistryItem {
   id: string;
@@ -41,6 +51,10 @@ export interface ConnectorRegistryItem {
   riskNotes: string[];
   setupNotes: string[];
   evidence: string[];
+  qualityGate: ConnectorQualityGate;
+  displayGroup: string;
+  safetyStatus: ConnectorSafetyStatus;
+  reviewStatus: ConnectorReviewStatus;
   notes: string;
 }
 
@@ -67,6 +81,10 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     riskNotes: [],
     setupNotes: ['P1b 已接入 PageShell'],
     evidence: ['apps/web-ui/src/pages/OpenAxiomReadonly.tsx'],
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    displayGroup: 'active_connectors',
+    safetyStatus: 'safe',
+    reviewStatus: 'preview_ok',
     notes: 'OpenAxiom 标注平台只读页。P1b PageShell migrated. 外部工具只读页，建议移至 connector 分组。',
   },
   {
@@ -90,6 +108,10 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     riskNotes: [],
     setupNotes: ['P1b 已接入 PageShell'],
     evidence: ['apps/web-ui/src/pages/MemoryHubReadonly.tsx'],
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    displayGroup: 'active_connectors',
+    safetyStatus: 'safe',
+    reviewStatus: 'preview_ok',
     notes: 'Memory Hub 记忆存储只读页。P1b PageShell migrated. 外部工具只读页，建议移至 connector 分组。',
   },
   {
@@ -112,6 +134,10 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     riskNotes: ['External API integration risk', 'Token display risk'],
     setupNotes: ['当前为 ModulePage 占位页', '需对接 HuggingFace API'],
     evidence: ['apps/web-ui/src/pages/ModulePage.tsx (huggingface route)'],
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    displayGroup: 'active_connectors',
+    safetyStatus: 'safe',
+    reviewStatus: 'future_review',
     notes: 'HuggingFace 模型平台候选。当前为 ModulePage 占位页，尚未对接 HuggingFace API。未来 Connector Center 候选。',
   },
 
@@ -136,6 +162,10 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     riskNotes: ['High risk — AI assistant scheduling', 'Could trigger automated task execution'],
     setupNotes: ['需定义 OpenClaw 桥接安全边界'],
     evidence: [],
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    displayGroup: 'future_connectors',
+    safetyStatus: 'risky',
+    reviewStatus: 'hold_review',
     notes: 'OpenClaw AI 助手。未来 Connector 候选。当前不接真实控制。',
   },
   {
@@ -158,6 +188,10 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     riskNotes: ['High risk — workflow execution', 'Could launch image generation pipelines'],
     setupNotes: ['需定义 ComfyUI 安全边界'],
     evidence: [],
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    displayGroup: 'future_connectors',
+    safetyStatus: 'risky',
+    reviewStatus: 'hold_review',
     notes: 'ComfyUI 工作流工具。未来 Connector 候选。当前不接真实控制。',
   },
   {
@@ -180,6 +214,10 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     riskNotes: ['Medium risk — message bridge exposed'],
     setupNotes: ['需设计 Hermes 集成方案'],
     evidence: [],
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    displayGroup: 'future_connectors',
+    safetyStatus: 'safe',
+    reviewStatus: 'future_review',
     notes: 'Hermes AI 助手桥接。未来 Connector 候选。',
   },
   {
@@ -202,6 +240,10 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     riskNotes: ['Medium risk — external switch control'],
     setupNotes: ['需设计 CC Switch 集成方案'],
     evidence: [],
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    displayGroup: 'future_connectors',
+    safetyStatus: 'safe',
+    reviewStatus: 'future_review',
     notes: 'CC Switch 外部连接器。未来 Connector 候选。',
   },
   {
@@ -224,6 +266,10 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     riskNotes: ['Medium risk — API proxy access', 'Token/key management risk'],
     setupNotes: ['需配置 Claude API key (不存储在 registry)', '需设计代理安全边界'],
     evidence: [],
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    displayGroup: 'future_connectors',
+    safetyStatus: 'safe',
+    reviewStatus: 'future_review',
     notes: 'Claude/DeepSeek 代理连接器。未来 Connector 候选。',
   },
 ];
@@ -274,6 +320,11 @@ export function getConnectorRegistryReadinessSummary(): { total: number; ready: 
     holdReview: CONNECTOR_REGISTRY_NEW.filter(c => c.readiness === 'hold_review').length,
     blocked: CONNECTOR_REGISTRY_NEW.filter(c => c.readiness === 'blocked').length,
   };
+}
+
+export function getConnectorRegistryQualityGateSummary(): { total: number; passedAll: number; holdReview: number } {
+  const passedAll = CONNECTOR_REGISTRY_NEW.filter(c => Object.values(c.qualityGate).every(v => v === true)).length;
+  return { total: CONNECTOR_REGISTRY_NEW.length, passedAll, holdReview: CONNECTOR_REGISTRY_NEW.filter(c => c.reviewStatus === 'hold_review').length };
 }
 
 // ── Backward-compatible exports for existing ConnectorCenter.tsx ──

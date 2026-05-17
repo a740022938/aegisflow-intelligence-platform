@@ -25,6 +25,18 @@ export type CenterAccessExposureRecommendation =
   | 'consider_sidebar_later'
   | 'do_not_expose';
 
+export type CenterAccessSidebarState = 'visible' | 'hidden_direct' | 'blocked';
+export type CenterAccessOperationalMode = 'readonly' | 'preview' | 'hold_review' | 'disabled';
+export type CenterAccessGroup = 'primary' | 'connector' | 'lab' | 'governance' | 'navigation';
+
+export interface CenterAccessQualityGate {
+  readonly: boolean;
+  noDbWrite: boolean;
+  noExternalControl: boolean;
+  noStageC: boolean;
+  noDangerousActions: boolean;
+}
+
 export interface CenterAccessItem {
   id: string;
   name: string;
@@ -41,6 +53,13 @@ export interface CenterAccessItem {
   blockedActions: string[];
   requiredBeforeExposure: string[];
   releaseGate: string[];
+  displayOrder: number;
+  group: CenterAccessGroup;
+  sidebarState: CenterAccessSidebarState;
+  operationalMode: CenterAccessOperationalMode;
+  readinessScore: number;
+  qualityGate: CenterAccessQualityGate;
+  statusBadges: string[];
   description: string;
   notes: string;
 }
@@ -62,6 +81,13 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'release'],
     requiredBeforeExposure: [],
     releaseGate: [],
+    displayOrder: 1,
+    group: 'primary',
+    sidebarState: 'visible',
+    operationalMode: 'readonly',
+    readinessScore: 100,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['已入菜单', '当前可开放', 'ready'],
     description: '只读门控页面。当前是唯一已入左侧菜单的高级入口。展示导航曝光建议和中心访问信息。',
     notes: 'Advanced Mode Preview — 已入左侧菜单。只读。不启用 Stage C。',
   },
@@ -81,6 +107,13 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'control_external_tools', 'call_external_api', 'release'],
     requiredBeforeExposure: ['no_real_connector_control', 'readonly_badge', 'manual_review'],
     releaseGate: ['connector_center_enabled_flag', 'no_write_verification'],
+    displayOrder: 2,
+    group: 'connector',
+    sidebarState: 'visible',
+    operationalMode: 'readonly',
+    readinessScore: 85,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['已入菜单', '当前可开放', 'preview_ready'],
     description: '只读连接器中心。展示 OpenAxiom、Memory Hub、Hugging Face 等外部工具状态。已入左侧菜单。',
     notes: 'Connector Center — 已入左侧菜单。hidden direct route。不接真实控制。P1 sidebar pilot.',
   },
@@ -100,6 +133,13 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'train_model', 'run_inference', 'save_labels', 'overwrite_dataset', 'release'],
     requiredBeforeExposure: ['no_training', 'no_inference', 'no_label_write', 'lab_warning'],
     releaseGate: ['lab_mode_flag', 'readonly_verification'],
+    displayOrder: 3,
+    group: 'lab',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 60,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '当前不可开放', 'preview_ready'],
     description: '只读实验室中心。展示 Mahjong Debug 等实验工具状态。未入左侧菜单。',
     notes: 'Lab Center — 未入左侧菜单。hidden direct route。不运行训练/推理/标注。',
   },
@@ -119,6 +159,13 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'approve_candidate', 'reject_candidate', 'archive_candidate', 'sync_lan_share', 'publish_release', 'create_tag', 'force_push'],
     requiredBeforeExposure: ['stage_c_remains_disabled', 'no_execution_buttons', 'readonly_validator_pass', 'human_approval'],
     releaseGate: ['governance_center_enabled_flag', 'stage_c_disabled_gate', 'readonly_verification'],
+    displayOrder: 4,
+    group: 'governance',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'hold_review',
+    readinessScore: 40,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '当前不可开放', 'hold_review'],
     description: '只读治理中心。展示 13 个治理模块、12 个门禁、风险边界。Stage C deferred。未入左侧菜单。',
     notes: 'Governance Center — 未入左侧菜单。readonly。Stage C deferred。不处理 candidate。',
   },
@@ -138,6 +185,13 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'move_menu', 'release'],
     requiredBeforeExposure: ['no_menu_apply', 'no_layout_write', 'no_persistence'],
     releaseGate: [],
+    displayOrder: 5,
+    group: 'navigation',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 70,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '当前不可开放', 'preview_ready'],
     description: '只读导航预览。展示未来 Connector/Lab/Governance/Advanced 分组结构。未入左侧菜单。',
     notes: 'Navigation Preview — 未入左侧菜单。hidden direct route。不改变真实菜单。',
   },
@@ -185,6 +239,27 @@ export function getCenterAccessFinalReadinessSummary(): {
     holdReview: CENTER_ACCESS_REGISTRY.filter(i => i.readiness === 'hold_review').length,
     blocked: CENTER_ACCESS_REGISTRY.filter(i => i.readiness === 'blocked').length,
   };
+}
+
+export function getCenterAccessQualityGateSummary(): { total: number; passedAll: number; failedAny: number } {
+  const passedAll = CENTER_ACCESS_REGISTRY.filter(i => Object.values(i.qualityGate).every(v => v === true)).length;
+  return { total: CENTER_ACCESS_REGISTRY.length, passedAll, failedAny: CENTER_ACCESS_REGISTRY.length - passedAll };
+}
+
+export function getCenterAccessBySidebarState(sidebarState: CenterAccessSidebarState): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.sidebarState === sidebarState);
+}
+
+export function getCenterAccessByOperationalMode(operationalMode: CenterAccessOperationalMode): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.operationalMode === operationalMode);
+}
+
+export function getCenterAccessVisibleSidebarItems(): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.visibleInSidebar);
+}
+
+export function getCenterAccessHiddenDirectItems(): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => !i.visibleInSidebar);
 }
 
 export function getCenterAccessSidebarVisibleCount(): number {

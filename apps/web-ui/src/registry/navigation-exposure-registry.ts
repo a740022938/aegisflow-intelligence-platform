@@ -948,6 +948,17 @@ export function getNavigationExposureAllowedNowFalseEntries(): NavigationExposur
   return NAVIGATION_EXPOSURE_REGISTRY.filter(entry => !entry.allowedNow);
 }
 
+export function getNavigationExposureSafetySummary(): {
+  highRiskPrimaryNav: number; highRiskAllowedNow: number; stageCEntriesAllowedNow: number;
+} {
+  const highRisk = NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.risk === 'high');
+  return {
+    highRiskPrimaryNav: highRisk.filter(e => e.currentExposure === 'primary_nav').length,
+    highRiskAllowedNow: highRisk.filter(e => e.allowedNow).length,
+    stageCEntriesAllowedNow: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.gates.includes('stage_c_disabled') && e.allowedNow).length,
+  };
+}
+
 export function getNavigationExposureGroupedByRecommendedLevel(): Record<string, NavigationExposureEntry[]> {
   return NAVIGATION_EXPOSURE_REGISTRY.reduce<Record<string, NavigationExposureEntry[]>>((acc, entry) => {
     const key = entry.recommendedExposure;
