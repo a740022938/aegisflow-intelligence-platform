@@ -736,6 +736,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
   },
 
+  // Connector Center read-only hub
+  {
+    id: 'connector-center-readonly',
+    path: '/connector-center-readonly',
+    label: 'Connector Center Readonly',
+    component: 'ConnectorCenterReadonly',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'connector_center',
+    recommendation: 'move_to_connector_center',
+    risk: 'low',
+    gates: ['readonly_only', 'connector_center_enabled'],
+    reason: 'Readonly Connector Center page. Displays external tool, assistant, model platform, and data system integration status. Not added to left menu. No external control. No external write. Safe to expose behind connector_center_enabled flag.',
+    allowedNow: false,
+    source: 'route',
+    notes: 'P2 added as hidden direct-route. Not in sidebar. No real connector control.',
+  },
+
   // Governance Center hub
   {
     id: 'governance-center',

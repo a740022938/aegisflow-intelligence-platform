@@ -1,259 +1,234 @@
-// Connector registry — static definitions for Connector Center
-// NOT used for external system control. Readonly metadata only.
+// Connector Registry — static connector definitions
+// READONLY METADATA ONLY. Does not call real APIs, write to databases,
+// or execute external tool operations.
+
+export type ConnectorType =
+  | 'external_tool'
+  | 'ai_assistant'
+  | 'model_platform'
+  | 'memory_system'
+  | 'labeling_tool'
+  | 'workflow_tool'
+  | 'future_connector';
+
+export type ConnectorMaturity = 'stable' | 'preview' | 'lab' | 'external' | 'future';
+export type ConnectorRiskLevel = 'low' | 'medium' | 'high';
+export type ConnectorRegistryStatus = 'available_route' | 'planned' | 'external_only' | 'unknown';
+
+export interface ConnectorRegistryItem {
+  id: string;
+  name: string;
+  type: ConnectorType;
+  status: ConnectorRegistryStatus;
+  maturity: ConnectorMaturity;
+  riskLevel: ConnectorRiskLevel;
+  currentRoute?: string;
+  futureRoute?: string;
+  capabilities: string[];
+  safetyBoundary: string[];
+  actionsAllowed: string[];
+  actionsBlocked: string[];
+  dataSource: 'static_registry' | 'existing_page' | 'future_integration';
+  notes: string;
+}
+
+export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
+  // ── Active / Available Routes ──
+
+  {
+    id: 'openaxiom',
+    name: 'OpenAxiom',
+    type: 'labeling_tool',
+    status: 'available_route',
+    maturity: 'external',
+    riskLevel: 'low',
+    currentRoute: '/openaxiom-readonly',
+    capabilities: ['标注数据查看', '标注状态检查', '只读审计'],
+    safetyBoundary: ['readonly', 'no_label_write', 'no_save_restore_train'],
+    actionsAllowed: ['view_status', 'view_report', 'view_related_route'],
+    actionsBlocked: ['write_database', 'modify_label', 'save_restore', 'train_model', 'taskkill', 'enable_stage_c'],
+    dataSource: 'existing_page',
+    notes: 'OpenAxiom 标注平台只读页。P1b PageShell migrated. 外部工具只读页，建议移至 connector 分组。',
+  },
+  {
+    id: 'memory-hub',
+    name: 'Memory Hub',
+    type: 'memory_system',
+    status: 'available_route',
+    maturity: 'external',
+    riskLevel: 'low',
+    currentRoute: '/memory-hub',
+    capabilities: ['记忆存储查看', '候选管理状态', '只读审计'],
+    safetyBoundary: ['readonly', 'no_sqlite_write', 'no_candidate_processing', 'no_lan_sync'],
+    actionsAllowed: ['view_status', 'view_report', 'view_related_route'],
+    actionsBlocked: ['write_database', 'modify_layout', 'approve_candidate', 'reject_candidate', 'archive_candidate', 'sync_lan_share', 'taskkill', 'restart_service', 'enable_stage_c'],
+    dataSource: 'existing_page',
+    notes: 'Memory Hub 记忆存储只读页。P1b PageShell migrated. 外部工具只读页，建议移至 connector 分组。',
+  },
+  {
+    id: 'huggingface',
+    name: 'Hugging Face',
+    type: 'model_platform',
+    status: 'external_only',
+    maturity: 'future',
+    riskLevel: 'medium',
+    capabilities: ['模型浏览', '模型下载状态', 'HuggingFace 集成参考'],
+    safetyBoundary: ['no_api_call', 'no_token_display', 'no_model_upload', 'readonly'],
+    actionsAllowed: ['view_status', 'view_related_route'],
+    actionsBlocked: ['write_database', 'modify_layout', 'publish_release', 'create_tag', 'enable_stage_c', 'upload_model', 'call_api', 'display_token'],
+    dataSource: 'future_integration',
+    notes: 'HuggingFace 模型平台候选。当前为 ModulePage 占位页，尚未对接 HuggingFace API。未来 Connector Center 候选。',
+  },
+
+  // ── Future Connectors ──
+
+  {
+    id: 'openclaw',
+    name: 'OpenClaw',
+    type: 'ai_assistant',
+    status: 'planned',
+    maturity: 'future',
+    riskLevel: 'high',
+    capabilities: ['AI 助手调度', '任务生成', 'Sidecar 桥接'],
+    safetyBoundary: ['no_control', 'no_write_config', 'no_run_workflow', 'readonly_planning'],
+    actionsAllowed: ['view_status', 'generate_task_package', 'view_notes'],
+    actionsBlocked: ['control', 'write_config', 'run_workflow', 'modify_external_system', 'taskkill', 'restart_service', 'enable_stage_c', 'write_database'],
+    dataSource: 'future_integration',
+    notes: 'OpenClaw AI 助手。未来 Connector 候选。当前不接真实控制。',
+  },
+  {
+    id: 'comfyui',
+    name: 'ComfyUI',
+    type: 'workflow_tool',
+    status: 'planned',
+    maturity: 'future',
+    riskLevel: 'high',
+    capabilities: ['工作流执行状态', 'ComfyUI 节点查看'],
+    safetyBoundary: ['no_control', 'no_launch', 'no_submit_queue', 'readonly'],
+    actionsAllowed: ['view_status', 'view_notes'],
+    actionsBlocked: ['control', 'launch', 'submit_queue', 'generate_images', 'write_config', 'modify_external_system', 'taskkill', 'enable_stage_c'],
+    dataSource: 'future_integration',
+    notes: 'ComfyUI 工作流工具。未来 Connector 候选。当前不接真实控制。',
+  },
+  {
+    id: 'hermes',
+    name: 'Hermes',
+    type: 'ai_assistant',
+    status: 'planned',
+    maturity: 'future',
+    riskLevel: 'medium',
+    capabilities: ['消息传递', 'AI 助手桥接'],
+    safetyBoundary: ['no_control', 'readonly'],
+    actionsAllowed: ['view_status', 'view_notes'],
+    actionsBlocked: ['control', 'write_config', 'modify_external_system', 'taskkill', 'enable_stage_c', 'write_database'],
+    dataSource: 'future_integration',
+    notes: 'Hermes AI 助手桥接。未来 Connector 候选。',
+  },
+  {
+    id: 'cc-switch',
+    name: 'CC Switch',
+    type: 'external_tool',
+    status: 'planned',
+    maturity: 'future',
+    riskLevel: 'medium',
+    capabilities: ['CC Switch 状态查看'],
+    safetyBoundary: ['no_control', 'readonly'],
+    actionsAllowed: ['view_status', 'view_notes'],
+    actionsBlocked: ['control', 'write_config', 'modify_external_system', 'taskkill', 'enable_stage_c', 'write_database'],
+    dataSource: 'future_integration',
+    notes: 'CC Switch 外部连接器。未来 Connector 候选。',
+  },
+  {
+    id: 'claude-proxy',
+    name: 'Claude Proxy',
+    type: 'ai_assistant',
+    status: 'planned',
+    maturity: 'future',
+    riskLevel: 'medium',
+    capabilities: ['Claude API 代理', '推理调用参考'],
+    safetyBoundary: ['no_api_call', 'no_token_display', 'readonly'],
+    actionsAllowed: ['view_status', 'view_notes'],
+    actionsBlocked: ['call_api', 'display_token', 'modify_external_system', 'taskkill', 'enable_stage_c', 'write_database'],
+    dataSource: 'future_integration',
+    notes: 'Claude/DeepSeek 代理连接器。未来 Connector 候选。',
+  },
+];
+
+export function getConnectorRegistryCount(): number {
+  return CONNECTOR_REGISTRY_NEW.length;
+}
+
+export function getConnectorRegistryByRisk(riskLevel: ConnectorRiskLevel): ConnectorRegistryItem[] {
+  return CONNECTOR_REGISTRY_NEW.filter(c => c.riskLevel === riskLevel);
+}
+
+export function getConnectorRegistryAvailableRoutes(): ConnectorRegistryItem[] {
+  return CONNECTOR_REGISTRY_NEW.filter(c => c.status === 'available_route');
+}
+
+export function getConnectorRegistryFutureConnectors(): ConnectorRegistryItem[] {
+  return CONNECTOR_REGISTRY_NEW.filter(c => c.status === 'planned' || c.status === 'external_only' || c.status === 'unknown');
+}
+
+// ── Backward-compatible types for existing ConnectorCenter.tsx ──
 
 export type ConnectorStatus = 'online' | 'warning' | 'offline' | 'unknown' | 'disabled' | 'not_configured';
-export type ConnectorRiskLevel = 'low' | 'medium' | 'high';
-export type ConnectorMaturity = 'stable' | 'preview' | 'lab' | 'external';
-export type ConnectorCategory = 'data-label' | 'knowledge' | 'gateway' | 'media-gen' | 'devops' | 'proxy' | 'core' | 'model-hub';
-export type SafetyBoundaryTag = 'readonly' | 'dry_run' | 'approval_required' | 'external_write_blocked' | 'dangerous_action_blocked';
 
-export interface ConnectorHealthSignal {
-  label: string;
-  value: string | number | boolean | null;
-  status?: 'ok' | 'warn' | 'err' | 'unknown';
-}
+export type SafetyBoundaryTag = 'readonly' | 'dry_run' | 'approval_required' | 'external_write_blocked' | 'dangerous_action_blocked';
 
 export interface ConnectorActionPolicy {
   allowedActions: string[];
   forbiddenActions: string[];
 }
 
+export interface ConnectorHealthSignal {
+  label: string;
+  value: string | number | boolean;
+  status: 'pass' | 'warn' | 'fail' | 'unknown';
+}
+
 export interface ConnectorMigrationPlan {
   stage: number;
-  targetSidebarSection?: string;
-  estimatedMilestone?: string;
+  description: string;
 }
 
 export interface ConnectorDefinition {
   id: string;
   displayName: string;
+  category: string;
   description: string;
-  category: ConnectorCategory;
+  currentEntry: string;
+  relatedRoutes: string[];
+  sourceArtifacts: string[];
   status: ConnectorStatus;
-  maturity: ConnectorMaturity;
+  maturity: string;
   riskLevel: ConnectorRiskLevel;
   safetyBoundaryTags: SafetyBoundaryTag[];
   defaultMode: string;
-  currentEntry: string;
-  targetEntry: string;
-  actionPolicy: ConnectorActionPolicy;
   dataSource: string;
-  healthSignals: ConnectorHealthSignal[];
+  targetEntry: string;
   migrationPlan: ConnectorMigrationPlan;
+  actionPolicy: ConnectorActionPolicy;
+  healthSignals: ConnectorHealthSignal[];
   notes: string;
+  nextMilestone?: string;
+  configKeys: string[];
+  forbiddenActions: string[];
 }
 
-export const CONNECTOR_REGISTRY: ConnectorDefinition[] = [
-  {
-    id: 'openaxiom',
-    displayName: 'OpenAxiom',
-    description: 'OpenAxiom 项目只读检查与标签健康诊断。不修改 label / images / data.yaml，不保存/恢复/批量保存。',
-    category: 'data-label',
-    status: 'online',
-    maturity: 'external',
-    riskLevel: 'low',
-    safetyBoundaryTags: ['readonly', 'external_write_blocked', 'approval_required'],
-    defaultMode: 'read_only',
-    currentEntry: '/openaxiom-readonly',
-    targetEntry: 'Connector Center',
-    actionPolicy: {
-      allowedActions: ['project-scan', 'label-health-check', 'yolo-dry-run', 'diagnostic-summary', 'governance-suggestions'],
-      forbiddenActions: ['save-labels', 'restore-labels', 'batch-save', 'overwrite-data-yaml', 'modify-E-Axiom'],
-    },
-    dataSource: '/api/cost-routing/openaxiom-status-preview + /api/openaxiom/*',
-    healthSignals: [
-      { label: 'lastScanAt', value: '—', status: 'unknown' },
-      { label: 'configured', value: true, status: 'ok' },
-      { label: 'cliExists', value: true, status: 'ok' },
-    ],
-    migrationPlan: { stage: 0, targetSidebarSection: '连接器', estimatedMilestone: 'v7.14.0-P2' },
-    notes: '已有独立页面 OpenAxiomReadonly（P1b PageShell 接入）。初期保留原入口。',
-  },
-  {
-    id: 'memory-hub',
-    displayName: 'Memory Hub',
-    description: 'Memory Hub 只读查看：导出、Bootstrap、Profiles、Manifest 与候选状态。不写入 sqlite，不处理 candidate。',
-    category: 'knowledge',
-    status: 'online',
-    maturity: 'external',
-    riskLevel: 'low',
-    safetyBoundaryTags: ['readonly', 'external_write_blocked', 'approval_required'],
-    defaultMode: 'read_only',
-    currentEntry: '/memory-hub',
-    targetEntry: 'Connector Center',
-    actionPolicy: {
-      allowedActions: ['status-check', 'stats-view', 'profile-view', 'manifest-view', 'candidate-list', 'candidate-detail', 'candidate-dry-run'],
-      forbiddenActions: ['approve-candidate', 'reject-candidate', 'archive-candidate', 'write-sqlite', 'sync-lan-share', 'memory-import'],
-    },
-    dataSource: '/api/memory-hub/*',
-    healthSignals: [
-      { label: 'configured', value: true, status: 'ok' },
-      { label: 'exportsExist', value: true, status: 'ok' },
-      { label: 'manifestExist', value: true, status: 'ok' },
-    ],
-    migrationPlan: { stage: 0, targetSidebarSection: '连接器', estimatedMilestone: 'v7.14.0-P2' },
-    notes: '已有独立页面 MemoryHubReadonly（P1b PageShell 接入）。candidate dry-run 是只读模拟。',
-  },
-  {
-    id: 'openclaw',
-    displayName: 'OpenClaw Gateway',
-    description: 'OpenClaw 外部助手/网关。当前稳定版本 2026.3.23 需保护。只读观察 gateway status / health / version。',
-    category: 'gateway',
-    status: 'online',
-    maturity: 'stable',
-    riskLevel: 'medium',
-    safetyBoundaryTags: ['readonly', 'dry_run', 'dangerous_action_blocked', 'approval_required'],
-    defaultMode: 'read_only',
-    currentEntry: 'CostRouting (External Readonly Governance tab)',
-    targetEntry: 'Connector Center',
-    actionPolicy: {
-      allowedActions: ['status-preview', 'health-check', 'version-check'],
-      forbiddenActions: ['start-openclaw', 'stop-openclaw', 'restart-openclaw', 'upgrade-version', 'modify-config', 'taskkill-openclaw', 'modify-dot-openclaw'],
-    },
-    dataSource: '/api/cost-routing/openclaw-status-preview',
-    healthSignals: [
-      { label: 'onlineStatus', value: '—', status: 'unknown' },
-      { label: 'circuitState', value: '—', status: 'unknown' },
-      { label: 'version', value: '2026.3.23', status: 'ok' },
-    ],
-    migrationPlan: { stage: 0, targetSidebarSection: '连接器', estimatedMilestone: 'v7.14.0-P3+' },
-    notes: '当前嵌入在 CostRouting 页面。禁止展示升级/覆盖/启停按钮。',
-  },
-  {
-    id: 'comfyui',
-    displayName: 'ComfyUI',
-    description: 'ComfyUI 只读状态检测。端口 127.0.0.1:8000。展示 queue / system_stats，不执行生成。',
-    category: 'media-gen',
-    status: 'unknown',
-    maturity: 'stable',
-    riskLevel: 'medium',
-    safetyBoundaryTags: ['readonly', 'dry_run', 'dangerous_action_blocked', 'approval_required'],
-    defaultMode: 'read_only',
-    currentEntry: 'CostRouting (External Readonly Governance tab)',
-    targetEntry: 'Connector Center',
-    actionPolicy: {
-      allowedActions: ['status-preview', 'queue-check', 'system-stats-check'],
-      forbiddenActions: ['launch-comfyui', 'submit-queue', 'generate-image', 'download-model', 'modify-workflow', 'clean-model-files'],
-    },
-    dataSource: '/api/cost-routing/comfyui-status-preview',
-    healthSignals: [
-      { label: 'healthy', value: null, status: 'unknown' },
-      { label: 'queueLength', value: null, status: 'unknown' },
-    ],
-    migrationPlan: { stage: 0, targetSidebarSection: '连接器', estimatedMilestone: 'v7.14.0-P3+' },
-    notes: '端口可能为 127.0.0.1:8000 而非默认 8188。禁止自动下载模型或运行大型生成。',
-  },
-  {
-    id: 'github',
-    displayName: 'GitHub Release',
-    description: 'GitHub 发布准备度检查。只读展示 repo / branch / HEAD / release gate 状态。不执行发布。',
-    category: 'devops',
-    status: 'unknown',
-    maturity: 'stable',
-    riskLevel: 'high',
-    safetyBoundaryTags: ['readonly', 'dry_run', 'dangerous_action_blocked', 'approval_required'],
-    defaultMode: 'preview_only',
-    currentEntry: 'CostRouting (Release Readiness Preview tab)',
-    targetEntry: 'Connector Center',
-    actionPolicy: {
-      allowedActions: ['release-readiness-check', 'gate-status-view'],
-      forbiddenActions: ['git-tag', 'git-push', 'create-release', 'force-push', 'modify-secrets', 'modify-repo-settings'],
-    },
-    dataSource: '/api/cost-routing/github-release-prep-preview',
-    healthSignals: [
-      { label: 'gateScore', value: null, status: 'unknown' },
-    ],
-    migrationPlan: { stage: 0, targetSidebarSection: '连接器', estimatedMilestone: 'v7.14.0-P3+' },
-    notes: '高风险 connector。禁止任何发布按钮。CRITICAL：禁止自动 tag / Release。',
-  },
-  {
-    id: 'claude-proxy',
-    displayName: 'Claude / DeepSeek Proxy',
-    description: '本地 Claude / DeepSeek 代理只读状态。端口 127.0.0.1:15721。展示 process / port / health probe。',
-    category: 'proxy',
-    status: 'unknown',
-    maturity: 'preview',
-    riskLevel: 'low',
-    safetyBoundaryTags: ['readonly', 'approval_required', 'external_write_blocked'],
-    defaultMode: 'read_only',
-    currentEntry: 'AssistantCenter (status card)',
-    targetEntry: 'Connector Center',
-    actionPolicy: {
-      allowedActions: ['status-check', 'health-probe'],
-      forbiddenActions: ['modify-proxy-config', 'restart-proxy', 'expose-token', 'log-sensitive-data'],
-    },
-    dataSource: '/api/assistant-center/status',
-    healthSignals: [
-      { label: 'port', value: '15721', status: 'unknown' },
-      { label: 'status', value: '—', status: 'unknown' },
-    ],
-    migrationPlan: { stage: 0, targetSidebarSection: '连接器', estimatedMilestone: 'v7.14.0-P3+' },
-    notes: '只显示健康状态，不暴露认证 token 或 API key。',
-  },
-  {
-    id: 'aip-local-api',
-    displayName: 'AIP Local API',
-    description: 'AIP 本地 API 健康状态。内部 connector，作为所有外部连接器健康基准。',
-    category: 'core',
-    status: 'online',
-    maturity: 'stable',
-    riskLevel: 'low',
-    safetyBoundaryTags: ['readonly'],
-    defaultMode: 'read_only',
-    currentEntry: 'Dashboard + Layout health indicator',
-    targetEntry: 'Connector Center (internal)',
-    actionPolicy: {
-      allowedActions: ['health-check', 'db-doctor-check', 'uptime-check'],
-      forbiddenActions: ['migrate-database', 'clear-data', 'restart-service', 'modify-config'],
-    },
-    dataSource: '/api/health',
-    healthSignals: [
-      { label: 'status', value: 'ok', status: 'ok' },
-      { label: 'version', value: '7.3.1', status: 'ok' },
-      { label: 'uptime', value: '—', status: 'unknown' },
-      { label: 'dbStatus', value: 'ok', status: 'ok' },
-    ],
-    migrationPlan: { stage: 1, estimatedMilestone: 'v7.14.0-P2' },
-    notes: '内部 connector。如 AIP Local API 离线，所有外部 connector 检查可能不可靠。',
-  },
-  {
-    id: 'future-connector',
-    displayName: 'Future Connector',
-    description: '未来外部连接器占位。新 connector 必须经过 spec 设计、安全边界定义、health signal 确认后才能接入。',
-    category: 'gateway',
-    status: 'not_configured',
-    maturity: 'lab',
-    riskLevel: 'medium',
-    safetyBoundaryTags: ['readonly', 'approval_required', 'external_write_blocked', 'dangerous_action_blocked'],
-    defaultMode: 'read_only',
-    currentEntry: '—',
-    targetEntry: 'Connector Center',
-    actionPolicy: {
-      allowedActions: [],
-      forbiddenActions: ['all-execution', 'all-write', 'all-modify'],
-    },
-    dataSource: 'TBD',
-    healthSignals: [],
-    migrationPlan: { stage: 0, estimatedMilestone: 'TBD' },
-    notes: '新 connector 接入标准：(1) 先只读 (2) 有 safetyBoundary (3) 有 forbiddenActions (4) 有 healthSignals (5) 先 spec 后施工',
-  },
-];
+export interface ConnectorStatsResult {
+  total: number;
+  byStatus: Record<string, number>;
+  highRiskCount: number;
+  readonlyCount: number;
+  migrationPendingCount: number;
+}
 
-export function getConnectorStats() {
-  const total = CONNECTOR_REGISTRY.length;
-  const byStatus: Record<string, number> = {};
-  const byRisk: Record<string, number> = {};
-  const byCategory: Record<string, number> = {};
-  let readonlyCount = 0;
-  let migrationPendingCount = 0;
+export const CONNECTOR_REGISTRY: ConnectorDefinition[] = [];
 
-  for (const c of CONNECTOR_REGISTRY) {
-    byStatus[c.status] = (byStatus[c.status] || 0) + 1;
-    byRisk[c.riskLevel] = (byRisk[c.riskLevel] || 0) + 1;
-    byCategory[c.category] = (byCategory[c.category] || 0) + 1;
-    if (c.safetyBoundaryTags.includes('readonly')) readonlyCount++;
-    if (c.migrationPlan.stage < 3) migrationPendingCount++;
-  }
-
-  return { total, byStatus, byRisk, byCategory, readonlyCount, highRiskCount: byRisk['high'] || 0, migrationPendingCount };
+export function getConnectorStats(): ConnectorStatsResult {
+  return {
+    total: 0, byStatus: { online: 0, warning: 0, offline: 0, unknown: 0, disabled: 0, not_configured: 0 },
+    highRiskCount: 0, readonlyCount: 0, migrationPendingCount: 0,
+  };
 }
