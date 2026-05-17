@@ -940,6 +940,10 @@ export function getNavigationExposureAdvancedCandidates(): NavigationExposureEnt
   return NAVIGATION_EXPOSURE_REGISTRY.filter(entry => entry.recommendedExposure === 'advanced_mode');
 }
 
+export function getNavigationExposurePlaceholderCandidates(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(entry => entry.recommendedExposure === 'advanced_mode');
+}
+
 export function getNavigationExposureAllowedNowFalseEntries(): NavigationExposureEntry[] {
   return NAVIGATION_EXPOSURE_REGISTRY.filter(entry => !entry.allowedNow);
 }
