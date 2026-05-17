@@ -351,6 +351,7 @@ function AppShell() {
                 <NavItem to="/governance-hub" icon="audit" label={t.nav.governanceHub} />
                 <NavItem to="/audit" icon="audit" label={t.nav.audit} />
                 <NavItem to="/feedback" icon="feedback" label={t.nav.feedback} />
+                <NavItem to="/advanced-mode-readonly" icon="audit" label={t.nav.advancedModeReadonly} />
               </>)}
             </div>
 

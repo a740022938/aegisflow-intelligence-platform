@@ -102,6 +102,23 @@ export const NAVIGATION_EXPOSURE_LEVELS: Record<NavigationExposureLevel, {
 };
 
 export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
+  // ── Advanced Mode Readonly (safe exposure pilot) ──
+  {
+    id: 'advanced-mode-readonly',
+    path: '/advanced-mode-readonly',
+    label: 'Advanced Mode Preview',
+    component: 'AdvancedModeReadonly',
+    currentExposure: 'primary_nav',
+    recommendedExposure: 'primary_nav',
+    recommendation: 'candidate_for_primary_nav',
+    risk: 'low',
+    gates: ['readonly_only', 'advanced_mode'],
+    reason: 'Safe entry exposure pilot. Readonly gate page only. Does not enable Advanced Mode, does not enable Stage C, does not expose high-risk functionality. Added to left menu as a controlled experiment.',
+    allowedNow: true,
+    source: 'layout',
+    notes: 'P3 exposed to left menu as safe entry pilot. Only readonly gate — no real execution, no Stage C, no Governance Center exposure.',
+  },
+
   // ── 概览 (3 items, from Layout) ──
   {
     id: 'dashboard',

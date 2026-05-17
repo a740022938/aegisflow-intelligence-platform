@@ -576,6 +576,18 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
         notes: '',
         currentNav: true,
       },
+      {
+        id: 'advanced-mode-readonly',
+        label: '高级模式预览',
+        labelKey: 'nav.advancedModeReadonly',
+        path: '/advanced-mode-readonly',
+        icon: 'audit',
+        maturity: 'preview',
+        riskLevel: 'low',
+        pageType: 'governance',
+        notes: '只读入口。不启用 Advanced Mode，不启用 Stage C，不提供真实执行能力。',
+        currentNav: true,
+      },
     ],
   },
 
