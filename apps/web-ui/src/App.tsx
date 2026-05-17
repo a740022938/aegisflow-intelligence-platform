@@ -32,6 +32,7 @@ const OpenAxiomReadonly = lazy(() => import('./pages/OpenAxiomReadonly'));
 const AssistantCenter = lazy(() => import('./pages/AssistantCenter'));
 const MemoryHubReadonly = lazy(() => import('./pages/MemoryHubReadonly'));
 const MenuGovernancePreview = lazy(() => import('./pages/MenuGovernancePreview'));
+const ConnectorCenter = lazy(() => import('./pages/ConnectorCenter'));
 
 function RouteFallback() {
   return (
@@ -128,6 +129,7 @@ const App: React.FC = () => {
             <Route path="memory-hub" element={<MemoryHubReadonly />} />
             <Route path="assistant-center" element={<AssistantCenter />} />
             <Route path="menu-governance-preview" element={<MenuGovernancePreview />} />
+            <Route path="connector-center" element={<ConnectorCenter />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
