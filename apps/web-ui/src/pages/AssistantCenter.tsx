@@ -11,6 +11,7 @@ import type {
   AssistantTaskPackageResponse,
 } from '../types/assistant-center';
 import { APP_VERSION } from '../constants/appVersion';
+import PageShell from '../components/ui/PageShell';
 
 const API = '/api/assistant-center';
 
@@ -188,20 +189,22 @@ export default function AssistantCenter() {
   }, [statusData]);
 
   return (
-    <div className="assistant-page">
-      <header className="assistant-header">
-        <div>
-          <p className="assistant-kicker">AIP {APP_VERSION}</p>
-          <h1>助手中心</h1>
-          <p className="assistant-subtitle">只读纳管 AIP、OpenClaw、Claude Proxy、OpenAxiom、报告、备份和安全边界。</p>
-        </div>
-        <div className="assistant-header-actions">
+    <PageShell
+      title="助手中心"
+      subtitle="汇总 AIP 本地服务、外部助手、只读检查、任务包与报告中心，辅助生成安全施工指令。"
+      versionLabel={`AIP ${APP_VERSION}`}
+      maturity="preview"
+      safetyBoundary="preview"
+      safetyText="预览与任务包模式 · 不自动执行修复 · 高风险操作需要人工确认"
+      actions={
+        <div style={{ display: 'flex', gap: 8 }}>
           <button className="assistant-primary-btn" type="button" onClick={loadReadonlyData} disabled={loading}>
             {loading ? '刷新中' : '刷新状态'}
           </button>
           <CopyButton text={diagnosticSummary} label="复制诊断摘要" />
         </div>
-      </header>
+      }
+    >
 
       {error && (
         <div className="assistant-error">
@@ -389,6 +392,6 @@ export default function AssistantCenter() {
           <div className="assistant-empty">暂无风险边界数据。</div>
         )}
       </Section>
-    </div>
+    </PageShell>
   );
 }
