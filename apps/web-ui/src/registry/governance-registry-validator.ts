@@ -161,6 +161,27 @@ export function validateGovernanceRegistry(): GovernanceRegistryValidationResult
     }
   }
 
+  // 17–20. Subtotal consistency checks
+  const summary = getGovernanceRegistrySummary();
+  const total = modules.length;
+  const subtotalStatus = Object.values(summary.byStatus).reduce((a: number, b: number) => a + b, 0);
+  const subtotalRisk = Object.values(summary.byRiskLevel).reduce((a: number, b: number) => a + b, 0);
+  const subtotalMaturity = Object.values(summary.byMaturity).reduce((a: number, b: number) => a + b, 0);
+  const subtotalOwner = Object.values(summary.byOwnerCenter).reduce((a: number, b: number) => a + b, 0);
+
+  if (subtotalStatus !== total) {
+    issues.push({ severity: 'blocking', message: `byStatus subtotal (${subtotalStatus}) !== total (${total})` });
+  }
+  if (subtotalRisk !== total) {
+    issues.push({ severity: 'blocking', message: `byRiskLevel subtotal (${subtotalRisk}) !== total (${total})` });
+  }
+  if (subtotalMaturity !== total) {
+    issues.push({ severity: 'blocking', message: `byMaturity subtotal (${subtotalMaturity}) !== total (${total})` });
+  }
+  if (subtotalOwner !== total) {
+    issues.push({ severity: 'blocking', message: `byOwnerCenter subtotal (${subtotalOwner}) !== total (${total})` });
+  }
+
   const blockingCount = issues.filter(i => i.severity === 'blocking').length;
   const warningCount = issues.filter(i => i.severity === 'warning').length;
   const infoCount = issues.filter(i => i.severity === 'info').length;
