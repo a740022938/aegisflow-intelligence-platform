@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { EmptyState, PageHeader, SectionCard, StatusBadge } from '../components/ui';
+import { EmptyState, SectionCard, StatusBadge } from '../components/ui';
+import PageShell from '../components/ui/PageShell';
 import '../components/ui/shared.css';
 import './CostRouting.css';
 import { roleClass } from '../theme/colorRoles';
@@ -1114,11 +1115,13 @@ export default function CostRoutingPage() {
   }, [selectedDecisionId]);
 
   return (
-    <div className="cost-routing-page page-root">
-      <PageHeader
-        title="AI Router Console / 成本路由策略台"
-        subtitle="AIP Core v7.3.1 · Cost Routing v7.12.3 · 当前为只读/预览模式，不执行真实操作、不写数据库、不调外部系统。no tag / no push / no release。"
-      />
+    <PageShell
+      title="AI Router Console / 成本路由中心"
+      subtitle="当前为只读/预览模式，不执行真实操作、不写数据库、不调外部系统。no tag / no push / no release。"
+      versionLabel="AIP Core v7.3.1 · Cost Routing v7.12.3"
+      safetyBoundary="preview"
+      safetyText="预览模式 · 不写入配置 · 需要人工确认"
+    >
 
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
@@ -2246,6 +2249,6 @@ export default function CostRoutingPage() {
 
       {error ? <div className="cost-routing-alert-error"><StatusBadge s="failed" /> {error}</div> : null}
       {msg ? <div className="cost-routing-alert-success"><StatusBadge s="success" /> {msg}</div> : null}
-    </div>
+    </PageShell>
   );
 }
