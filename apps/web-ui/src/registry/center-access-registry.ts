@@ -29,6 +29,19 @@ export type CenterAccessSidebarState = 'visible' | 'hidden_direct' | 'blocked';
 export type CenterAccessOperationalMode = 'readonly' | 'preview' | 'hold_review' | 'disabled';
 export type CenterAccessGroup = 'primary' | 'connector' | 'lab' | 'governance' | 'navigation';
 
+export type AccessLevel =
+  | 'primary_nav'
+  | 'advanced_nav'
+  | 'launchpad_card'
+  | 'related_link'
+  | 'direct_url_only'
+  | 'hidden_internal'
+  | 'deferred';
+
+export type ExposureStage = 'design' | 'pilot' | 'stable' | 'retired';
+export type ExposureDecision = 'approved' | 'hold' | 'rejected' | 'deferred';
+export type CenterMaturity = 'stable' | 'preview' | 'lab' | 'external' | 'hold_review';
+
 export interface CenterAccessQualityGate {
   readonly: boolean;
   noDbWrite: boolean;
@@ -62,6 +75,19 @@ export interface CenterAccessItem {
   statusBadges: string[];
   description: string;
   notes: string;
+  accessLevel: AccessLevel;
+  recommendedAccessLevel: AccessLevel;
+  launchpadVisible: boolean;
+  advancedHubVisible: boolean;
+  directUrlAllowed: boolean;
+  exposureStage: ExposureStage;
+  exposureDecision: ExposureDecision;
+  exposureReason: string;
+  targetContainer: string;
+  rollbackPlan: string;
+  userImpact: string;
+  maturity: CenterMaturity;
+  owner: string;
 }
 
 export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
@@ -90,6 +116,19 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     statusBadges: ['已入菜单', '当前可开放', 'ready'],
     description: '只读门控页面。当前是唯一已入左侧菜单的高级入口。展示导航曝光建议和中心访问信息。',
     notes: 'Advanced Mode Preview — 已入左侧菜单。只读。不启用 Stage C。',
+    accessLevel: 'primary_nav',
+    recommendedAccessLevel: 'primary_nav',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'stable',
+    exposureDecision: 'approved',
+    exposureReason: 'Readonly gate page. Entered sidebar as safe pilot in v7.16.0-P3.',
+    targetContainer: 'sidebar',
+    rollbackPlan: 'Remove NavItem from Layout.tsx, update 4 registry files.',
+    userImpact: 'Low — page is readonly, non-essential for daily work.',
+    maturity: 'preview',
+    owner: 'governance',
   },
   {
     id: 'connector-center-readonly',
@@ -116,6 +155,19 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     statusBadges: ['已入菜单', '当前可开放', 'preview_ready'],
     description: '只读连接器中心。展示 OpenAxiom、Memory Hub、Hugging Face 等外部工具状态。已入左侧菜单。',
     notes: 'Connector Center — 已入左侧菜单。hidden direct route。不接真实控制。P1 sidebar pilot.',
+    accessLevel: 'primary_nav',
+    recommendedAccessLevel: 'primary_nav',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'pilot',
+    exposureDecision: 'approved',
+    exposureReason: 'Sidebar pilot since v7.19.0-P1. Readonly, no real control, no external writes.',
+    targetContainer: 'sidebar',
+    rollbackPlan: 'Revert commit that added NavItem to Layout.tsx and update 4 registry files.',
+    userImpact: 'Medium — users rely on Connector Center for external tool status.',
+    maturity: 'preview',
+    owner: 'connector',
   },
   {
     id: 'lab-center-readonly',
@@ -142,6 +194,19 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     statusBadges: ['未入菜单', '当前不可开放', 'preview_ready'],
     description: '只读实验室中心。展示 Mahjong Debug 等实验工具状态。未入左侧菜单。',
     notes: 'Lab Center — 未入左侧菜单。hidden direct route。不运行训练/推理/标注。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'launchpad_card',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'Preview ready but not user-ready. Recommended to expose via Center Launchpad.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove from launchpad if needed.',
+    userImpact: 'Low — only used by advanced users for experimental debug.',
+    maturity: 'preview',
+    owner: 'lab',
   },
   {
     id: 'governance-center',
@@ -168,6 +233,19 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     statusBadges: ['未入菜单', '当前不可开放', 'hold_review'],
     description: '只读治理中心。展示 13 个治理模块、12 个门禁、风险边界。Stage C deferred。未入左侧菜单。',
     notes: 'Governance Center — 未入左侧菜单。readonly。Stage C deferred。不处理 candidate。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'launchpad_card',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'hold_review readiness. do_not_expose until Stage C disabled and human approval.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove from launchpad if needed.',
+    userImpact: 'Low — governance dashboard primarily for audit and monitoring.',
+    maturity: 'hold_review',
+    owner: 'governance',
   },
   {
     id: 'navigation-preview-readonly',
@@ -194,6 +272,19 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     statusBadges: ['未入菜单', '当前不可开放', 'preview_ready'],
     description: '只读导航预览。展示未来 Connector/Lab/Governance/Advanced 分组结构。未入左侧菜单。',
     notes: 'Navigation Preview — 未入左侧菜单。hidden direct route。不改变真实菜单。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: false,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'Preview non-essential. Keep hidden direct until Center Launchpad is ready.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove from launchpad if needed.',
+    userImpact: 'Very low — preview page only for navigation structure reference.',
+    maturity: 'preview',
+    owner: 'navigation',
   },
 ];
 
@@ -279,4 +370,114 @@ export function getCenterAccessConnectorStatusSummary(): {
     connectorAllowedNow: connector?.allowedNow ?? false,
     connectorReadiness: connector?.readiness ?? 'unknown',
   };
+}
+
+export function getCenterAccessSummary(): {
+  total: number;
+  byAccessLevel: Record<string, number>;
+  byRecommendedAccessLevel: Record<string, number>;
+  sidebarVisible: number;
+  launchpadVisible: number;
+  advancedHubVisible: number;
+  directUrlAllowed: number;
+  deferred: number;
+  highRiskPrimaryNav: number;
+} {
+  const byAccessLevel: Record<string, number> = {};
+  const byRecommendedAccessLevel: Record<string, number> = {};
+  for (const c of CENTER_ACCESS_REGISTRY) {
+    byAccessLevel[c.accessLevel] = (byAccessLevel[c.accessLevel] || 0) + 1;
+    byRecommendedAccessLevel[c.recommendedAccessLevel] = (byRecommendedAccessLevel[c.recommendedAccessLevel] || 0) + 1;
+  }
+  return {
+    total: CENTER_ACCESS_REGISTRY.length,
+    byAccessLevel,
+    byRecommendedAccessLevel,
+    sidebarVisible: CENTER_ACCESS_REGISTRY.filter(i => i.visibleInSidebar).length,
+    launchpadVisible: CENTER_ACCESS_REGISTRY.filter(i => i.launchpadVisible).length,
+    advancedHubVisible: CENTER_ACCESS_REGISTRY.filter(i => i.advancedHubVisible).length,
+    directUrlAllowed: CENTER_ACCESS_REGISTRY.filter(i => i.directUrlAllowed).length,
+    deferred: CENTER_ACCESS_REGISTRY.filter(i => i.recommendedAccessLevel === 'deferred' || i.exposureDecision === 'deferred').length,
+    highRiskPrimaryNav: CENTER_ACCESS_REGISTRY.filter(i => i.accessLevel === 'primary_nav' && i.risk === 'high').length,
+  };
+}
+
+export function getCenterAccessByAccessLevel(level: AccessLevel): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.accessLevel === level);
+}
+
+export function getCenterAccessByRecommendedAccessLevel(level: AccessLevel): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.recommendedAccessLevel === level);
+}
+
+export function getCenterAccessLaunchpadVisible(): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.launchpadVisible);
+}
+
+export function getCenterAccessAdvancedHubVisible(): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.advancedHubVisible);
+}
+
+export function getCenterAccessByExposureDecision(decision: ExposureDecision): CenterAccessItem[] {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.exposureDecision === decision);
+}
+
+export function getCenterAccessHighRiskPrimaryNavCount(): number {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.accessLevel === 'primary_nav' && i.risk === 'high').length;
+}
+
+export function getCenterAccessStageCPrimaryNavCount(): number {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.accessLevel === 'primary_nav' && i.blockedActions.includes('enable_stage_c')).length;
+}
+
+export interface CenterAccessValidationIssue {
+  centerId: string;
+  field: string;
+  severity: 'blocking' | 'warning' | 'info';
+  message: string;
+}
+
+export function validateCenterAccess(): CenterAccessValidationIssue[] {
+  const issues: CenterAccessValidationIssue[] = [];
+  for (const c of CENTER_ACCESS_REGISTRY) {
+    if (c.accessLevel === 'primary_nav' && c.risk === 'high') {
+      issues.push({ centerId: c.id, field: 'accessLevel', severity: 'blocking', message: 'High risk center must not have primary_nav access level.' });
+    }
+    if (c.recommendedAccessLevel === 'primary_nav' && c.risk === 'high') {
+      issues.push({ centerId: c.id, field: 'recommendedAccessLevel', severity: 'blocking', message: 'High risk center must not recommend primary_nav.' });
+    }
+    if (c.accessLevel === 'deferred' && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'Deferred center must not be visible in sidebar.' });
+    }
+    if (c.accessLevel === 'direct_url_only' && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'warning', message: 'direct_url_only center should not be visible in sidebar.' });
+    }
+    if (c.accessLevel === 'primary_nav' && !c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'warning', message: 'primary_nav center should be visible in sidebar.' });
+    }
+    if (c.launchpadVisible && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'launchpadVisible', severity: 'info', message: 'Center is both in sidebar and launchpad — verify if this is intentional.' });
+    }
+    if (!c.exposureReason) {
+      issues.push({ centerId: c.id, field: 'exposureReason', severity: 'blocking', message: 'exposureReason must be defined.' });
+    }
+    if (!c.rollbackPlan) {
+      issues.push({ centerId: c.id, field: 'rollbackPlan', severity: 'warning', message: 'rollbackPlan should be defined.' });
+    }
+    if (!c.userImpact) {
+      issues.push({ centerId: c.id, field: 'userImpact', severity: 'info', message: 'userImpact should be documented.' });
+    }
+    // Verify sidebar state consistency with layout
+    if (c.id === 'advanced-mode-readonly' || c.id === 'connector-center-readonly') {
+      if (!c.visibleInSidebar) {
+        issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: `${c.id} should be visible in sidebar per Layout.tsx.` });
+      }
+    }
+    if (c.id === 'lab-center-readonly' || c.id === 'governance-center' || c.id === 'navigation-preview-readonly') {
+      if (c.visibleInSidebar) {
+        issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: `${c.id} should NOT be visible in sidebar per current policy.` });
+      }
+    }
+  }
+  return issues;
 }

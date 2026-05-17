@@ -989,3 +989,106 @@ export function getNavigationExposureStats(): {
     allowedNowFalseCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => !e.allowedNow).length,
   };
 }
+
+export function getNavigationExposureSummary(): {
+  total: number;
+  primaryNavCount: number;
+  launchpadCandidateCount: number;
+  advancedHubVisibleCount: number;
+  deferredCount: number;
+  highRiskPrimaryNavCount: number;
+  stageCPrimaryNavCount: number;
+} {
+  return {
+    total: NAVIGATION_EXPOSURE_REGISTRY.length,
+    primaryNavCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav').length,
+    launchpadCandidateCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.recommendedExposure === 'advanced_mode' || e.recommendedExposure === 'lab_mode' || e.recommendedExposure === 'governance_center' || e.recommendedExposure === 'connector_center').length,
+    advancedHubVisibleCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.recommendedExposure === 'advanced_mode').length,
+    deferredCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.recommendedExposure === 'hidden_internal' || !e.allowedNow).length,
+    highRiskPrimaryNavCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav' && e.risk === 'high').length,
+    stageCPrimaryNavCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav' && e.gates.includes('stage_c_disabled')).length,
+  };
+}
+
+export function getPrimaryNavExposureItems(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav');
+}
+
+export function getLaunchpadCandidateItems(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(e =>
+    e.recommendedExposure === 'advanced_mode' ||
+    e.recommendedExposure === 'lab_mode' ||
+    e.recommendedExposure === 'governance_center' ||
+    e.recommendedExposure === 'connector_center'
+  );
+}
+
+export function getAdvancedHubVisibleItems(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.recommendedExposure === 'advanced_mode');
+}
+
+export function getDeferredExposureItems(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(e => !e.allowedNow || e.recommendedExposure === 'hidden_internal');
+}
+
+export function summarizeExposureRisk(): {
+  totalHighRisk: number;
+  highRiskExposed: number;
+  highRiskBlocked: number;
+  mediumRiskExposed: number;
+} {
+  const highRisk = NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.risk === 'high');
+  return {
+    totalHighRisk: highRisk.length,
+    highRiskExposed: highRisk.filter(e => e.currentExposure === 'primary_nav' || e.currentExposure === 'advanced_mode').length,
+    highRiskBlocked: highRisk.filter(e => !e.allowedNow).length,
+    mediumRiskExposed: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.risk === 'medium' && e.currentExposure === 'primary_nav').length,
+  };
+}
+
+export interface ExposureValidationIssue {
+  entryId: string;
+  field: string;
+  severity: 'blocking' | 'warning' | 'info';
+  message: string;
+}
+
+export function validateNavigationExposure(): ExposureValidationIssue[] {
+  const issues: ExposureValidationIssue[] = [];
+  for (const entry of NAVIGATION_EXPOSURE_REGISTRY) {
+    if (entry.currentExposure === 'primary_nav' && entry.risk === 'high') {
+      issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'High risk entry must not have primary_nav exposure.' });
+    }
+    if (entry.currentExposure === 'primary_nav' && entry.gates.includes('stage_c_disabled')) {
+      issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'Stage C gated entry must not have primary_nav exposure.' });
+    }
+    if (entry.currentExposure === 'hidden_internal' && entry.allowedNow) {
+      issues.push({ entryId: entry.id, field: 'allowedNow', severity: 'blocking', message: 'Deferred entry must not be allowedNow.' });
+    }
+    if (!entry.reason) {
+      issues.push({ entryId: entry.id, field: 'reason', severity: 'warning', message: 'reason should be defined.' });
+    }
+    // Verify known sidebar entries
+    if (entry.id === 'advanced-mode-readonly' || entry.id === 'connector-center-readonly') {
+      if (entry.currentExposure !== 'primary_nav') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: `${entry.id} should have currentExposure=primary_nav per Layout.tsx.` });
+      }
+    }
+    if (entry.id === 'lab-center-readonly') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'lab-center-readonly should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'governance-center') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'governance-center should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'navigation-preview-readonly') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'info', message: 'navigation-preview-readonly expected direct_route.' });
+      }
+    }
+  }
+  return issues;
+}
