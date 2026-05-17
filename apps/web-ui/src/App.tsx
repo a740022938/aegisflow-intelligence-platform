@@ -33,6 +33,7 @@ const AssistantCenter = lazy(() => import('./pages/AssistantCenter'));
 const MemoryHubReadonly = lazy(() => import('./pages/MemoryHubReadonly'));
 const MenuGovernancePreview = lazy(() => import('./pages/MenuGovernancePreview'));
 const ConnectorCenter = lazy(() => import('./pages/ConnectorCenter'));
+const LabCenter = lazy(() => import('./pages/LabCenter'));
 
 function RouteFallback() {
   return (
@@ -130,6 +131,7 @@ const App: React.FC = () => {
             <Route path="assistant-center" element={<AssistantCenter />} />
             <Route path="menu-governance-preview" element={<MenuGovernancePreview />} />
             <Route path="connector-center" element={<ConnectorCenter />} />
+            <Route path="lab-center" element={<LabCenter />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
