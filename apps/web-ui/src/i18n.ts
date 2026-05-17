@@ -41,6 +41,7 @@ export const translations = {
       audit: '审计',
       feedback: '回流池',
       advancedModeReadonly: '高级模式预览',
+      connectorCenterReadonly: '连接器中心',
       knowledgeCenter: '知识中心',
       standardOutput: '标准输出',
       // ── 新模块 ──
@@ -201,6 +202,7 @@ export const translations = {
       audit: 'Audit',
       feedback: 'Feedback Pool',
       advancedModeReadonly: 'Advanced Mode Preview',
+      connectorCenterReadonly: 'Connector Center',
       knowledgeCenter: 'Knowledge Center',
       standardOutput: 'Standard Output',
       // ── New modules ──

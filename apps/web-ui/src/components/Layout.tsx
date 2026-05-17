@@ -293,6 +293,7 @@ function AppShell() {
                 <NavItem to="/cost-routing" icon="route" label={t.nav.costRouting} />
                 <NavItem to="/openaxiom-readonly" icon="label" label={t.nav.openAxiomReadonly} />
                 <NavItem to="/memory-hub" icon="label" label={t.nav.memoryHubReadonly} />
+                <NavItem to="/connector-center-readonly" icon="route" label={t.nav.connectorCenterReadonly} />
               </>)}
             </div>
 
