@@ -18,6 +18,9 @@ import {
   getCenterAccessByReadiness,
   getCenterAccessSidebarCandidates,
   getCenterAccessFinalReadinessSummary,
+  getCenterAccessConnectorStatusSummary,
+  getCenterAccessSidebarVisibleCount,
+  getCenterAccessHiddenDirectCount,
 } from '../registry/center-access-registry';
 import {
   ADVANCED_PLACEHOLDER_REGISTRY,
@@ -131,6 +134,9 @@ export default function AdvancedModeReadonly() {
 
   const sidebarCandidates = useMemo(() => getCenterAccessSidebarCandidates(), []);
   const hiddenDirect = useMemo(() => centerItems.filter(c => !c.visibleInSidebar), [centerItems]);
+  const connectorStatus = useMemo(() => getCenterAccessConnectorStatusSummary(), []);
+  const sidebarVisibleCount = useMemo(() => getCenterAccessSidebarVisibleCount(), []);
+  const hiddenDirectCount = useMemo(() => getCenterAccessHiddenDirectCount(), []);
 
   return (
     <PageShell
@@ -161,8 +167,8 @@ export default function AdvancedModeReadonly() {
           <KpiCard label="预览就绪" value={String(readinessSummary.previewReady)} color="var(--warning)" />
           <KpiCard label="待复核" value={String(readinessSummary.holdReview)} color="var(--danger)" />
           <KpiCard label="已拦截" value={String(readinessSummary.blocked)} color="#6B7280" />
-          <KpiCard label="已入菜单" value={String(centerItems.filter(c => c.visibleInSidebar).length)} color="var(--success)" />
-          <KpiCard label="隐藏直达" value={String(hiddenDirect.length)} color="var(--warning)" />
+          <KpiCard label="已入菜单" value={String(sidebarVisibleCount)} color="var(--success)" />
+          <KpiCard label="隐藏直达" value={String(hiddenDirectCount)} color="var(--warning)" />
         </div>
         <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           {centerItems.map(c => <Badge key={c.id} label={`${c.name}: ${c.readiness}`} color={READINESS_COLORS[c.readiness] || '#6B7280'} />)}

@@ -14,6 +14,10 @@ export type ConnectorType =
 export type ConnectorMaturity = 'stable' | 'preview' | 'lab' | 'external' | 'future';
 export type ConnectorRiskLevel = 'low' | 'medium' | 'high';
 export type ConnectorRegistryStatus = 'available_route' | 'planned' | 'external_only' | 'unknown';
+export type ConnectorCategory = 'active' | 'future' | 'hold_review';
+export type ConnectorReadiness = 'ready' | 'preview_ready' | 'planned' | 'hold_review' | 'blocked';
+export type ConnectorExposure = 'sidebar' | 'advanced_hub' | 'hidden_direct' | 'future';
+export type ConnectorHealthLabel = 'ok' | 'watch' | 'unknown' | 'blocked';
 
 export interface ConnectorRegistryItem {
   id: string;
@@ -29,12 +33,19 @@ export interface ConnectorRegistryItem {
   actionsAllowed: string[];
   actionsBlocked: string[];
   dataSource: 'static_registry' | 'existing_page' | 'future_integration';
+  category: ConnectorCategory;
+  readiness: ConnectorReadiness;
+  exposure: ConnectorExposure;
+  healthLabel: ConnectorHealthLabel;
+  recommendedNextStep: string;
+  riskNotes: string[];
+  setupNotes: string[];
+  evidence: string[];
   notes: string;
 }
 
 export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
   // ── Active / Available Routes ──
-
   {
     id: 'openaxiom',
     name: 'OpenAxiom',
@@ -48,6 +59,14 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     actionsAllowed: ['view_status', 'view_report', 'view_related_route'],
     actionsBlocked: ['write_database', 'modify_label', 'save_restore', 'train_model', 'taskkill', 'enable_stage_c'],
     dataSource: 'existing_page',
+    category: 'active',
+    readiness: 'preview_ready',
+    exposure: 'sidebar',
+    healthLabel: 'ok',
+    recommendedNextStep: 'Keep readonly. Monitor label access patterns.',
+    riskNotes: [],
+    setupNotes: ['P1b 已接入 PageShell'],
+    evidence: ['apps/web-ui/src/pages/OpenAxiomReadonly.tsx'],
     notes: 'OpenAxiom 标注平台只读页。P1b PageShell migrated. 外部工具只读页，建议移至 connector 分组。',
   },
   {
@@ -63,6 +82,14 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     actionsAllowed: ['view_status', 'view_report', 'view_related_route'],
     actionsBlocked: ['write_database', 'modify_layout', 'approve_candidate', 'reject_candidate', 'archive_candidate', 'sync_lan_share', 'taskkill', 'restart_service', 'enable_stage_c'],
     dataSource: 'existing_page',
+    category: 'active',
+    readiness: 'preview_ready',
+    exposure: 'sidebar',
+    healthLabel: 'ok',
+    recommendedNextStep: 'Keep readonly. Monitor memory access patterns.',
+    riskNotes: [],
+    setupNotes: ['P1b 已接入 PageShell'],
+    evidence: ['apps/web-ui/src/pages/MemoryHubReadonly.tsx'],
     notes: 'Memory Hub 记忆存储只读页。P1b PageShell migrated. 外部工具只读页，建议移至 connector 分组。',
   },
   {
@@ -77,11 +104,18 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     actionsAllowed: ['view_status', 'view_related_route'],
     actionsBlocked: ['write_database', 'modify_layout', 'publish_release', 'create_tag', 'enable_stage_c', 'upload_model', 'call_api', 'display_token'],
     dataSource: 'future_integration',
+    category: 'active',
+    readiness: 'planned',
+    exposure: 'advanced_hub',
+    healthLabel: 'unknown',
+    recommendedNextStep: 'Plan HuggingFace API integration design. Do not expose token fields.',
+    riskNotes: ['External API integration risk', 'Token display risk'],
+    setupNotes: ['当前为 ModulePage 占位页', '需对接 HuggingFace API'],
+    evidence: ['apps/web-ui/src/pages/ModulePage.tsx (huggingface route)'],
     notes: 'HuggingFace 模型平台候选。当前为 ModulePage 占位页，尚未对接 HuggingFace API。未来 Connector Center 候选。',
   },
 
   // ── Future Connectors ──
-
   {
     id: 'openclaw',
     name: 'OpenClaw',
@@ -94,6 +128,14 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     actionsAllowed: ['view_status', 'generate_task_package', 'view_notes'],
     actionsBlocked: ['control', 'write_config', 'run_workflow', 'modify_external_system', 'taskkill', 'restart_service', 'enable_stage_c', 'write_database'],
     dataSource: 'future_integration',
+    category: 'future',
+    readiness: 'hold_review',
+    exposure: 'future',
+    healthLabel: 'unknown',
+    recommendedNextStep: 'Hold for review. Define OpenClaw safety boundary before any integration.',
+    riskNotes: ['High risk — AI assistant scheduling', 'Could trigger automated task execution'],
+    setupNotes: ['需定义 OpenClaw 桥接安全边界'],
+    evidence: [],
     notes: 'OpenClaw AI 助手。未来 Connector 候选。当前不接真实控制。',
   },
   {
@@ -108,6 +150,14 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     actionsAllowed: ['view_status', 'view_notes'],
     actionsBlocked: ['control', 'launch', 'submit_queue', 'generate_images', 'write_config', 'modify_external_system', 'taskkill', 'enable_stage_c'],
     dataSource: 'future_integration',
+    category: 'future',
+    readiness: 'hold_review',
+    exposure: 'future',
+    healthLabel: 'unknown',
+    recommendedNextStep: 'Hold for review. Define ComfyUI safety boundary before any integration.',
+    riskNotes: ['High risk — workflow execution', 'Could launch image generation pipelines'],
+    setupNotes: ['需定义 ComfyUI 安全边界'],
+    evidence: [],
     notes: 'ComfyUI 工作流工具。未来 Connector 候选。当前不接真实控制。',
   },
   {
@@ -122,6 +172,14 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     actionsAllowed: ['view_status', 'view_notes'],
     actionsBlocked: ['control', 'write_config', 'modify_external_system', 'taskkill', 'enable_stage_c', 'write_database'],
     dataSource: 'future_integration',
+    category: 'future',
+    readiness: 'planned',
+    exposure: 'future',
+    healthLabel: 'unknown',
+    recommendedNextStep: 'Plan Hermes integration design.',
+    riskNotes: ['Medium risk — message bridge exposed'],
+    setupNotes: ['需设计 Hermes 集成方案'],
+    evidence: [],
     notes: 'Hermes AI 助手桥接。未来 Connector 候选。',
   },
   {
@@ -136,6 +194,14 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     actionsAllowed: ['view_status', 'view_notes'],
     actionsBlocked: ['control', 'write_config', 'modify_external_system', 'taskkill', 'enable_stage_c', 'write_database'],
     dataSource: 'future_integration',
+    category: 'future',
+    readiness: 'planned',
+    exposure: 'future',
+    healthLabel: 'unknown',
+    recommendedNextStep: 'Plan CC Switch integration design.',
+    riskNotes: ['Medium risk — external switch control'],
+    setupNotes: ['需设计 CC Switch 集成方案'],
+    evidence: [],
     notes: 'CC Switch 外部连接器。未来 Connector 候选。',
   },
   {
@@ -150,6 +216,14 @@ export const CONNECTOR_REGISTRY_NEW: ConnectorRegistryItem[] = [
     actionsAllowed: ['view_status', 'view_notes'],
     actionsBlocked: ['call_api', 'display_token', 'modify_external_system', 'taskkill', 'enable_stage_c', 'write_database'],
     dataSource: 'future_integration',
+    category: 'future',
+    readiness: 'planned',
+    exposure: 'future',
+    healthLabel: 'unknown',
+    recommendedNextStep: 'Plan Claude Proxy integration design. Do not expose token fields.',
+    riskNotes: ['Medium risk — API proxy access', 'Token/key management risk'],
+    setupNotes: ['需配置 Claude API key (不存储在 registry)', '需设计代理安全边界'],
+    evidence: [],
     notes: 'Claude/DeepSeek 代理连接器。未来 Connector 候选。',
   },
 ];
@@ -170,65 +244,54 @@ export function getConnectorRegistryFutureConnectors(): ConnectorRegistryItem[] 
   return CONNECTOR_REGISTRY_NEW.filter(c => c.status === 'planned' || c.status === 'external_only' || c.status === 'unknown');
 }
 
-// ── Backward-compatible types for existing ConnectorCenter.tsx ──
-
-export type ConnectorStatus = 'online' | 'warning' | 'offline' | 'unknown' | 'disabled' | 'not_configured';
-
-export type SafetyBoundaryTag = 'readonly' | 'dry_run' | 'approval_required' | 'external_write_blocked' | 'dangerous_action_blocked';
-
-export interface ConnectorActionPolicy {
-  allowedActions: string[];
-  forbiddenActions: string[];
+export function getConnectorRegistryByCategory(category: ConnectorCategory): ConnectorRegistryItem[] {
+  return CONNECTOR_REGISTRY_NEW.filter(c => c.category === category);
 }
 
-export interface ConnectorHealthSignal {
-  label: string;
-  value: string | number | boolean;
-  status: 'pass' | 'warn' | 'fail' | 'unknown';
+export function getConnectorRegistryByReadiness(readiness: ConnectorReadiness): ConnectorRegistryItem[] {
+  return CONNECTOR_REGISTRY_NEW.filter(c => c.readiness === readiness);
 }
 
-export interface ConnectorMigrationPlan {
-  stage: number;
-  description: string;
+export function getConnectorRegistrySidebarReadyItems(): ConnectorRegistryItem[] {
+  return CONNECTOR_REGISTRY_NEW.filter(c => c.exposure === 'sidebar' || c.exposure === 'advanced_hub');
 }
 
-export interface ConnectorDefinition {
-  id: string;
-  displayName: string;
-  category: string;
-  description: string;
-  currentEntry: string;
-  relatedRoutes: string[];
-  sourceArtifacts: string[];
-  status: ConnectorStatus;
-  maturity: string;
-  riskLevel: ConnectorRiskLevel;
-  safetyBoundaryTags: SafetyBoundaryTag[];
-  defaultMode: string;
-  dataSource: string;
-  targetEntry: string;
-  migrationPlan: ConnectorMigrationPlan;
-  actionPolicy: ConnectorActionPolicy;
-  healthSignals: ConnectorHealthSignal[];
-  notes: string;
-  nextMilestone?: string;
-  configKeys: string[];
-  forbiddenActions: string[];
-}
-
-export interface ConnectorStatsResult {
-  total: number;
-  byStatus: Record<string, number>;
-  highRiskCount: number;
-  readonlyCount: number;
-  migrationPendingCount: number;
-}
-
-export const CONNECTOR_REGISTRY: ConnectorDefinition[] = [];
-
-export function getConnectorStats(): ConnectorStatsResult {
+export function getConnectorRegistryRiskSummary(): { total: number; low: number; medium: number; high: number } {
   return {
-    total: 0, byStatus: { online: 0, warning: 0, offline: 0, unknown: 0, disabled: 0, not_configured: 0 },
-    highRiskCount: 0, readonlyCount: 0, migrationPendingCount: 0,
+    total: CONNECTOR_REGISTRY_NEW.length,
+    low: CONNECTOR_REGISTRY_NEW.filter(c => c.riskLevel === 'low').length,
+    medium: CONNECTOR_REGISTRY_NEW.filter(c => c.riskLevel === 'medium').length,
+    high: CONNECTOR_REGISTRY_NEW.filter(c => c.riskLevel === 'high').length,
   };
+}
+
+export function getConnectorRegistryReadinessSummary(): { total: number; ready: number; previewReady: number; planned: number; holdReview: number; blocked: number } {
+  return {
+    total: CONNECTOR_REGISTRY_NEW.length,
+    ready: CONNECTOR_REGISTRY_NEW.filter(c => c.readiness === 'ready').length,
+    previewReady: CONNECTOR_REGISTRY_NEW.filter(c => c.readiness === 'preview_ready').length,
+    planned: CONNECTOR_REGISTRY_NEW.filter(c => c.readiness === 'planned').length,
+    holdReview: CONNECTOR_REGISTRY_NEW.filter(c => c.readiness === 'hold_review').length,
+    blocked: CONNECTOR_REGISTRY_NEW.filter(c => c.readiness === 'blocked').length,
+  };
+}
+
+// ── Backward-compatible exports for existing ConnectorCenter.tsx ──
+export type ConnectorStatus = 'online' | 'warning' | 'offline' | 'unknown' | 'disabled' | 'not_configured';
+export type SafetyBoundaryTag = 'readonly' | 'dry_run' | 'approval_required' | 'external_write_blocked' | 'dangerous_action_blocked';
+export interface ConnectorActionPolicy { allowedActions: string[]; forbiddenActions: string[] }
+export interface ConnectorHealthSignal { label: string; value: string | number | boolean; status: 'pass' | 'warn' | 'fail' | 'unknown' }
+export interface ConnectorMigrationPlan { stage: number; description: string }
+export interface ConnectorDefinition {
+  id: string; displayName: string; category: string; description: string; currentEntry: string;
+  relatedRoutes: string[]; sourceArtifacts: string[]; status: ConnectorStatus; maturity: string;
+  riskLevel: ConnectorRiskLevel; safetyBoundaryTags: SafetyBoundaryTag[]; defaultMode: string;
+  dataSource: string; targetEntry: string; migrationPlan: ConnectorMigrationPlan;
+  actionPolicy: ConnectorActionPolicy; healthSignals: ConnectorHealthSignal[]; notes: string;
+  nextMilestone?: string; configKeys: string[]; forbiddenActions: string[];
+}
+export interface ConnectorStatsResult { total: number; byStatus: Record<string, number>; highRiskCount: number; readonlyCount: number; migrationPendingCount: number }
+export const CONNECTOR_REGISTRY: ConnectorDefinition[] = [];
+export function getConnectorStats(): ConnectorStatsResult {
+  return { total: 0, byStatus: { online: 0, warning: 0, offline: 0, unknown: 0, disabled: 0, not_configured: 0 }, highRiskCount: 0, readonlyCount: 0, migrationPendingCount: 0 };
 }

@@ -186,3 +186,22 @@ export function getCenterAccessFinalReadinessSummary(): {
     blocked: CENTER_ACCESS_REGISTRY.filter(i => i.readiness === 'blocked').length,
   };
 }
+
+export function getCenterAccessSidebarVisibleCount(): number {
+  return CENTER_ACCESS_REGISTRY.filter(i => i.visibleInSidebar).length;
+}
+
+export function getCenterAccessHiddenDirectCount(): number {
+  return CENTER_ACCESS_REGISTRY.filter(i => !i.visibleInSidebar).length;
+}
+
+export function getCenterAccessConnectorStatusSummary(): {
+  connectorVisible: boolean; connectorAllowedNow: boolean; connectorReadiness: string;
+} {
+  const connector = CENTER_ACCESS_REGISTRY.find(i => i.kind === 'connector');
+  return {
+    connectorVisible: connector?.visibleInSidebar ?? false,
+    connectorAllowedNow: connector?.allowedNow ?? false,
+    connectorReadiness: connector?.readiness ?? 'unknown',
+  };
+}
