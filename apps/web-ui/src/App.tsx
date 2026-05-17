@@ -36,6 +36,7 @@ const ConnectorCenter = lazy(() => import('./pages/ConnectorCenter'));
 const LabCenter = lazy(() => import('./pages/LabCenter'));
 const RegistryRenderPreview = lazy(() => import('./pages/RegistryRenderPreview'));
 const MenuMoveDryRun = lazy(() => import('./pages/MenuMoveDryRun'));
+const GovernanceCenter = lazy(() => import('./pages/GovernanceCenter'));
 
 function RouteFallback() {
   return (
@@ -136,6 +137,7 @@ const App: React.FC = () => {
             <Route path="lab-center" element={<LabCenter />} />
             <Route path="registry-render-preview" element={<RegistryRenderPreview />} />
             <Route path="menu-move-dry-run" element={<MenuMoveDryRun />} />
+            <Route path="governance-center" element={<GovernanceCenter />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
