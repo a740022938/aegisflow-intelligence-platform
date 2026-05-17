@@ -889,6 +889,15 @@ export function getNavigationExposureAllowedNowFalseEntries(): NavigationExposur
   return NAVIGATION_EXPOSURE_REGISTRY.filter(entry => !entry.allowedNow);
 }
 
+export function getNavigationExposureGroupedByRecommendedLevel(): Record<string, NavigationExposureEntry[]> {
+  return NAVIGATION_EXPOSURE_REGISTRY.reduce<Record<string, NavigationExposureEntry[]>>((acc, entry) => {
+    const key = entry.recommendedExposure;
+    acc[key] = acc[key] ?? [];
+    acc[key].push(entry);
+    return acc;
+  }, {});
+}
+
 export function getNavigationExposureStats(): {
   total: number;
   byRecommendedLevel: Record<string, number>;
