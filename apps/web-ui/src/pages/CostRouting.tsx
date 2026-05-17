@@ -658,7 +658,7 @@ export default function CostRoutingPage() {
   const [policyName, setPolicyName] = useState('inference balanced policy');
   const [policyRouteType, setPolicyRouteType] = useState<RouteType>('local_balanced');
   const [policyPriority, setPolicyPriority] = useState(120);
-  const [policyReasonTpl, setPolicyReasonTpl] = useState('task_type={task_type}; route={route_type}; policy={policy_id}; rule={rule_kind}');
+  const [policyReasonTpl, setPolicyReasonTpl] = useState('匹配任务类型和路由策略的命中原因说明');
 
   const [simulateTaskType, setSimulateTaskType] = useState('training');
   const [simulateTaskId, setSimulateTaskId] = useState('sim-task-v640-001');
@@ -1117,13 +1117,13 @@ export default function CostRoutingPage() {
     <div className="cost-routing-page page-root">
       <PageHeader
         title="AI Router Console / 成本路由策略台"
-        subtitle="AIP Core v7.3.1 · Cost Routing v7.12.2 · 当前为只读/预览模式，不执行真实操作、不写数据库、不调外部系统。no tag / no push / no release。"
+        subtitle="AIP Core v7.3.1 · Cost Routing v7.12.3 · 当前为只读/预览模式，不执行真实操作、不写数据库、不调外部系统。no tag / no push / no release。"
       />
 
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>AIP Core v7.3.1 · Cost Routing v7.12.2 (preview_only)</b>
+          <b>AIP Core v7.3.1 · Cost Routing v7.12.3 (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -1147,7 +1147,7 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-          <b>v7.12.1 UX Compact Polish</b>
+          <b>v7.12.3 UX Sanity Hotfix</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">当前模式</span>
@@ -1598,6 +1598,11 @@ export default function CostRoutingPage() {
         </SectionCard>
 
         <SectionCard className={`role-card ${roleClass('exec')}`} title="路由矩阵">
+          {!practicalConfig?.route_matrix ? (
+            <div className="cost-routing-policy-meta" style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              暂无数据 / 选择任务后生成
+            </div>
+          ) : (
           <div className="cr-mini-table">
             {[
               ['低风险 + 省钱优先', 'text_inference', 'save_money'],
@@ -1616,6 +1621,7 @@ export default function CostRoutingPage() {
               );
             })}
           </div>
+          )}
           <div className="cr-template-desc">
             Pipeline：{(practicalConfig?.decision_pipeline || []).join(' -> ') || '加载中'}
           </div>
@@ -1648,7 +1654,11 @@ export default function CostRoutingPage() {
 
         <SectionCard className={`role-card ${roleClass('gov')}`} title="Case Matrix">
           <div className="cr-case-grid">
-            {(practicalConfig?.case_matrix || []).map((item) => (
+            {(practicalConfig?.case_matrix || []).length === 0 ? (
+              <div className="cost-routing-policy-meta" style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                暂无数据 / 选择任务后生成
+              </div>
+            ) : (practicalConfig?.case_matrix || []).map((item) => (
               <button className="cr-case-item" type="button" key={item.label} onClick={() => applyExample({
                 label: item.label,
                 mode: item.mode,
@@ -2091,8 +2101,8 @@ export default function CostRoutingPage() {
                     <button className="ui-btn" type="button" onClick={() => runOptimization('preview')} disabled={optimizing}>
                       {optimizing ? '计算中...' : '生成建议'}
                     </button>
-                    <button className="ui-btn ui-btn-primary" type="button" onClick={() => runOptimization('apply')} disabled={optimizing}>
-                      应用优化
+                    <button className="ui-btn ui-btn-primary" type="button" onClick={() => runOptimization('preview')} disabled={optimizing}>
+                      生成优化建议
                     </button>
                   </div>
                 </div>
