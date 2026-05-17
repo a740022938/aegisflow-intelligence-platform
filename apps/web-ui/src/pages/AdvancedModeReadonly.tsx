@@ -24,6 +24,12 @@ import {
   getCenterAccessQualityGateSummary,
   getCenterAccessBySidebarState,
   getCenterAccessByOperationalMode,
+  getCenterAccessSummary,
+  getCenterAccessLaunchpadVisible,
+  getCenterAccessAdvancedHubVisible,
+  getCenterAccessHighRiskPrimaryNavCount,
+  getCenterAccessStageCPrimaryNavCount,
+  validateCenterAccess,
 } from '../registry/center-access-registry';
 import {
   ADVANCED_PLACEHOLDER_REGISTRY,
@@ -46,6 +52,7 @@ import {
 } from '../registry/lab-registry';
 import {
   getNavigationExposureSafetySummary,
+  getNavigationExposureSummary,
 } from '../registry/navigation-exposure-registry';
 import type { NavigationExposureEntry, NavigationExposureLevel, NavigationExposureRisk } from '../registry/navigation-exposure-registry';
 import type { CenterAccessItem, CenterAccessKind, CenterAccessRisk } from '../registry/center-access-registry';
@@ -58,6 +65,16 @@ const RISK_COLORS: Record<string, string> = {
 const LEVEL_COLORS: Record<string, string> = {
   hidden_internal: '#6B7280', direct_route: '#8B5CF6', advanced_mode: '#F97316',
   lab_mode: '#3B82F6', connector_center: '#22C55E', governance_center: '#22C55E', primary_nav: 'var(--success)',
+};
+
+const ACCESS_LEVEL_LABELS: Record<string, string> = {
+  primary_nav: '主菜单', advanced_nav: '高级模式', launchpad_card: '启动台卡片',
+  related_link: '相关链接', direct_url_only: '仅 URL 直达', hidden_internal: '内部隐藏', deferred: '暂缓',
+};
+
+const ACCESS_LEVEL_COLORS: Record<string, string> = {
+  primary_nav: 'var(--success)', advanced_nav: '#F97316', launchpad_card: '#8B5CF6',
+  related_link: '#3B82F6', direct_url_only: '#6B7280', hidden_internal: '#6B7280', deferred: 'var(--danger)',
 };
 
 const CENTER_KIND_LABELS: Record<CenterAccessKind, string> = {
@@ -132,6 +149,30 @@ function EntryGroup({ title, entries }: { title: string; entries: NavigationExpo
   return <SectionCard title={`${title}（${entries.length}）`} style={{ marginBottom: 16 }}>{entries.map(e => <ExposureEntryRow key={e.id} entry={e} />)}</SectionCard>;
 }
 
+function LaunchpadCenterCard({ center }: { center: CenterAccessItem }) {
+  return <div style={{ padding: 12, borderRadius: 8, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderLeft: `3px solid ${RISK_COLORS[center.risk]}`, fontSize: 11, marginBottom: 8 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 4 }}>
+      <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 13 }}>{center.name}</span>
+      <Badge label={center.accessLevel} color={ACCESS_LEVEL_COLORS[center.accessLevel] || '#6B7280'} />
+      <Badge label={`→ ${center.recommendedAccessLevel}`} color={ACCESS_LEVEL_COLORS[center.recommendedAccessLevel] || '#6B7280'} />
+      <Badge label={center.risk} color={RISK_COLORS[center.risk]} />
+      {center.visibleInSidebar ? <Badge label="已入菜单" color="var(--success)" /> : <Badge label="未入菜单" color="var(--warning)" />}
+      {center.launchpadVisible && <Badge label="启动台可见" color="var(--success)" />}
+      {center.advancedHubVisible && <Badge label="高级中心可见" color="#F97316" />}
+    </div>
+    <div style={{ color: 'var(--text-secondary)', marginBottom: 2 }}>路由: {center.route} | owner: {center.owner} | maturity: {center.maturity}</div>
+    <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 2 }}>
+      {center.safetyBoundary.map(s => <Badge key={s} label={s} color="#6B7280" />)}
+    </div>
+    <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 2 }}>
+      <span style={{ color: 'var(--text-muted)' }}>qualityGate: </span>
+      {Object.entries(center.qualityGate).map(([k, v]) => <Badge key={k} label={`${k}=${v}`} color={v ? 'var(--success)' : 'var(--danger)'} />)}
+    </div>
+    <div style={{ marginTop: 2, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{center.exposureReason}</div>
+    <div style={{ marginTop: 2, color: 'var(--text-muted)', fontStyle: 'italic' }}>回滚: {center.rollbackPlan}</div>
+  </div>;
+}
+
 export default function AdvancedModeReadonly() {
   const stats = useMemo(() => getNavigationExposureStats(), []);
   const centerItems = useMemo(() => CENTER_ACCESS_REGISTRY, []);
@@ -168,6 +209,16 @@ export default function AdvancedModeReadonly() {
   const labFuture = useMemo(() => getLabFuture(), []);
   const labQuality = useMemo(() => getLabRegistryQualityGateSummary(), []);
   const safetySummary = useMemo(() => getNavigationExposureSafetySummary(), []);
+  const centerSummary = useMemo(() => getCenterAccessSummary(), []);
+  const launchpadVisible = useMemo(() => getCenterAccessLaunchpadVisible(), []);
+  const advancedHubVisible = useMemo(() => getCenterAccessAdvancedHubVisible(), []);
+  const highRiskPrimaryNav = useMemo(() => getCenterAccessHighRiskPrimaryNavCount(), []);
+  const stageCPrimaryNav = useMemo(() => getCenterAccessStageCPrimaryNavCount(), []);
+  const exposureSummary = useMemo(() => getNavigationExposureSummary(), []);
+  const validatorIssues = useMemo(() => validateCenterAccess(), []);
+  const validatorBlocking = useMemo(() => validatorIssues.filter(i => i.severity === 'blocking').length, [validatorIssues]);
+  const validatorWarning = useMemo(() => validatorIssues.filter(i => i.severity === 'warning').length, [validatorIssues]);
+  const validatorInfo = useMemo(() => validatorIssues.filter(i => i.severity === 'info').length, [validatorIssues]);
 
   return (
     <PageShell
@@ -233,6 +284,55 @@ export default function AdvancedModeReadonly() {
           <KpiCard label="Active" value={String(labActive.length)} color="var(--success)" />
           <KpiCard label="待复核" value={String(labHold.length)} color="var(--warning)" />
           <KpiCard label="Future" value={String(labFuture.length)} color="#6B7280" />
+        </div>
+      </SectionCard>
+
+      {/* ── A4. Center Launchpad Preview ── */}
+      <SectionCard title="中心入口预览 (Center Launchpad Preview)" style={{ marginBottom: 20, border: '1px solid var(--secondary)' }}>
+        <div style={{ padding: '6px 10px', marginBottom: 8, borderRadius: 4, background: 'rgba(139,92,246,0.08)', fontSize: 10, color: '#8B5CF6' }}>
+          当前中心入口策略预览。不改变 Layout，不改变左侧菜单，不新增 route，不移动菜单。
+        </div>
+        {/* Summary Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 10, marginBottom: 16 }}>
+          <KpiCard label="总中心" value={String(centerItems.length)} color="var(--primary)" />
+          <KpiCard label="已入菜单" value={String(centerSummary.sidebarVisible)} color="var(--success)" />
+          <KpiCard label="启动台可见" value={String(centerSummary.launchpadVisible)} color="#8B5CF6" />
+          <KpiCard label="高级中心可见" value={String(centerSummary.advancedHubVisible)} color="#F97316" />
+          <KpiCard label="高风险主菜单" value={String(centerSummary.highRiskPrimaryNav)} color={centerSummary.highRiskPrimaryNav > 0 ? 'var(--danger)' : 'var(--success)'} />
+          <KpiCard label="Stage C 主菜单" value={String(stageCPrimaryNav)} color={stageCPrimaryNav > 0 ? 'var(--danger)' : 'var(--success)'} />
+          <KpiCard label="Validator B/W/I" value={`${validatorBlocking}/${validatorWarning}/${validatorInfo}`} color={validatorBlocking > 0 ? 'var(--danger)' : validatorWarning > 0 ? 'var(--warning)' : 'var(--success)'} />
+        </div>
+        {/* Center Cards */}
+        {centerItems.map(c => <LaunchpadCenterCard key={c.id} center={c} />)}
+        {/* Access Level Matrix */}
+        <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>Access Level 矩阵</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 6, fontSize: 10 }}>
+            {Object.entries(ACCESS_LEVEL_LABELS).map(([level, label]) => {
+              const count = centerItems.filter(c => c.accessLevel === level).length;
+              return <div key={level} style={{ padding: '6px 8px', borderRadius: 4, background: count > 0 ? 'rgba(139,92,246,0.08)' : 'transparent', border: `1px solid ${count > 0 ? ACCESS_LEVEL_COLORS[level] : 'var(--border)'}` }}>
+                <div style={{ fontWeight: 600, color: ACCESS_LEVEL_COLORS[level], marginBottom: 2 }}>{label}</div>
+                <div style={{ color: 'var(--text-secondary)' }}>{level} — {count > 0 ? centerItems.filter(c => c.accessLevel === level).map(c => c.name).join(', ') : '无'}</div>
+              </div>;
+            })}
+          </div>
+        </div>
+        {/* Exposure Safety Notice */}
+        <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 4, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.7 }}>
+          <strong>只读安全声明：</strong><br />
+          本区块是<u>中心入口预览</u>，数据来源于 center-access-registry（只读元数据）。本区块不改变 Layout，不改变左侧菜单，不新增 route，不移动菜单，不启用 Stage C，不写 DB，不控制外部工具。
+        </div>
+        {/* Recommended Next Actions */}
+        <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>推荐下一步动作</div>
+          <ul style={{ margin: 0, paddingLeft: 16, fontSize: 10, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
+            <li>Connector Center — <strong>保持 primary_nav</strong>（已入菜单）</li>
+            <li>Advanced Mode — <strong>保持 primary_nav</strong>（已入菜单）</li>
+            <li>Lab Center — <strong>保持 launchpad_card</strong>（不入菜单）</li>
+            <li>Governance Center — <strong>保持 launchpad_card</strong>（不入菜单）</li>
+            <li>Navigation Preview — <strong>保持 direct_url_only</strong>（不入菜单）</li>
+            <li>Stage C — <strong>deferred</strong>（不启用）</li>
+          </ul>
         </div>
       </SectionCard>
 
