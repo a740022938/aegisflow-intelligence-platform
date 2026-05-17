@@ -936,6 +936,10 @@ export function getRouteAccessRecommendation(path: string): NavigationExposureEn
   return NAVIGATION_EXPOSURE_REGISTRY.find(entry => entry.path === path);
 }
 
+export function getNavigationExposureAdvancedCandidates(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(entry => entry.recommendedExposure === 'advanced_mode');
+}
+
 export function getNavigationExposureAllowedNowFalseEntries(): NavigationExposureEntry[] {
   return NAVIGATION_EXPOSURE_REGISTRY.filter(entry => !entry.allowedNow);
 }
