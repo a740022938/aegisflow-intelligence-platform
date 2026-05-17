@@ -884,3 +884,29 @@ export function getDisallowedEntries(): NavigationExposureEntry[] {
 export function getRouteAccessRecommendation(path: string): NavigationExposureEntry | undefined {
   return NAVIGATION_EXPOSURE_REGISTRY.find(entry => entry.path === path);
 }
+
+export function getNavigationExposureAllowedNowFalseEntries(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(entry => !entry.allowedNow);
+}
+
+export function getNavigationExposureStats(): {
+  total: number;
+  byRecommendedLevel: Record<string, number>;
+  byRisk: Record<string, number>;
+  highRiskCount: number;
+  allowedNowFalseCount: number;
+} {
+  const byRecommendedLevel: Record<string, number> = {};
+  const byRisk: Record<string, number> = {};
+  for (const entry of NAVIGATION_EXPOSURE_REGISTRY) {
+    byRecommendedLevel[entry.recommendedExposure] = (byRecommendedLevel[entry.recommendedExposure] || 0) + 1;
+    byRisk[entry.risk] = (byRisk[entry.risk] || 0) + 1;
+  }
+  return {
+    total: NAVIGATION_EXPOSURE_REGISTRY.length,
+    byRecommendedLevel,
+    byRisk,
+    highRiskCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.risk === 'high').length,
+    allowedNowFalseCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => !e.allowedNow).length,
+  };
+}
