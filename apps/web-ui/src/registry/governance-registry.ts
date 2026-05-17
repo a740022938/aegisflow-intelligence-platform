@@ -34,7 +34,7 @@ export interface GovernanceActionPolicy {
 export interface GovernanceGate {
   gateId: string;
   displayName: string;
-  status: 'pass' | 'fail' | 'warn' | 'pending' | 'unknown';
+  status: 'pass' | 'fail' | 'warn' | 'pending' | 'unknown' | 'deferred' | 'approval_required';
   source: string;
   blocking: boolean;
   lastKnownResult?: string;
@@ -148,6 +148,9 @@ export const GOVERNANCE_REGISTRY: GovernanceModuleDefinition[] = [
     writesExternalSystem: false,
     writesDatabase: false,
     migrationStage: 0,
+    gates: [
+      { gateId: 'menu_parity_gate', displayName: 'Menu Parity', status: 'pass', source: 'menu-parity-checker.ts', blocking: true, lastKnownResult: '0 blocking / 0 warning / 0 info', requiredBefore: [], failurePolicy: 'block', notes: 'MENU_REGISTRY vs Layout snapshot parity. All checks pass.' },
+    ],
     notes: 'P1 created. Parity pass: 0 blocking / 0 warning / 0 info.',
   },
 
@@ -174,6 +177,9 @@ export const GOVERNANCE_REGISTRY: GovernanceModuleDefinition[] = [
     writesExternalSystem: false,
     writesDatabase: false,
     migrationStage: 0,
+    gates: [
+      { gateId: 'render_preview_gate', displayName: 'Render Preview', status: 'pass', source: 'menu-render-preview.ts', blocking: true, lastKnownResult: '0 mismatch', requiredBefore: ['menu_parity_gate'], failurePolicy: 'block', notes: 'Layout snapshot matches registry render tree. No mismatch.' },
+    ],
     notes: 'P4 created. Stage B complete. Layout snapshot matches registry render (0 mismatch).',
   },
 
@@ -200,6 +206,9 @@ export const GOVERNANCE_REGISTRY: GovernanceModuleDefinition[] = [
     writesExternalSystem: false,
     writesDatabase: false,
     migrationStage: 0,
+    gates: [
+      { gateId: 'menu_move_dry_run_gate', displayName: 'Menu Move Dry-Run', status: 'pass', source: 'menu-move-dry-run.ts', blocking: true, lastKnownResult: '12/12 checks pass', requiredBefore: ['render_preview_gate'], failurePolicy: 'block', notes: 'Dry-run validated: MOVE_TO_LAB=13, MOVE_TO_CONNECTOR=2, MOVE_TO_GOVERNANCE=0.' },
+    ],
     notes: 'P5 created. Dry-run validated: 12/12 checks pass. MOVE_TO_LAB=13, MOVE_TO_CONNECTOR=2, MOVE_TO_GOVERNANCE=0.',
   },
 
@@ -226,6 +235,10 @@ export const GOVERNANCE_REGISTRY: GovernanceModuleDefinition[] = [
     writesExternalSystem: false,
     writesDatabase: false,
     migrationStage: 0,
+    gates: [
+      { gateId: 'smoke_gate', displayName: 'Smoke Test', status: 'pass', source: 'npm run test:smoke', blocking: true, lastKnownResult: 'pass (manual)', requiredBefore: ['code_quality_gate', 'typecheck_gate', 'build_gate'], failurePolicy: 'block', notes: 'Smoke test validates basic rendering and routing. Not automated in CI yet.' },
+      { gateId: 'db_doctor_gate', displayName: 'DB Doctor', status: 'pass', source: 'npm run db:doctor', blocking: false, lastKnownResult: 'pass (manual)', requiredBefore: ['build_gate'], failurePolicy: 'warn', notes: 'Database health check. Non-blocking but warns on failure.' },
+    ],
     notes: 'Gate info sourced from CostRouting console dashboard.',
   },
 
@@ -252,6 +265,9 @@ export const GOVERNANCE_REGISTRY: GovernanceModuleDefinition[] = [
     writesExternalSystem: true,
     writesDatabase: false,
     migrationStage: 0,
+    gates: [
+      { gateId: 'release_readiness_gate', displayName: 'Release Readiness', status: 'pass', source: 'GitHub release gate check', blocking: true, lastKnownResult: 'All release gates pass', requiredBefore: ['code_quality_gate', 'typecheck_gate', 'build_gate', 'secret_scan_gate', 'human_approval_gate'], failurePolicy: 'block', notes: 'Release readiness gate. Display only — no real release triggered from Governance Center.' },
+    ],
     notes: 'High risk. All release actions forbidden. Dry-run only. Connector Center reference.',
   },
 
@@ -278,6 +294,9 @@ export const GOVERNANCE_REGISTRY: GovernanceModuleDefinition[] = [
     writesExternalSystem: false,
     writesDatabase: false,
     migrationStage: 0,
+    gates: [
+      { gateId: 'human_approval_gate', displayName: 'Human Approval', status: 'approval_required', source: '/approvals page', blocking: true, lastKnownResult: 'Pending human approval', requiredBefore: [], failurePolicy: 'block', notes: 'Display only. No auto-approve from Governance Center. All approvals require human action via /approvals page.' },
+    ],
     notes: 'Approval gates display only. No real approve/reject execution from Governance Center.',
   },
 
@@ -304,6 +323,9 @@ export const GOVERNANCE_REGISTRY: GovernanceModuleDefinition[] = [
     writesExternalSystem: false,
     writesDatabase: false,
     migrationStage: 0,
+    gates: [
+      { gateId: 'stage_c_gate', displayName: 'Stage C Gate', status: 'deferred', source: 'governance-registry.ts', blocking: true, lastKnownResult: 'deferred', requiredBefore: ['release_readiness_gate', 'human_approval_gate', 'menu_move_dry_run_gate'], failurePolicy: 'block', notes: 'Stage C (Feature-flagged Layout Rendering) has not started. Must not auto-enable. Requires independent design review and human sign-off. Current page must not provide enable button.' },
+    ],
     notes: 'All flags default false. Stage C flag must remain deferred until separate design review.',
   },
 

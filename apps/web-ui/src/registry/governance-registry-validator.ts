@@ -9,7 +9,13 @@ const ALLOWED_STATUSES: GovernanceStatus[] = ['pass', 'warning', 'blocked', 'pen
 const ALLOWED_RISK_LEVELS: GovernanceRiskLevel[] = ['low', 'medium', 'high', 'critical'];
 const ALLOWED_OWNER_CENTERS: GovernanceOwnerCenter[] = ['governance', 'connector', 'lab', 'standalone', 'future'];
 const ALLOWED_TAGS: SafetyBoundaryTag[] = ['readonly', 'dry_run', 'approval_required', 'external_write_blocked', 'dangerous_action_blocked'];
-const STAGE_C_NOT_ALLOWED_STATUSES: GovernanceStatus[] = ['pass'];
+const ALLOWED_GATE_STATUSES: string[] = ['pass', 'fail', 'warn', 'pending', 'unknown', 'deferred', 'blocked', 'approval_required'];
+const ALLOWED_STAGE_C_STATUSES: string[] = ['deferred', 'blocked', 'pending_review', 'approval_required'];
+const REQUIRED_GATE_IDS: string[] = [
+  'code_quality_gate', 'typecheck_gate', 'build_gate', 'smoke_gate',
+  'db_doctor_gate', 'secret_scan_gate', 'menu_parity_gate', 'render_preview_gate',
+  'menu_move_dry_run_gate', 'release_readiness_gate', 'human_approval_gate', 'stage_c_gate',
+];
 
 export interface GovernanceRegistryIssue {
   severity: IssueSeverity;
@@ -128,14 +134,62 @@ export function validateGovernanceRegistry(): GovernanceRegistryValidationResult
     // This is a documentation-level check
   }
 
-  // 13. stage_c_gate must not be pass
-  const stageCGateModules = modules.filter(m => m.gates?.some(g => g.gateId === 'stage_c_gate'));
-  for (const mod of stageCGateModules) {
-    const gate = mod.gates!.find(g => g.gateId === 'stage_c_gate')!;
-    if (STAGE_C_NOT_ALLOWED_STATUSES.includes(gate.status as GovernanceStatus)) {
-      issues.push({ severity: 'blocking', moduleId: mod.moduleId, field: 'gates.stage_c_gate', message: 'stage_c_gate must not be pass. Must be deferred/blocked/pending_review/approval_required' });
+  // ── Gate validations ──
+  const allGates = modules.flatMap(m => m.gates || []);
+
+  // G1. Total gate count must be exactly 12
+  if (allGates.length !== 12) {
+    issues.push({ severity: 'blocking', message: `Total gate count is ${allGates.length}, expected 12` });
+  }
+
+  // G2. All required gateIds must be present
+  const existingGateIds = allGates.map(g => g.gateId);
+  for (const gid of REQUIRED_GATE_IDS) {
+    if (!existingGateIds.includes(gid)) {
+      issues.push({ severity: 'blocking', message: `Required gate "${gid}" is missing` });
     }
   }
+
+  // G3. Gate ID uniqueness across all modules
+  const uniqueGateIds = new Set(existingGateIds);
+  if (uniqueGateIds.size !== existingGateIds.length) {
+    issues.push({ severity: 'blocking', message: 'Duplicate gateId found across modules' });
+  }
+
+  // G4. All gate statuses must belong to allowed enum
+  for (const gate of allGates) {
+    if (!ALLOWED_GATE_STATUSES.includes(gate.status)) {
+      issues.push({ severity: 'blocking', field: `gates.${gate.gateId}`, message: `Invalid gate status "${gate.status}"` });
+    }
+  }
+
+  // G5–G7. stage_c_gate specific validations
+  const stageCGate = allGates.find(g => g.gateId === 'stage_c_gate');
+  if (!stageCGate) {
+    issues.push({ severity: 'blocking', message: 'stage_c_gate is not defined — must exist with deferred/blocked/pending_review/approval_required status' });
+  } else {
+    if (stageCGate.status === 'pass') {
+      issues.push({ severity: 'blocking', field: 'gates.stage_c_gate', message: 'stage_c_gate must not be pass. Must be deferred/blocked/pending_review/approval_required' });
+    }
+    if (!ALLOWED_STAGE_C_STATUSES.includes(stageCGate.status)) {
+      issues.push({ severity: 'blocking', field: 'gates.stage_c_gate', message: `stage_c_gate status "${stageCGate.status}" is not allowed. Must be deferred/blocked/pending_review/approval_required` });
+    }
+  }
+
+  // G8. release-readiness module must forbid publish_release
+  const rrModule = modules.find(m => m.moduleId === 'release-readiness');
+  if (rrModule && !rrModule.actionPolicy.forbiddenActions.includes('publish_release')) {
+    issues.push({ severity: 'blocking', moduleId: 'release-readiness', field: 'actionPolicy.forbiddenActions', message: 'release-readiness must include publish_release in forbiddenActions' });
+  }
+
+  // G9. human-approval-gates module must not allow approve/reject/archive in allowedActions
+  const haModule = modules.find(m => m.moduleId === 'human-approval-gates');
+  if (haModule && haModule.actionPolicy.allowedActions.some(a => a.startsWith('approve_') || a.startsWith('reject_') || a.startsWith('archive_'))) {
+    issues.push({ severity: 'blocking', moduleId: 'human-approval-gates', field: 'actionPolicy.allowedActions', message: 'human-approval-gates must not include approve/reject/archive in allowedActions' });
+  }
+
+  // G10. All gates must be display-only — no actionPolicy on gates
+  // (GovernanceGate has no actionPolicy field; enforcement is by interface definition)
 
   // 14. cost-routing currentEntry must be /cost-routing
   const cr = modules.find(m => m.moduleId === 'cost-routing');
