@@ -4,6 +4,7 @@ import SectionCard from '../components/ui/SectionCard';
 import StatusBadge from '../components/ui/StatusBadge';
 import { MENU_REGISTRY } from '../registry/menu-registry';
 import type { MenuRegistryItem } from '../registry/menu-registry';
+import { runMenuParityCheck } from '../registry/menu-parity-checker';
 
 // ── Governance action enum — DO NOT introduce MOVE_TO_GOVERNANCE here ──
 type GovernanceAction = 'KEEP' | 'RENAME' | 'MERGE' | 'MOVE_TO_LAB' | 'MOVE_TO_CONNECTOR_CENTER' | 'HIDE' | 'ARCHIVE_CANDIDATE';
@@ -264,6 +265,7 @@ export default function MenuGovernancePreview() {
   const placeholderCount = rows.filter(r => r.pageType === 'placeholder').length;
   const highRiskCount = rows.filter(r => r.riskLevel === 'high').length;
   const noDecisionCount = rows.filter(r => !GOVERNANCE[r.id]).length;
+  const parity = useMemo(() => runMenuParityCheck(), []);
 
   return (
     <PageShell
@@ -438,7 +440,84 @@ export default function MenuGovernancePreview() {
         </div>
       </SectionCard>
 
-      {/* ── 6. 44 vs 40 Explanation ── */}
+      {/* ── 6. Registry Parity Check ── */}
+      <SectionCard title="Registry Parity Check" style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 12, lineHeight: 1.7, color: 'var(--text-secondary)' }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+            {[
+              ['Layout Snapshot Sections', String(parity.snapshotSectionCount), 'var(--primary)'],
+              ['Layout Snapshot Items', String(parity.snapshotItemCount), 'var(--primary)'],
+              ['MENU_REGISTRY Sections', String(parity.registrySectionCount), 'var(--secondary)'],
+              ['MENU_REGISTRY Items', String(parity.registryItemCount), 'var(--secondary)'],
+              ['Overall Status', parity.overallStatus.toUpperCase(),
+                parity.overallStatus === 'pass' ? 'var(--success)' : parity.overallStatus === 'warning' ? 'var(--warning)' : 'var(--danger)'],
+              ['Blocking', String(parity.blockingCount), parity.blockingCount > 0 ? 'var(--danger)' : 'var(--success)'],
+              ['Warning', String(parity.warningCount), parity.warningCount > 0 ? 'var(--warning)' : 'var(--success)'],
+              ['Info', String(parity.infoCount), 'var(--text-muted)'],
+              ['MOVE_TO_GOVERNANCE', String(parity.governanceChecks.moveToGovernanceCount),
+                parity.governanceChecks.moveToGovernanceCount > 0 ? 'var(--danger)' : 'var(--success)'],
+              ['cost-routing', parity.governanceChecks.costRoutingAction,
+                parity.governanceChecks.costRoutingAction === 'KEEP' ? 'var(--success)' : 'var(--danger)'],
+            ].map(([label, value, color]) => (
+              <div key={String(label)} style={{
+                background: 'var(--bg-surface)', border: '1px solid var(--border)',
+                borderRadius: 6, padding: '10px 14px', textAlign: 'center', minWidth: 100,
+              }}>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2 }}>{label}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color }}>{value}</div>
+              </div>
+            ))}
+          </div>
+
+          {parity.mismatches.length > 0 && (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <th style={{ ...thStyle, width: 60 }}>Severity</th>
+                    <th style={thStyle}>Type</th>
+                    <th style={thStyle}>Section</th>
+                    <th style={thStyle}>Path</th>
+                    <th style={thStyle}>Layout</th>
+                    <th style={thStyle}>Registry</th>
+                    <th style={thStyle}>Message</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {parity.mismatches.map((m, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <td style={tdStyle}>
+                        <span style={{ color: m.severity === 'blocking' ? 'var(--danger)' : m.severity === 'warning' ? 'var(--warning)' : 'var(--text-muted)', fontWeight: 600 }}>
+                          {m.severity}
+                        </span>
+                      </td>
+                      <td style={tdStyle}>{m.type}</td>
+                      <td style={tdStyle}>{m.section || '—'}</td>
+                      <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: 10 }}>{m.path || '—'}</td>
+                      <td style={tdStyle}>{m.layoutValue || '—'}</td>
+                      <td style={tdStyle}>{m.registryValue || '—'}</td>
+                      <td style={{ ...tdStyle, color: 'var(--text-muted)', fontSize: 10, maxWidth: 300 }}>{m.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {parity.mismatches.length === 0 && (
+            <div style={{ padding: 16, textAlign: 'center', color: 'var(--success)', fontSize: 13 }}>
+              ✅ 完全一致 — 未发现任何 mismatch
+            </div>
+          )}
+
+          <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 4, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            <strong>说明：</strong>
+            当前 Layout 仍是真实菜单来源，MENU_REGISTRY 仍未接管真实菜单渲染。本检查只读，不会移动/隐藏/删除菜单，不会写数据库，不会启用 feature flag。
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* ── 7. 44 vs 40 Explanation ── */}
       <SectionCard title="44 vs 40 差异说明">
         <div style={{ fontSize: 12, lineHeight: 1.7, color: 'var(--text-secondary)' }}>
           <p><strong>问题：</strong>v7.13.0-preflight 证据快照报告左侧菜单为 <strong>44 项</strong>，但 P1f 源码提取确认为 <strong>40 项</strong>。</p>
