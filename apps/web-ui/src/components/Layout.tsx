@@ -235,7 +235,7 @@ function AppShell() {
               {!collapsed.has('overview') && (<>
                 <NavItem to="/" icon="dashboard" label={t.nav.dashboard} />
                 <NavItem to="/factory-status" icon="factory" label={t.nav.factoryStatus} />
-                <NavItem to="/assistant-center" icon="modules" label="助手中心" />
+                <NavItem to="/assistant-center" icon="modules" label={t.nav.assistantCenter} />
               </>)}
             </div>
 
@@ -291,8 +291,8 @@ function AppShell() {
                 <NavItem to="/plugin-pool" icon="api" label={t.nav.pluginPool} />
                 <NavItem to="/tasks" icon="tasks" label={t.nav.taskOrchestration} />
                 <NavItem to="/cost-routing" icon="route" label={t.nav.costRouting} />
-                <NavItem to="/openaxiom-readonly" icon="label" label="OpenAxiom 只读检查" />
-                <NavItem to="/memory-hub" icon="label" label="Memory Hub 只读查看" />
+                <NavItem to="/openaxiom-readonly" icon="label" label={t.nav.openAxiomReadonly} />
+                <NavItem to="/memory-hub" icon="label" label={t.nav.memoryHubReadonly} />
               </>)}
             </div>
 

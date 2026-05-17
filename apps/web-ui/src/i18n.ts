@@ -62,6 +62,10 @@ export const translations = {
       intentEngine: '意图引擎',
       systemStatus: '系统状态',
       apiDocs: 'API 文档',
+      // ── 新增页导航 ──
+      assistantCenter: '助手中心',
+      openAxiomReadonly: 'OpenAxiom 只读检查',
+      memoryHubReadonly: 'Memory Hub 只读查看',
       // ── 视觉实验室 ──
       mahjongDebug: '麻将视觉调试台',
     },
@@ -217,6 +221,10 @@ export const translations = {
       intentEngine: 'Intent Engine',
       systemStatus: 'System Status',
       apiDocs: 'API Docs',
+      // ── New pages ──
+      assistantCenter: 'Assistant Center',
+      openAxiomReadonly: 'OpenAxiom Readonly Check',
+      memoryHubReadonly: 'Memory Hub Readonly View',
       // ── Vision Lab ──
       mahjongDebug: 'Mahjong Debug Console',
     },
@@ -273,7 +281,7 @@ export const translations = {
       recentErrors: 'Recent Errors',
       recentActivity: 'Recent Activity',
       systemStats: 'System Stats',
-      quickAccess: '快速入口',
+      quickAccess: 'Quick Access',
       lastAction: 'Last Action',
       lastError: 'Last Error',
       circuitState: 'Circuit State',
