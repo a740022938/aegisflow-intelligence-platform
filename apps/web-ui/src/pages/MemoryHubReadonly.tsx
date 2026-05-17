@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../components/ui/shared.css';
+import PageShell from '../components/ui/PageShell';
 
 // ---- Types ----
 interface StatusData {
@@ -141,21 +142,14 @@ function MemoryHubReadonly() {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 960, margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 600 }}>Memory Hub</h1>
-        <span style={{
-          padding: '2px 8px', fontSize: 11, borderRadius: 4,
-          background: 'var(--warning)', color: '#000', fontWeight: 600,
-        }}>只读</span>
-      </div>
-
-      <div style={{
-        background: 'var(--bg-card)', border: '1px solid var(--warning)', borderRadius: 8,
-        padding: '10px 16px', marginBottom: 16, fontSize: 13, color: 'var(--warning)',
-      }}>
-        <strong>安全提示：</strong> 当前页面只读。AIP 不写 Memory Hub 数据库，不提交 candidate，不审批记忆。
-      </div>
+    <PageShell
+      title="Memory Hub 只读查看"
+      subtitle="查看 Memory Hub 导出、Bootstrap、Profiles、Manifest 与候选状态，不直接写入 sqlite。"
+      versionLabel="AIP Core v7.3.1"
+      maturity="external"
+      safetyBoundary="readonly"
+      safetyText="只读模式 · 不写入 Memory Hub sqlite · 不处理 candidate"
+    >
 
       {/* Status */}
       {card('状态', (
@@ -416,7 +410,7 @@ function MemoryHubReadonly() {
           <pre id="cand-detail-result" style={{ marginTop: 8, maxHeight: 500, overflow: 'auto', fontSize: 11, background: 'var(--bg-input)', padding: 12, borderRadius: 6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}></pre>
         </div>
       ))}
-    </div>
+    </PageShell>
   );
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { PageHeader, SectionCard, StatusBadge, EmptyState } from '../components/ui';
+import { SectionCard, StatusBadge, EmptyState } from '../components/ui';
+import PageShell from '../components/ui/PageShell';
 import '../components/ui/shared.css';
 
 interface ApiResponse {
@@ -324,19 +325,14 @@ function OpenAxiomReadonly() {
   useEffect(() => { loadHistory(1); loadStats(30); loadGovTasks(1); }, []);
 
   return (
-    <div style={{ padding: 16 }}>
-      <PageHeader title="OpenAxiom 只读检查" subtitle="AIP × OpenAxiom Readonly Integration" />
-
-      {/* Safety banner */}
-      <div style={{
-        background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-        borderRadius: 8, padding: '10px 16px', marginBottom: 16, fontSize: 12,
-        color: 'var(--text-secondary)', lineHeight: 1.6,
-      }}>
-        <strong style={{ color: 'var(--warning)' }}>当前模式: OpenAxiom 只读检查</strong><br />
-        允许保存: AIP 审计记录 · 禁止写入: label / images / data.yaml<br />
-        不会保存 label · 不会恢复 label · 不会批量覆盖 · 不会删除文件
-      </div>
+    <PageShell
+      title="OpenAxiom 只读检查"
+      subtitle="只读检查 OpenAxiom 项目、标签健康、YOLO dry-run 与治理建议，不修改 label 或模型文件。"
+      versionLabel="AIP Core v7.3.1"
+      maturity="external"
+      safetyBoundary="readonly"
+      safetyText="只读模式 · 不修改 label · 不执行保存/恢复/训练"
+    >
 
       {/* Tool cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 16, marginBottom: 16 }}>
@@ -852,7 +848,7 @@ function OpenAxiomReadonly() {
       }}>
         OpenAxiom 只读治理 · 允许写入 AIP 审计/任务记录 · 禁止写入 label / images / data.yaml · 所有治理任务需人工确认
       </div>
-    </div>
+    </PageShell>
   );
 }
 
