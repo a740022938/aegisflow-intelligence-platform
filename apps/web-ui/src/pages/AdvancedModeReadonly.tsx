@@ -224,7 +224,7 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="只读查看中心入口、隐藏路由与 Advanced placeholder 的曝光状态；本页面不启用高级模式，不改变导航。"
-      versionLabel="AIP v7.18.0-P2"
+      versionLabel="AIP v7.21.0-P4"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="只读总控 · 不改变菜单 · 不启用 Stage C · 不执行高风险动作"
@@ -307,12 +307,36 @@ export default function AdvancedModeReadonly() {
         {/* Access Level Matrix */}
         <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
           <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>Access Level 矩阵</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 6, fontSize: 10 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 10, fontSize: 10 }}>
+            <Badge label={`已对齐: ${centerItems.filter(c => c.accessLevel === c.recommendedAccessLevel).length}/${centerItems.length}`} color="var(--success)" />
+            <Badge label={`待迁移: ${centerItems.filter(c => c.accessLevel !== c.recommendedAccessLevel).length}/${centerItems.length}`} color="var(--warning)" />
+            <span style={{ color: 'var(--text-muted)', lineHeight: '20px' }}>
+              {centerItems.filter(c => c.accessLevel !== c.recommendedAccessLevel).map(c => c.name).join(', ') || '全部已对齐'}
+            </span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 6, fontSize: 10 }}>
             {Object.entries(ACCESS_LEVEL_LABELS).map(([level, label]) => {
-              const count = centerItems.filter(c => c.accessLevel === level).length;
-              return <div key={level} style={{ padding: '6px 8px', borderRadius: 4, background: count > 0 ? 'rgba(139,92,246,0.08)' : 'transparent', border: `1px solid ${count > 0 ? ACCESS_LEVEL_COLORS[level] : 'var(--border)'}` }}>
-                <div style={{ fontWeight: 600, color: ACCESS_LEVEL_COLORS[level], marginBottom: 2 }}>{label}</div>
-                <div style={{ color: 'var(--text-secondary)' }}>{level} — {count > 0 ? centerItems.filter(c => c.accessLevel === level).map(c => c.name).join(', ') : '无'}</div>
+              const current = centerItems.filter(c => c.accessLevel === level);
+              const recommended = centerItems.filter(c => c.recommendedAccessLevel === level);
+              if (current.length === 0 && recommended.length === 0) return null;
+              return <div key={level} style={{ padding: '8px', borderRadius: 4, border: `1px solid ${ACCESS_LEVEL_COLORS[level] || 'var(--border)'}`, background: 'rgba(139,92,246,0.04)' }}>
+                <div style={{ fontWeight: 600, color: ACCESS_LEVEL_COLORS[level], marginBottom: 4, fontSize: 12 }}>{label}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  <div>
+                    <div style={{ color: 'var(--text-muted)', marginBottom: 1, fontSize: 9 }}>当前 ({current.length})</div>
+                    {current.length > 0 ? current.map(c => {
+                      const diff = c.accessLevel !== c.recommendedAccessLevel;
+                      return <div key={c.id} style={{ padding: '1px 0', color: diff ? 'var(--warning)' : 'var(--success)', fontWeight: diff ? 600 : 400 }}>
+                        {c.name}{diff ? ' →' : ''}
+                      </div>;
+                    }) : <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>无</div>}
+                  </div>
+                  <div>
+                    <div style={{ color: 'var(--text-muted)', marginBottom: 1, fontSize: 9 }}>推荐 ({recommended.length})</div>
+                    {recommended.length > 0 ? recommended.map(c => <div key={c.id} style={{ color: '#8B5CF6' }}>{c.name}</div>)
+                      : <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>无</div>}
+                  </div>
+                </div>
               </div>;
             })}
           </div>
