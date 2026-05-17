@@ -3,19 +3,18 @@ import PageShell from '../components/ui/PageShell';
 import SectionCard from '../components/ui/SectionCard';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
-import type { GovernanceModuleDefinition, GovernanceStatus, GovernanceRiskLevel, SafetyBoundaryTag } from '../registry/governance-registry';
-import type { GovernanceRegistryIssue } from '../registry/governance-registry-validator';
+import type { GovernanceModuleDefinition } from '../registry/governance-registry';
 
 // ── Constants ──
 const VALIDATOR_EXPECTED = { modules: 13, gates: 12, blocking: 0, warning: 0 };
-const STATUS_COLORS: Record<string, string> = {
+
+const C: Record<string, string> = {
   pass: 'var(--success)', warning: 'var(--warning)', blocked: 'var(--danger)',
   pending_review: 'var(--secondary)', approval_required: '#F97316', dry_run_only: '#8B5CF6',
   disabled: '#6B7280', deferred: '#6B7280', unknown: 'var(--text-muted)',
-};
-const RISK_COLORS: Record<string, string> = { low: 'var(--success)', medium: 'var(--warning)', high: 'var(--danger)', critical: '#7C3AED' };
-const TAG_COLORS: Record<string, string> = {
-  readonly: 'var(--secondary)', dry_run: '#8B5CF6', approval_required: 'var(--warning)',
+  low: 'var(--success)', medium: 'var(--warning)', high: 'var(--danger)', critical: '#7C3AED',
+  stable: 'var(--success)', preview: 'var(--warning)', lab: 'var(--secondary)', external: '#8B5CF6',
+  readonly: 'var(--secondary)', dry_run: '#8B5CF6',
   external_write_blocked: 'var(--danger)', dangerous_action_blocked: 'var(--danger)',
 };
 
@@ -23,7 +22,7 @@ function Badge({ label, color }: { label: string; color?: string }) {
   return (
     <span style={{
       display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11,
-      fontWeight: 600, color: '#fff', background: color || 'var(--text-muted)',
+      fontWeight: 600, color: '#fff', background: color || '#6B7280',
       lineHeight: '16px', whiteSpace: 'nowrap',
     }}>{label}</span>
   );
@@ -38,48 +37,108 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
   );
 }
 
+function KpiCard({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
+      <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 2 }}>{label}</div>
+      <div style={{ fontSize: 18, fontWeight: 700, color }}>{value}</div>
+    </div>
+  );
+}
+
+// ── Module Card ──
 function ModuleCard({ mod }: { mod: GovernanceModuleDefinition }) {
   const [expanded, setExpanded] = React.useState(false);
+  const isHighRisk = mod.riskLevel === 'high' || mod.riskLevel === 'critical';
+  const needsApproval = mod.approvalRequired;
+  const isDangerous = mod.safetyBoundaryTags.includes('dangerous_action_blocked');
+  const writesExternally = mod.writesExternalSystem;
+
   return (
-    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 14 }}>
+    <div style={{
+      background: 'var(--bg-surface)', border: '1px solid var(--border)',
+      borderRadius: 8, padding: 14,
+      borderLeft: `3px solid ${isHighRisk ? 'var(--danger)' : needsApproval ? '#F97316' : 'var(--border)'}`,
+    }}>
+      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{mod.displayName}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{mod.displayName}</span>
+            {isHighRisk && <Badge label="HIGH RISK" color="var(--danger)" />}
+            {needsApproval && <Badge label="需要审批" color="#F97316" />}
+            {isDangerous && <Badge label="危险操作禁止" color="var(--danger)" />}
+            {writesExternally && <Badge label="外部写入禁止" color="var(--danger)" />}
+          </div>
           <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 1 }}>{mod.moduleId}</div>
         </div>
-        <div style={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <Badge label={mod.status} color={STATUS_COLORS[mod.status]} />
-          <Badge label={mod.riskLevel} color={RISK_COLORS[mod.riskLevel]} />
-          <Badge label={mod.maturity} color={mod.maturity === 'stable' ? 'var(--success)' : mod.maturity === 'preview' ? 'var(--warning)' : mod.maturity === 'lab' ? 'var(--secondary)' : '#8B5CF6'} />
+        <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <Badge label={mod.status} color={C[mod.status] || '#6B7280'} />
+          <Badge label={mod.riskLevel} color={C[mod.riskLevel] || '#6B7280'} />
+          <Badge label={mod.maturity} color={C[mod.maturity] || '#6B7280'} />
         </div>
       </div>
-      <div style={{ fontSize: 10, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 6 }}>{mod.description}</div>
+
+      {/* Description */}
+      <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 6 }}>{mod.description}</div>
+
+      {/* Tags row */}
       <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 6 }}>
-        {mod.safetyBoundaryTags.map(t => <Badge key={t} label={t} color={TAG_COLORS[t]} />)}
-        <Badge label={mod.ownerCenter} color="var(--text-muted)" />
+        {mod.safetyBoundaryTags.map(t => <Badge key={t} label={t} color={C[t] || '#6B7280'} />)}
+        <Badge label={mod.ownerCenter} color="#6B7280" />
         <Badge label={mod.category} color="var(--secondary)" />
       </div>
+
+      {/* Entry + flags */}
       <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>
         {mod.currentEntry !== '—' ? `入口: ${mod.currentEntry}` : '无独立入口'}
-        {mod.dryRunSupport && ' · dry-run'}{mod.approvalRequired && ' · 需审批'}{mod.writesExternalSystem && ' · 外写'}
+        <span style={{ marginLeft: 8 }}>
+          {mod.dryRunSupport && '🔹dry-run '}{mod.approvalRequired && '🔸需审批 '}{mod.writesExternalSystem && '🚫外写'}
+        </span>
       </div>
+
+      {/* Risk + approval warnings inline */}
+      {isHighRisk && (
+        <div style={{ padding: '4px 8px', marginBottom: 6, borderRadius: 4, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 10, color: 'var(--danger)' }}>
+          ⚠ 高风险模块 — 所有真实执行操作已被禁止。当前仅 dry-run / preview。
+        </div>
+      )}
+      {needsApproval && !isHighRisk && (
+        <div style={{ padding: '4px 8px', marginBottom: 6, borderRadius: 4, background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)', fontSize: 10, color: '#F97316' }}>
+          🔸 此模块中的部分操作需要人工审批，当前均为只读预览。
+        </div>
+      )}
+
       <button type="button" onClick={() => setExpanded(!expanded)}
         style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 10, color: 'var(--secondary)', padding: 0, fontFamily: 'inherit' }}>
-        {expanded ? '收起 ▲' : '展开 ▼'}
+        {expanded ? '收起详情 ▲' : '展开详情 ▼'}
       </button>
+
       {expanded && (
         <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>详情</div>
           <DetailRow label="relatedRoutes" value={mod.relatedRoutes.join(', ') || '—'} />
-          <DetailRow label="dryRun" value={mod.dryRunSupport ? '✅' : '❌'} />
-          <DetailRow label="approvalRequired" value={mod.approvalRequired ? '✅' : '❌'} />
-          <DetailRow label="writesDB" value={mod.writesDatabase ? '⚠️ YES' : '❌'} />
-          <DetailRow label="writesExternal" value={mod.writesExternalSystem ? '✅' : '❌'} />
-          <DetailRow label="migrationStage" value={String(mod.migrationStage)} />
-          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', marginTop: 6, marginBottom: 2 }}>禁止操作</div>
-          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-            {mod.actionPolicy.forbiddenActions.slice(0, 8).map(a => <Badge key={a} label={a} color="var(--danger)" />)}
-            {mod.actionPolicy.forbiddenActions.length > 8 && <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>+{mod.actionPolicy.forbiddenActions.length - 8}</span>}
+          <DetailRow label="sourceArtifacts" value={
+            mod.sourceArtifacts.length > 0
+              ? mod.sourceArtifacts.map(a => a.split('/').pop()).join(', ')
+              : <span style={{ color: 'var(--text-muted)' }}>未填写 (info)</span>
+          } />
+          <DetailRow label="dryRunSupport" value={mod.dryRunSupport ? '✅' : '❌'} />
+          <DetailRow label="approvalRequired" value={mod.approvalRequired ? '✅ 需要人工审批' : '❌'} />
+          <DetailRow label="writesDatabase" value={mod.writesDatabase ? '⚠️ BLOCKED — 禁止写数据库' : '❌ 未声明'} />
+          <DetailRow label="writesExternalSystem" value={mod.writesExternalSystem ? '🚫 BLOCKED — 禁止外部写入' : '❌'} />
+          <DetailRow label="migrationStage" value={`Stage ${mod.migrationStage}`} />
+
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', marginTop: 6, marginBottom: 2 }}>允许操作 (allowedActions)</div>
+          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 6 }}>
+            {mod.actionPolicy.allowedActions.map(a => <Badge key={a} label={a} color="var(--success)" />)}
           </div>
+
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>禁止操作 (forbiddenActions)</div>
+          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 6 }}>
+            {mod.actionPolicy.forbiddenActions.map(a => <Badge key={a} label={a} color="var(--danger)" />)}
+          </div>
+
           {mod.notes && <DetailRow label="备注" value={mod.notes} />}
         </div>
       )}
@@ -87,29 +146,112 @@ function ModuleCard({ mod }: { mod: GovernanceModuleDefinition }) {
   );
 }
 
-function GateBadge({ gate }: { gate: any }) {
-  const color = gate.status === 'pass' ? 'var(--success)' : gate.status === 'fail' ? 'var(--danger)' : gate.status === 'warn' ? 'var(--warning)' : 'var(--text-muted)';
+// ── Gate Card ──
+function GateCard({ gate }: { gate: any }) {
+  const color = gate.status === 'pass' ? 'var(--success)' : gate.status === 'fail' ? 'var(--danger)' : gate.status === 'warn' ? 'var(--warning)' : '#6B7280';
+  const isStageC = gate.gateId === 'stage_c_gate';
   return (
-    <div style={{ padding: '6px 10px', borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)', fontSize: 11 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-        <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{gate.displayName}</span>
+    <div style={{
+      padding: '8px 12px', borderRadius: 6,
+      background: 'var(--bg-surface)', border: `1px solid ${isStageC ? 'var(--warning)' : 'var(--border)'}`,
+      fontSize: 11, position: 'relative',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+        <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 11 }}>{gate.displayName}</span>
         <Badge label={gate.status} color={color} />
-        {gate.blocking && <span style={{ fontSize: 9, color: 'var(--danger)' }}>BLOCKING</span>}
+        {gate.blocking && <Badge label="BLOCKING" color="var(--danger)" />}
+        {isStageC && <Badge label="DEFERRED" color="var(--warning)" />}
       </div>
       <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{gate.source}</div>
-      {gate.lastKnownResult && <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{gate.lastKnownResult}</div>}
-      {gate.failurePolicy && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>failure: {gate.failurePolicy}</div>}
+      {gate.lastKnownResult && <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>结果: {gate.lastKnownResult}</div>}
+      {gate.requiredBefore && gate.requiredBefore.length > 0 && (
+        <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>前置: {gate.requiredBefore.join(', ')}</div>
+      )}
+      <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>失败策略: {gate.failurePolicy}</div>
+      {isStageC && (
+        <div style={{ marginTop: 4, padding: '4px 8px', borderRadius: 4, background: 'rgba(245,158,11,0.08)', fontSize: 10, color: 'var(--warning)' }}>
+          Stage C 尚未开始。本页面没有启用按钮。
+        </div>
+      )}
     </div>
   );
 }
 
+// ── Risk Summary Section ──
+function RiskSummarySection({ summary, modules }: { summary: any; modules: GovernanceModuleDefinition[] }) {
+  const groups: Record<string, string[]> = { critical: [], high: [], medium: [], low: [] };
+  for (const m of modules) { (groups[m.riskLevel] || groups['low']).push(m.displayName); }
+
+  return (
+    <SectionCard title="风险与安全边界汇总" style={{ marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 12 }}>
+        {[
+          ['Low', String(summary.byRiskLevel['low'] || 0), C.low],
+          ['Medium', String(summary.byRiskLevel['medium'] || 0), C.medium],
+          ['High', String(summary.byRiskLevel['high'] || 0), C.high],
+          ['Critical', String(summary.byRiskLevel['critical'] || 0), C.critical],
+          ['Approval Required', String(summary.approvalRequiredCount), '#F97316'],
+          ['External Write Blocked', String(summary.externalWriteBlockedCount), 'var(--danger)'],
+          ['Dangerous Action Blocked', String(summary.dangerousActionBlockedCount), 'var(--danger)'],
+          ['Dry-Run Only', String(summary.dryRunOnlyCount), '#8B5CF6'],
+        ].map(([label, value, color]) => (
+          <div key={String(label)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color, minWidth: 28 }}>{value}</span>
+            <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{label}</span>
+          </div>
+        ))}
+      </div>
+      {/* High/Critical list */}
+      {(groups['high'].length > 0 || groups['critical'].length > 0) && (
+        <div style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
+          <strong style={{ color: 'var(--danger)' }}>高风险/严重模块：</strong>
+          {[...groups['critical'], ...groups['high']].join('、')}
+          — 所有真实执行已被禁止，仅 dry-run / preview。
+        </div>
+      )}
+    </SectionCard>
+  );
+}
+
+// ── Forbidden Actions Matrix ──
+function ForbiddenActionsMatrix({ modules }: { modules: GovernanceModuleDefinition[] }) {
+  const allActions = Array.from(new Set(modules.flatMap(m => m.actionPolicy.forbiddenActions))).sort();
+  const criticalActions = ['write_database', 'modify_layout', 'move_real_menu', 'hide_real_menu', 'delete_menu',
+    'approve_candidate', 'reject_candidate', 'archive_candidate', 'sync_lan_share',
+    'taskkill', 'restart_service', 'publish_release', 'create_tag', 'force_push', 'enable_stage_c'];
+  const normalActions = allActions.filter(a => !criticalActions.includes(a));
+
+  return (
+    <SectionCard title="禁止操作矩阵" style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 8, fontSize: 11, color: 'var(--text-muted)' }}>
+        以下为所有治理模块的 forbiddenActions 汇总。这些动作在 Governance Center 中全部禁止展示为可执行按钮。
+        <strong style={{ color: 'var(--danger)' }}> 这不是权限系统 — 仅做治理展示。</strong>
+      </div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--danger)', marginBottom: 4 }}>关键禁止操作（15 项）</div>
+      <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 10 }}>
+        {criticalActions.map(a => <Badge key={a} label={a} color="var(--danger)" />)}
+      </div>
+      {normalActions.length > 0 && (
+        <>
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>其他禁止操作（{normalActions.length} 项）</div>
+          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+            {normalActions.map(a => <Badge key={a} label={a} color="var(--danger)" />)}
+          </div>
+        </>
+      )}
+      <div style={{ marginTop: 8, fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+        for biddenActions 是治理展示，不是权限系统。页面不会执行这些动作。
+      </div>
+    </SectionCard>
+  );
+}
+
+// ── Main ──
 export default function GovernanceCenter() {
   const summary = useMemo(() => getGovernanceRegistrySummary(), []);
   const validator = useMemo(() => validateGovernanceRegistry(), []);
 
-  const allGates = useMemo(() => {
-    return GOVERNANCE_REGISTRY.flatMap(m => m.gates || []);
-  }, []);
+  const allGates = useMemo(() => GOVERNANCE_REGISTRY.flatMap(m => m.gates || []), []);
 
   const selfCheck = useMemo(() => {
     const checks: Array<{ name: string; status: 'pass' | 'fail'; detail: string }> = [];
@@ -137,8 +279,8 @@ export default function GovernanceCenter() {
   return (
     <PageShell
       title="治理中心"
-      subtitle="AIP v7.15.0-P2 Governance Center Readonly Shell"
-      versionLabel="AIP v7.15.0-P2"
+      subtitle="AIP v7.15.0-P3 Governance Center — 只读治理态势面板"
+      versionLabel="AIP v7.15.0-P3"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="只读治理中心 · 不写数据库 · 不移动菜单 · 不启用 Stage C · 不处理 Memory Hub candidate · 不发 GitHub Release · 不执行外部写入 · 不做自动修复"
@@ -156,49 +298,48 @@ export default function GovernanceCenter() {
         </div>
       )}
 
-      {/* Overview Cards */}
+      {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
-        {[
-          ['Modules', String(summary.totalModules), 'var(--primary)'],
-          ['Gates', String(allGates.length), 'var(--secondary)'],
-          ['Validator', validator.pass ? 'PASS' : 'FAIL', validator.pass ? 'var(--success)' : 'var(--danger)'],
-          ['Blocking', String(validator.blockingCount), validator.blockingCount > 0 ? 'var(--danger)' : 'var(--success)'],
-          ['Warning', String(validator.warningCount), validator.warningCount > 0 ? 'var(--warning)' : 'var(--success)'],
-          ['Info', String(validator.infoCount), 'var(--text-muted)'],
-          ['ApprovalReq', String(summary.approvalRequiredCount), 'var(--warning)'],
-          ['HighRisk', String(summary.byRiskLevel['high'] || 0), 'var(--danger)'],
-          ['ExtWriteBlock', String(summary.externalWriteBlockedCount), 'var(--danger)'],
-          ['DangerBlock', String(summary.dangerousActionBlockedCount), 'var(--danger)'],
-        ].map(([label, value, color]) => (
-          <div key={String(label)} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
-            <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 2 }}>{label}</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color }}>{value}</div>
-          </div>
-        ))}
+        <KpiCard label="Modules" value={String(summary.totalModules)} color="var(--primary)" />
+        <KpiCard label="Gates" value={String(allGates.length)} color="var(--secondary)" />
+        <KpiCard label="Validator" value={validator.pass ? 'PASS' : 'FAIL'} color={validator.pass ? 'var(--success)' : 'var(--danger)'} />
+        <KpiCard label="Blocking" value={String(validator.blockingCount)} color={validator.blockingCount > 0 ? 'var(--danger)' : 'var(--success)'} />
+        <KpiCard label="Warning" value={String(validator.warningCount)} color={validator.warningCount > 0 ? 'var(--warning)' : 'var(--success)'} />
+        <KpiCard label="Info" value={String(validator.infoCount)} color="#6B7280" />
+        <KpiCard label="ApprovalReq" value={String(summary.approvalRequiredCount)} color="#F97316" />
+        <KpiCard label="HighRisk" value={String(summary.byRiskLevel['high'] || 0)} color="var(--danger)" />
+        <KpiCard label="ExtWriteBlock" value={String(summary.externalWriteBlockedCount)} color="var(--danger)" />
+        <KpiCard label="DangerBlock" value={String(summary.dangerousActionBlockedCount)} color="var(--danger)" />
       </div>
+
+      {/* Risk / Safety Summary */}
+      <RiskSummarySection summary={summary} modules={GOVERNANCE_REGISTRY} />
 
       {/* Governance Modules */}
       <SectionCard title="治理模块" style={{ marginBottom: 20 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: 12 }}>
           {GOVERNANCE_REGISTRY.map(m => <ModuleCard key={m.moduleId} mod={m} />)}
         </div>
       </SectionCard>
 
       {/* Gates Panel */}
       <SectionCard title="治理门禁" style={{ marginBottom: 20 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
-          {allGates.map(g => <GateBadge key={g.gateId} gate={g} />)}
+        <div style={{ marginBottom: 8, fontSize: 11, color: 'var(--text-muted)' }}>
+          共 {allGates.length} 个门禁 · blocking gate 失败时阻止进入下一阶段 · stage_c_gate 当前为 deferred，Stage C 未开始
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 8 }}>
+          {allGates.map(g => <GateCard key={g.gateId} gate={g} />)}
         </div>
       </SectionCard>
 
       {/* Validator Issues */}
       <SectionCard title="Validator Issues" style={{ marginBottom: 20 }}>
         {validator.issues.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, fontSize: 11 }}>
             {validator.issues.map((issue, i) => (
               <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'flex-start', padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
-                <Badge label={issue.severity} color={issue.severity === 'blocking' ? 'var(--danger)' : issue.severity === 'warning' ? 'var(--warning)' : 'var(--text-muted)'} />
-                <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--text-muted)' }}>{issue.moduleId || '—'}</span>
+                <Badge label={issue.severity} color={issue.severity === 'blocking' ? 'var(--danger)' : issue.severity === 'warning' ? 'var(--warning)' : '#6B7280'} />
+                <span style={{ fontFamily: 'monospace', fontSize: 10, color: '#6B7280' }}>{issue.moduleId || '—'}</span>
                 <span style={{ color: 'var(--text-secondary)' }}>{issue.field || ''}</span>
                 <span style={{ color: 'var(--text-primary)' }}>{issue.message}</span>
               </div>
@@ -210,13 +351,7 @@ export default function GovernanceCenter() {
       </SectionCard>
 
       {/* Forbidden Actions Matrix */}
-      <SectionCard title="禁止操作矩阵" style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-          {Array.from(new Set(GOVERNANCE_REGISTRY.flatMap(m => m.actionPolicy.forbiddenActions))).sort().map(a => (
-            <Badge key={a} label={a} color="var(--danger)" />
-          ))}
-        </div>
-      </SectionCard>
+      <ForbiddenActionsMatrix modules={GOVERNANCE_REGISTRY} />
 
       {/* Related Routes */}
       <SectionCard title="相关页面" style={{ marginBottom: 20 }}>
@@ -231,22 +366,24 @@ export default function GovernanceCenter() {
       </SectionCard>
 
       {/* Stage C Notice */}
-      <SectionCard title="Stage C 说明">
+      <SectionCard title="Stage C 说明" style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 12, lineHeight: 1.7, color: 'var(--text-secondary)' }}>
           <p><strong>Stage C（Feature-flagged Layout Rendering）尚未开始。</strong></p>
           <ul style={{ margin: '4px 0', paddingLeft: 20 }}>
-            <li>stage_c_gate status: <Badge label="deferred" color="#6B7280" /></li>
+            <li>stage_c_gate: <Badge label="deferred" color="#6B7280" /></li>
             <li>本页面没有启用 Stage C 的按钮</li>
-            <li>本页面不会改变 Layout</li>
-            <li>本页面不会改变左侧菜单</li>
+            <li>不会改变 Layout</li>
+            <li>不会改变左侧菜单</li>
           </ul>
         </div>
       </SectionCard>
 
-      {/* Safety footer */}
-      <div style={{ marginTop: 24, padding: '12px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-        <strong>安全边界：</strong>
-        Governance Center 是只读中枢。Governance Registry 是只读元数据。本页面不会写 DB、不会执行外部调用、不会处理 Memory Hub candidate、不会发布 GitHub Release、不会启用 Stage C、不会移动菜单、不会修改 Layout。
+      {/* Readonly Boundary Notice */}
+      <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
+        <strong>只读边界声明：</strong><br />
+        Governance Center 是<u>只读治理态势面板</u>。Governance Registry 是<u>只读元数据</u>。
+        本页面不会写数据库、不会执行外部调用、不会处理 Memory Hub candidate、不会发布 GitHub Release、不会启用 Stage C、不会移动菜单、不会修改 Layout。
+        forbiddenActions 是治理展示，不是权限系统。页面不会执行这些动作。
       </div>
     </PageShell>
   );
