@@ -41,6 +41,13 @@ import RollbackGateDesignSpec from '../components/governance/RollbackGateDesignS
 import RollbackPlanModel from '../components/governance/RollbackPlanModel';
 import DeploymentRollbackGuardrailMatrix from '../components/governance/DeploymentRollbackGuardrailMatrix';
 import DeploymentRollbackLifecycleDesign from '../components/governance/DeploymentRollbackLifecycleDesign';
+import EmergencyStopGateDesignSpec from '../components/governance/EmergencyStopGateDesignSpec';
+import EmergencyStopPolicyModel from '../components/governance/EmergencyStopPolicyModel';
+import EmergencyStopBoundaryMatrix from '../components/governance/EmergencyStopBoundaryMatrix';
+import AuditEvidenceGateDesignSpec from '../components/governance/AuditEvidenceGateDesignSpec';
+import AuditEvidenceRetentionMatrix from '../components/governance/AuditEvidenceRetentionMatrix';
+import EmergencyStopAuditGuardrailMatrix from '../components/governance/EmergencyStopAuditGuardrailMatrix';
+import EmergencyStopAuditLifecycleDesign from '../components/governance/EmergencyStopAuditLifecycleDesign';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -293,10 +300,10 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.23.0-P7"
+      versionLabel="AIP v7.23.0-P8"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -400,6 +407,10 @@ export default function GovernanceCenter() {
             { item: 'Rollback Gate design', pass: true, ev: 'design-only, no rollback/restore' },
             { item: 'Deployment evidence', pass: true, ev: 'design-only, no runtime' },
             { item: 'Deploy/Rollback guardrails', pass: true, ev: 'all activeRisk=0' },
+            { item: 'Emergency Stop Gate', pass: true, ev: 'design-only, no stop/kill/restart' },
+            { item: 'Emergency Stop boundary', pass: true, ev: 'all stop/pause/kill=no' },
+            { item: 'Audit Evidence Gate', pass: true, ev: 'design-only, no write/upload/export' },
+            { item: 'Emergency/Audit guardrails', pass: true, ev: 'all activeRisk=0' },
           ].map(r => (
             <div key={r.item} style={{ display: 'grid', gridTemplateColumns: '1.5fr 60px 2fr', gap: 8, padding: '5px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.02)', alignItems: 'center' }}>
               <span style={{ color: 'var(--text-primary)' }}>{r.item}</span>
@@ -444,6 +455,13 @@ export default function GovernanceCenter() {
             { label: 'Deploy boundary rows', value: '7', color: '#F97316' },
             { label: 'Deploy evidence types', value: '10', color: '#F97316' },
             { label: 'Deploy/rollback stages', value: '10', color: '#F97316' },
+            { label: 'Emergency stop fields', value: '11', color: '#EF4444' },
+            { label: 'Emergency policies', value: '10', color: '#EF4444' },
+            { label: 'Emergency boundary rows', value: '7', color: '#EF4444' },
+            { label: 'Audit evidence fields', value: '11', color: '#3B82F6' },
+            { label: 'Evidence retention rows', value: '8', color: '#3B82F6' },
+            { label: 'Emergency/audit guardrails', value: '8', color: '#EF4444' },
+            { label: 'Emergency/audit stages', value: '11', color: '#EF4444' },
           ].map(k => (
             <div key={k.label} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px', textAlign: 'center' }}>
               <div style={{ fontSize: 8, color: 'var(--text-muted)', marginBottom: 1 }}>{k.label}</div>
@@ -482,6 +500,11 @@ export default function GovernanceCenter() {
             { gate: 'Deployment Boundary', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'gated', evidence: 'deploy boundary', stage: 'deferred' },
             { gate: 'Rollback Plan Model', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'none', evidence: 'restore+verification', stage: 'deferred' },
             { gate: 'Deploy/Rollback Guardrail', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'none', evidence: 'activeRisk=0', stage: 'deferred' },
+            { gate: 'Emergency Stop Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'none', evidence: 'stop plan', stage: 'deferred' },
+            { gate: 'Emergency Stop Policy', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'none', evidence: 'policy model', stage: 'deferred' },
+            { gate: 'Emergency Stop Boundary', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'none', evidence: 'boundary matrix', stage: 'deferred' },
+            { gate: 'Audit Evidence Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'none', evidence: 'evidence model', stage: 'deferred' },
+            { gate: 'Audit Evidence Retention', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'none', evidence: 'retention matrix', stage: 'deferred' },
           ].map(r => (
             <div key={r.gate} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 70px 60px 60px 80px 1.2fr 80px', gap: 8, padding: '5px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.02)', alignItems: 'center' }}>
               <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{r.gate}</span>
@@ -642,6 +665,36 @@ export default function GovernanceCenter() {
         <DeploymentRollbackLifecycleDesign />
       </SectionCard>
 
+      {/* ── v7.23.0-P8 Emergency Stop Gate + Audit Evidence Gate Design Spec Sections ── */}
+
+      <SectionCard title="Emergency Stop Gate Design Spec" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <EmergencyStopGateDesignSpec />
+      </SectionCard>
+
+      <SectionCard title="Emergency Stop Policy Model" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <EmergencyStopPolicyModel />
+      </SectionCard>
+
+      <SectionCard title="Emergency Stop Boundary Matrix" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <EmergencyStopBoundaryMatrix />
+      </SectionCard>
+
+      <SectionCard title="Audit Evidence Gate Design Spec" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <AuditEvidenceGateDesignSpec />
+      </SectionCard>
+
+      <SectionCard title="Audit Evidence Model / Retention Matrix" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <AuditEvidenceRetentionMatrix />
+      </SectionCard>
+
+      <SectionCard title="Emergency Stop + Audit Guardrail Matrix" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <EmergencyStopAuditGuardrailMatrix />
+      </SectionCard>
+
+      <SectionCard title="Emergency Stop + Audit Lifecycle Design" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <EmergencyStopAuditLifecycleDesign />
+      </SectionCard>
+
       {/* Related Routes */}
       <SectionCard title="Related Pages" style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 12, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
@@ -657,7 +710,7 @@ export default function GovernanceCenter() {
       {/* Readonly Boundary Notice */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
         <strong>Readonly boundary notice:</strong><br />
-        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, rollback, restore, sync LAN_SHARE, restart services, or enable Stage C. All <code>forbiddenActions</code> are governance display, not a permission system.
+        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, rollback, restore, emergency stop, pause, kill, taskkill, restart, disable, shutdown, sync LAN_SHARE, restart services, write/upload/export audit evidence, or enable Stage C. All <code>forbiddenActions</code> are governance display, not a permission system.
       </div>
     </PageShell>
   );

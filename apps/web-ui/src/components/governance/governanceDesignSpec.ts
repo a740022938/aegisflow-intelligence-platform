@@ -864,3 +864,178 @@ export const EXECUTION_LIFECYCLE_STAGES: ExecutionLifecycleStage[] = [
   { stage: 'Audit record required', purpose: '需要审计记录', status: 'design-only' },
   { stage: 'Closure review', purpose: '关闭审查', status: 'design-only' },
 ];
+
+// ── P8: Emergency Stop Gate Design Fields ──
+
+export interface EmergencyStopField {
+  field: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  stopPermission: string;
+  serviceControl: string;
+  taskkillPath: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const EMERGENCY_STOP_DESIGN_FIELDS: EmergencyStopField[] = [
+  { field: 'EmergencyStopRequest', purpose: '紧急停止请求 — 记录停止操作的详情', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no stop/pause/kill/taskkill/restart', futureRequirement: '人工提交紧急停止请求' },
+  { field: 'StopScope', purpose: '停止范围 — 定义停止操作影响哪些系统', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no stop/pause/kill/restart', futureRequirement: '范围选择+影响预估' },
+  { field: 'StopTarget', purpose: '停止目标 — 定义停止的具体服务/进程', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no process stop/kill', futureRequirement: '目标选择+确认' },
+  { field: 'StopReason', purpose: '停止原因 — 记录停止操作的理由', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no stop without reason', futureRequirement: '原因填写+分类' },
+  { field: 'TriggerPolicy', purpose: '触发策略 — 手动或自动触发', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no auto-trigger', futureRequirement: '策略选择+确认' },
+  { field: 'ManualApprovalRequirement', purpose: '人工审批要求 — 停止前需要谁批准', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no auto-stop without approval', futureRequirement: '审批人配置+通知' },
+  { field: 'RecoveryPlan', purpose: '恢复计划 — 停止后的恢复步骤', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no recovery execute', futureRequirement: '恢复步骤+验证' },
+  { field: 'RollbackDependency', purpose: '回滚依赖 — 停止是否需要回滚', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no rollback trigger', futureRequirement: '依赖检查+通知' },
+  { field: 'AuditEvidenceRequirement', purpose: '审计证据要求 — 停止操作需要保存证据', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no evidence write/upload', futureRequirement: '证据收集+保存' },
+  { field: 'NotificationPolicy', purpose: '通知策略 — 停止后通知相关人员', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no notification send', futureRequirement: '通知配置+发送' },
+  { field: 'ExpiryPolicy', purpose: '过期策略 — 停止请求超时失效', status: 'design-only', runtimeEffect: 'none', stopPermission: 'disabled', serviceControl: 'disabled', taskkillPath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no auto-expire yet', futureRequirement: '超时策略+通知机制' },
+];
+
+// ── P8: Emergency Stop Policy Model ──
+
+export interface EmergencyStopPolicyItem {
+  policy: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  serviceControl: string;
+  stageGate: string;
+}
+
+export const EMERGENCY_STOP_POLICY_ITEMS: EmergencyStopPolicyItem[] = [
+  { policy: 'Trigger source policy', purpose: '触发来源策略 — 谁可以触发紧急停止', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'Manual confirmation policy', purpose: '人工确认策略 — 停止前需要人工确认', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'Blast radius policy', purpose: '爆炸半径策略 — 定义停止操作的影响范围', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'Recovery ownership policy', purpose: '恢复归属策略 — 谁负责恢复', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'Notification policy', purpose: '通知策略 — 停止后通知链', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'Audit evidence policy', purpose: '审计证据策略 — 停止操作证据保存要求', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'Rollback dependency policy', purpose: '回滚依赖策略 — 停止是否需要回滚', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'False-positive handling policy', purpose: '误报处理策略 — 错误触发的处理流程', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'Service isolation policy', purpose: '服务隔离策略 — 是否需要隔离受影响服务', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+  { policy: 'Final safety review policy', purpose: '最终安全审查策略 — 停止前最终安全确认', status: 'not active', runtimeEffect: 'none', serviceControl: 'disabled', stageGate: 'Stage C deferred' },
+];
+
+// ── P8: Emergency Stop Boundary Matrix ──
+
+export interface EmergencyStopBoundaryRow {
+  boundaryArea: string;
+  currentMode: string;
+  stop: string;
+  pause: string;
+  kill: string;
+  restart: string;
+  disable: string;
+  serviceIO: string;
+  stageGate: string;
+  status: string;
+}
+
+export const EMERGENCY_STOP_BOUNDARY_ROWS: EmergencyStopBoundaryRow[] = [
+  { boundaryArea: 'Web UI', currentMode: 'readonly', stop: 'no', pause: 'no', kill: 'no', restart: 'no', disable: 'no', serviceIO: 'no', stageGate: 'Stage C deferred', status: 'design-only' },
+  { boundaryArea: 'API service', currentMode: 'readonly', stop: 'no', pause: 'no', kill: 'no', restart: 'no', disable: 'no', serviceIO: 'no', stageGate: 'Stage C deferred', status: 'design-only' },
+  { boundaryArea: 'Gateway', currentMode: 'readonly', stop: 'no', pause: 'no', kill: 'no', restart: 'no', disable: 'no', serviceIO: 'no', stageGate: 'Stage C deferred', status: 'design-only' },
+  { boundaryArea: 'Connector writes', currentMode: 'disabled', stop: 'no', pause: 'no', kill: 'no', restart: 'no', disable: 'no', serviceIO: 'gated', stageGate: 'Stage C deferred', status: 'disabled' },
+  { boundaryArea: 'Lab execution', currentMode: 'disabled', stop: 'no', pause: 'no', kill: 'no', restart: 'no', disable: 'no', serviceIO: 'no', stageGate: 'Stage C deferred', status: 'disabled' },
+  { boundaryArea: 'Deployment actions', currentMode: 'disabled', stop: 'no', pause: 'no', kill: 'no', restart: 'no', disable: 'no', serviceIO: 'gated', stageGate: 'Stage C deferred', status: 'disabled' },
+  { boundaryArea: 'Service restart', currentMode: 'disabled', stop: 'no', pause: 'no', kill: 'no', restart: 'no', disable: 'no', serviceIO: 'local gated', stageGate: 'Stage C deferred', status: 'disabled' },
+];
+
+// ── P8: Audit Evidence Gate Design Fields ──
+
+export interface AuditEvidenceField {
+  field: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  writePath: string;
+  uploadExportPath: string;
+  persistence: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const AUDIT_EVIDENCE_DESIGN_FIELDS: AuditEvidenceField[] = [
+  { field: 'EvidenceBundle', purpose: '证据包 — 收集所有审计证据的容器', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no evidence write/upload/export/persist', futureRequirement: '证据包创建+收集' },
+  { field: 'EvidenceSource', purpose: '证据来源 — 定义证据的来源系统/工具', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no source read/write', futureRequirement: '来源选择+注册' },
+  { field: 'EvidenceType', purpose: '证据类型 — validator/db-doctor/secret-scan/build/smoke', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no type write/upload', futureRequirement: '类型定义+验证' },
+  { field: 'EvidenceHash', purpose: '证据哈希 — 确保证据完整性', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no hash compute/write', futureRequirement: '哈希算法+验证' },
+  { field: 'EvidenceTimestamp', purpose: '证据时间戳 — 记录证据生成时间', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no timestamp write', futureRequirement: '时间戳生成+验证' },
+  { field: 'EvidenceOwner', purpose: '证据所有者 — 谁生成/负责该证据', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no owner write', futureRequirement: '所有者分配+通知' },
+  { field: 'EvidenceRetentionPolicy', purpose: '证据保留策略 — 保留时间和删除规则', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no retention policy write/execute', futureRequirement: '保留策略配置' },
+  { field: 'EvidenceIntegrityCheck', purpose: '证据完整性检查 — 验证证据未被篡改', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no integrity check write/execute', futureRequirement: '完整性算法+验证' },
+  { field: 'EvidenceAccessScope', purpose: '证据访问范围 — 谁可以查看/下载证据', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no scope write', futureRequirement: '访问控制配置' },
+  { field: 'EvidenceExportPolicy', purpose: '证据导出策略 — 导出格式和限制', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no export path', futureRequirement: '导出格式+限制' },
+  { field: 'EvidenceAuditRecord', purpose: '证据审计记录 — 记录证据的所有操作', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', uploadExportPath: 'disabled', persistence: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no audit write', futureRequirement: '审计追踪+不可篡改' },
+];
+
+// ── P8: Audit Evidence Retention Matrix ──
+
+export interface AuditEvidenceRetentionRow {
+  evidenceType: string;
+  currentMode: string;
+  persist: string;
+  upload: string;
+  export: string;
+  hash: string;
+  retention: string;
+  integrity: string;
+  status: string;
+}
+
+export const AUDIT_EVIDENCE_RETENTION_ROWS: AuditEvidenceRetentionRow[] = [
+  { evidenceType: 'Validator snapshot', currentMode: 'readonly', persist: 'no', upload: 'no', export: 'no', hash: 'future', retention: 'future', integrity: 'future', status: 'design-only' },
+  { evidenceType: 'DB doctor result', currentMode: 'readonly', persist: 'no', upload: 'no', export: 'no', hash: 'future', retention: 'future', integrity: 'future', status: 'design-only' },
+  { evidenceType: 'Secret scan result', currentMode: 'readonly', persist: 'no', upload: 'no', export: 'no', hash: 'future', retention: 'future', integrity: 'future', status: 'design-only' },
+  { evidenceType: 'Build result', currentMode: 'readonly', persist: 'no', upload: 'no', export: 'no', hash: 'future', retention: 'future', integrity: 'future', status: 'design-only' },
+  { evidenceType: 'Smoke status', currentMode: 'readonly', persist: 'no', upload: 'no', export: 'no', hash: 'future', retention: 'future', integrity: 'future', status: 'design-only' },
+  { evidenceType: 'Manual reviewer note', currentMode: 'design-only', persist: 'no', upload: 'no', export: 'no', hash: 'future', retention: 'future', integrity: 'future', status: 'deferred' },
+  { evidenceType: 'Rollback evidence', currentMode: 'design-only', persist: 'no', upload: 'no', export: 'no', hash: 'future', retention: 'future', integrity: 'future', status: 'deferred' },
+  { evidenceType: 'Emergency stop evidence', currentMode: 'design-only', persist: 'no', upload: 'no', export: 'no', hash: 'future', retention: 'future', integrity: 'future', status: 'deferred' },
+];
+
+// ── P8: Emergency Stop + Audit Guardrail Matrix ──
+
+export interface EmergencyStopAuditGuardrailRow {
+  risk: string;
+  currentExposure: string;
+  activeRisk: string;
+  guardrail: string;
+  status: string;
+}
+
+export const EMERGENCY_STOP_AUDIT_GUARDRAIL_MATRIX: EmergencyStopAuditGuardrailRow[] = [
+  { risk: 'Emergency stop action', currentExposure: 'none', activeRisk: '0', guardrail: 'no stop path', status: 'safe' },
+  { risk: 'Taskkill / service restart', currentExposure: 'none', activeRisk: '0', guardrail: 'no system command', status: 'safe' },
+  { risk: 'Service disable', currentExposure: 'none', activeRisk: '0', guardrail: 'no service control', status: 'safe' },
+  { risk: 'Audit evidence write', currentExposure: 'none', activeRisk: '0', guardrail: 'persistence disabled', status: 'safe' },
+  { risk: 'Evidence upload/export', currentExposure: 'none', activeRisk: '0', guardrail: 'external writes disabled', status: 'safe' },
+  { risk: 'Evidence tampering', currentExposure: 'none', activeRisk: '0', guardrail: 'design-only, no persisted evidence', status: 'safe' },
+  { risk: 'False emergency trigger', currentExposure: 'none', activeRisk: '0', guardrail: 'no trigger path', status: 'safe' },
+  { risk: 'Stage C activation', currentExposure: 'none', activeRisk: '0', guardrail: 'deferred', status: 'safe' },
+];
+
+// ── P8: Emergency Stop + Audit Lifecycle Stages ──
+
+export interface EmergencyStopAuditLifecycleStage {
+  stage: string;
+  purpose: string;
+  status: string;
+}
+
+export const EMERGENCY_STOP_AUDIT_LIFECYCLE_STAGES: EmergencyStopAuditLifecycleStage[] = [
+  { stage: 'Draft emergency policy', purpose: '草拟应急策略', status: 'design-only / no runtime effect' },
+  { stage: 'Define stop scope', purpose: '定义停止范围', status: 'design-only / no runtime effect' },
+  { stage: 'Define recovery owner', purpose: '定义恢复负责人', status: 'design-only / no runtime effect' },
+  { stage: 'Attach audit evidence requirement', purpose: '附上审计证据要求', status: 'design-only / no runtime effect' },
+  { stage: 'Attach rollback dependency', purpose: '附上回滚依赖', status: 'design-only / no runtime effect' },
+  { stage: 'Manual review required', purpose: '需要人工审查', status: 'design-only / no runtime effect' },
+  { stage: 'Emergency stop deferred', purpose: '紧急停止延后 — 待条件满足', status: 'design-only / no runtime effect' },
+  { stage: 'Audit evidence model reviewed', purpose: '审计证据模型已审查', status: 'design-only / no runtime effect' },
+  { stage: 'Integrity policy required', purpose: '需要完整性策略', status: 'design-only / no runtime effect' },
+  { stage: 'Final safety audit required', purpose: '需要最终安全审计', status: 'design-only / no runtime effect' },
+  { stage: 'Closure review', purpose: '关闭审查', status: 'design-only / no runtime effect' },
+];

@@ -68,6 +68,13 @@ import {
   ROLLBACK_PLAN_FIELDS,
   DEPLOYMENT_ROLLBACK_GUARDRAIL_MATRIX,
   DEPLOYMENT_ROLLBACK_LIFECYCLE_STAGES,
+  EMERGENCY_STOP_DESIGN_FIELDS,
+  EMERGENCY_STOP_POLICY_ITEMS,
+  EMERGENCY_STOP_BOUNDARY_ROWS,
+  AUDIT_EVIDENCE_DESIGN_FIELDS,
+  AUDIT_EVIDENCE_RETENTION_ROWS,
+  EMERGENCY_STOP_AUDIT_GUARDRAIL_MATRIX,
+  EMERGENCY_STOP_AUDIT_LIFECYCLE_STAGES,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -816,10 +823,40 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 + P6 + P7 Control Room Safety Notice ── */}
+      {/* ── v7.23.0-P8 Emergency Stop / Audit Evidence Gate Bridge ── */}
+      <SectionCard title="Emergency Stop / Audit Evidence Gate Bridge" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Emergency Stop Gate" value="design-only" color="#EF4444" />
+          <KpiCard label="Audit Evidence Gate" value="design-only" color="#3B82F6" />
+          <KpiCard label="Stop controls" value="0" color="var(--success)" />
+          <KpiCard label="Pause controls" value="0" color="var(--success)" />
+          <KpiCard label="Kill controls" value="0" color="var(--success)" />
+          <KpiCard label="Taskkill paths" value="0" color="var(--success)" />
+          <KpiCard label="Restart controls" value="0" color="var(--success)" />
+          <KpiCard label="Evidence write paths" value="0" color="var(--success)" />
+          <KpiCard label="Evidence upload" value="0" color="var(--success)" />
+          <KpiCard label="Evidence export" value="0" color="var(--success)" />
+          <KpiCard label="Emergency design fields" value={String(EMERGENCY_STOP_DESIGN_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Emergency policies" value={String(EMERGENCY_STOP_POLICY_ITEMS.length)} color="#8B5CF6" />
+          <KpiCard label="Emergency boundary rows" value={String(EMERGENCY_STOP_BOUNDARY_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Audit design fields" value={String(AUDIT_EVIDENCE_DESIGN_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Evidence retention rows" value={String(AUDIT_EVIDENCE_RETENTION_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Guardrail rows" value={String(EMERGENCY_STOP_AUDIT_GUARDRAIL_MATRIX.length)} color="var(--success)" />
+          <KpiCard label="Lifecycle stages" value={String(EMERGENCY_STOP_AUDIT_LIFECYCLE_STAGES.length)} color="#8B5CF6" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Emergency Stop / Audit Evidence Gate Spec →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep emergency stop and audit evidence gates in design review</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(239,68,68,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Emergency Stop Gate = <strong>design-only</strong>. Audit Evidence Gate = <strong>design-only</strong>. Stop controls = <strong>0</strong>. Pause controls = <strong>0</strong>. Kill controls = <strong>0</strong>. Taskkill paths = <strong>0</strong>. Restart controls = <strong>0</strong>. Disable controls = <strong>0</strong>. Evidence write paths = <strong>0</strong>. Evidence upload/export = <strong>0</strong>. Stage C = <strong>deferred</strong>. Recommended next = <strong>keep emergency stop and audit evidence gates in design review</strong>.
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 + P7 + P8 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 + P5 + P6 + P7 Control Room & Governance safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 + P6 + P7 + P8 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}
