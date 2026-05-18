@@ -95,6 +95,14 @@ import StageCDryRunSimulationDesign from '../components/governance/StageCDryRunS
 import ActivationSafetyReviewChecklist from '../components/governance/ActivationSafetyReviewChecklist';
 import RuntimeReadinessEvidenceMatrix from '../components/governance/RuntimeReadinessEvidenceMatrix';
 import ActivationRollbackReadinessPlan from '../components/governance/ActivationRollbackReadinessPlan';
+import RuntimeImplementationPackageBoundary from '../components/governance/RuntimeImplementationPackageBoundary';
+import AuthorizationStorageSchemaDesignReview from '../components/governance/AuthorizationStorageSchemaDesignReview';
+import AuthorizationApiContractDesignReview from '../components/governance/AuthorizationApiContractDesignReview';
+import RuntimeEvaluatorImplementationBoundary from '../components/governance/RuntimeEvaluatorImplementationBoundary';
+import ReviewWorkflowImplementationBoundary from '../components/governance/ReviewWorkflowImplementationBoundary';
+import StorageApiRiskReviewMatrix from '../components/governance/StorageApiRiskReviewMatrix';
+import ImplementationSequencingPlan from '../components/governance/ImplementationSequencingPlan';
+import ImplementationGoNoGoGate from '../components/governance/ImplementationGoNoGoGate';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -350,7 +358,7 @@ export default function GovernanceCenter() {
       versionLabel="AIP v7.24.0-P2"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence · v7.24.0-P4 Authorization Review Policy + Decision Governance Design — design-only, no runtime · v7.24.0-P5 Activation Blocker Roadmap + Readiness Simulation — planning-only, no activation, no implement"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence · v7.24.0-P4 Authorization Review Policy + Decision Governance Design — design-only, no runtime · v7.24.0-P5 Activation Blocker Roadmap + Readiness Simulation — planning-only, no activation, no implement · v7.24.0-P6 Implementation Boundary + Storage/API Design Review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -946,6 +954,40 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Activation Rollback Readiness Plan (P5)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
         <ActivationRollbackReadinessPlan />
+      </SectionCard>
+
+      {/* ── v7.24.0-P6 Runtime Implementation Package Boundary + Storage/API Design Review Sections ── */}
+
+      <SectionCard title="Runtime Implementation Package Boundary (P6)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <RuntimeImplementationPackageBoundary />
+      </SectionCard>
+
+      <SectionCard title="Authorization Storage Schema Design Review (P6)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <AuthorizationStorageSchemaDesignReview />
+      </SectionCard>
+
+      <SectionCard title="Authorization API Contract Design Review (P6)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <AuthorizationApiContractDesignReview />
+      </SectionCard>
+
+      <SectionCard title="Runtime Evaluator Implementation Boundary (P6)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <RuntimeEvaluatorImplementationBoundary />
+      </SectionCard>
+
+      <SectionCard title="Review Workflow Implementation Boundary (P6)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <ReviewWorkflowImplementationBoundary />
+      </SectionCard>
+
+      <SectionCard title="Storage/API Risk Review Matrix (P6)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <StorageApiRiskReviewMatrix />
+      </SectionCard>
+
+      <SectionCard title="Implementation Sequencing Plan (P6)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <ImplementationSequencingPlan />
+      </SectionCard>
+
+      <SectionCard title="Implementation Go/No-Go Gate (P6)" style={{ marginBottom: 20, border: '2px solid #EF4444' }}>
+        <ImplementationGoNoGoGate />
       </SectionCard>
 
       {/* Related Routes */}

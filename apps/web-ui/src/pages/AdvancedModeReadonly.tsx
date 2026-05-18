@@ -120,6 +120,14 @@ import {
   ACTIVATION_SAFETY_CHECKLIST_ITEMS,
   RUNTIME_READINESS_EVIDENCE_TYPES,
   ACTIVATION_ROLLBACK_READINESS_ITEMS,
+  IMPLEMENTATION_PACKAGE_BOUNDARY_ITEMS,
+  FUTURE_SCHEMA_TABLES,
+  FUTURE_API_ENDPOINTS,
+  RUNTIME_EVALUATOR_STAGES,
+  REVIEW_WORKFLOW_STAGES,
+  STORAGE_API_RISK_ROWS,
+  IMPLEMENTATION_SEQUENCE_ROWS,
+  IMPLEMENTATION_GO_NO_GO_CHECKS,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -343,10 +351,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -1047,6 +1055,39 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(239,68,68,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
           v7.24.0-P5 Runtime Readiness = <strong>No-Go</strong>. Activation blockers = <strong>{ACTIVATION_BLOCKER_ROADMAP_ITEMS.length}</strong> (all not resolved). Readiness simulation areas = <strong>{RUNTIME_READINESS_SIMULATION_AREAS.length}</strong> (all 0% simulated score). Go/No-Go gates = <strong>{GO_NO_GO_DECISION_GATES.length}</strong> (all No-Go). Blocker dependencies = <strong>{BLOCKER_DEPENDENCY_SEQUENCES.length}</strong> (all future). Dry-run areas = <strong>{DRY_RUN_SIMULATION_AREAS.length}</strong> (all none). Safety checks = <strong>{ACTIVATION_SAFETY_CHECKLIST_ITEMS.length}</strong> (baseline verified not activation ready, all future required). Evidence types = <strong>{RUNTIME_READINESS_EVIDENCE_TYPES.length}</strong> (available baseline not activation ready, future evidence not available). Rollback readiness items = <strong>{ACTIVATION_ROLLBACK_READINESS_ITEMS.length}</strong> (all design-only not implemented). Runtime simulator = <strong>not implemented</strong>. Dry-run engine = <strong>not implemented</strong>. Preflight = <strong>not executed</strong>. Runtime state reads = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Real control buttons = <strong>0</strong>. Recommended next = <strong>keep Stage C disabled — address blocker resolution packages, do not enable activation.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── v7.24.0-P6 Implementation Boundary Bridge ── */}
+      <SectionCard title="Implementation Boundary Bridge (P6)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Implementation boundary" value="design-review-only" color="#EF4444" />
+          <KpiCard label="Implementation packages" value={String(IMPLEMENTATION_PACKAGE_BOUNDARY_ITEMS.length)} color="#8B5CF6" />
+          <KpiCard label="Future schema tables" value={String(FUTURE_SCHEMA_TABLES.length)} color="#8B5CF6" />
+          <KpiCard label="Future API endpoints" value={String(FUTURE_API_ENDPOINTS.length)} color="#8B5CF6" />
+          <KpiCard label="Evaluator stages" value={String(RUNTIME_EVALUATOR_STAGES.length)} color="#8B5CF6" />
+          <KpiCard label="Workflow stages" value={String(REVIEW_WORKFLOW_STAGES.length)} color="#8B5CF6" />
+          <KpiCard label="Storage/API risks" value={String(STORAGE_API_RISK_ROWS.length)} color="var(--success)" />
+          <KpiCard label="Sequence rows" value={String(IMPLEMENTATION_SEQUENCE_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Go/No-Go checks" value={String(IMPLEMENTATION_GO_NO_GO_CHECKS.length)} color="var(--danger)" />
+          <KpiCard label="Overall decision" value="No-Go" color="#EF4444" />
+          <KpiCard label="Planning allowed" value="true" color="#8B5CF6" />
+          <KpiCard label="Runtime execution" value="false" color="var(--success)" />
+          <KpiCard label="DB schema added" value="0" color="var(--success)" />
+          <KpiCard label="Migration added" value="0" color="var(--success)" />
+          <KpiCard label="API endpoints added" value="0" color="var(--success)" />
+          <KpiCard label="Storage writes" value="0" color="var(--success)" />
+          <KpiCard label="Runtime evaluator" value="not implemented" color="#6B7280" />
+          <KpiCard label="Review workflow" value="not implemented" color="#6B7280" />
+          <KpiCard label="Decision engine" value="not implemented" color="#6B7280" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Implementation Boundary & Design Review →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep implementation in design-review-only — no runtime execution</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(239,68,68,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P6 Implementation Boundary = <strong>implementation-boundary-only / storage-api-design-review</strong>. Implementation packages = <strong>{IMPLEMENTATION_PACKAGE_BOUNDARY_ITEMS.length}</strong> (all not implemented, No-Go). Future schema tables = <strong>{FUTURE_SCHEMA_TABLES.length}</strong> (all not added). Future API endpoints = <strong>{FUTURE_API_ENDPOINTS.length}</strong> (all not implemented). Evaluator stages = <strong>{RUNTIME_EVALUATOR_STAGES.length}</strong> (all none, not implemented). Workflow stages = <strong>{REVIEW_WORKFLOW_STAGES.length}</strong> (all none, not implemented). Storage/API risks = <strong>{STORAGE_API_RISK_ROWS.length}</strong> (all activeRisk=0, safe). Sequencing rows = <strong>{IMPLEMENTATION_SEQUENCE_ROWS.length}</strong> (all future, No-Go). Go/No-Go checks = <strong>{IMPLEMENTATION_GO_NO_GO_CHECKS.length}</strong> (all No-Go). Overall implementation decision = <strong>No-Go</strong>. Implementation planning allowed = <strong>true</strong>. Runtime execution allowed = <strong>false</strong>. DB schema added = <strong>0</strong>. Migration added = <strong>0</strong>. API endpoints added = <strong>0</strong>. Storage writes = <strong>0</strong>. Runtime evaluator = <strong>not implemented</strong>. Review workflow = <strong>not implemented</strong>. Decision engine = <strong>not implemented</strong>. Permission evaluator = <strong>not implemented</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>proceed to storage schema implementation plan review — not implementation.</strong>
         </div>
       </SectionCard>
 

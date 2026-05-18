@@ -2268,3 +2268,208 @@ export const ACTIVATION_ROLLBACK_READINESS_ITEMS: ActivationRollbackItem[] = [
   { planItem: 'Operator communication plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'operator notification + escalation during rollback', runtimeDependency: 'manual approval policy', blockedAction: 'no notification action', riskNote: 'operators not informed during rollback' },
   { planItem: 'Final rollback verification', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'rollback verification + recovery sign-off', runtimeDependency: 'rollback execution path', blockedAction: 'no rollback verification action', riskNote: 'no confidence in rollback completeness' },
 ];
+
+// ── v7.24.0-P6: Implementation Package Boundary ──
+
+export interface ImplementationPackageBoundaryEntry {
+  packageName: string;
+  futurePurpose: string;
+  currentStatus: string;
+  currentMode: string;
+  dbSchemaImpact: string;
+  apiEndpointImpact: string;
+  runtimeImpact: string;
+  writeImpact: string;
+  dependency: string;
+  goNoGoStatus: string;
+  requiredValidation: string;
+}
+
+export const IMPLEMENTATION_PACKAGE_BOUNDARY_ITEMS: ImplementationPackageBoundaryEntry[] = [
+  { packageName: 'Authorization Persistence Package', futurePurpose: '持久化授权请求/决策/证据数据', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'future — authorization_requests, authorization_decisions, authorization_evidence', apiEndpointImpact: 'future — CRUD endpoints', runtimeImpact: 'none', writeImpact: 'none', dependency: 'v7.24.0-P3 design', goNoGoStatus: 'No-Go', requiredValidation: 'data integrity + migration test + security review' },
+  { packageName: 'Authorization API Package', futurePurpose: '提供授权操作的外部 API 接口', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'none — uses persistence layer', apiEndpointImpact: 'future — REST endpoints', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Authorization Persistence Package', goNoGoStatus: 'No-Go', requiredValidation: 'API integration test + auth flow validation' },
+  { packageName: 'Runtime Evaluator Package', futurePurpose: '运行时评估授权请求的 scope/role/risk 等条件', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'none', apiEndpointImpact: 'none', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Authorization API Package', goNoGoStatus: 'No-Go', requiredValidation: 'evaluation engine unit test + scenario simulation' },
+  { packageName: 'Review Workflow Package', futurePurpose: '人工 review 工作流引擎', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'future — review_tasks, review_decisions', apiEndpointImpact: 'future — review endpoints', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Runtime Evaluator Package', goNoGoStatus: 'No-Go', requiredValidation: 'workflow integration test + manual reviewer simulation' },
+  { packageName: 'Decision Engine Package', futurePurpose: '最终授权决策引擎 (approve/reject/defer)', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'none — uses persistence layer', apiEndpointImpact: 'none', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Review Workflow Package', goNoGoStatus: 'No-Go', requiredValidation: 'decision policy unit test + end-to-end auth flow test' },
+  { packageName: 'Audit Evidence Persistence Package', futurePurpose: '持久化审计证据并保证完整性', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'future — audit_evidence, evidence_integrity', apiEndpointImpact: 'future — evidence endpoints', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Authorization Persistence Package', goNoGoStatus: 'No-Go', requiredValidation: 'evidence integrity hash test + retention simulation' },
+  { packageName: 'Dry-run Engine Package', futurePurpose: '模拟执行授权操作而不产生真实影响', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'none', apiEndpointImpact: 'none', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Runtime Evaluator Package', goNoGoStatus: 'No-Go', requiredValidation: 'dry-run simulation accuracy test + sandbox isolation test' },
+  { packageName: 'External Write Sandbox Package', futurePurpose: '沙箱化外部写入操作', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'future — external_write_audit, write_policy', apiEndpointImpact: 'future — sandbox endpoints', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Dry-run Engine Package', goNoGoStatus: 'No-Go', requiredValidation: 'sandbox isolation test + external endpoint mock validation' },
+  { packageName: 'Rollback Runtime Package', futurePurpose: '运行时回滚引擎', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'future — rollback_plans, rollback_audit', apiEndpointImpact: 'future — rollback endpoints', runtimeImpact: 'none', writeImpact: 'none', dependency: 'External Write Sandbox Package', goNoGoStatus: 'No-Go', requiredValidation: 'rollback simulation + restore verification test' },
+  { packageName: 'Emergency Stop Runtime Package', futurePurpose: '运行时紧急停止引擎', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'future — emergency_stop_audit', apiEndpointImpact: 'future — emergency endpoints', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Rollback Runtime Package', goNoGoStatus: 'No-Go', requiredValidation: 'stop simulation + recovery test + service isolation test' },
+  { packageName: 'Smoke Environment Package', futurePurpose: '冒烟测试环境与测试套件', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'none', apiEndpointImpact: 'none', runtimeImpact: 'none', writeImpact: 'none', dependency: 'All runtime packages', goNoGoStatus: 'No-Go', requiredValidation: 'smoke test run + integration validation' },
+  { packageName: 'Security Review Package', futurePurpose: '安全审计与渗透测试', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'none', apiEndpointImpact: 'none', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Smoke Environment Package', goNoGoStatus: 'No-Go', requiredValidation: 'penetration test + vulnerability scan + security review sign-off' },
+  { packageName: 'Final Activation Package', futurePurpose: '最终激活审计与签批', currentStatus: 'not implemented', currentMode: 'design-review-only', dbSchemaImpact: 'none', apiEndpointImpact: 'none', runtimeImpact: 'none', writeImpact: 'none', dependency: 'Security Review Package', goNoGoStatus: 'No-Go', requiredValidation: 'activation audit report + sign-off + final go/no-go decision' },
+];
+
+// ── v7.24.0-P6: Authorization Storage Schema Design Review ──
+
+export interface FutureSchemaTableEntry {
+  futureTable: string;
+  purpose: string;
+  currentSchemaStatus: string;
+  migrationStatus: string;
+  writePath: string;
+  readPath: string;
+  riskClass: string;
+  requiredReview: string;
+}
+
+export const FUTURE_SCHEMA_TABLES: FutureSchemaTableEntry[] = [
+  { futureTable: 'authorization_requests', purpose: '存储授权请求记录', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', riskClass: 'high', requiredReview: 'schema design review + security review' },
+  { futureTable: 'authorization_decisions', purpose: '存储授权决策记录 (approve/reject/defer)', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', riskClass: 'critical', requiredReview: 'schema design review + integrity design review' },
+  { futureTable: 'authorization_scopes', purpose: '存储授权范围定义', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', riskClass: 'medium', requiredReview: 'schema design review' },
+  { futureTable: 'authorization_evidence_refs', purpose: '存储审计证据引用', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', riskClass: 'high', requiredReview: 'schema design review + evidence integrity review' },
+  { futureTable: 'authorization_audit_chain', purpose: '存储审计链记录', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', riskClass: 'critical', requiredReview: 'schema design review + audit chain integrity review' },
+  { futureTable: 'authorization_expiry', purpose: '存储授权过期策略与状态', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', riskClass: 'medium', requiredReview: 'schema design review + expiry policy review' },
+  { futureTable: 'authorization_revocations', purpose: '存储授权撤销记录', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', riskClass: 'high', requiredReview: 'schema design review + revocation policy review' },
+  { futureTable: 'authorization_integrity_markers', purpose: '存储数据完整性标记 (hash/checksum)', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', riskClass: 'critical', requiredReview: 'schema design review + integrity algorithm review' },
+];
+
+// ── v7.24.0-P6: Authorization API Contract Design Review ──
+
+export interface FutureApiEndpointEntry {
+  futureEndpoint: string;
+  method: string;
+  purpose: string;
+  currentStatus: string;
+  authRequirement: string;
+  writeImpact: string;
+  riskClass: string;
+  requiredFutureGate: string;
+}
+
+export const FUTURE_API_ENDPOINTS: FutureApiEndpointEntry[] = [
+  { futureEndpoint: '/authorization/requests', method: 'POST', purpose: '创建授权请求', currentStatus: 'not implemented', authRequirement: 'future — operator auth required', writeImpact: 'future — writes authorization_requests table', riskClass: 'high', requiredFutureGate: 'Authorization API Gate' },
+  { futureEndpoint: '/authorization/requests/:id', method: 'GET', purpose: '查询授权请求详情', currentStatus: 'not implemented', authRequirement: 'future — viewer role', writeImpact: 'none — read only', riskClass: 'low', requiredFutureGate: 'Authorization API Gate' },
+  { futureEndpoint: '/authorization/requests/:id/evidence', method: 'POST', purpose: '为授权请求附加审计证据', currentStatus: 'not implemented', authRequirement: 'future — reviewer role', writeImpact: 'future — writes evidence refs', riskClass: 'high', requiredFutureGate: 'Authorization API Gate + Audit Evidence Gate' },
+  { futureEndpoint: '/authorization/requests/:id/decision', method: 'POST', purpose: '提交授权决策 (approve/reject/defer)', currentStatus: 'not implemented', authRequirement: 'future — approver role', writeImpact: 'future — writes authorization_decisions table', riskClass: 'critical', requiredFutureGate: 'Authorization API Gate + Review Workflow Gate' },
+  { futureEndpoint: '/authorization/requests/:id/revoke', method: 'POST', purpose: '撤销已有授权', currentStatus: 'not implemented', authRequirement: 'future — admin role', writeImpact: 'future — writes revocations table', riskClass: 'critical', requiredFutureGate: 'Authorization API Gate + Audit Evidence Gate' },
+  { futureEndpoint: '/authorization/audit/:id', method: 'GET', purpose: '查询授权审计链', currentStatus: 'not implemented', authRequirement: 'future — auditor role', writeImpact: 'none — read only', riskClass: 'medium', requiredFutureGate: 'Authorization API Gate' },
+];
+
+// ── v7.24.0-P6: Runtime Evaluator Implementation Boundary ──
+
+export interface RuntimeEvaluatorStageEntry {
+  evaluatorStage: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  runtimeEffect: string;
+  writePath: string;
+  requiredDependency: string;
+  riskIfImplementedEarly: string;
+}
+
+export const RUNTIME_EVALUATOR_STAGES: RuntimeEvaluatorStageEntry[] = [
+  { evaluatorStage: 'Scope validation', futurePurpose: '验证授权范围是否合法', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Authorization Persistence + API', riskIfImplementedEarly: 'bypass of scope policy without persistence' },
+  { evaluatorStage: 'Role validation', futurePurpose: '验证操作人员角色是否有权限', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Operator role registry + runtime', riskIfImplementedEarly: 'unauthorized role access without audit' },
+  { evaluatorStage: 'Risk validation', futurePurpose: '验证操作风险等级是否可接受', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Risk classification engine', riskIfImplementedEarly: 'unreviewed high-risk action' },
+  { evaluatorStage: 'Evidence validation', futurePurpose: '验证审计证据包是否完整', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Evidence persistence + integrity check', riskIfImplementedEarly: 'action without audit evidence' },
+  { evaluatorStage: 'Approval dependency validation', futurePurpose: '验证审批依赖是否已满足', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Review Workflow + Decision Engine', riskIfImplementedEarly: 'action without proper approval chain' },
+  { evaluatorStage: 'Expiry validation', futurePurpose: '验证授权是否已过期', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Expiry policy engine + scheduler', riskIfImplementedEarly: 'stale authorization execution' },
+  { evaluatorStage: 'Revocation validation', futurePurpose: '验证授权是否已被撤销', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Revocation engine + audit', riskIfImplementedEarly: 'revoked action execution' },
+  { evaluatorStage: 'Stage C enabled check', futurePurpose: '验证 Stage C 是否已启用', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Stage C activation toggle (future)', riskIfImplementedEarly: 'activation without full readiness' },
+  { evaluatorStage: 'Deny-by-default fallback', futurePurpose: '默认拒绝所有未通过评估的请求', currentImplementation: 'none — design-only', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'All evaluator stages', riskIfImplementedEarly: 'false positive denial without fallback review' },
+  { evaluatorStage: 'Audit decision handoff', futurePurpose: '将评估结果传递给审计链', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredDependency: 'Audit Evidence Persistence', riskIfImplementedEarly: 'incomplete audit trail' },
+];
+
+// ── v7.24.0-P6: Review Workflow Implementation Boundary ──
+
+export interface ReviewWorkflowStageEntry {
+  workflowStage: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  decisionPersistence: string;
+  runtimeEffect: string;
+  blockedAction: string;
+  futurePackage: string;
+}
+
+export const REVIEW_WORKFLOW_STAGES: ReviewWorkflowStageEntry[] = [
+  { workflowStage: 'Request intake', futurePurpose: '接收并验证授权请求', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no request create/submit', futurePackage: 'Authorization API Package' },
+  { workflowStage: 'Evidence review', futurePurpose: '审查已附加的审计证据', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no evidence review/write', futurePackage: 'Review Workflow Package' },
+  { workflowStage: 'Risk review', futurePurpose: '审查操作风险等级', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no risk review/write', futurePackage: 'Review Workflow Package' },
+  { workflowStage: 'Manual reviewer assignment', futurePurpose: '分配人工审查负责人', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no reviewer assign/notify', futurePackage: 'Review Workflow Package' },
+  { workflowStage: 'Decision draft', futurePurpose: '草拟审批决策', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no decision draft/save', futurePackage: 'Decision Engine Package' },
+  { workflowStage: 'Decision finalization', futurePurpose: '最终确定审批决策 (approve/reject)', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no decision finalize/execute', futurePackage: 'Decision Engine Package' },
+  { workflowStage: 'Decision expiry', futurePurpose: '决策过期自动失效', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no expiry auto-close', futurePackage: 'Authorization Persistence Package' },
+  { workflowStage: 'Decision revocation', futurePurpose: '决策撤销', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no revocation write/execute', futurePackage: 'Authorization Persistence Package' },
+  { workflowStage: 'Audit closure', futurePurpose: '关闭审计记录', currentImplementation: 'none', decisionPersistence: 'disabled', runtimeEffect: 'none', blockedAction: 'no closure write/archive', futurePackage: 'Audit Evidence Persistence Package' },
+];
+
+// ── v7.24.0-P6: Storage/API Risk Review Matrix ──
+
+export interface StorageApiRiskReviewEntry {
+  risk: string;
+  currentExposure: string;
+  activeRisk: number;
+  guardrail: string;
+  futureMitigation: string;
+  status: string;
+}
+
+export const STORAGE_API_RISK_ROWS: StorageApiRiskReviewEntry[] = [
+  { risk: 'Schema drift', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no schema implemented', futureMitigation: 'schema versioning + migration policy', status: 'safe — future mitigation required' },
+  { risk: 'Unauthorized write endpoint', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no API endpoint implemented', futureMitigation: 'auth middleware + role-based access', status: 'safe — future mitigation required' },
+  { risk: 'Decision state corruption', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no decision persistence', futureMitigation: 'state machine + integrity checks + audit trail', status: 'safe — future mitigation required' },
+  { risk: 'Audit chain tampering', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no audit persistence', futureMitigation: 'hash chain + integrity verification', status: 'safe — future mitigation required' },
+  { risk: 'Evidence link leakage', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no evidence storage', futureMitigation: 'encryption + access control + audit', status: 'safe — future mitigation required' },
+  { risk: 'Expired authorization reuse', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no expiry runtime', futureMitigation: 'expiry engine + auto-revocation', status: 'safe — future mitigation required' },
+  { risk: 'Revoked authorization reuse', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no revocation runtime', futureMitigation: 'revocation check in evaluator + audit', status: 'safe — future mitigation required' },
+  { risk: 'External write escalation', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no external write path', futureMitigation: 'write sandbox + policy engine + audit', status: 'safe — future mitigation required' },
+  { risk: 'Stage C premature enablement', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'Stage C deferred — no toggle', futureMitigation: 'activation audit + blocker resolution + go/no-go gate', status: 'safe — future mitigation required' },
+];
+
+// ── v7.24.0-P6: Implementation Sequencing Plan ──
+
+export interface ImplementationSequenceEntry {
+  sequence: number;
+  implementationPackage: string;
+  dependsOn: string;
+  unlocks: string;
+  currentStatus: string;
+  requiredValidation: string;
+  goNoGoStatus: string;
+}
+
+export const IMPLEMENTATION_SEQUENCE_ROWS: ImplementationSequenceEntry[] = [
+  { sequence: 1, implementationPackage: 'Storage schema design review', dependsOn: 'v7.24.0-P3 design review', unlocks: 'migration design', currentStatus: 'future', requiredValidation: 'schema review sign-off', goNoGoStatus: 'No-Go' },
+  { sequence: 2, implementationPackage: 'Migration design review', dependsOn: 'Storage schema design review', unlocks: 'DB schema implementation', currentStatus: 'future', requiredValidation: 'migration plan review + rollback plan', goNoGoStatus: 'No-Go' },
+  { sequence: 3, implementationPackage: 'API contract design review', dependsOn: 'Migration design review', unlocks: 'API implementation', currentStatus: 'future', requiredValidation: 'API contract review + security review', goNoGoStatus: 'No-Go' },
+  { sequence: 4, implementationPackage: 'Persistence write/read implementation package', dependsOn: 'API contract design review', unlocks: 'runtime evaluator', currentStatus: 'future', requiredValidation: 'CRUD integration test + data integrity test', goNoGoStatus: 'No-Go' },
+  { sequence: 5, implementationPackage: 'Runtime evaluator implementation package', dependsOn: 'Persistence write/read implementation', unlocks: 'review workflow', currentStatus: 'future', requiredValidation: 'evaluator unit test + scenario simulation', goNoGoStatus: 'No-Go' },
+  { sequence: 6, implementationPackage: 'Review workflow implementation package', dependsOn: 'Runtime evaluator implementation', unlocks: 'decision engine', currentStatus: 'future', requiredValidation: 'workflow integration test + manual review simulation', goNoGoStatus: 'No-Go' },
+  { sequence: 7, implementationPackage: 'Decision audit persistence package', dependsOn: 'Review workflow implementation', unlocks: 'dry-run engine', currentStatus: 'future', requiredValidation: 'audit integrity test + retention simulation', goNoGoStatus: 'No-Go' },
+  { sequence: 8, implementationPackage: 'Dry-run engine package', dependsOn: 'Decision audit persistence', unlocks: 'external write sandbox', currentStatus: 'future', requiredValidation: 'dry-run accuracy test + sandbox isolation test', goNoGoStatus: 'No-Go' },
+  { sequence: 9, implementationPackage: 'External write sandbox package', dependsOn: 'Dry-run engine', unlocks: 'rollback runtime', currentStatus: 'future', requiredValidation: 'sandbox isolation test + endpoint mock validation', goNoGoStatus: 'No-Go' },
+  { sequence: 10, implementationPackage: 'Rollback runtime package', dependsOn: 'External write sandbox', unlocks: 'emergency stop', currentStatus: 'future', requiredValidation: 'rollback simulation + restore verification test', goNoGoStatus: 'No-Go' },
+  { sequence: 11, implementationPackage: 'Emergency stop runtime package', dependsOn: 'Rollback runtime', unlocks: 'smoke environment', currentStatus: 'future', requiredValidation: 'stop simulation + recovery test + service isolation test', goNoGoStatus: 'No-Go' },
+  { sequence: 12, implementationPackage: 'Smoke environment validation', dependsOn: 'All runtime packages', unlocks: 'security review', currentStatus: 'future', requiredValidation: 'smoke test run + integration validation', goNoGoStatus: 'No-Go' },
+  { sequence: 13, implementationPackage: 'Security review', dependsOn: 'Smoke environment', unlocks: 'final activation', currentStatus: 'future', requiredValidation: 'penetration test + vulnerability scan + sign-off', goNoGoStatus: 'No-Go' },
+  { sequence: 14, implementationPackage: 'Final activation audit', dependsOn: 'Security review', unlocks: 'Stage C enablement', currentStatus: 'future', requiredValidation: 'activation audit report + sign-off + go/no-go decision', goNoGoStatus: 'No-Go' },
+];
+
+// ── v7.24.0-P6: Implementation Go/No-Go Gate Checks ──
+
+export interface ImplementationGoNoGoCheckEntry {
+  check: string;
+  purpose: string;
+  currentState: string;
+  goDecision: number;
+  noGoDecision: number;
+  requiredForActivation: string;
+}
+
+export const IMPLEMENTATION_GO_NO_GO_CHECKS: ImplementationGoNoGoCheckEntry[] = [
+  { check: 'DB schema review complete', purpose: '数据库 schema 设计审查已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Migration review complete', purpose: '数据迁移设计审查已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'API contract review complete', purpose: 'API 契约审查已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Storage write risk reviewed', purpose: '存储写入风险评估已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Runtime evaluator risk reviewed', purpose: '运行时评估器风险评估已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Review workflow risk reviewed', purpose: '审查工作流风险评估已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Audit persistence risk reviewed', purpose: '审计持久化风险评估已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Dry-run engine risk reviewed', purpose: 'Dry-run 引擎风险评估已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Emergency stop risk reviewed', purpose: '紧急停止风险评估已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Smoke environment validated', purpose: '冒烟环境已验证', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Security review completed', purpose: '安全审查已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Final activation audit completed', purpose: '最终激活审计已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+];
