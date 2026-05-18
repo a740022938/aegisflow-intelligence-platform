@@ -699,6 +699,29 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
+      {/* ── v7.23.0-P4 Mutation Gate Bridge ── */}
+      <SectionCard title="Mutation Gate Bridge" style={{ marginBottom: 20, border: '1px solid #A855F7' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Mutation Gate" value="design-only" color="#A855F7" />
+          <KpiCard label="Mutation controls" value="0" color="var(--success)" />
+          <KpiCard label="Diff/Impact required" value="future" color="#F97316" />
+          <KpiCard label="Rollback contract" value="design-only" color="#A855F7" />
+          <KpiCard label="Evidence types" value="10" color="#A855F7" />
+          <KpiCard label="Lifecycle stages" value="9" color="#A855F7" />
+          <KpiCard label="Risk guardrails" value="8 safe" color="var(--success)" />
+          <KpiCard label="Active mutation risk" value="0" color="var(--success)" />
+          <KpiCard label="Write paths" value="0" color="var(--success)" />
+          <KpiCard label="External writes" value="0" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(168,85,247,0.08)', color: '#A855F7', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Mutation Gate Spec →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(168,85,247,0.08)', color: '#A855F7', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep mutation gate in design review</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(168,85,247,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Mutation Gate = <strong>design-only</strong>. Mutation controls = <strong>0</strong>. Diff/Impact = <strong>required future</strong>. Rollback contract = <strong>design-only</strong>. Evidence types = <strong>10</strong> (all design-only). Lifecycle stages = <strong>9</strong> (all design-only). Risk guardrails = <strong>8 safe / 0 active</strong>. Write paths = <strong>0</strong>. External writes = <strong>0</strong>. Recommended mode = <strong>keep mutation gate in design review</strong>.
+        </div>
+      </SectionCard>
+
       {/* ── P3 + P4 + P5 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
         <strong>P3 + P4 + P5 Control Room & Governance safety notice:</strong><br />

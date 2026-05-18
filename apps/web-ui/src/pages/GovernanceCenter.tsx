@@ -17,6 +17,11 @@ import ApprovalEvidenceModel from '../components/governance/ApprovalEvidenceMode
 import ApprovalRollbackPlan from '../components/governance/ApprovalRollbackPlan';
 import ApprovalAuditTrailSpec from '../components/governance/ApprovalAuditTrailSpec';
 import ApprovalGateMatrixTable from '../components/governance/ApprovalGateMatrixTable';
+import MutationGateDesignSpec from '../components/governance/MutationGateDesignSpec';
+import MutationRequestModel from '../components/governance/MutationRequestModel';
+import MutationDiffImpactMatrix from '../components/governance/MutationDiffImpactMatrix';
+import MutationRollbackContract from '../components/governance/MutationRollbackContract';
+import MutationRiskGuardrailMatrix from '../components/governance/MutationRiskGuardrailMatrix';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -269,7 +274,7 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.23.0-P3"
+      versionLabel="AIP v7.23.0-P4"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls"
@@ -485,6 +490,28 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Approval Gate Matrix" style={{ marginBottom: 20, border: '1px solid #EC4899' }}>
         <ApprovalGateMatrixTable />
+      </SectionCard>
+
+      {/* ── v7.23.0-P4 Mutation Gate Design Spec Sections ── */}
+
+      <SectionCard title="Mutation Gate Design Spec" style={{ marginBottom: 20, border: '1px solid #A855F7' }}>
+        <MutationGateDesignSpec />
+      </SectionCard>
+
+      <SectionCard title="Mutation Request Model" style={{ marginBottom: 20, border: '1px solid #A855F7' }}>
+        <MutationRequestModel />
+      </SectionCard>
+
+      <SectionCard title="Mutation Diff / Impact Matrix" style={{ marginBottom: 20, border: '1px solid #A855F7' }}>
+        <MutationDiffImpactMatrix />
+      </SectionCard>
+
+      <SectionCard title="Mutation Rollback Contract" style={{ marginBottom: 20, border: '1px solid #A855F7' }}>
+        <MutationRollbackContract />
+      </SectionCard>
+
+      <SectionCard title="Mutation Risk Guardrail Matrix" style={{ marginBottom: 20, border: '1px solid #A855F7' }}>
+        <MutationRiskGuardrailMatrix />
       </SectionCard>
 
       {/* Related Routes */}

@@ -213,3 +213,154 @@ export const APPROVAL_GATE_MATRIX: ApprovalGateMatrixRow[] = [
   { area: 'Deployment', currentMode: 'disabled', approval: 'deferred', reject: 'deferred', write: 'no', execute: 'no', evidence: 'release plan', status: 'disabled' },
   { area: 'Service control', currentMode: 'disabled', approval: 'deferred', reject: 'deferred', write: 'no', execute: 'no', evidence: 'recovery plan', status: 'disabled' },
 ];
+
+// ── Mutation Gate Design Spec ──
+
+export interface MutationField {
+  fieldName: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  writePath: string;
+  stageGate: string;
+  futureRequirement: string;
+}
+
+export const MUTATION_DESIGN_FIELDS: MutationField[] = [
+  { fieldName: 'MutationRequest', purpose: '变更请求 — 记录待变更操作详情', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '人工提交变更请求' },
+  { fieldName: 'MutationScope', purpose: '变更范围 — 定义变更影响哪些系统/模块', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '范围选择+影响预估' },
+  { fieldName: 'MutationDiff', purpose: '变更差异 — 记录变更前后差异', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '差异对比+可视化' },
+  { fieldName: 'MutationImpact', purpose: '变更影响 — 评估变更的潜在影响', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '影响评分+风险标识' },
+  { fieldName: 'MutationRollbackPlan', purpose: '回滚计划 — 变更失败后的回退策略', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '回滚步骤+成功验证' },
+  { fieldName: 'MutationEvidence', purpose: '变更证据 — 附上审计证据', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '证据上传+摘要' },
+  { fieldName: 'MutationApprovalLink', purpose: '审批链接 — 关联 Approval Gate 记录', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '跨门禁关联' },
+  { fieldName: 'MutationAuditRecord', purpose: '审计记录 — 完整记录变更全链路', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '不可篡改审计追踪' },
+  { fieldName: 'MutationExpiry', purpose: '变更过期 — 变更请求超时失效', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '超时策略+通知' },
+  { fieldName: 'MutationOwner', purpose: '变更负责人 — 指定执行变更的人员', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '负责人分配+通知' },
+];
+
+// ── Mutation Request Model ──
+
+export interface MutationRequestField {
+  field: string;
+  purpose: string;
+  status: string;
+  persisted: string;
+}
+
+export const MUTATION_REQUEST_FIELDS: MutationRequestField[] = [
+  { field: 'Request ID', purpose: '变更请求唯一标识', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Requested mutation', purpose: '请求的具体变更操作描述', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Target domain', purpose: '变更目标域', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Target resource', purpose: '变更目标资源', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Requester note', purpose: '发起人备注', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Approval dependency', purpose: '依赖的审批门禁', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Evidence bundle', purpose: '证据包引用', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Rollback requirement', purpose: '回滚要求', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Risk class', purpose: '风险等级分类', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Expiration policy', purpose: '过期策略', status: 'design-only', persisted: 'not persisted' },
+];
+
+// ── Mutation Diff / Impact Matrix ──
+
+export interface MutationDiffRow {
+  area: string;
+  currentMode: string;
+  diffRequired: string;
+  impactRequired: string;
+  write: string;
+  execute: string;
+  externalIO: string;
+  status: string;
+}
+
+export const MUTATION_DIFF_MATRIX: MutationDiffRow[] = [
+  { area: 'Navigation exposure', currentMode: 'readonly', diffRequired: 'future', impactRequired: 'future', write: 'no', execute: 'no', externalIO: 'no', status: 'design-only' },
+  { area: 'Center access', currentMode: 'readonly', diffRequired: 'future', impactRequired: 'future', write: 'no', execute: 'no', externalIO: 'no', status: 'design-only' },
+  { area: 'Memory candidate', currentMode: 'preview', diffRequired: 'required future', impactRequired: 'required future', write: 'no', execute: 'no', externalIO: 'no', status: 'deferred' },
+  { area: 'Connector metadata', currentMode: 'readonly', diffRequired: 'required future', impactRequired: 'required future', write: 'no', execute: 'no', externalIO: 'no', status: 'deferred' },
+  { area: 'Lab capability metadata', currentMode: 'readonly', diffRequired: 'required future', impactRequired: 'required future', write: 'no', execute: 'no', externalIO: 'no', status: 'deferred' },
+  { area: 'External connector write', currentMode: 'disabled', diffRequired: 'required future', impactRequired: 'required future', write: 'no', execute: 'no', externalIO: 'gated', status: 'disabled' },
+  { area: 'Deployment config', currentMode: 'disabled', diffRequired: 'required future', impactRequired: 'required future', write: 'no', execute: 'no', externalIO: 'gated', status: 'disabled' },
+];
+
+// ── Mutation Rollback Contract ──
+
+export interface MutationRollbackContractField {
+  field: string;
+  purpose: string;
+  status: string;
+}
+
+export const MUTATION_ROLLBACK_CONTRACT: MutationRollbackContractField[] = [
+  { field: 'Restore target', purpose: '恢复目标 — 恢复到哪个基线版本', status: 'design-only' },
+  { field: 'Rollback command placeholder', purpose: '回滚命令占位 — 未来可执行的回滚命令', status: 'design-only' },
+  { field: 'Manual owner', purpose: '手动回滚负责人', status: 'design-only' },
+  { field: 'Verification command', purpose: '验证命令 — 回滚后验证成功的命令', status: 'design-only' },
+  { field: 'Affected scope', purpose: '影响范围 — 回滚操作影响的模块', status: 'design-only' },
+  { field: 'Data safety note', purpose: '数据安全说明', status: 'design-only' },
+  { field: 'Audit evidence', purpose: '审计证据 — 回滚证据记录', status: 'design-only' },
+  { field: 'Failure handling', purpose: '失败处理 — 回滚失败时的升级策略', status: 'design-only' },
+];
+
+// ── Mutation Evidence Types ──
+
+export interface MutationEvidenceType {
+  evidence: string;
+  purpose: string;
+  status: string;
+}
+
+export const MUTATION_EVIDENCE_TYPES: MutationEvidenceType[] = [
+  { evidence: 'Before snapshot', purpose: '变更前快照', status: 'design-only' },
+  { evidence: 'After preview', purpose: '变更后预览', status: 'design-only' },
+  { evidence: 'Diff summary', purpose: '差异汇总', status: 'design-only' },
+  { evidence: 'Risk assessment', purpose: '风险评估', status: 'design-only' },
+  { evidence: 'Approval reference', purpose: '审批引用', status: 'design-only' },
+  { evidence: 'Rollback plan', purpose: '回滚计划', status: 'design-only' },
+  { evidence: 'Validator snapshot', purpose: '当前 validator 快照', status: 'design-only' },
+  { evidence: 'DB doctor result', purpose: '数据库健康检查结果', status: 'design-only' },
+  { evidence: 'Secret scan result', purpose: '密钥扫描结果', status: 'design-only' },
+  { evidence: 'Manual reviewer note', purpose: '人工审查备注', status: 'design-only' },
+];
+
+// ── Mutation Risk Guardrail Matrix ──
+
+export interface MutationGuardrailRow {
+  risk: string;
+  currentExposure: string;
+  activeRisk: number;
+  guardrail: string;
+  status: string;
+}
+
+export const MUTATION_GUARDRAIL_MATRIX: MutationGuardrailRow[] = [
+  { risk: 'DB mutation', currentExposure: 'none', activeRisk: 0, guardrail: 'no write path', status: 'safe' },
+  { risk: 'Memory candidate mutation', currentExposure: 'none', activeRisk: 0, guardrail: 'Stage C deferred', status: 'safe' },
+  { risk: 'Connector write', currentExposure: 'none', activeRisk: 0, guardrail: 'external writes disabled', status: 'safe' },
+  { risk: 'LAN sync', currentExposure: 'none', activeRisk: 0, guardrail: 'sync disabled', status: 'safe' },
+  { risk: 'Dataset mutation', currentExposure: 'none', activeRisk: 0, guardrail: 'no dataset writes', status: 'safe' },
+  { risk: 'Navigation mutation', currentExposure: 'none', activeRisk: 0, guardrail: 'no Layout/menu changes', status: 'safe' },
+  { risk: 'Release mutation', currentExposure: 'none', activeRisk: 0, guardrail: 'no tag/release', status: 'safe' },
+  { risk: 'Service mutation', currentExposure: 'none', activeRisk: 0, guardrail: 'no taskkill/restart', status: 'safe' },
+];
+
+// ── Mutation Lifecycle Stages ──
+
+export interface MutationLifecycleStage {
+  stage: string;
+  purpose: string;
+  status: string;
+}
+
+export const MUTATION_LIFECYCLE_STAGES: MutationLifecycleStage[] = [
+  { stage: 'Draft mutation request', purpose: '草拟变更请求', status: 'design-only' },
+  { stage: 'Attach diff evidence', purpose: '附上变更差异证据', status: 'design-only' },
+  { stage: 'Attach impact analysis', purpose: '附上影响分析', status: 'design-only' },
+  { stage: 'Attach rollback plan', purpose: '附上回滚计划', status: 'design-only' },
+  { stage: 'Approval gate pending', purpose: '等待审批门禁', status: 'design-only' },
+  { stage: 'Dry-run required', purpose: '需要模拟执行验证', status: 'design-only' },
+  { stage: 'Execution deferred', purpose: '执行延后 — 待条件满足', status: 'design-only' },
+  { stage: 'Audit record required', purpose: '需要审计记录', status: 'design-only' },
+  { stage: 'Closure review', purpose: '关闭审查', status: 'design-only' },
+];
