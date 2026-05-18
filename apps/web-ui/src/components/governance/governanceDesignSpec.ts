@@ -506,6 +506,157 @@ export const EXECUTION_GUARDRAIL_MATRIX: ExecutionGuardrailRow[] = [
   { risk: 'Tag/release', currentExposure: 'none', activeRisk: 0, guardrail: 'no release path', status: 'safe' },
 ];
 
+// ── P6 External Write Gate Design Spec ──
+
+export interface ExternalWriteField {
+  fieldName: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  externalWritePermission: string;
+  writePath: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const EXTERNAL_WRITE_DESIGN_FIELDS: ExternalWriteField[] = [
+  { fieldName: 'ExternalWriteRequest', purpose: '外部写入请求 — 记录对外部系统的写入操作详情', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no external write/push/upload', futureRequirement: '人工提交外部写入请求' },
+  { fieldName: 'TargetConnector', purpose: '目标连接器 — 指定写入目标系统（OpenClaw/GitHub/HuggingFace等）', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no connector write/sync', futureRequirement: '连接器选择+端点验证' },
+  { fieldName: 'TargetEndpoint', purpose: '目标端点 — 具体的外部系统 API 端点', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no endpoint call/write', futureRequirement: '端点清单+健康检查' },
+  { fieldName: 'PayloadPreview', purpose: '载荷预览 — 展示即将写入的数据内容', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no payload upload/send', futureRequirement: '载荷生成+差异对比' },
+  { fieldName: 'WriteScope', purpose: '写入范围 — 定义写入影响哪些资源', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no scope write', futureRequirement: '范围选择+影响预估' },
+  { fieldName: 'EndpointRiskClass', purpose: '端点风险等级 — 评估目标端点的风险分类', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no risk bypass', futureRequirement: '风险评分+分类策略' },
+  { fieldName: 'ApprovalDependency', purpose: '审批依赖 — 关联 Approval Gate 记录', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no cross-gate write', futureRequirement: '审批门禁关联' },
+  { fieldName: 'MutationDependency', purpose: '变更依赖 — 关联 Mutation Gate 记录', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no mutation without gate', futureRequirement: '变更门禁关联' },
+  { fieldName: 'ExecutionDependency', purpose: '执行依赖 — 关联 Execution Gate 记录', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no execute without gate', futureRequirement: '执行门禁关联' },
+  { fieldName: 'RollbackRequirement', purpose: '回滚要求 — 外部写入失败后的回退策略', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no rollback execute', futureRequirement: '回滚步骤+验证方法' },
+  { fieldName: 'AuditEvidence', purpose: '审计证据 — 外部写入操作的审计记录', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no audit write', futureRequirement: '不可篡改审计追踪' },
+  { fieldName: 'ExpiryPolicy', purpose: '过期策略 — 外部写入请求超时失效', status: 'design-only', runtimeEffect: 'none', externalWritePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no auto-expire yet', futureRequirement: '超时策略+通知机制' },
+];
+
+// ── P6 Connector Write Policy Model ──
+
+export interface ConnectorPolicyEntry {
+  connectorName: string;
+  currentWritePosture: string;
+  externalIOPosture: string;
+  allowedWrite: string;
+  requiredFutureGate: string;
+  riskClass: string;
+  blockedActions: string;
+  auditEvidenceRequired: string;
+  rollbackRequirement: string;
+}
+
+export const CONNECTOR_POLICY_ENTRIES: ConnectorPolicyEntry[] = [
+  { connectorName: 'AIP Core', currentWritePosture: 'readonly / design-only', externalIOPosture: 'no external IO', allowedWrite: 'no', requiredFutureGate: 'not required', riskClass: 'low', blockedActions: 'no write/sync/upload', auditEvidenceRequired: 'future', rollbackRequirement: 'future' },
+  { connectorName: 'OpenClaw', currentWritePosture: 'not active / design-only', externalIOPosture: 'gated — observed only', allowedWrite: 'no', requiredFutureGate: 'External Write Gate', riskClass: 'high', blockedActions: 'no connector write/sync/deploy', auditEvidenceRequired: 'required future', rollbackRequirement: 'required future' },
+  { connectorName: 'Memory Hub', currentWritePosture: 'readonly / design-only', externalIOPosture: 'no external IO', allowedWrite: 'no', requiredFutureGate: 'Stage C deferred', riskClass: 'medium', blockedActions: 'no memory write/mutate', auditEvidenceRequired: 'required future', rollbackRequirement: 'required future' },
+  { connectorName: 'OpenAxiom', currentWritePosture: 'not active / design-only', externalIOPosture: 'gated — observe only', allowedWrite: 'no', requiredFutureGate: 'External Write Gate', riskClass: 'high', blockedActions: 'no external write/sync', auditEvidenceRequired: 'required future', rollbackRequirement: 'required future' },
+  { connectorName: 'ComfyUI', currentWritePosture: 'planned / design-only', externalIOPosture: 'local gated only', allowedWrite: 'no', requiredFutureGate: 'Stage C deferred', riskClass: 'medium', blockedActions: 'no workflow write/execute', auditEvidenceRequired: 'future', rollbackRequirement: 'future' },
+  { connectorName: 'Hugging Face', currentWritePosture: 'planned / design-only', externalIOPosture: 'gated — read planned only', allowedWrite: 'no', requiredFutureGate: 'Stage C deferred', riskClass: 'high', blockedActions: 'no upload/push/sync', auditEvidenceRequired: 'required future', rollbackRequirement: 'required future' },
+  { connectorName: 'GitHub', currentWritePosture: 'readonly/manual / design-only', externalIOPosture: 'gated — manual only', allowedWrite: 'no', requiredFutureGate: 'manual only / Stage C deferred', riskClass: 'high', blockedActions: 'no push/tag/release/PR write', auditEvidenceRequired: 'required future', rollbackRequirement: 'required future' },
+  { connectorName: 'LAN_SHARE', currentWritePosture: 'disabled / design-only', externalIOPosture: 'local network gated', allowedWrite: 'no', requiredFutureGate: 'Stage C deferred', riskClass: 'medium', blockedActions: 'no LAN sync/share write', auditEvidenceRequired: 'required future', rollbackRequirement: 'required future' },
+  { connectorName: 'Local Models', currentWritePosture: 'readonly / design-only', externalIOPosture: 'no external IO', allowedWrite: 'no', requiredFutureGate: 'not required', riskClass: 'low', blockedActions: 'no model write/modify', auditEvidenceRequired: 'future', rollbackRequirement: 'future' },
+  { connectorName: 'Stage C Governance', currentWritePosture: 'deferred / design-only', externalIOPosture: 'no external IO', allowedWrite: 'no', requiredFutureGate: 'Stage C package approved', riskClass: 'medium', blockedActions: 'no stageC enable/write', auditEvidenceRequired: 'required future', rollbackRequirement: 'required future' },
+];
+
+// ── P6 External IO Boundary Matrix ──
+
+export interface ExternalIOBoundaryRow {
+  connector: string;
+  read: string;
+  write: string;
+  sync: string;
+  upload: string;
+  deploy: string;
+  externalIO: string;
+  stageGate: string;
+  status: string;
+}
+
+export const EXTERNAL_IO_BOUNDARY_ROWS: ExternalIOBoundaryRow[] = [
+  { connector: 'AIP Core', read: 'readonly', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'none', stageGate: 'none', status: 'stable' },
+  { connector: 'OpenClaw', read: 'observe only', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'gated', stageGate: 'future', status: 'design-only' },
+  { connector: 'Memory Hub', read: 'readonly', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'none', stageGate: 'Stage C deferred', status: 'deferred' },
+  { connector: 'OpenAxiom', read: 'observe only', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'gated', stageGate: 'future', status: 'design-only' },
+  { connector: 'ComfyUI', read: 'planned', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'local gated', stageGate: 'future', status: 'planned' },
+  { connector: 'Hugging Face', read: 'planned', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'gated', stageGate: 'Stage C deferred', status: 'deferred' },
+  { connector: 'GitHub', read: 'readonly/manual', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'gated', stageGate: 'manual only', status: 'disabled' },
+  { connector: 'LAN_SHARE', read: 'disabled', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'local network gated', stageGate: 'Stage C deferred', status: 'disabled' },
+  { connector: 'Local Models', read: 'readonly', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'none', stageGate: 'none', status: 'stable' },
+  { connector: 'Stage C Governance', read: 'readonly', write: 'no', sync: 'no', upload: 'no', deploy: 'no', externalIO: 'none', stageGate: 'Stage C deferred', status: 'deferred' },
+];
+
+// ── P6 External Write Evidence Matrix ──
+
+export interface ExternalWriteEvidenceType {
+  evidence: string;
+  purpose: string;
+  status: string;
+}
+
+export const EXTERNAL_WRITE_EVIDENCE_TYPES: ExternalWriteEvidenceType[] = [
+  { evidence: 'Endpoint inventory', purpose: '目标端点清单 — 列出所有要写入的外部端点', status: 'readonly / design-only' },
+  { evidence: 'Payload preview', purpose: '载荷预览 — 展示即将写入的数据', status: 'readonly / design-only' },
+  { evidence: 'Diff summary', purpose: '差异汇总 — 写入内容的变更对比', status: 'readonly / design-only' },
+  { evidence: 'Risk assessment', purpose: '风险评估 — 外部写入操作的风险评估', status: 'readonly / design-only' },
+  { evidence: 'Approval reference', purpose: '审批引用 — 关联的审批记录', status: 'readonly / design-only' },
+  { evidence: 'Mutation reference', purpose: '变更引用 — 关联的变更记录', status: 'readonly / design-only' },
+  { evidence: 'Execution reference', purpose: '执行引用 — 关联的执行记录', status: 'readonly / design-only' },
+  { evidence: 'Rollback plan', purpose: '回滚计划 — 外部写入失败后的回退策略', status: 'readonly / design-only' },
+  { evidence: 'Validator snapshot', purpose: '当前 validator 快照', status: 'readonly / design-only' },
+  { evidence: 'Secret scan result', purpose: '密钥扫描结果 — 检查载荷中是否包含密钥', status: 'readonly / design-only' },
+  { evidence: 'DB doctor result', purpose: '数据库健康检查结果', status: 'readonly / design-only' },
+  { evidence: 'Manual reviewer note', purpose: '人工审查备注', status: 'readonly / design-only' },
+];
+
+// ── P6 External Write Guardrail Matrix ──
+
+export interface ExternalWriteGuardrailRow {
+  risk: string;
+  currentExposure: string;
+  activeRisk: number;
+  guardrail: string;
+  status: string;
+}
+
+export const EXTERNAL_WRITE_GUARDRAIL_MATRIX: ExternalWriteGuardrailRow[] = [
+  { risk: 'External write', currentExposure: 'none', activeRisk: 0, guardrail: 'no write path', status: 'safe' },
+  { risk: 'Connector write', currentExposure: 'none', activeRisk: 0, guardrail: 'writes disabled', status: 'safe' },
+  { risk: 'LAN sync', currentExposure: 'none', activeRisk: 0, guardrail: 'sync disabled', status: 'safe' },
+  { risk: 'GitHub release/tag', currentExposure: 'none', activeRisk: 0, guardrail: 'no release path', status: 'safe' },
+  { risk: 'Hugging Face upload', currentExposure: 'none', activeRisk: 0, guardrail: 'upload disabled', status: 'safe' },
+  { risk: 'ComfyUI workflow write', currentExposure: 'none', activeRisk: 0, guardrail: 'local-gated only', status: 'safe' },
+  { risk: 'Memory mutation', currentExposure: 'none', activeRisk: 0, guardrail: 'Stage C deferred', status: 'safe' },
+  { risk: 'Deployment', currentExposure: 'none', activeRisk: 0, guardrail: 'deploy disabled', status: 'safe' },
+  { risk: 'OpenAxiom write', currentExposure: 'none', activeRisk: 0, guardrail: 'observe only', status: 'safe' },
+  { risk: 'Payload upload', currentExposure: 'none', activeRisk: 0, guardrail: 'no upload path', status: 'safe' },
+];
+
+// ── P6 Connector Write Lifecycle Stages ──
+
+export interface ConnectorWriteLifecycleStage {
+  stage: string;
+  purpose: string;
+  status: string;
+}
+
+export const CONNECTOR_WRITE_LIFECYCLE_STAGES: ConnectorWriteLifecycleStage[] = [
+  { stage: 'Draft external write request', purpose: '草拟外部写入请求', status: 'design-only / no runtime effect' },
+  { stage: 'Attach endpoint inventory', purpose: '附上目标端点清单', status: 'design-only / no runtime effect' },
+  { stage: 'Attach payload preview', purpose: '附上载荷预览', status: 'design-only / no runtime effect' },
+  { stage: 'Attach risk assessment', purpose: '附上风险评估', status: 'design-only / no runtime effect' },
+  { stage: 'Attach approval reference', purpose: '附上审批引用', status: 'design-only / no runtime effect' },
+  { stage: 'Attach mutation reference', purpose: '附上变更引用', status: 'design-only / no runtime effect' },
+  { stage: 'Attach execution reference', purpose: '附上执行引用', status: 'design-only / no runtime effect' },
+  { stage: 'Attach rollback plan', purpose: '附上回滚计划', status: 'design-only / no runtime effect' },
+  { stage: 'External write deferred', purpose: '外部写入延后 — 待条件满足', status: 'design-only / no runtime effect' },
+  { stage: 'Audit record required', purpose: '需要审计记录', status: 'design-only / no runtime effect' },
+  { stage: 'Closure review', purpose: '关闭审查', status: 'design-only / no runtime effect' },
+];
+
 // ── Execution Lifecycle Stages ──
 
 export interface ExecutionLifecycleStage {

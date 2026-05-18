@@ -27,6 +27,12 @@ import ExecutionRequestModel from '../components/governance/ExecutionRequestMode
 import ExecutionPreflightMatrix from '../components/governance/ExecutionPreflightMatrix';
 import ExecutionBoundaryMatrix from '../components/governance/ExecutionBoundaryMatrix';
 import ExecutionRiskGuardrailMatrix from '../components/governance/ExecutionRiskGuardrailMatrix';
+import ExternalWriteGateDesignSpec from '../components/governance/ExternalWriteGateDesignSpec';
+import ConnectorWritePolicyModel from '../components/governance/ConnectorWritePolicyModel';
+import ExternalIOBoundaryMatrix from '../components/governance/ExternalIOBoundaryMatrix';
+import ExternalWriteEvidenceMatrix from '../components/governance/ExternalWriteEvidenceMatrix';
+import ExternalWriteGuardrailMatrix from '../components/governance/ExternalWriteGuardrailMatrix';
+import ConnectorWriteLifecycleDesign from '../components/governance/ConnectorWriteLifecycleDesign';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -279,10 +285,10 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.23.0-P5"
+      versionLabel="AIP v7.23.0-P6"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -377,6 +383,11 @@ export default function GovernanceCenter() {
             { item: 'Service control', pass: true, ev: 'none' },
             { item: 'Stage C activation', pass: true, ev: 'false' },
             { item: 'Tag / Release', pass: true, ev: 'none' },
+            { item: 'External Write Gate design', pass: true, ev: 'design-only, no write' },
+            { item: 'Connector Write Policy', pass: true, ev: 'all allowedWrite=no' },
+            { item: 'External IO', pass: true, ev: 'all Write/Sync/Upload/Deploy=no' },
+            { item: 'Write guardrails', pass: true, ev: 'all activeRisk=0' },
+            { item: 'Write lifecycle', pass: true, ev: 'design-only, no runtime' },
           ].map(r => (
             <div key={r.item} style={{ display: 'grid', gridTemplateColumns: '1.5fr 60px 2fr', gap: 8, padding: '5px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.02)', alignItems: 'center' }}>
               <span style={{ color: 'var(--text-primary)' }}>{r.item}</span>
@@ -410,6 +421,12 @@ export default function GovernanceCenter() {
             { label: 'Deployment triggers', value: '0', color: 'var(--success)' },
             { label: 'Service controls', value: '0', color: 'var(--success)' },
             { label: 'Tag / Release triggers', value: '0', color: 'var(--success)' },
+            { label: 'External write fields', value: '12', color: '#8B5CF6' },
+            { label: 'Connector policy entries', value: '10', color: '#8B5CF6' },
+            { label: 'IO matrix rows', value: '10', color: '#8B5CF6' },
+            { label: 'Evidence types', value: '12', color: '#8B5CF6' },
+            { label: 'Guardrail rows', value: '10', color: 'var(--success)' },
+            { label: 'Lifecycle stages', value: '11', color: '#8B5CF6' },
           ].map(k => (
             <div key={k.label} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px', textAlign: 'center' }}>
               <div style={{ fontSize: 8, color: 'var(--text-muted)', marginBottom: 1 }}>{k.label}</div>
@@ -441,6 +458,9 @@ export default function GovernanceCenter() {
             { gate: 'External Write Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'gated', evidence: 'endpoint + audit', stage: 'deferred' },
             { gate: 'Deployment Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'gated', evidence: 'release plan', stage: 'deferred' },
             { gate: 'Rollback Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'no', evidence: 'restore plan', stage: 'deferred' },
+            { gate: 'Connector Write Policy', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'gated', evidence: 'endpoint + risk', stage: 'deferred' },
+            { gate: 'External IO Boundary', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'gated/disabled', evidence: 'boundary matrix', stage: 'deferred' },
+            { gate: 'Write Guardrail', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'none', evidence: 'activeRisk=0', stage: 'deferred' },
           ].map(r => (
             <div key={r.gate} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 70px 60px 60px 80px 1.2fr 80px', gap: 8, padding: '5px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.02)', alignItems: 'center' }}>
               <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{r.gate}</span>
@@ -539,6 +559,32 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Execution Risk Guardrail Matrix" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
         <ExecutionRiskGuardrailMatrix />
+      </SectionCard>
+
+      {/* ── v7.23.0-P6 External Write Gate + Connector Write Policy Design Spec Sections ── */}
+
+      <SectionCard title="External Write Gate Design Spec" style={{ marginBottom: 20, border: '1px solid #DC2626' }}>
+        <ExternalWriteGateDesignSpec />
+      </SectionCard>
+
+      <SectionCard title="Connector Write Policy Model" style={{ marginBottom: 20, border: '1px solid #DC2626' }}>
+        <ConnectorWritePolicyModel />
+      </SectionCard>
+
+      <SectionCard title="External IO Boundary Matrix" style={{ marginBottom: 20, border: '1px solid #DC2626' }}>
+        <ExternalIOBoundaryMatrix />
+      </SectionCard>
+
+      <SectionCard title="External Write Evidence Matrix" style={{ marginBottom: 20, border: '1px solid #DC2626' }}>
+        <ExternalWriteEvidenceMatrix />
+      </SectionCard>
+
+      <SectionCard title="External Write Guardrail Matrix" style={{ marginBottom: 20, border: '1px solid #DC2626' }}>
+        <ExternalWriteGuardrailMatrix />
+      </SectionCard>
+
+      <SectionCard title="Connector Write Lifecycle Design" style={{ marginBottom: 20, border: '1px solid #DC2626' }}>
+        <ConnectorWriteLifecycleDesign />
       </SectionCard>
 
       {/* Related Routes */}

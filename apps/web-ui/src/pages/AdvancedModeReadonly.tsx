@@ -54,6 +54,14 @@ import {
   GOVERNANCE_REGISTRY,
 } from '../registry/governance-registry';
 import {
+  EXTERNAL_WRITE_DESIGN_FIELDS,
+  CONNECTOR_POLICY_ENTRIES,
+  EXTERNAL_IO_BOUNDARY_ROWS,
+  EXTERNAL_WRITE_EVIDENCE_TYPES,
+  EXTERNAL_WRITE_GUARDRAIL_MATRIX,
+  CONNECTOR_WRITE_LIFECYCLE_STAGES,
+} from '../components/governance/governanceDesignSpec';
+import {
   getGovernanceRegistrySummary,
   validateGovernanceRegistry,
 } from '../registry/governance-registry-validator';
@@ -745,10 +753,37 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 Control Room Safety Notice ── */}
+      {/* ── v7.23.0-P6 External Write Gate Bridge ── */}
+      <SectionCard title="External Write Gate Bridge" style={{ marginBottom: 20, border: '1px solid #DC2626' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="External Write Gate" value="design-only" color="#DC2626" />
+          <KpiCard label="External write paths" value="0" color="var(--success)" />
+          <KpiCard label="Connector writes" value="0" color="var(--success)" />
+          <KpiCard label="LAN sync paths" value="0" color="var(--success)" />
+          <KpiCard label="Upload controls" value="0" color="var(--success)" />
+          <KpiCard label="Deploy controls" value="0" color="var(--success)" />
+          <KpiCard label="Push controls" value="0" color="var(--success)" />
+          <KpiCard label="Design fields" value={String(EXTERNAL_WRITE_DESIGN_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Connector policies" value={String(CONNECTOR_POLICY_ENTRIES.length)} color="#8B5CF6" />
+          <KpiCard label="IO matrix rows" value={String(EXTERNAL_IO_BOUNDARY_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Evidence types" value={String(EXTERNAL_WRITE_EVIDENCE_TYPES.length)} color="#8B5CF6" />
+          <KpiCard label="Guardrail rows" value={String(EXTERNAL_WRITE_GUARDRAIL_MATRIX.length)} color="var(--success)" />
+          <KpiCard label="Lifecycle stages" value={String(CONNECTOR_WRITE_LIFECYCLE_STAGES.length)} color="#8B5CF6" />
+          <KpiCard label="Rollback plan" value="required future" color="#F97316" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(220,38,38,0.08)', color: '#DC2626', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review External Write Gate Spec →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(220,38,38,0.08)', color: '#DC2626', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep external write gate in design review</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(220,38,38,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          External Write Gate = <strong>design-only</strong>. External write paths = <strong>0</strong>. Connector writes = <strong>0</strong>. LAN sync paths = <strong>0</strong>. Upload controls = <strong>0</strong>. Deploy controls = <strong>0</strong>. Push controls = <strong>0</strong>. Rollback plan = <strong>required in future</strong>. Recommended next = <strong>keep external write gate in design review</strong>.
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 + P5 Control Room & Governance safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 + P6 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}
