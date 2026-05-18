@@ -60,6 +60,14 @@ import {
   EXTERNAL_WRITE_EVIDENCE_TYPES,
   EXTERNAL_WRITE_GUARDRAIL_MATRIX,
   CONNECTOR_WRITE_LIFECYCLE_STAGES,
+  DEPLOYMENT_DESIGN_FIELDS,
+  DEPLOYMENT_REQUEST_FIELDS,
+  DEPLOYMENT_BOUNDARY_ROWS,
+  DEPLOYMENT_EVIDENCE_TYPES,
+  ROLLBACK_DESIGN_FIELDS,
+  ROLLBACK_PLAN_FIELDS,
+  DEPLOYMENT_ROLLBACK_GUARDRAIL_MATRIX,
+  DEPLOYMENT_ROLLBACK_LIFECYCLE_STAGES,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -780,10 +788,38 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 + P6 Control Room Safety Notice ── */}
+      {/* ── v7.23.0-P7 Deployment / Rollback Gate Bridge ── */}
+      <SectionCard title="Deployment / Rollback Gate Bridge" style={{ marginBottom: 20, border: '1px solid #F97316' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Deployment Gate" value="design-only" color="#F97316" />
+          <KpiCard label="Rollback Gate" value="design-only" color="#F97316" />
+          <KpiCard label="Deploy paths" value="0" color="var(--success)" />
+          <KpiCard label="Upload controls" value="0" color="var(--success)" />
+          <KpiCard label="Push controls" value="0" color="var(--success)" />
+          <KpiCard label="Rollback/restore" value="0" color="var(--success)" />
+          <KpiCard label="Service restart" value="0" color="var(--success)" />
+          <KpiCard label="Deploy design fields" value={String(DEPLOYMENT_DESIGN_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Deploy request fields" value={String(DEPLOYMENT_REQUEST_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Deploy boundary rows" value={String(DEPLOYMENT_BOUNDARY_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Deploy evidence types" value={String(DEPLOYMENT_EVIDENCE_TYPES.length)} color="#8B5CF6" />
+          <KpiCard label="Rollback design fields" value={String(ROLLBACK_DESIGN_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Rollback plan fields" value={String(ROLLBACK_PLAN_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Guardrail rows" value={String(DEPLOYMENT_ROLLBACK_GUARDRAIL_MATRIX.length)} color="var(--success)" />
+          <KpiCard label="Lifecycle stages" value={String(DEPLOYMENT_ROLLBACK_LIFECYCLE_STAGES.length)} color="#8B5CF6" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(249,115,22,0.08)', color: '#F97316', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Deployment / Rollback Gate Spec →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(249,115,22,0.08)', color: '#F97316', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep deployment and rollback gates in design review</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(249,115,22,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Deployment Gate = <strong>design-only</strong>. Rollback Gate = <strong>design-only</strong>. Deploy paths = <strong>0</strong>. Upload controls = <strong>0</strong>. Push controls = <strong>0</strong>. Rollback/restore = <strong>0</strong>. Service restart = <strong>0</strong>. Recommended next = <strong>keep deployment and rollback gates in design review</strong>.
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 + P7 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 + P5 + P6 Control Room & Governance safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 + P6 + P7 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}

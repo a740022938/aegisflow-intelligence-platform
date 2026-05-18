@@ -154,13 +154,13 @@ export const APPROVAL_EVIDENCE_TYPES: ApprovalEvidenceType[] = [
 
 // ── Approval Rollback Plan Spec ──
 
-export interface RollbackField {
+export interface ApprovalRollbackField {
   field: string;
   purpose: string;
   status: string;
 }
 
-export const APPROVAL_ROLLBACK_FIELDS: RollbackField[] = [
+export const APPROVAL_ROLLBACK_FIELDS: ApprovalRollbackField[] = [
   { field: 'Rollback target', purpose: '回滚目标 — 定义回滚到哪个基线', status: 'design-only' },
   { field: 'Restore point', purpose: '恢复点 — 定义可恢复的快照标识', status: 'design-only' },
   { field: 'Affected scope', purpose: '影响范围 — 回滚操作影响哪些系统', status: 'design-only' },
@@ -653,6 +653,194 @@ export const CONNECTOR_WRITE_LIFECYCLE_STAGES: ConnectorWriteLifecycleStage[] = 
   { stage: 'Attach execution reference', purpose: '附上执行引用', status: 'design-only / no runtime effect' },
   { stage: 'Attach rollback plan', purpose: '附上回滚计划', status: 'design-only / no runtime effect' },
   { stage: 'External write deferred', purpose: '外部写入延后 — 待条件满足', status: 'design-only / no runtime effect' },
+  { stage: 'Audit record required', purpose: '需要审计记录', status: 'design-only / no runtime effect' },
+  { stage: 'Closure review', purpose: '关闭审查', status: 'design-only / no runtime effect' },
+];
+
+// ── P7 Deployment Gate Design Spec ──
+
+export interface DeploymentField {
+  fieldName: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  deploymentPermission: string;
+  releasePermission: string;
+  externalWritePath: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const DEPLOYMENT_DESIGN_FIELDS: DeploymentField[] = [
+  { fieldName: 'DeploymentRequest', purpose: '部署请求 — 记录部署操作详情', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no deploy/release/tag/push', futureRequirement: '人工提交部署请求' },
+  { fieldName: 'DeploymentScope', purpose: '部署范围 — 定义部署影响哪些系统/模块', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no scope deploy/release', futureRequirement: '范围选择+影响预估' },
+  { fieldName: 'DeploymentTarget', purpose: '部署目标 — 指定部署目标环境/服务', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no target write/deploy', futureRequirement: '目标选择+健康检查' },
+  { fieldName: 'DeploymentPlan', purpose: '部署计划 — 详细的部署步骤与时间线', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no plan execute/deploy', futureRequirement: '步骤生成+审批' },
+  { fieldName: 'DeploymentEvidence', purpose: '部署证据 — 附上构建/测试证据', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no evidence upload/write', futureRequirement: '证据上传+摘要' },
+  { fieldName: 'ReleasePlan', purpose: '发布计划 — 定义发布策略与回退方案', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no release/tag/push', futureRequirement: '发布策略+版本号' },
+  { fieldName: 'ApprovalDependency', purpose: '审批依赖 — 关联 Approval Gate 记录', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no cross-gate deploy', futureRequirement: '审批门禁关联' },
+  { fieldName: 'ExecutionDependency', purpose: '执行依赖 — 关联 Execution Gate 记录', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no execute without gate', futureRequirement: '执行门禁关联' },
+  { fieldName: 'RollbackDependency', purpose: '回滚依赖 — 关联 Rollback Gate 记录', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no rollback without gate', futureRequirement: '回滚门禁关联' },
+  { fieldName: 'DeploymentAuditRecord', purpose: '审计记录 — 完整记录部署全链路', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no audit write', futureRequirement: '不可篡改审计追踪' },
+  { fieldName: 'DeploymentExpiry', purpose: '部署过期 — 部署请求超时失效', status: 'design-only', runtimeEffect: 'none', deploymentPermission: 'disabled', releasePermission: 'disabled', externalWritePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no auto-expire yet', futureRequirement: '超时策略+通知机制' },
+];
+
+// ── P7 Deployment Request Model ──
+
+export interface DeploymentRequestField {
+  field: string;
+  purpose: string;
+  status: string;
+  persisted: string;
+}
+
+export const DEPLOYMENT_REQUEST_FIELDS: DeploymentRequestField[] = [
+  { field: 'Request ID', purpose: '部署请求唯一标识', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Deployment target', purpose: '部署目标环境/服务', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Deployment scope', purpose: '部署影响范围', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Requested artifact', purpose: '请求部署的构建产物', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Release note', purpose: '发布说明', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Preflight requirement', purpose: '预检要求', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Approval dependency', purpose: '依赖的审批门禁', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Execution dependency', purpose: '依赖的执行门禁', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Rollback dependency', purpose: '依赖的回滚门禁', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Risk class', purpose: '风险等级分类', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Expiration policy', purpose: '过期策略', status: 'design-only', persisted: 'not persisted' },
+];
+
+// ── P7 Deployment Boundary Matrix ──
+
+export interface DeploymentBoundaryRow {
+  area: string;
+  currentMode: string;
+  deploy: string;
+  release: string;
+  tag: string;
+  push: string;
+  externalIO: string;
+  stageGate: string;
+  status: string;
+}
+
+export const DEPLOYMENT_BOUNDARY_ROWS: DeploymentBoundaryRow[] = [
+  { area: 'Web UI', currentMode: 'readonly', deploy: 'no', release: 'no', tag: 'no', push: 'no', externalIO: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { area: 'API service', currentMode: 'readonly', deploy: 'no', release: 'no', tag: 'no', push: 'no', externalIO: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { area: 'Gateway', currentMode: 'readonly', deploy: 'no', release: 'no', tag: 'no', push: 'no', externalIO: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { area: 'Connector metadata', currentMode: 'readonly', deploy: 'no', release: 'no', tag: 'no', push: 'no', externalIO: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { area: 'LAN_SHARE', currentMode: 'disabled', deploy: 'no', release: 'no', tag: 'no', push: 'no', externalIO: 'local gated', stageGate: 'Stage C deferred', status: 'disabled' },
+  { area: 'GitHub Release', currentMode: 'disabled', deploy: 'no', release: 'no', tag: 'no', push: 'no', externalIO: 'gated', stageGate: 'manual only', status: 'disabled' },
+  { area: 'Service restart', currentMode: 'disabled', deploy: 'no', release: 'no', tag: 'no', push: 'no', externalIO: 'local gated', stageGate: 'Stage C deferred', status: 'disabled' },
+];
+
+// ── P7 Deployment Evidence / Release Plan Matrix ──
+
+export interface DeploymentEvidenceType {
+  evidence: string;
+  purpose: string;
+  status: string;
+}
+
+export const DEPLOYMENT_EVIDENCE_TYPES: DeploymentEvidenceType[] = [
+  { evidence: 'Build result', purpose: '构建结果 — 构建是否成功', status: 'readonly / design-only' },
+  { evidence: 'Typecheck result', purpose: '类型检查结果', status: 'readonly / design-only' },
+  { evidence: 'Lint result', purpose: '代码规范检查结果', status: 'readonly / design-only' },
+  { evidence: 'DB doctor result', purpose: '数据库健康检查结果', status: 'readonly / design-only' },
+  { evidence: 'Secret scan result', purpose: '密钥扫描结果', status: 'readonly / design-only' },
+  { evidence: 'Smoke status', purpose: '冒烟测试状态', status: 'readonly / design-only' },
+  { evidence: 'Release note', purpose: '发布说明', status: 'readonly / design-only' },
+  { evidence: 'Artifact summary', purpose: '构建产物摘要', status: 'readonly / design-only' },
+  { evidence: 'Rollback plan', purpose: '回滚计划', status: 'readonly / design-only' },
+  { evidence: 'Manual reviewer note', purpose: '人工审查备注', status: 'readonly / design-only' },
+];
+
+// ── P7 Rollback Gate Design Spec ──
+
+export interface RollbackField {
+  fieldName: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  rollbackPermission: string;
+  restorePath: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const ROLLBACK_DESIGN_FIELDS: RollbackField[] = [
+  { fieldName: 'RollbackRequest', purpose: '回滚请求 — 记录回滚操作详情', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no rollback/restore/reset/revert/checkout', futureRequirement: '人工提交回滚请求' },
+  { fieldName: 'RestoreTarget', purpose: '恢复目标 — 定义回滚到哪个基线版本', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no restore/reset/revert', futureRequirement: '基线选择+版本验证' },
+  { fieldName: 'RestorePoint', purpose: '恢复点 — 定义可恢复的快照标识', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no restore point write', futureRequirement: '快照标识+恢复验证' },
+  { fieldName: 'RollbackScope', purpose: '回滚范围 — 定义回滚影响哪些系统/模块', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no scope rollback/restore', futureRequirement: '范围选择+影响预估' },
+  { fieldName: 'RollbackEvidence', purpose: '回滚证据 — 附上回滚操作审计证据', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no evidence write/upload', futureRequirement: '证据上传+摘要' },
+  { fieldName: 'VerificationPlan', purpose: '验证计划 — 回滚后的验证步骤', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no verification execute', futureRequirement: '验证命令+成功标准' },
+  { fieldName: 'FailureHandling', purpose: '失败处理 — 回滚失败时的升级策略', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no fallback execute', futureRequirement: '升级策略+通知' },
+  { fieldName: 'ManualOwner', purpose: '手动负责人 — 指定执行回滚的人员', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no auto rollback', futureRequirement: '负责人分配+通知' },
+  { fieldName: 'AuditRecord', purpose: '审计记录 — 完整记录回滚全链路', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no audit write', futureRequirement: '不可篡改审计追踪' },
+  { fieldName: 'ExpiryPolicy', purpose: '过期策略 — 回滚请求超时失效', status: 'design-only', runtimeEffect: 'none', rollbackPermission: 'disabled', restorePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no auto-expire yet', futureRequirement: '超时策略+通知机制' },
+];
+
+// ── P7 Rollback Plan Model ──
+
+export interface RollbackPlanField {
+  field: string;
+  purpose: string;
+  status: string;
+  persisted: string;
+}
+
+export const ROLLBACK_PLAN_FIELDS: RollbackPlanField[] = [
+  { field: 'Restore target', purpose: '恢复目标 — 恢复到哪个基线版本', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Restore source', purpose: '恢复源 — 从哪个备份/快照恢复', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Affected services', purpose: '受影响服务 — 回滚会影响哪些服务', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Affected data', purpose: '受影响数据 — 回滚会影响哪些数据', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Manual owner', purpose: '手动回滚负责人', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Verification command', purpose: '验证命令 — 回滚后验证成功的命令', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Risk level', purpose: '风险等级分类', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Failure fallback', purpose: '失败回退 — 回滚失败时的应急策略', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Audit evidence', purpose: '审计证据 — 回滚操作证据记录', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Closure review', purpose: '关闭审查 — 回滚完成后的审查', status: 'design-only', persisted: 'not persisted' },
+];
+
+// ── P7 Deployment / Rollback Guardrail Matrix ──
+
+export interface DeploymentRollbackGuardrailRow {
+  risk: string;
+  currentExposure: string;
+  activeRisk: number;
+  guardrail: string;
+  status: string;
+}
+
+export const DEPLOYMENT_ROLLBACK_GUARDRAIL_MATRIX: DeploymentRollbackGuardrailRow[] = [
+  { risk: 'Deployment action', currentExposure: 'none', activeRisk: 0, guardrail: 'no deploy path', status: 'safe' },
+  { risk: 'GitHub Release', currentExposure: 'none', activeRisk: 0, guardrail: 'no release path', status: 'safe' },
+  { risk: 'Git tag', currentExposure: 'none', activeRisk: 0, guardrail: 'no tag operation', status: 'safe' },
+  { risk: 'Push/upload', currentExposure: 'none', activeRisk: 0, guardrail: 'external writes disabled', status: 'safe' },
+  { risk: 'Service restart', currentExposure: 'none', activeRisk: 0, guardrail: 'no restart/taskkill', status: 'safe' },
+  { risk: 'Rollback action', currentExposure: 'none', activeRisk: 0, guardrail: 'no restore/reset/revert', status: 'safe' },
+  { risk: 'DB restore', currentExposure: 'none', activeRisk: 0, guardrail: 'no DB restore path', status: 'safe' },
+  { risk: 'LAN sync', currentExposure: 'none', activeRisk: 0, guardrail: 'sync disabled', status: 'safe' },
+];
+
+// ── P7 Deployment / Rollback Lifecycle Stages ──
+
+export interface DeploymentRollbackLifecycleStage {
+  stage: string;
+  purpose: string;
+  status: string;
+}
+
+export const DEPLOYMENT_ROLLBACK_LIFECYCLE_STAGES: DeploymentRollbackLifecycleStage[] = [
+  { stage: 'Draft deployment request', purpose: '草拟部署请求', status: 'design-only / no runtime effect' },
+  { stage: 'Attach build evidence', purpose: '附上构建证据', status: 'design-only / no runtime effect' },
+  { stage: 'Attach release plan', purpose: '附上发布计划', status: 'design-only / no runtime effect' },
+  { stage: 'Attach rollback plan', purpose: '附上回滚计划', status: 'design-only / no runtime effect' },
+  { stage: 'Approval gate pending', purpose: '等待审批门禁', status: 'design-only / no runtime effect' },
+  { stage: 'Execution gate pending', purpose: '等待执行门禁', status: 'design-only / no runtime effect' },
+  { stage: 'Deployment deferred', purpose: '部署延后 — 待条件满足', status: 'design-only / no runtime effect' },
+  { stage: 'Rollback readiness reviewed', purpose: '回滚就绪审查', status: 'design-only / no runtime effect' },
   { stage: 'Audit record required', purpose: '需要审计记录', status: 'design-only / no runtime effect' },
   { stage: 'Closure review', purpose: '关闭审查', status: 'design-only / no runtime effect' },
 ];
