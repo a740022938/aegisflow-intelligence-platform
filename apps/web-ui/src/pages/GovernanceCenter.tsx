@@ -103,6 +103,14 @@ import ReviewWorkflowImplementationBoundary from '../components/governance/Revie
 import StorageApiRiskReviewMatrix from '../components/governance/StorageApiRiskReviewMatrix';
 import ImplementationSequencingPlan from '../components/governance/ImplementationSequencingPlan';
 import ImplementationGoNoGoGate from '../components/governance/ImplementationGoNoGoGate';
+import P7SchemaImplementationPlan from '../components/governance/P7SchemaImplementationPlan';
+import P7AuthorizationTableDesignReview from '../components/governance/P7AuthorizationTableDesignReview';
+import P7MigrationBoundaryDesign from '../components/governance/P7MigrationBoundaryDesign';
+import P7SchemaChangeRiskMatrix from '../components/governance/P7SchemaChangeRiskMatrix';
+import P7RetentionCleanupDesign from '../components/governance/P7RetentionCleanupDesign';
+import P7SchemaRollbackPlanning from '../components/governance/P7SchemaRollbackPlanning';
+import P7StorageValidationPlan from '../components/governance/P7StorageValidationPlan';
+import P7DbDoctorExtensionDesign from '../components/governance/P7DbDoctorExtensionDesign';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -990,6 +998,40 @@ export default function GovernanceCenter() {
         <ImplementationGoNoGoGate />
       </SectionCard>
 
+      {/* ── v7.24.0-P7 Storage Schema Implementation Plan Review + Migration Boundary Design Sections ── */}
+
+      <SectionCard title="Schema Implementation Plan Review (P7)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <P7SchemaImplementationPlan />
+      </SectionCard>
+
+      <SectionCard title="Authorization Table Design Review (P7)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <P7AuthorizationTableDesignReview />
+      </SectionCard>
+
+      <SectionCard title="Migration Boundary Design (P7)" style={{ marginBottom: 20, border: '1px solid #F59E0B' }}>
+        <P7MigrationBoundaryDesign />
+      </SectionCard>
+
+      <SectionCard title="Schema Change Risk Matrix (P7)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <P7SchemaChangeRiskMatrix />
+      </SectionCard>
+
+      <SectionCard title="Data Retention / Cleanup Design Review (P7)" style={{ marginBottom: 20, border: '1px solid #14B8A6' }}>
+        <P7RetentionCleanupDesign />
+      </SectionCard>
+
+      <SectionCard title="Schema Rollback Planning Design (P7)" style={{ marginBottom: 20, border: '1px solid #F43F5E' }}>
+        <P7SchemaRollbackPlanning />
+      </SectionCard>
+
+      <SectionCard title="Storage Validation Plan (P7)" style={{ marginBottom: 20, border: '1px solid #06B6D4' }}>
+        <P7StorageValidationPlan />
+      </SectionCard>
+
+      <SectionCard title="DB Doctor Extension Design (P7)" style={{ marginBottom: 20, border: '1px solid #6366F1' }}>
+        <P7DbDoctorExtensionDesign />
+      </SectionCard>
+
       {/* Related Routes */}
       <SectionCard title="Related Pages" style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 12, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
@@ -1005,7 +1047,7 @@ export default function GovernanceCenter() {
       {/* Readonly Boundary Notice */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
         <strong>Readonly boundary notice:</strong><br />
-        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, rollback, restore, emergency stop, pause, kill, taskkill, restart, disable, shutdown, sync LAN_SHARE, restart services, write/upload/export audit evidence, or enable Stage C. All <code>forbiddenActions</code> are governance display, not a permission system.
+        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, rollback, restore, emergency stop, pause, kill, taskkill, restart, disable, shutdown, sync LAN_SHARE, restart services, write/upload/export audit evidence, or enable Stage C. P7 storage schema implementation plan review is design-review-only — no DB schema, no migration, no API endpoint, no runtime implementation, no DB writes. All <code>forbiddenActions</code> are governance display, not a permission system.
       </div>
     </PageShell>
   );

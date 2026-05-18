@@ -128,6 +128,14 @@ import {
   STORAGE_API_RISK_ROWS,
   IMPLEMENTATION_SEQUENCE_ROWS,
   IMPLEMENTATION_GO_NO_GO_CHECKS,
+  SCHEMA_IMPLEMENTATION_PHASES,
+  AUTHORIZATION_TABLE_DESIGN_ROWS,
+  MIGRATION_BOUNDARY_ITEMS,
+  SCHEMA_CHANGE_RISK_ROWS,
+  RETENTION_CLEANUP_POLICY_AREAS,
+  SCHEMA_ROLLBACK_PLANNING_ITEMS,
+  STORAGE_VALIDATION_CHECKS,
+  DB_DOCTOR_EXTENSION_CHECKS,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -351,10 +359,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6 + P7"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation · P7 storage schema implementation plan review — design-review-only, no db schema, no migration, no api endpoint, no runtime implementation"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -1088,6 +1096,35 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(239,68,68,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
           v7.24.0-P6 Implementation Boundary = <strong>implementation-boundary-only / storage-api-design-review</strong>. Implementation packages = <strong>{IMPLEMENTATION_PACKAGE_BOUNDARY_ITEMS.length}</strong> (all not implemented, No-Go). Future schema tables = <strong>{FUTURE_SCHEMA_TABLES.length}</strong> (all not added). Future API endpoints = <strong>{FUTURE_API_ENDPOINTS.length}</strong> (all not implemented). Evaluator stages = <strong>{RUNTIME_EVALUATOR_STAGES.length}</strong> (all none, not implemented). Workflow stages = <strong>{REVIEW_WORKFLOW_STAGES.length}</strong> (all none, not implemented). Storage/API risks = <strong>{STORAGE_API_RISK_ROWS.length}</strong> (all activeRisk=0, safe). Sequencing rows = <strong>{IMPLEMENTATION_SEQUENCE_ROWS.length}</strong> (all future, No-Go). Go/No-Go checks = <strong>{IMPLEMENTATION_GO_NO_GO_CHECKS.length}</strong> (all No-Go). Overall implementation decision = <strong>No-Go</strong>. Implementation planning allowed = <strong>true</strong>. Runtime execution allowed = <strong>false</strong>. DB schema added = <strong>0</strong>. Migration added = <strong>0</strong>. API endpoints added = <strong>0</strong>. Storage writes = <strong>0</strong>. Runtime evaluator = <strong>not implemented</strong>. Review workflow = <strong>not implemented</strong>. Decision engine = <strong>not implemented</strong>. Permission evaluator = <strong>not implemented</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>proceed to storage schema implementation plan review — not implementation.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── v7.24.0-P7 Storage Schema Implementation Plan Review Bridge ── */}
+      <SectionCard title="Storage Schema Implementation Plan Review Bridge (P7)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Schema implementation phases" value={String(SCHEMA_IMPLEMENTATION_PHASES.length)} color="#8B5CF6" />
+          <KpiCard label="Authorization table designs" value={String(AUTHORIZATION_TABLE_DESIGN_ROWS.length)} color="#EF4444" />
+          <KpiCard label="Migration boundaries" value={String(MIGRATION_BOUNDARY_ITEMS.length)} color="#F59E0B" />
+          <KpiCard label="Schema change risks" value={String(SCHEMA_CHANGE_RISK_ROWS.length)} color="var(--success)" />
+          <KpiCard label="Retention/cleanup policies" value={String(RETENTION_CLEANUP_POLICY_AREAS.length)} color="#14B8A6" />
+          <KpiCard label="Rollback planning items" value={String(SCHEMA_ROLLBACK_PLANNING_ITEMS.length)} color="#F43F5E" />
+          <KpiCard label="Storage validation checks" value={String(STORAGE_VALIDATION_CHECKS.length)} color="#06B6D4" />
+          <KpiCard label="DB doctor extension checks" value={String(DB_DOCTOR_EXTENSION_CHECKS.length)} color="#6366F1" />
+          <KpiCard label="Overall decision" value="No-Go" color="#EF4444" />
+          <KpiCard label="Planning allowed" value="true" color="#8B5CF6" />
+          <KpiCard label="Runtime execution" value="false" color="var(--success)" />
+          <KpiCard label="DB schema added" value="0" color="var(--success)" />
+          <KpiCard label="Migration added" value="0" color="var(--success)" />
+          <KpiCard label="API endpoints added" value="0" color="var(--success)" />
+          <KpiCard label="Storage writes" value="0" color="var(--success)" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Storage Schema Implementation Plan →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep implementation in design-review-only — no runtime execution</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P7 Storage Schema Implementation Plan Review = <strong>design-review-only</strong>. Schema implementation phases = <strong>{SCHEMA_IMPLEMENTATION_PHASES.length}</strong> (all review-only, No-Go). Authorization table designs = <strong>{AUTHORIZATION_TABLE_DESIGN_ROWS.length}</strong> (all not added, disabled). Migration boundaries = <strong>{MIGRATION_BOUNDARY_ITEMS.length}</strong> (all blocked, not implemented). Schema change risks = <strong>{SCHEMA_CHANGE_RISK_ROWS.length}</strong> (all activeRisk=0, safe). Retention/cleanup policies = <strong>{RETENTION_CLEANUP_POLICY_AREAS.length}</strong> (all none, not implemented). Rollback planning items = <strong>{SCHEMA_ROLLBACK_PLANNING_ITEMS.length}</strong> (all design-only, blocked). Storage validation checks = <strong>{STORAGE_VALIDATION_CHECKS.length}</strong> (most future, baseline available). DB doctor extension checks = <strong>{DB_DOCTOR_EXTENSION_CHECKS.length}</strong> (all not implemented, read-only probes). Overall implementation decision = <strong>No-Go</strong>. Implementation planning allowed = <strong>true</strong>. Runtime execution allowed = <strong>false</strong>. DB schema added = <strong>0</strong>. Migration added = <strong>0</strong>. API endpoints added = <strong>0</strong>. Storage writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>proceed to activation safety review and runtime readiness validation — not implementation.</strong>
         </div>
       </SectionCard>
 

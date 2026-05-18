@@ -2473,3 +2473,206 @@ export const IMPLEMENTATION_GO_NO_GO_CHECKS: ImplementationGoNoGoCheckEntry[] = 
   { check: 'Security review completed', purpose: '安全审查已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
   { check: 'Final activation audit completed', purpose: '最终激活审计已完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
 ];
+
+// ── v7.24.0-P7: Storage Schema Implementation Plan Review ──
+
+export interface SchemaImplementationPhaseEntry {
+  phase: string;
+  futurePurpose: string;
+  currentStatus: string;
+  dbImpact: string;
+  migrationImpact: string;
+  writeImpact: string;
+  dependency: string;
+  requiredValidation: string;
+  goNoGoStatus: string;
+}
+
+export const SCHEMA_IMPLEMENTATION_PHASES: SchemaImplementationPhaseEntry[] = [
+  { phase: 'Schema design freeze', futurePurpose: '冻结 authorization schema 设计，进入 migration 草案阶段', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'v7.24.0-P3/P6 design review', requiredValidation: 'schema design review sign-off', goNoGoStatus: 'No-Go' },
+  { phase: 'Migration draft review', futurePurpose: '审查 migration 草案，确保向前/向后兼容', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Schema design freeze', requiredValidation: 'migration dry-run + rollback plan', goNoGoStatus: 'No-Go' },
+  { phase: 'Index strategy review', futurePurpose: '审查索引策略，确保查询性能', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Migration draft review', requiredValidation: 'index coverage analysis + query plan review', goNoGoStatus: 'No-Go' },
+  { phase: 'Foreign-key strategy review', futurePurpose: '审查外键策略，确保数据完整性', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Index strategy review', requiredValidation: 'FK integrity analysis + cascade policy review', goNoGoStatus: 'No-Go' },
+  { phase: 'Retention policy review', futurePurpose: '审查数据保留策略，确保合规', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Foreign-key strategy review', requiredValidation: 'retention policy review + cleanup plan', goNoGoStatus: 'No-Go' },
+  { phase: 'Rollback migration review', futurePurpose: '审查回滚 migration，确保可逆', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Retention policy review', requiredValidation: 'rollback dry-run + data integrity check', goNoGoStatus: 'No-Go' },
+  { phase: 'DB doctor extension review', futurePurpose: '审查 db:doctor 扩展，确保 schema 监控', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Rollback migration review', requiredValidation: 'extension design review + probe validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Seed/backfill policy review', futurePurpose: '审查种子数据/回填策略', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'DB doctor extension review', requiredValidation: 'seed plan review + data validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Read API boundary review', futurePurpose: '审查读 API 边界，确保只读安全', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Seed/backfill policy review', requiredValidation: 'API boundary review + RBAC validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Write API boundary review', futurePurpose: '审查写 API 边界，确保写入受控', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Read API boundary review', requiredValidation: 'write authorization review + audit policy', goNoGoStatus: 'No-Go' },
+  { phase: 'Final migration approval gate', futurePurpose: '最终 migration 审批门禁', currentStatus: 'review-only', dbImpact: 'none', migrationImpact: 'none', writeImpact: 'none', dependency: 'Write API boundary review', requiredValidation: 'final approval + go/no-go decision', goNoGoStatus: 'No-Go' },
+];
+
+// ── v7.24.0-P7: Authorization Table Design Review ──
+
+export interface AuthorizationTableDesignEntry {
+  futureTable: string;
+  purpose: string;
+  currentSchemaStatus: string;
+  migrationStatus: string;
+  writePath: string;
+  readPath: string;
+  indexStrategy: string;
+  retentionClass: string;
+  riskClass: string;
+  requiredValidation: string;
+}
+
+export const AUTHORIZATION_TABLE_DESIGN_ROWS: AuthorizationTableDesignEntry[] = [
+  { futureTable: 'authorization_requests', purpose: '存储授权请求记录', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', indexStrategy: 'future review', retentionClass: 'future review', riskClass: 'high', requiredValidation: 'schema design review + migration dry-run' },
+  { futureTable: 'authorization_decisions', purpose: '存储授权决策记录', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', indexStrategy: 'future review', retentionClass: 'future review', riskClass: 'critical', requiredValidation: 'schema design review + integrity design review' },
+  { futureTable: 'authorization_scopes', purpose: '存储授权范围定义', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', indexStrategy: 'future review', retentionClass: 'future review', riskClass: 'medium', requiredValidation: 'schema design review' },
+  { futureTable: 'authorization_evidence_refs', purpose: '存储审计证据引用', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', indexStrategy: 'future review', retentionClass: 'future review', riskClass: 'high', requiredValidation: 'schema design review + evidence integrity review' },
+  { futureTable: 'authorization_audit_chain', purpose: '存储审计链记录', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', indexStrategy: 'future review', retentionClass: 'future review', riskClass: 'critical', requiredValidation: 'schema design review + audit chain integrity review' },
+  { futureTable: 'authorization_expiry', purpose: '存储授权过期策略与状态', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', indexStrategy: 'future review', retentionClass: 'future review', riskClass: 'medium', requiredValidation: 'schema design review + expiry policy review' },
+  { futureTable: 'authorization_revocations', purpose: '存储授权撤销记录', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', indexStrategy: 'future review', retentionClass: 'future review', riskClass: 'high', requiredValidation: 'schema design review + revocation policy review' },
+  { futureTable: 'authorization_integrity_markers', purpose: '存储数据完整性标记', currentSchemaStatus: 'not added', migrationStatus: 'not added', writePath: 'disabled', readPath: 'disabled', indexStrategy: 'future review', retentionClass: 'future review', riskClass: 'critical', requiredValidation: 'schema design review + integrity algorithm review' },
+];
+
+// ── v7.24.0-P7: Migration Boundary Design ──
+
+export interface MigrationBoundaryItemEntry {
+  boundaryItem: string;
+  currentState: string;
+  blockedAction: string;
+  futurePackage: string;
+  requiredPreflight: string;
+  riskIfViolated: string;
+}
+
+export const MIGRATION_BOUNDARY_ITEMS: MigrationBoundaryItemEntry[] = [
+  { boundaryItem: 'No migration file generation', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'migration design review + approval', riskIfViolated: 'unreviewed schema change without rollback plan' },
+  { boundaryItem: 'No migration execution', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'migration dry-run + DB health check', riskIfViolated: 'unrecoverable schema migration without rollback' },
+  { boundaryItem: 'No schema push', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'schema freeze + migration approval', riskIfViolated: 'unauthorized schema mutation without audit' },
+  { boundaryItem: 'No ORM model update', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'model design review + migration alignment', riskIfViolated: 'inconsistent model-schema mapping' },
+  { boundaryItem: 'No table creation', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'table design review + migration draft', riskIfViolated: 'unreviewed table creation without index strategy' },
+  { boundaryItem: 'No index creation', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'index strategy review + query analysis', riskIfViolated: 'performance regression without index plan' },
+  { boundaryItem: 'No foreign key creation', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'FK strategy review + cascade policy', riskIfViolated: 'data integrity violation without FK plan' },
+  { boundaryItem: 'No seed/backfill job', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'seed plan review + data validation', riskIfViolated: 'inconsistent seed data without validation' },
+  { boundaryItem: 'No data migration', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'data migration plan + rollback plan', riskIfViolated: 'data loss without rollback plan' },
+  { boundaryItem: 'No rollback migration execution', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Authorization Persistence Package', requiredPreflight: 'rollback plan review + DB health check', riskIfViolated: 'unrecoverable state without rollback preflight' },
+];
+
+// ── v7.24.0-P7: Schema Change Risk Matrix ──
+
+export interface SchemaChangeRiskEntry {
+  risk: string;
+  currentExposure: string;
+  activeRisk: number;
+  guardrail: string;
+  futureMitigation: string;
+  status: string;
+}
+
+export const SCHEMA_CHANGE_RISK_ROWS: SchemaChangeRiskEntry[] = [
+  { risk: 'Schema drift', currentExposure: 'none — no schema implemented', activeRisk: 0, guardrail: 'no DB schema exists', futureMitigation: 'schema versioning + migration policy + db:doctor drift check', status: 'safe — future mitigation required' },
+  { risk: 'Migration failure', currentExposure: 'none — no migration executed', activeRisk: 0, guardrail: 'no migration file generated', futureMitigation: 'migration dry-run + rollback plan + DB health check', status: 'safe — future mitigation required' },
+  { risk: 'Rollback failure', currentExposure: 'none — no rollback executed', activeRisk: 0, guardrail: 'no migration executed', futureMitigation: 'rollback plan + restore point + data backup', status: 'safe — future mitigation required' },
+  { risk: 'Data loss', currentExposure: 'none — no data persisted', activeRisk: 0, guardrail: 'no DB write path', futureMitigation: 'backup plan + data validation + rollback plan', status: 'safe — future mitigation required' },
+  { risk: 'Authorization record corruption', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no authorization persistence', futureMitigation: 'integrity hash + audit chain + validation', status: 'safe — future mitigation required' },
+  { risk: 'Decision state mismatch', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no decision persistence', futureMitigation: 'state machine + integrity check + audit', status: 'safe — future mitigation required' },
+  { risk: 'Audit chain corruption', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no audit persistence', futureMitigation: 'hash chain + integrity verification', status: 'safe — future mitigation required' },
+  { risk: 'Evidence ref leakage', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no evidence storage', futureMitigation: 'encryption + access control + audit', status: 'safe — future mitigation required' },
+  { risk: 'Index performance regression', currentExposure: 'none — no index created', activeRisk: 0, guardrail: 'no table/index exists', futureMitigation: 'index strategy review + query plan analysis', status: 'safe — future mitigation required' },
+  { risk: 'Unauthorized write path', currentExposure: 'none — no write path', activeRisk: 0, guardrail: 'no API endpoint implemented', futureMitigation: 'write auth middleware + role-based access', status: 'safe — future mitigation required' },
+  { risk: 'Retention cleanup error', currentExposure: 'none — no retention job', activeRisk: 0, guardrail: 'no cleanup scheduler', futureMitigation: 'retention policy + cleanup validation + rollback', status: 'safe — future mitigation required' },
+  { risk: 'Expiry/revocation mismatch', currentExposure: 'none — design-only', activeRisk: 0, guardrail: 'no expiry/revocation runtime', futureMitigation: 'expiry engine + revocation audit + integrity check', status: 'safe — future mitigation required' },
+];
+
+// ── v7.24.0-P7: Data Retention / Cleanup Design Review ──
+
+export interface RetentionCleanupPolicyEntry {
+  policyArea: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  retentionJob: string;
+  cleanupJob: string;
+  dbWrite: string;
+  riskNote: string;
+  futureValidation: string;
+}
+
+export const RETENTION_CLEANUP_POLICY_AREAS: RetentionCleanupPolicyEntry[] = [
+  { policyArea: 'Authorization request retention', futurePurpose: '保留授权请求记录至到期后自动归档', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '请求记录丢失将导致审计缺口', futureValidation: 'retention period test + cleanup simulation' },
+  { policyArea: 'Decision record retention', futurePurpose: '保留授权决策记录供审计', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '决策记录丢失将导致无法追踪审批链', futureValidation: 'decision record retention test' },
+  { policyArea: 'Audit chain retention', futurePurpose: '保留审计链记录确保完整性', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '审计链断裂将导致完整性无法验证', futureValidation: 'audit chain integrity test + retention test' },
+  { policyArea: 'Evidence ref retention', futurePurpose: '保留审计证据引用', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '证据引用丢失将导致证据无法定位', futureValidation: 'evidence ref integrity test' },
+  { policyArea: 'Expiry record cleanup', futurePurpose: '清理已过期的授权记录', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '过期记录堆积将导致性能下降', futureValidation: 'expiry cleanup simulation + performance test' },
+  { policyArea: 'Revocation record retention', futurePurpose: '保留撤销记录供审计追溯', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '撤销记录丢失将导致无法追踪撤销链', futureValidation: 'revocation retention test' },
+  { policyArea: 'Integrity marker retention', futurePurpose: '保留完整性标记用于验证', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '完整性标记丢失将导致无法验证数据完整性', futureValidation: 'integrity marker retention test' },
+  { policyArea: 'Manual reviewer note retention', futurePurpose: '保留人工审查备注', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '审查备注丢失将导致审计上下文丢失', futureValidation: 'reviewer note retention test' },
+  { policyArea: 'Closure archive retention', futurePurpose: '保留关闭归档记录', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '归档记录丢失将导致历史追踪缺口', futureValidation: 'archive retention test' },
+  { policyArea: 'Legal hold future policy', futurePurpose: '法律保留策略 — 阻止合规要求的记录被清理', currentImplementation: 'none', retentionJob: 'none', cleanupJob: 'none', dbWrite: 'none', riskNote: '法律要求记录被清理将导致合规违规', futureValidation: 'legal hold policy review + compliance audit' },
+];
+
+// ── v7.24.0-P7: Schema Rollback Planning Design ──
+
+export interface SchemaRollbackPlanningEntry {
+  rollbackItem: string;
+  currentStatus: string;
+  futurePurpose: string;
+  runtimeEffect: string;
+  dbEffect: string;
+  blockedAction: string;
+  requiredFutureValidation: string;
+}
+
+export const SCHEMA_ROLLBACK_PLANNING_ITEMS: SchemaRollbackPlanningEntry[] = [
+  { rollbackItem: 'Rollback migration draft', currentStatus: 'design-only', futurePurpose: '定义回滚 migration 的 SQL 草案', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'rollback dry-run + schema diff check' },
+  { rollbackItem: 'Restore point requirement', currentStatus: 'design-only', futurePurpose: '定义回滚前需要创建的恢复点', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'restore point creation test + verification' },
+  { rollbackItem: 'Schema backup requirement', currentStatus: 'design-only', futurePurpose: '定义回滚前的 schema 备份要求', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'schema backup simulation + restore test' },
+  { rollbackItem: 'Data backup requirement', currentStatus: 'design-only', futurePurpose: '定义回滚前的数据备份要求', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'data backup simulation + integrity check' },
+  { rollbackItem: 'Rollback validation command', currentStatus: 'design-only', futurePurpose: '定义回滚后的验证命令', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'validation command dry-run' },
+  { rollbackItem: 'DB doctor post-rollback check', currentStatus: 'design-only', futurePurpose: '定义回滚后执行 db:doctor 检查', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'db:doctor post-rollback run' },
+  { rollbackItem: 'Audit chain integrity recheck', currentStatus: 'design-only', futurePurpose: '定义回滚后审计链完整性重校验', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'audit chain integrity re-verification' },
+  { rollbackItem: 'Manual approval before rollback', currentStatus: 'design-only', futurePurpose: '定义回滚前需要人工审批', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'approval gate simulation + reviewer test' },
+  { rollbackItem: 'Rollback failure fallback', currentStatus: 'design-only', futurePurpose: '定义回滚失败时的升级策略', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'failure fallback drill + escalation test' },
+  { rollbackItem: 'Final rollback closure note', currentStatus: 'design-only', futurePurpose: '定义回滚完成后的关闭备注', runtimeEffect: 'none', dbEffect: 'none', blockedAction: 'true', requiredFutureValidation: 'closure note audit review' },
+];
+
+// ── v7.24.0-P7: Storage Validation Plan ──
+
+export interface StorageValidationCheckEntry {
+  validationCheck: string;
+  currentAvailability: string;
+  futureRequirement: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  status: string;
+}
+
+export const STORAGE_VALIDATION_CHECKS: StorageValidationCheckEntry[] = [
+  { validationCheck: 'Schema lint future', currentAvailability: 'not available (future)', futureRequirement: 'schema lint tool + migration validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Migration dry-run future', currentAvailability: 'not available (future)', futureRequirement: 'migration dry-run engine + rollback validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Migration rollback dry-run future', currentAvailability: 'not available (future)', futureRequirement: 'rollback migration dry-run + restore validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'DB doctor extension future', currentAvailability: 'not available (future)', futureRequirement: 'authorization-specific db:doctor checks', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Index validation future', currentAvailability: 'not available (future)', futureRequirement: 'index coverage analysis + query plan validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Foreign key validation future', currentAvailability: 'not available (future)', futureRequirement: 'FK integrity check + cascade policy validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Retention job validation future', currentAvailability: 'not available (future)', futureRequirement: 'retention period test + cleanup simulation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Audit chain integrity validation future', currentAvailability: 'not available (future)', futureRequirement: 'audit chain hash verification + integrity test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Secret scan validation', currentAvailability: 'available now', futureRequirement: 'ensure no secret in schema/migration files', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+  { validationCheck: 'Build/typecheck/lint validation', currentAvailability: 'available now', futureRequirement: 'ensure schema/migration does not break build', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+];
+
+// ── v7.24.0-P7: DB Doctor Extension Design ──
+
+export interface DbDoctorExtensionCheckEntry {
+  futureCheck: string;
+  purpose: string;
+  currentImplementation: string;
+  dbReadWriteEffect: string;
+  requiredFuturePackage: string;
+  riskIfMissing: string;
+}
+
+export const DB_DOCTOR_EXTENSION_CHECKS: DbDoctorExtensionCheckEntry[] = [
+  { futureCheck: 'Authorization table existence', purpose: '检查 authorization 表是否存在', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'schema drift undetected' },
+  { futureCheck: 'Authorization index coverage', purpose: '检查 authorization 表的索引覆盖', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'performance regression undetected' },
+  { futureCheck: 'Authorization FK integrity', purpose: '检查 authorization 表的外键完整性', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'data integrity violation undetected' },
+  { futureCheck: 'Authorization retention policy config', purpose: '检查 authorization 保留策略配置', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'retention policy drift undetected' },
+  { futureCheck: 'Authorization audit chain config', purpose: '检查 authorization 审计链配置', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'audit chain integrity gap undetected' },
+  { futureCheck: 'Authorization expiry policy config', purpose: '检查 authorization 过期策略配置', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'expiry policy drift undetected' },
+  { futureCheck: 'Authorization revocation policy config', purpose: '检查 authorization 撤销策略配置', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'revocation policy gap undetected' },
+  { futureCheck: 'Authorization storage write guard', purpose: '检查 authorization 存储写入保护', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'unauthorized write path undetected' },
+  { futureCheck: 'Authorization schema drift check', purpose: '检查 authorization schema 与 ORM 模型一致性', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'schema-model mismatch undetected' },
+  { futureCheck: 'Authorization migration status check', purpose: '检查 authorization 相关 migration 状态', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'pending migration undetected' },
+];
