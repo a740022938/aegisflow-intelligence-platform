@@ -79,6 +79,14 @@ import AuthorizationStorageBoundaryMatrix from '../components/governance/Authori
 import AuthorizationPersistenceRiskGuardrailMatrix from '../components/governance/AuthorizationPersistenceRiskGuardrailMatrix';
 import AuthorizationRetentionExpiryStorageDesign from '../components/governance/AuthorizationRetentionExpiryStorageDesign';
 import AuthorizationPersistenceAuditIntegrityDesign from '../components/governance/AuthorizationPersistenceAuditIntegrityDesign';
+import AuthorizationReviewPolicyDesign from '../components/governance/AuthorizationReviewPolicyDesign';
+import AuthorizationDecisionGovernanceModel from '../components/governance/AuthorizationDecisionGovernanceModel';
+import ManualReviewScopeMatrix from '../components/governance/ManualReviewScopeMatrix';
+import DecisionEvidenceRequirementMatrix from '../components/governance/DecisionEvidenceRequirementMatrix';
+import DenyByDefaultPolicyDesign from '../components/governance/DenyByDefaultPolicyDesign';
+import DecisionConflictOverrideBoundaryMatrix from '../components/governance/DecisionConflictOverrideBoundaryMatrix';
+import ReviewEscalationExpiryRevocationPolicy from '../components/governance/ReviewEscalationExpiryRevocationPolicy';
+import AuthorizationDecisionAuditDesign from '../components/governance/AuthorizationDecisionAuditDesign';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -334,7 +342,7 @@ export default function GovernanceCenter() {
       versionLabel="AIP v7.24.0-P2"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence · v7.24.0-P4 Authorization Review Policy + Decision Governance Design — design-only, no runtime"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -862,6 +870,40 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Authorization Persistence Audit / Integrity Design (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
         <AuthorizationPersistenceAuditIntegrityDesign />
+      </SectionCard>
+
+      {/* ── v7.24.0-P4 Authorization Review Policy + Decision Governance Design Sections ── */}
+
+      <SectionCard title="Authorization Review Policy Design (P4)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationReviewPolicyDesign />
+      </SectionCard>
+
+      <SectionCard title="Authorization Decision Governance Model (P4)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationDecisionGovernanceModel />
+      </SectionCard>
+
+      <SectionCard title="Manual Review Scope Matrix (P4)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <ManualReviewScopeMatrix />
+      </SectionCard>
+
+      <SectionCard title="Decision Evidence Requirement Matrix (P4)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <DecisionEvidenceRequirementMatrix />
+      </SectionCard>
+
+      <SectionCard title="Deny-by-Default Policy Design (P4)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <DenyByDefaultPolicyDesign />
+      </SectionCard>
+
+      <SectionCard title="Decision Conflict / Override Boundary Matrix (P4)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <DecisionConflictOverrideBoundaryMatrix />
+      </SectionCard>
+
+      <SectionCard title="Review Escalation / Expiry / Revocation Policy (P4)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <ReviewEscalationExpiryRevocationPolicy />
+      </SectionCard>
+
+      <SectionCard title="Authorization Decision Audit Design (P4)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationDecisionAuditDesign />
       </SectionCard>
 
       {/* Related Routes */}

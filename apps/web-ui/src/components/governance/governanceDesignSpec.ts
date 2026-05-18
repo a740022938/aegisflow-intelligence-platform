@@ -1829,3 +1829,225 @@ export const AUTHORIZATION_PERSISTENCE_AUDIT_INTEGRITY_ITEMS: PersistenceAuditIn
   { item: 'closureProof', purpose: '关闭证明', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement closure proof + archive' },
   { item: 'fullIntegrityVerification', purpose: '完整完整性验证', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement full verification chain + report' },
 ];
+
+// ── v7.24.0-P4: Authorization Review Policy Design ──
+
+export interface ReviewPolicyField {
+  fieldName: string;
+  purpose: string;
+  currentStatus: string;
+  runtimeEffect: string;
+  reviewWorkflow: string;
+  decisionPersistence: string;
+  dbSchema: string;
+  apiEndpoint: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const AUTHORIZATION_REVIEW_POLICY_FIELDS: ReviewPolicyField[] = [
+  { fieldName: 'reviewPolicyId', purpose: '审查策略标识符', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no review workflow, no decision persistence, no approve action, no reject action, no allow action, no deny action', futureRequirement: 'implement review policy registry + API + workflow engine' },
+  { fieldName: 'reviewScope', purpose: '审查范围定义', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no scope enforcement, no scope validation', futureRequirement: 'implement scope registry + validation + runtime check' },
+  { fieldName: 'reviewTrigger', purpose: '审查触发条件', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no auto-trigger, no manual trigger', futureRequirement: 'implement trigger engine + event listener' },
+  { fieldName: 'reviewRiskClass', purpose: '审查风险等级', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no risk classification, no risk-based routing', futureRequirement: 'implement risk classifier + escalation routing' },
+  { fieldName: 'requiredReviewerRole', purpose: '所需审查者角色', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no role assignment, no reviewer pool', futureRequirement: 'implement role registry + reviewer assignment' },
+  { fieldName: 'requiredEvidence', purpose: '所需证据要求', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no evidence collection, no evidence validation', futureRequirement: 'implement evidence collector + validator' },
+  { fieldName: 'decisionMode', purpose: '决策模式（自动/人工）', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no auto decision, no manual decision UI', futureRequirement: 'implement decision engine + manual review UI' },
+  { fieldName: 'denyByDefaultRule', purpose: '默认拒绝规则', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no deny-by-default enforcement', futureRequirement: 'implement deny-by-default rule engine' },
+  { fieldName: 'escalationRule', purpose: '升级规则', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no escalation, no re-routing', futureRequirement: 'implement escalation engine + notification' },
+  { fieldName: 'expiryRule', purpose: '过期规则', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no expiry check, no expiry notification', futureRequirement: 'implement expiry scheduler + notification' },
+  { fieldName: 'revocationRule', purpose: '撤销规则', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no revocation trigger, no revocation action', futureRequirement: 'implement revocation engine + audit' },
+  { fieldName: 'auditRequirement', purpose: '审计要求', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no audit capture, no audit export', futureRequirement: 'implement audit recorder + exporter' },
+  { fieldName: 'overrideBoundary', purpose: '覆盖边界定义', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no override, no admin bypass', futureRequirement: 'implement override policy + audit trail' },
+  { fieldName: 'fallbackPolicy', purpose: '降级策略', currentStatus: 'design-only', runtimeEffect: 'none', reviewWorkflow: 'not implemented', decisionPersistence: 'disabled', dbSchema: 'not implemented', apiEndpoint: 'not implemented', stageGate: 'Stage C deferred', blockedActions: 'no fallback, no safe-mode', futureRequirement: 'implement fallback policy + safe-mode' },
+];
+
+// ── v7.24.0-P4: Decision Governance Model ──
+
+export interface DecisionGovernanceItem {
+  modelItem: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  runtimeEffect: string;
+  persistence: string;
+  writePath: string;
+  requiredFuturePackage: string;
+}
+
+export const AUTHORIZATION_DECISION_GOVERNANCE_ITEMS: DecisionGovernanceItem[] = [
+  { modelItem: 'DecisionRequest', futurePurpose: '决策请求模型', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+  { modelItem: 'DecisionScope', futurePurpose: '决策范围定义', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+  { modelItem: 'DecisionRiskClass', futurePurpose: '决策风险等级', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+  { modelItem: 'DecisionEvidenceBundle', futurePurpose: '决策证据包', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+  { modelItem: 'DecisionReviewerRole', futurePurpose: '决策审查者角色', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+  { modelItem: 'DecisionState', futurePurpose: '决策状态机', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package + State Machine' },
+  { modelItem: 'DecisionOutcome', futurePurpose: '决策结果', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+  { modelItem: 'DecisionExpiry', futurePurpose: '决策过期策略', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package + Scheduler' },
+  { modelItem: 'DecisionRevocation', futurePurpose: '决策撤销策略', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package + Trigger' },
+  { modelItem: 'DecisionAuditRecord', futurePurpose: '决策审计记录', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+  { modelItem: 'DecisionConflictPolicy', futurePurpose: '决策冲突处理策略', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+  { modelItem: 'DecisionFallbackPolicy', futurePurpose: '决策降级策略', currentImplementation: 'none', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', requiredFuturePackage: 'Authorization Decision Package' },
+];
+
+// ── v7.24.0-P4: Manual Review Scope Matrix ──
+
+export interface ManualReviewScopeRow {
+  scope: string;
+  reviewRequiredFuture: string;
+  currentReviewAvailability: string;
+  currentDecisionAuthority: string;
+  currentPermission: string;
+  runtimeControl: string;
+  writePath: string;
+  stageGate: string;
+  status: string;
+}
+
+export const MANUAL_REVIEW_SCOPE_ROWS: ManualReviewScopeRow[] = [
+  { scope: 'Navigation exposure', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Center access', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Memory candidate mutation', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Connector write', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'External write', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Lab execution', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Training trigger', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Inference trigger', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Deployment', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Rollback', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Emergency stop', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'Audit evidence write', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+  { scope: 'LAN_SHARE sync', reviewRequiredFuture: 'future', currentReviewAvailability: 'design-only', currentDecisionAuthority: 'none', currentPermission: 'false', runtimeControl: '0', writePath: 'disabled', stageGate: 'Stage C deferred', status: 'design-only' },
+];
+
+// ── v7.24.0-P4: Decision Evidence Requirement Matrix ──
+
+export interface DecisionEvidenceRequirementRow {
+  evidenceType: string;
+  futurePurpose: string;
+  currentAvailability: string;
+  persistence: string;
+  uploadExport: string;
+  runtimeEffect: string;
+  requiredFor: string;
+  status: string;
+}
+
+export const DECISION_EVIDENCE_REQUIREMENT_ROWS: DecisionEvidenceRequirementRow[] = [
+  { evidenceType: 'Scope declaration', futurePurpose: '声明审批范围', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Risk classification', futurePurpose: '风险等级声明', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Validator snapshot', futurePurpose: '治理校验快照', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'DB doctor result', futurePurpose: '数据库健康报告', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Secret scan result', futurePurpose: '密钥扫描报告', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Build result', futurePurpose: '构建验证报告', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Typecheck result', futurePurpose: '类型检查报告', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Smoke status', futurePurpose: '冒烟测试状态', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Rollback plan', futurePurpose: '回滚计划', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Audit evidence plan', futurePurpose: '审计证据计划', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Manual reviewer note', futurePurpose: '人工审查备注', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+  { evidenceType: 'Operator identity note', futurePurpose: '操作者身份备注', currentAvailability: 'design-only', persistence: 'disabled', uploadExport: 'disabled', runtimeEffect: 'none', requiredFor: 'future authorization decision', status: 'future requirement' },
+];
+
+// ── v7.24.0-P4: Deny-by-default Policy Design ──
+
+export interface DenyByDefaultRule {
+  condition: string;
+  futureDecision: string;
+  currentBehavior: string;
+  runtimeEffect: string;
+  riskIfIgnored: string;
+  status: string;
+}
+
+export const DENY_BY_DEFAULT_RULES: DenyByDefaultRule[] = [
+  { condition: 'Missing scope', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'unauthorized access', status: 'future package required' },
+  { condition: 'Missing evidence', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'unverified action', status: 'future package required' },
+  { condition: 'High risk without approval', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'high-risk action without oversight', status: 'future package required' },
+  { condition: 'Expired authorization', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'stale authorization reuse', status: 'future package required' },
+  { condition: 'Revoked authorization', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'revoked action execution', status: 'future package required' },
+  { condition: 'Missing rollback plan', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'irreversible action', status: 'future package required' },
+  { condition: 'Missing audit evidence', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'unauditable action', status: 'future package required' },
+  { condition: 'Stage C disabled', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'stage bypass', status: 'future package required' },
+  { condition: 'Unknown operator role', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'unauthorized operator', status: 'future package required' },
+  { condition: 'External write sandbox absent', futureDecision: 'deny', currentBehavior: 'no runtime / design-only blocked', runtimeEffect: 'none', riskIfIgnored: 'uncontrolled external write', status: 'future package required' },
+];
+
+// ── v7.24.0-P4: Decision Conflict / Override Boundary Matrix ──
+
+export interface DecisionConflictOverrideRow {
+  conflictCase: string;
+  futureHandling: string;
+  currentHandling: string;
+  overrideAllowedNow: string;
+  runtimeEffect: string;
+  stageGate: string;
+  status: string;
+}
+
+export const DECISION_CONFLICT_OVERRIDE_ROWS: DecisionConflictOverrideRow[] = [
+  { conflictCase: 'Reviewer conflict', futureHandling: 'escalate to senior reviewer', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'Scope mismatch', futureHandling: 'reject decision, re-scope', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'Evidence mismatch', futureHandling: 'reject decision, re-collect evidence', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'Risk class escalation', futureHandling: 'route to higher authority', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'Expired review', futureHandling: 'require re-review', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'Revoked decision', futureHandling: 'reject all dependent actions', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'Conflicting gate dependency', futureHandling: 'block until dependency resolved', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'Emergency stop conflict', futureHandling: 'immediate deny all non-emergency', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'External write sandbox missing', futureHandling: 'deny external write', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { conflictCase: 'Audit evidence missing', futureHandling: 'deny action, require evidence', currentHandling: 'no handling — design-only', overrideAllowedNow: 'false', runtimeEffect: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+];
+
+// ── v7.24.0-P4: Review Escalation / Expiry / Revocation Policy ──
+
+export interface ReviewEscalationExpiryField {
+  fieldName: string;
+  purpose: string;
+  currentStatus: string;
+  runtimeEffect: string;
+  persistence: string;
+  writePath: string;
+  stageGate: string;
+  futureRequirement: string;
+}
+
+export const REVIEW_ESCALATION_EXPIRY_REVOCATION_FIELDS: ReviewEscalationExpiryField[] = [
+  { fieldName: 'escalationTrigger', purpose: '升级触发条件', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement escalation trigger + event' },
+  { fieldName: 'escalationTarget', purpose: '升级目标角色/组', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement escalation target + notification' },
+  { fieldName: 'expiryCondition', purpose: '过期条件', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement expiry condition + scheduler' },
+  { fieldName: 'expiryTimestampFuture', purpose: '未来过期时间戳', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement expiry timestamp + persistence' },
+  { fieldName: 'revocationTrigger', purpose: '撤销触发条件', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement revocation trigger + event' },
+  { fieldName: 'revocationReason', purpose: '撤销原因', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement revocation reason + audit' },
+  { fieldName: 'revocationActorFuture', purpose: '未来撤销执行者', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement revocation actor + role' },
+  { fieldName: 'manualReviewNote', purpose: '人工审查备注', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement note capture + persistence' },
+  { fieldName: 'auditNoteRequirement', purpose: '审计备注要求', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement audit note + policy' },
+  { fieldName: 'closureRequirement', purpose: '关闭要求', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', writePath: 'none', stageGate: 'Stage C deferred', futureRequirement: 'implement closure proof + archive' },
+];
+
+// ── v7.24.0-P4: Authorization Decision Audit Design ──
+
+export interface AuthorizationDecisionAuditItem {
+  item: string;
+  purpose: string;
+  currentStatus: string;
+  auditPersistence: string;
+  auditWrite: string;
+  auditExport: string;
+  integrityMarker: string;
+  runtimeEffect: string;
+  futureRequirement: string;
+}
+
+export const AUTHORIZATION_DECISION_AUDIT_ITEMS: AuthorizationDecisionAuditItem[] = [
+  { item: 'decisionId', purpose: '决策唯一标识', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement decision id + audit store' },
+  { item: 'decisionScope', purpose: '决策范围记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement scope capture + audit' },
+  { item: 'reviewerRole', purpose: '审查者角色记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement role capture + audit' },
+  { item: 'evidenceSummary', purpose: '证据摘要记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement evidence summary + audit' },
+  { item: 'riskClass', purpose: '风险等级记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement risk class capture + audit' },
+  { item: 'decisionState', purpose: '决策状态记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement state machine + audit trail' },
+  { item: 'decisionReason', purpose: '决策原因记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement reason capture + audit' },
+  { item: 'expiryPolicy', purpose: '过期策略记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement expiry policy + audit' },
+  { item: 'revocationPolicy', purpose: '撤销策略记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement revocation policy + audit' },
+  { item: 'conflictNote', purpose: '冲突备注记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement conflict note + audit' },
+  { item: 'closureNote', purpose: '关闭备注记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement closure note + archive' },
+  { item: 'integrityMarkerFuture', purpose: '未来完整性标记', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement integrity marker + verification' },
+];

@@ -104,6 +104,14 @@ import {
   AUTHORIZATION_PERSISTENCE_GUARDRAIL_ROWS,
   AUTHORIZATION_RETENTION_EXPIRY_FIELDS,
   AUTHORIZATION_PERSISTENCE_AUDIT_INTEGRITY_ITEMS,
+  AUTHORIZATION_REVIEW_POLICY_FIELDS,
+  AUTHORIZATION_DECISION_GOVERNANCE_ITEMS,
+  MANUAL_REVIEW_SCOPE_ROWS,
+  DECISION_EVIDENCE_REQUIREMENT_ROWS,
+  DENY_BY_DEFAULT_RULES,
+  DECISION_CONFLICT_OVERRIDE_ROWS,
+  REVIEW_ESCALATION_EXPIRY_REVOCATION_FIELDS,
+  AUTHORIZATION_DECISION_AUDIT_ITEMS,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -327,10 +335,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -979,6 +987,31 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
           v7.24.0-P3 Authorization Persistence Design = <strong>design-only</strong>. Design fields = <strong>{AUTHORIZATION_PERSISTENCE_DESIGN_FIELDS.length}</strong> (all design-only, persistence disabled). Storage contracts = <strong>{AUTHORIZATION_STORAGE_CONTRACT_ITEMS.length}</strong> (all enforced-by-absence, no storage writes). Entity models = <strong>{AUTHORIZATION_PERSISTENCE_ENTITY_MODELS.length}</strong> (all none/not implemented). Lifecycle stages = <strong>{AUTHORIZATION_RECORD_LIFECYCLE_STAGES.length}</strong> (all design-only). Storage boundary rows = <strong>{AUTHORIZATION_STORAGE_BOUNDARY_ROWS.length}</strong> (all design-only, no DB/migration/write/read). Guardrail rows = <strong>{AUTHORIZATION_PERSISTENCE_GUARDRAIL_ROWS.length}</strong> (active risk = 0). Retention/expiry fields = <strong>{AUTHORIZATION_RETENTION_EXPIRY_FIELDS.length}</strong> (all design-only, no scheduler/revocation). Audit/integrity items = <strong>{AUTHORIZATION_PERSISTENCE_AUDIT_INTEGRITY_ITEMS.length}</strong> (all design-only, hash none, audit writes 0, export disabled). Persistence implementation = <strong>none</strong>. DB schema = <strong>not implemented</strong>. API endpoint = <strong>not implemented</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>keep authorization persistence in design-only — no implementation work has started.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── v7.24.0-P4 Authorization Review Policy + Decision Governance Design Bridge ── */}
+      <SectionCard title="Authorization Review Policy & Decision Governance Design Bridge (P4)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Review policy fields" value={String(AUTHORIZATION_REVIEW_POLICY_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Decision governance items" value={String(AUTHORIZATION_DECISION_GOVERNANCE_ITEMS.length)} color="#8B5CF6" />
+          <KpiCard label="Review scope rows" value={String(MANUAL_REVIEW_SCOPE_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Evidence requirement rows" value={String(DECISION_EVIDENCE_REQUIREMENT_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Deny-by-default rules" value={String(DENY_BY_DEFAULT_RULES.length)} color="#8B5CF6" />
+          <KpiCard label="Conflict/override rows" value={String(DECISION_CONFLICT_OVERRIDE_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Escalation/expiry/revocation fields" value={String(REVIEW_ESCALATION_EXPIRY_REVOCATION_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Audit design items" value={String(AUTHORIZATION_DECISION_AUDIT_ITEMS.length)} color="#8B5CF6" />
+          <KpiCard label="Review workflow" value="not implemented" color="#6B7280" />
+          <KpiCard label="Decision engine" value="not implemented" color="#6B7280" />
+          <KpiCard label="Override allowed now" value="false" color="var(--success)" />
+          <KpiCard label="Stage C deferred" value="true" color="#F97316" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Authorization Review Policy Design →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep authorization review policy in design-only — no Stage C enablement</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P4 Authorization Review Policy + Decision Governance Design = <strong>design-only</strong>. Review policy fields = <strong>{AUTHORIZATION_REVIEW_POLICY_FIELDS.length}</strong> (all design-only). Decision governance items = <strong>{AUTHORIZATION_DECISION_GOVERNANCE_ITEMS.length}</strong> (all design-only). Review scope rows = <strong>{MANUAL_REVIEW_SCOPE_ROWS.length}</strong> (all future, not ready). Evidence requirement rows = <strong>{DECISION_EVIDENCE_REQUIREMENT_ROWS.length}</strong> (all future, disabled). Deny-by-default rules = <strong>{DENY_BY_DEFAULT_RULES.length}</strong> (all design-only, no evaluator). Conflict/override rows = <strong>{DECISION_CONFLICT_OVERRIDE_ROWS.length}</strong> (override not allowed now). Escalation/expiry/revocation fields = <strong>{REVIEW_ESCALATION_EXPIRY_REVOCATION_FIELDS.length}</strong> (all design-only, no scheduler/revocation). Audit design items = <strong>{AUTHORIZATION_DECISION_AUDIT_ITEMS.length}</strong> (all design-only, audit writes=0, export=0, hash=0). Review workflow = <strong>not implemented</strong>. Decision engine = <strong>not implemented</strong>. Override allowed now = <strong>false</strong>. Stage C = <strong>deferred</strong>. Recommended next = <strong>keep authorization review policy in design-only — no implementation work has started.</strong>
         </div>
       </SectionCard>
 
