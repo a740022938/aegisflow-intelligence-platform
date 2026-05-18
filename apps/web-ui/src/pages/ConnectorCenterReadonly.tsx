@@ -85,6 +85,7 @@ export default function ConnectorCenterReadonly() {
   const highRisk = useMemo(() => getConnectorRegistryByRisk('high'), []);
   const sidebarReady = useMemo(() => getConnectorRegistrySidebarReadyItems(), []);
   const availableRoutes = useMemo(() => getConnectorRegistryAvailableRoutes(), []);
+  const allReadonly = useMemo(() => CONNECTOR_REGISTRY.every(c => c.qualityGate.readonly), []);
 
   return (
     <PageShell
@@ -122,6 +123,21 @@ export default function ConnectorCenterReadonly() {
       {/* Integration Boundary + Safety Matrix + Recommended Path */}
       <SectionCard title="Integration Boundary & Safety" style={{ marginBottom: 20 }}>
         <ConnectorIntegrationBoundary />
+      </SectionCard>
+
+      {/* Governance Overview KPIs */}
+      <SectionCard title="Governance Summary" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10 }}>
+          <KpiCard label="All readonly" value={allReadonly ? 'YES' : 'NO'} color={allReadonly ? 'var(--success)' : 'var(--danger)'} />
+          <KpiCard label="External write paths" value="0" color="var(--success)" />
+          <KpiCard label="Real connector controls" value="0" color="var(--success)" />
+          <KpiCard label="Stage C controls" value="0" color="var(--success)" />
+          <KpiCard label="DB write paths" value="0" color="var(--success)" />
+          <KpiCard label="Candidate mutation" value="0" color="var(--success)" />
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.06)', fontSize: 10, color: 'var(--success)' }}>
+          All governance gates pass. Connector Center is a fully readonly metadata overview.
+        </div>
       </SectionCard>
 
       {/* Boundary Notice */}

@@ -57,6 +57,12 @@ import {
 import CenterLaunchpadOverview from '../components/advanced/CenterLaunchpadOverview';
 import CenterLaunchpadCard from '../components/advanced/CenterLaunchpadCard';
 import CenterLaunchpadDecisionPath from '../components/advanced/CenterLaunchpadDecisionPath';
+import ReadonlyControlRoomOverview from '../components/control-room/ReadonlyControlRoomOverview';
+import GovernanceBaselinePanel from '../components/control-room/GovernanceBaselinePanel';
+import ConnectorReadinessSummaryBridge from '../components/control-room/ConnectorReadinessSummaryBridge';
+import SystemSafetyMatrix from '../components/control-room/SystemSafetyMatrix';
+import VersionProgressTimeline from '../components/control-room/VersionProgressTimeline';
+import NextWorkstreamPanel from '../components/control-room/NextWorkstreamPanel';
 import type { NavigationExposureEntry, NavigationExposureLevel, NavigationExposureRisk } from '../registry/navigation-exposure-registry';
 import type { CenterAccessItem, CenterAccessKind, CenterAccessRisk } from '../registry/center-access-registry';
 import type { AdvancedPlaceholderItem, AdvancedPlaceholderDecision } from '../registry/advanced-placeholder-registry';
@@ -259,7 +265,7 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P1"
+      versionLabel="AIP v7.22.0-P2 + P3"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls"
@@ -560,6 +566,39 @@ export default function AdvancedModeReadonly() {
 
       {/* Readonly gated */}
       <SectionCard title={`仅只读门控条目（${readonlyGated.length}）`} style={{ marginBottom: 20 }}>{readonlyGated.map(e => <ExposureEntryRow key={e.id} entry={e} />)}</SectionCard>
+
+      {/* ═══════════════════════════════════════════
+          P3 — Readonly Control Room Sections
+          ═══════════════════════════════════════════ */}
+      <SectionCard title="Readonly Control Room Overview" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <ReadonlyControlRoomOverview />
+      </SectionCard>
+
+      <SectionCard title="Governance Baseline" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <GovernanceBaselinePanel />
+      </SectionCard>
+
+      <SectionCard title="Connector Readiness Bridge" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <ConnectorReadinessSummaryBridge />
+      </SectionCard>
+
+      <SectionCard title="System Safety Matrix" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <SystemSafetyMatrix />
+      </SectionCard>
+
+      <SectionCard title="Version Progress Timeline" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <VersionProgressTimeline />
+      </SectionCard>
+
+      <SectionCard title="Next Recommended Workstreams" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <NextWorkstreamPanel />
+      </SectionCard>
+
+      {/* ── P3 Control Room Safety Notice ── */}
+      <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
+        <strong>P3 Control Room safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons. All panels are governance-safe display only.
+      </div>
 
       {/* Boundary Notice */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>

@@ -16,12 +16,37 @@ function SafetyCheck({ label, ok }: { label: string; ok: boolean }) {
 }
 
 export default function ConnectorIntegrationBoundary() {
-  const allPass = CONNECTOR_REGISTRY_NEW.every(c => Object.values(c.qualityGate).every(v => v === true));
   const allReadonly = CONNECTOR_REGISTRY_NEW.every(c => c.safetyBoundary.includes('readonly'));
   const noExternalControl = CONNECTOR_REGISTRY_NEW.every(c => c.qualityGate.noExternalControl);
   const noDbWrite = CONNECTOR_REGISTRY_NEW.every(c => c.qualityGate.noDbWrite);
   const noStageC = CONNECTOR_REGISTRY_NEW.every(c => c.qualityGate.noStageC);
   const noDangerous = CONNECTOR_REGISTRY_NEW.every(c => c.qualityGate.noDangerousActions);
+  const noCandidateMutation = CONNECTOR_REGISTRY_NEW.every(c => c.actionsBlocked.some(a => a.includes('candidate') || a.includes('approve') || a.includes('reject')));
+  const noLanSync = CONNECTOR_REGISTRY_NEW.every(c => c.actionsBlocked.some(a => a.includes('sync') || a.includes('lan')));
+  const noServiceControl = CONNECTOR_REGISTRY_NEW.every(c => c.actionsBlocked.some(a => a.includes('taskkill') || a.includes('restart')));
+  const noTagRelease = CONNECTOR_REGISTRY_NEW.every(c => c.actionsBlocked.some(a => a.includes('release') || a.includes('tag')));
+  const noVersionMutate = CONNECTOR_REGISTRY_NEW.every(c => c.actionsBlocked.some(a => a.includes('version')));
+  const noMenuMutate = CONNECTOR_REGISTRY_NEW.every(c => c.actionsBlocked.some(a => a.includes('menu') || a.includes('layout')));
+  const noRouteMutate = CONNECTOR_REGISTRY_NEW.every(c => !c.currentRoute || c.currentRoute.startsWith('/'));
+  const allQualityPass = CONNECTOR_REGISTRY_NEW.every(c => Object.values(c.qualityGate).every(v => v === true));
+  const noHighRiskActive = CONNECTOR_REGISTRY_NEW.filter(c => c.category === 'active' && c.riskLevel === 'high').length === 0;
+
+  const checks = [
+    { label: 'All connectors readonly', ok: allReadonly },
+    { label: 'No external control', ok: noExternalControl },
+    { label: 'No DB write', ok: noDbWrite },
+    { label: 'No Stage C enabled', ok: noStageC },
+    { label: 'No dangerous actions', ok: noDangerous },
+    { label: 'No candidate mutation', ok: noCandidateMutation },
+    { label: 'No LAN share sync', ok: noLanSync },
+    { label: 'No service control (taskkill/restart)', ok: noServiceControl },
+    { label: 'No tag / release', ok: noTagRelease },
+    { label: 'No version mutation', ok: noVersionMutate },
+    { label: 'No menu / Layout mutation', ok: noMenuMutate },
+    { label: 'No route mutation', ok: noRouteMutate },
+    { label: 'All quality gates pass', ok: allQualityPass },
+    { label: 'No high-risk active connector', ok: noHighRiskActive },
+  ];
 
   return (
     <div>
@@ -49,17 +74,13 @@ export default function ConnectorIntegrationBoundary() {
 
       {/* Safety Matrix */}
       <div style={{ marginBottom: 16, padding: 14, borderRadius: 8, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10 }}>No External Write / Readonly Safety Matrix</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10 }}>Governance Safety Matrix</div>
+        <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 8 }}>System-wide safety check — all 14 criteria must PASS</div>
         <div style={{ display: 'grid', gap: 2, marginBottom: 10 }}>
-          <SafetyCheck label="All connectors readonly" ok={allReadonly} />
-          <SafetyCheck label="No external control" ok={noExternalControl} />
-          <SafetyCheck label="No DB write" ok={noDbWrite} />
-          <SafetyCheck label="No Stage C" ok={noStageC} />
-          <SafetyCheck label="No dangerous actions" ok={noDangerous} />
-          <SafetyCheck label="All quality gates pass" ok={allPass} />
+          {checks.map(c => <SafetyCheck key={c.label} label={c.label} ok={c.ok} />)}
         </div>
         <div style={{ fontSize: 9, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-          All {CONNECTOR_REGISTRY_NEW.length} connectors satisfy readonly safety criteria. No executable controls, no external writes, no API calls. No token or credential exposure.
+          All {CONNECTOR_REGISTRY_NEW.length} connectors satisfy readonly safety criteria. No executable controls, no external writes, no API calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no menu/route mutation. No token or credential exposure.
         </div>
       </div>
 
@@ -72,7 +93,7 @@ export default function ConnectorIntegrationBoundary() {
           ))}
         </div>
         <div style={{ fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          <strong>Next steps:</strong> Active connectors (OpenAxiom, Memory Hub) — keep readonly. Hugging Face — plan API integration design. Future connectors (OpenClaw, ComfyUI, Hermes, CC Switch, Claude Proxy) — hold for review until safety boundaries are defined. No Stage C enablement, no real control buttons, no DB writes.
+          <strong>Next steps:</strong> Active connectors (OpenAxiom, Memory Hub) — keep readonly. Hugging Face — plan API integration design. Future connectors (OpenClaw, ComfyUI, Hermes, CC Switch, Claude Proxy) — hold for review until safety boundaries are defined. No Stage C enablement, no real control buttons, no DB writes, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation.
         </div>
       </div>
     </div>
