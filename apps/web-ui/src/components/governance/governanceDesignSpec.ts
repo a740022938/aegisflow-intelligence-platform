@@ -1631,3 +1631,201 @@ export const AUTHORIZATION_FAILURE_FALLBACK_ROWS: AuthorizationFailureFallbackRo
   { failureCase: 'Emergency stop runtime absent', futureResponse: 'deny — emergency stop runtime required', currentBehavior: 'design-only deny / no runtime', runtimeEffect: 'none', riskIfIgnored: 'no emergency response capability', status: 'blocked — future package required' },
   { failureCase: 'Authorization runtime absent', futureResponse: 'deny — authorization runtime not implemented', currentBehavior: 'design-only deny / no runtime', runtimeEffect: 'none', riskIfIgnored: 'no authorization control at all', status: 'blocked — future package required' },
 ];
+
+// ── v7.24.0-P3: Authorization Persistence Design Spec ──
+
+export interface AuthorizationPersistenceField {
+  fieldName: string;
+  purpose: string;
+  currentStatus: string;
+  persistence: string;
+  dbSchema: string;
+  migration: string;
+  apiEndpoint: string;
+  writePath: string;
+  stageGate: string;
+  futureRequirement: string;
+}
+
+export const AUTHORIZATION_PERSISTENCE_DESIGN_FIELDS: AuthorizationPersistenceField[] = [
+  { fieldName: 'AuthorizationRecord', purpose: '授权记录持久化实体', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement authorization record table + CRUD API' },
+  { fieldName: 'AuthorizationSnapshot', purpose: '授权快照持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement snapshot table + versioning' },
+  { fieldName: 'AuthorizationDecisionRecord', purpose: '审批决策记录持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement decision record table + approval store' },
+  { fieldName: 'AuthorizationEvidenceLink', purpose: '审计证据链接持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement evidence link table + integrity check' },
+  { fieldName: 'AuthorizationScopeSnapshot', purpose: '授权范围快照持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement scope snapshot table + validation' },
+  { fieldName: 'AuthorizationExpiryRecord', purpose: '授权过期记录持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement expiry record table + scheduler' },
+  { fieldName: 'AuthorizationRevocationRecord', purpose: '授权撤销记录持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement revocation record table + trigger' },
+  { fieldName: 'AuthorizationAuditChainRef', purpose: '审计链引用持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement audit chain table + integrity hash' },
+  { fieldName: 'AuthorizationIntegrityMarker', purpose: '完整性标记持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement integrity marker + verification' },
+  { fieldName: 'AuthorizationRetentionClass', purpose: '保留类别持久化', currentStatus: 'design-only', persistence: 'disabled', dbSchema: 'not implemented', migration: 'not implemented', apiEndpoint: 'not implemented', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: 'implement retention class + cleanup policy' },
+];
+
+// ── v7.24.0-P3: Authorization Storage Contract ──
+
+export interface AuthorizationStorageContractItem {
+  contractItem: string;
+  currentState: string;
+  blockedAction: string;
+  futurePackage: string;
+  requiredValidation: string;
+  riskIfViolated: string;
+}
+
+export const AUTHORIZATION_STORAGE_CONTRACT_ITEMS: AuthorizationStorageContractItem[] = [
+  { contractItem: 'No authorization record persistence in current build', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'integration test + security review', riskIfViolated: 'authorization state loss' },
+  { contractItem: 'No DB table creation', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'schema migration test', riskIfViolated: 'unauthorized schema change' },
+  { contractItem: 'No migration execution', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'migration rollback test', riskIfViolated: 'schema drift' },
+  { contractItem: 'No write API endpoint', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'API security + rate limit test', riskIfViolated: 'unauthorized data injection' },
+  { contractItem: 'No evidence file persistence', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'file upload + integrity test', riskIfViolated: 'evidence tampering' },
+  { contractItem: 'No audit chain write', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'audit chain integrity test', riskIfViolated: 'audit trail loss' },
+  { contractItem: 'No retention job', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'retention scheduler test', riskIfViolated: 'data retention violation' },
+  { contractItem: 'No revocation job', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'revocation trigger + audit test', riskIfViolated: 'stale authorization execution' },
+  { contractItem: 'No expiry scheduler', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'expiry scheduler + notification test', riskIfViolated: 'expired authorization reuse' },
+  { contractItem: 'No external storage sink', currentState: 'enforced by absence', blockedAction: 'disabled', futurePackage: 'v7.24.x Auth Persistence', requiredValidation: 'external storage security + compliance test', riskIfViolated: 'external data leak' },
+];
+
+// ── v7.24.0-P3: Persistence Entity Model ──
+
+export interface PersistenceEntityModel {
+  entityName: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  schemaStatus: string;
+  storageStatus: string;
+  writePath: string;
+  readPath: string;
+  futureDependency: string;
+}
+
+export const AUTHORIZATION_PERSISTENCE_ENTITY_MODELS: PersistenceEntityModel[] = [
+  { entityName: 'AuthorizationRequestEntity', futurePurpose: '授权请求实体持久化', currentImplementation: 'none', schemaStatus: 'not implemented', storageStatus: 'disabled', writePath: 'none', readPath: 'none', futureDependency: 'Authorization Persistence Package' },
+  { entityName: 'AuthorizationDecisionEntity', futurePurpose: '审批决策实体持久化', currentImplementation: 'none', schemaStatus: 'not implemented', storageStatus: 'disabled', writePath: 'none', readPath: 'none', futureDependency: 'Authorization Persistence Package' },
+  { entityName: 'AuthorizationScopeEntity', futurePurpose: '授权范围实体持久化', currentImplementation: 'none', schemaStatus: 'not implemented', storageStatus: 'disabled', writePath: 'none', readPath: 'none', futureDependency: 'Authorization Persistence Package' },
+  { entityName: 'AuthorizationEvidenceEntity', futurePurpose: '审计证据实体持久化', currentImplementation: 'none', schemaStatus: 'not implemented', storageStatus: 'disabled', writePath: 'none', readPath: 'none', futureDependency: 'Authorization Persistence Package' },
+  { entityName: 'AuthorizationAuditEntity', futurePurpose: '审计记录实体持久化', currentImplementation: 'none', schemaStatus: 'not implemented', storageStatus: 'disabled', writePath: 'none', readPath: 'none', futureDependency: 'Authorization Persistence Package' },
+  { entityName: 'AuthorizationExpiryEntity', futurePurpose: '过期记录实体持久化', currentImplementation: 'none', schemaStatus: 'not implemented', storageStatus: 'disabled', writePath: 'none', readPath: 'none', futureDependency: 'Authorization Persistence Package + Scheduler' },
+  { entityName: 'AuthorizationRevocationEntity', futurePurpose: '撤销记录实体持久化', currentImplementation: 'none', schemaStatus: 'not implemented', storageStatus: 'disabled', writePath: 'none', readPath: 'none', futureDependency: 'Authorization Persistence Package + Trigger' },
+  { entityName: 'AuthorizationIntegrityEntity', futurePurpose: '完整性验证实体持久化', currentImplementation: 'none', schemaStatus: 'not implemented', storageStatus: 'disabled', writePath: 'none', readPath: 'none', futureDependency: 'Authorization Persistence Package + Hash' },
+];
+
+// ── v7.24.0-P3: Authorization Record Lifecycle Design ──
+
+export interface AuthorizationRecordLifecycleStage {
+  stage: string;
+  purpose: string;
+  currentStatus: string;
+  persistence: string;
+  runtimeEffect: string;
+  stageGate: string;
+}
+
+export const AUTHORIZATION_RECORD_LIFECYCLE_STAGES: AuthorizationRecordLifecycleStage[] = [
+  { stage: 'Draft record design', purpose: '授权记录草稿设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Scope snapshot design', purpose: '范围快照记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Evidence link design', purpose: '审计证据链接记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Decision record design', purpose: '决策记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Expiry record design', purpose: '过期记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Revocation record design', purpose: '撤销记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Audit chain design', purpose: '审计链记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Integrity marker design', purpose: '完整性标记记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Retention class design', purpose: '保留类别记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+  { stage: 'Closure archive design', purpose: '关闭归档记录设计', currentStatus: 'design-only', persistence: 'disabled', runtimeEffect: 'none', stageGate: 'Stage C deferred' },
+];
+
+// ── v7.24.0-P3: Storage Boundary Matrix ──
+
+export interface AuthorizationStorageBoundaryRow {
+  storageArea: string;
+  currentMode: string;
+  dbSchema: string;
+  migration: string;
+  writePath: string;
+  readPath: string;
+  externalSink: string;
+  stageGate: string;
+  status: string;
+}
+
+export const AUTHORIZATION_STORAGE_BOUNDARY_ROWS: AuthorizationStorageBoundaryRow[] = [
+  { storageArea: 'Authorization request storage', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'Decision state storage', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'Scope snapshot storage', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'Evidence link storage', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'Audit chain storage', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'Expiry storage', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'Revocation storage', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'Integrity marker storage', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'Retention job', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+  { storageArea: 'External archive', currentMode: 'design-only', dbSchema: 'none', migration: 'none', writePath: 'disabled', readPath: 'disabled', externalSink: 'none', stageGate: 'Stage C deferred', status: 'design-only' },
+];
+
+// ── v7.24.0-P3: Persistence Risk Guardrail Matrix ──
+
+export interface PersistenceGuardrailRow {
+  risk: string;
+  currentExposure: string;
+  activeRisk: string;
+  guardrail: string;
+  status: string;
+}
+
+export const AUTHORIZATION_PERSISTENCE_GUARDRAIL_ROWS: PersistenceGuardrailRow[] = [
+  { risk: 'Unauthorized DB write', currentExposure: 'none', activeRisk: '0', guardrail: 'no schema / no write path', status: 'safe' },
+  { risk: 'Schema drift', currentExposure: 'none', activeRisk: '0', guardrail: 'no migration', status: 'safe' },
+  { risk: 'Authorization state mismatch', currentExposure: 'none', activeRisk: '0', guardrail: 'no persisted state', status: 'design-only' },
+  { risk: 'Audit evidence mismatch', currentExposure: 'none', activeRisk: '0', guardrail: 'persistence disabled', status: 'design-only' },
+  { risk: 'Expired authorization reuse', currentExposure: 'none', activeRisk: '0', guardrail: 'no runtime authorization', status: 'safe' },
+  { risk: 'Revoked authorization reuse', currentExposure: 'none', activeRisk: '0', guardrail: 'no runtime authorization', status: 'safe' },
+  { risk: 'External storage leak', currentExposure: 'none', activeRisk: '0', guardrail: 'no external sink', status: 'safe' },
+];
+
+// ── v7.24.0-P3: Retention / Expiry / Revocation Storage Design ──
+
+export interface RetentionExpiryField {
+  fieldName: string;
+  purpose: string;
+  currentStatus: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const AUTHORIZATION_RETENTION_EXPIRY_FIELDS: RetentionExpiryField[] = [
+  { fieldName: 'retentionClass', purpose: '保留类别定义', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no retention class write/apply', futureRequirement: 'retention policy + classification engine' },
+  { fieldName: 'retentionDuration', purpose: '保留时长', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no duration write/validate', futureRequirement: 'duration config + enforcement' },
+  { fieldName: 'expiryTimestamp', purpose: '过期时间戳', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no expiry timestamp write/auto', futureRequirement: 'expiry timestamp + scheduler' },
+  { fieldName: 'revocationReason', purpose: '撤销原因', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no revocation reason write', futureRequirement: 'reason capture + audit' },
+  { fieldName: 'revocationActor', purpose: '撤销操作人', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no revocation actor record', futureRequirement: 'actor identity + audit' },
+  { fieldName: 'revocationEvidence', purpose: '撤销证据', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no revocation evidence write', futureRequirement: 'evidence bundle + integrity' },
+  { fieldName: 'integrityCheck', purpose: '完整性校验', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no integrity check execute', futureRequirement: 'hash verification + audit' },
+  { fieldName: 'closureArchive', purpose: '关闭归档', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no closure archive write', futureRequirement: 'archive engine + retention' },
+  { fieldName: 'futureCleanupPolicy', purpose: '未来清理策略', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no cleanup policy write/execute', futureRequirement: 'cleanup scheduler + policy engine' },
+  { fieldName: 'persistedRevocationRecord', purpose: '已持久化的撤销记录', currentStatus: 'design-only', stageGate: 'Stage C deferred', blockedActions: 'no revocation record write/delete', futureRequirement: 'revocation persistence + integrity' },
+];
+
+// ── v7.24.0-P3: Persistence Audit / Integrity Design ──
+
+export interface PersistenceAuditIntegrityItem {
+  item: string;
+  purpose: string;
+  currentStatus: string;
+  hashComputed: string;
+  auditWrite: string;
+  integrityRuntime: string;
+  exportUpload: string;
+  futureRequirement: string;
+}
+
+export const AUTHORIZATION_PERSISTENCE_AUDIT_INTEGRITY_ITEMS: PersistenceAuditIntegrityItem[] = [
+  { item: 'recordHash', purpose: '授权记录哈希', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement record hash + verification' },
+  { item: 'evidenceHash', purpose: '审计证据哈希', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement evidence hash + integrity check' },
+  { item: 'auditChainChecksum', purpose: '审计链校验和', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement chain checksum + verification' },
+  { item: 'tamperMarker', purpose: '篡改标记', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement tamper detection + alert' },
+  { item: 'integrityVerificationStatus', purpose: '完整性验证状态', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement verification status + audit' },
+  { item: 'manualReviewerNote', purpose: '人工审查备注', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement note capture + persistence' },
+  { item: 'retentionProof', purpose: '保留证明', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement retention proof + verification' },
+  { item: 'revocationProof', purpose: '撤销证明', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement revocation proof + audit' },
+  { item: 'expiryProof', purpose: '过期证明', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement expiry proof + audit' },
+  { item: 'closureProof', purpose: '关闭证明', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement closure proof + archive' },
+  { item: 'fullIntegrityVerification', purpose: '完整完整性验证', currentStatus: 'design-only', hashComputed: 'none', auditWrite: '0', integrityRuntime: 'none', exportUpload: 'disabled', futureRequirement: 'implement full verification chain + report' },
+];

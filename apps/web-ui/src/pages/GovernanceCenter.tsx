@@ -71,6 +71,14 @@ import RuntimePermissionEvaluationDesign from '../components/governance/RuntimeP
 import AuthorizationRevocationExpiryDesign from '../components/governance/AuthorizationRevocationExpiryDesign';
 import AuthorizationAuditChainDesign from '../components/governance/AuthorizationAuditChainDesign';
 import AuthorizationFailureFallbackMatrix from '../components/governance/AuthorizationFailureFallbackMatrix';
+import AuthorizationPersistenceDesignSpec from '../components/governance/AuthorizationPersistenceDesignSpec';
+import AuthorizationStorageContract from '../components/governance/AuthorizationStorageContract';
+import AuthorizationPersistenceEntityModel from '../components/governance/AuthorizationPersistenceEntityModel';
+import AuthorizationRecordLifecycleDesign from '../components/governance/AuthorizationRecordLifecycleDesign';
+import AuthorizationStorageBoundaryMatrix from '../components/governance/AuthorizationStorageBoundaryMatrix';
+import AuthorizationPersistenceRiskGuardrailMatrix from '../components/governance/AuthorizationPersistenceRiskGuardrailMatrix';
+import AuthorizationRetentionExpiryStorageDesign from '../components/governance/AuthorizationRetentionExpiryStorageDesign';
+import AuthorizationPersistenceAuditIntegrityDesign from '../components/governance/AuthorizationPersistenceAuditIntegrityDesign';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -326,7 +334,7 @@ export default function GovernanceCenter() {
       versionLabel="AIP v7.24.0-P2"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -820,6 +828,40 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Authorization Failure / Fallback Matrix (P2)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
         <AuthorizationFailureFallbackMatrix />
+      </SectionCard>
+
+      {/* ── v7.24.0-P3 Authorization Persistence Design Spec Sections ── */}
+
+      <SectionCard title="Authorization Persistence Design Spec (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationPersistenceDesignSpec />
+      </SectionCard>
+
+      <SectionCard title="Authorization Storage Contract (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationStorageContract />
+      </SectionCard>
+
+      <SectionCard title="Authorization Persistence Entity Model (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationPersistenceEntityModel />
+      </SectionCard>
+
+      <SectionCard title="Authorization Record Lifecycle Design (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationRecordLifecycleDesign />
+      </SectionCard>
+
+      <SectionCard title="Authorization Storage Boundary Matrix (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationStorageBoundaryMatrix />
+      </SectionCard>
+
+      <SectionCard title="Authorization Persistence Risk Guardrail Matrix (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationPersistenceRiskGuardrailMatrix />
+      </SectionCard>
+
+      <SectionCard title="Authorization Retention / Expiry Storage Design (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationRetentionExpiryStorageDesign />
+      </SectionCard>
+
+      <SectionCard title="Authorization Persistence Audit / Integrity Design (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationPersistenceAuditIntegrityDesign />
       </SectionCard>
 
       {/* Related Routes */}

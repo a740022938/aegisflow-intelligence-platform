@@ -96,6 +96,14 @@ import {
   AUTHORIZATION_REVOCATION_EXPIRY_FIELDS,
   AUTHORIZATION_AUDIT_CHAIN_STEPS,
   AUTHORIZATION_FAILURE_FALLBACK_ROWS,
+  AUTHORIZATION_PERSISTENCE_DESIGN_FIELDS,
+  AUTHORIZATION_STORAGE_CONTRACT_ITEMS,
+  AUTHORIZATION_PERSISTENCE_ENTITY_MODELS,
+  AUTHORIZATION_RECORD_LIFECYCLE_STAGES,
+  AUTHORIZATION_STORAGE_BOUNDARY_ROWS,
+  AUTHORIZATION_PERSISTENCE_GUARDRAIL_ROWS,
+  AUTHORIZATION_RETENTION_EXPIRY_FIELDS,
+  AUTHORIZATION_PERSISTENCE_AUDIT_INTEGRITY_ITEMS,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -319,10 +327,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -949,10 +957,35 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 Control Room Safety Notice ── */}
+      {/* ── v7.24.0-P3 Authorization Persistence Bridge ── */}
+      <SectionCard title="Authorization Persistence Bridge (P3)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Design fields" value={String(AUTHORIZATION_PERSISTENCE_DESIGN_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Storage contracts" value={String(AUTHORIZATION_STORAGE_CONTRACT_ITEMS.length)} color="#8B5CF6" />
+          <KpiCard label="Entity models" value={String(AUTHORIZATION_PERSISTENCE_ENTITY_MODELS.length)} color="#8B5CF6" />
+          <KpiCard label="Lifecycle stages" value={String(AUTHORIZATION_RECORD_LIFECYCLE_STAGES.length)} color="#8B5CF6" />
+          <KpiCard label="Storage boundary rows" value={String(AUTHORIZATION_STORAGE_BOUNDARY_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Guardrail rows" value={String(AUTHORIZATION_PERSISTENCE_GUARDRAIL_ROWS.length)} color="var(--success)" />
+          <KpiCard label="Retention/expiry fields" value={String(AUTHORIZATION_RETENTION_EXPIRY_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Audit/integrity items" value={String(AUTHORIZATION_PERSISTENCE_AUDIT_INTEGRITY_ITEMS.length)} color="#8B5CF6" />
+          <KpiCard label="Persistence impl" value="none" color="#6B7280" />
+          <KpiCard label="DB schema" value="not implemented" color="#6B7280" />
+          <KpiCard label="API endpoint" value="not implemented" color="#6B7280" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Authorization Persistence Design →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep persistence in design-only — no implementation</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P3 Authorization Persistence Design = <strong>design-only</strong>. Design fields = <strong>{AUTHORIZATION_PERSISTENCE_DESIGN_FIELDS.length}</strong> (all design-only, persistence disabled). Storage contracts = <strong>{AUTHORIZATION_STORAGE_CONTRACT_ITEMS.length}</strong> (all enforced-by-absence, no storage writes). Entity models = <strong>{AUTHORIZATION_PERSISTENCE_ENTITY_MODELS.length}</strong> (all none/not implemented). Lifecycle stages = <strong>{AUTHORIZATION_RECORD_LIFECYCLE_STAGES.length}</strong> (all design-only). Storage boundary rows = <strong>{AUTHORIZATION_STORAGE_BOUNDARY_ROWS.length}</strong> (all design-only, no DB/migration/write/read). Guardrail rows = <strong>{AUTHORIZATION_PERSISTENCE_GUARDRAIL_ROWS.length}</strong> (active risk = 0). Retention/expiry fields = <strong>{AUTHORIZATION_RETENTION_EXPIRY_FIELDS.length}</strong> (all design-only, no scheduler/revocation). Audit/integrity items = <strong>{AUTHORIZATION_PERSISTENCE_AUDIT_INTEGRITY_ITEMS.length}</strong> (all design-only, hash none, audit writes 0, export disabled). Persistence implementation = <strong>none</strong>. DB schema = <strong>not implemented</strong>. API endpoint = <strong>not implemented</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>keep authorization persistence in design-only — no implementation work has started.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 + P3 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 Control Room & Governance safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. v7.24.0-P1 Activation Planning is planning-only — no activation code, no runtime implementation, no DB writes. v7.24.0-P2 Authorization Data Contract is design-contract-only — no runtime implementation, no DB schema, no API endpoint, no activation. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 + P3 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. v7.24.0-P1 Activation Planning is planning-only — no activation code, no runtime implementation, no DB writes. v7.24.0-P2 Authorization Data Contract is design-contract-only — no runtime implementation, no DB schema, no API endpoint, no activation. v7.24.0-P3 Authorization Persistence Design is design-only — no persistence, no DB schema, no migration, no API endpoint, no runtime evaluator, no activation. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}
