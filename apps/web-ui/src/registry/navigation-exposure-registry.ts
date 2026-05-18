@@ -967,12 +967,15 @@ export function getNavigationExposureAllowedNowFalseEntries(): NavigationExposur
 
 export function getNavigationExposureSafetySummary(): {
   highRiskPrimaryNav: number; highRiskAllowedNow: number; stageCEntriesAllowedNow: number;
+  highRiskPrimaryNavActive: number; acceptedGuardedExposure: number;
 } {
   const highRisk = NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.risk === 'high');
   return {
     highRiskPrimaryNav: highRisk.filter(e => e.currentExposure === 'primary_nav').length,
     highRiskAllowedNow: highRisk.filter(e => e.allowedNow).length,
     stageCEntriesAllowedNow: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.gates.includes('stage_c_disabled') && e.allowedNow).length,
+    highRiskPrimaryNavActive: highRisk.filter(e => e.currentExposure === 'primary_nav' && e.allowedNow).length,
+    acceptedGuardedExposure: highRisk.filter(e => e.currentExposure === 'primary_nav' && !e.allowedNow && e.component === 'ModulePage' && (e.gates.includes('advanced_mode') || e.gates.includes('human_approval_required') || e.gates.includes('readonly_only'))).length,
   };
 }
 
@@ -1014,6 +1017,8 @@ export function getNavigationExposureSummary(): {
   advancedHubVisibleCount: number;
   deferredCount: number;
   highRiskPrimaryNavCount: number;
+  activeHighRiskPrimaryNavCount: number;
+  acceptedGuardedExposureCount: number;
   stageCPrimaryNavCount: number;
 } {
   return {
@@ -1023,6 +1028,8 @@ export function getNavigationExposureSummary(): {
     advancedHubVisibleCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.recommendedExposure === 'advanced_mode').length,
     deferredCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.recommendedExposure === 'hidden_internal' || !e.allowedNow).length,
     highRiskPrimaryNavCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav' && e.risk === 'high').length,
+    activeHighRiskPrimaryNavCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav' && e.risk === 'high' && e.allowedNow).length,
+    acceptedGuardedExposureCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav' && e.risk === 'high' && !e.allowedNow && e.component === 'ModulePage' && (e.gates.includes('advanced_mode') || e.gates.includes('human_approval_required') || e.gates.includes('readonly_only'))).length,
     stageCPrimaryNavCount: NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav' && e.gates.includes('stage_c_disabled')).length,
   };
 }
@@ -1070,11 +1077,31 @@ export interface ExposureValidationIssue {
   message: string;
 }
 
+export function isGuardedHighRiskExposure(entry: NavigationExposureEntry): boolean {
+  return entry.risk === 'high'
+    && entry.currentExposure === 'primary_nav'
+    && !entry.allowedNow
+    && entry.component === 'ModulePage'
+    && (entry.gates.includes('advanced_mode') || entry.gates.includes('human_approval_required') || entry.gates.includes('readonly_only'));
+}
+
+export function getGuardedHighRiskPrimaryNavEntries(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(isGuardedHighRiskExposure);
+}
+
+export function getActiveHighRiskPrimaryNavEntries(): NavigationExposureEntry[] {
+  return NAVIGATION_EXPOSURE_REGISTRY.filter(e => e.currentExposure === 'primary_nav' && e.risk === 'high' && e.allowedNow);
+}
+
 export function validateNavigationExposure(): ExposureValidationIssue[] {
   const issues: ExposureValidationIssue[] = [];
   for (const entry of NAVIGATION_EXPOSURE_REGISTRY) {
     if (entry.currentExposure === 'primary_nav' && entry.risk === 'high') {
-      issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'High risk entry must not have primary_nav exposure.' });
+      if (isGuardedHighRiskExposure(entry)) {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'info', message: 'Accepted guarded exposure: high-risk with primary_nav, but disallowed, gated, and placeholder/readonly.' });
+      } else {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'High risk entry must not have primary_nav exposure.' });
+      }
     }
     if (entry.currentExposure === 'primary_nav' && entry.gates.includes('stage_c_disabled')) {
       issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'Stage C gated entry must not have primary_nav exposure.' });
