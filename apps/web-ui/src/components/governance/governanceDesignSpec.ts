@@ -364,3 +364,164 @@ export const MUTATION_LIFECYCLE_STAGES: MutationLifecycleStage[] = [
   { stage: 'Audit record required', purpose: '需要审计记录', status: 'design-only' },
   { stage: 'Closure review', purpose: '关闭审查', status: 'design-only' },
 ];
+
+// ── Execution Gate Design Spec ──
+
+export interface ExecutionField {
+  fieldName: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  executePermission: string;
+  writePath: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const EXECUTION_DESIGN_FIELDS: ExecutionField[] = [
+  { fieldName: 'ExecutionRequest', purpose: '执行请求 — 记录待执行操作详情', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no run/start/stop/deploy', futureRequirement: '人工提交执行请求' },
+  { fieldName: 'ExecutionScope', purpose: '执行范围 — 定义执行影响哪些系统/模块', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no run outside scope', futureRequirement: '范围选择+影响预估' },
+  { fieldName: 'ExecutionPreflight', purpose: '执行预检 — 执行前验证条件是否满足', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no preflight execute', futureRequirement: '预检结果收集+展示' },
+  { fieldName: 'ExecutionDryRunPolicy', purpose: 'Dry-run 策略 — 定义模拟执行方式', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no dry-run execute', futureRequirement: 'dry-run 输出摘要' },
+  { fieldName: 'ExecutionEvidence', purpose: '执行证据 — 附上审计证据', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no evidence read/upload', futureRequirement: '证据上传+摘要' },
+  { fieldName: 'ExecutionApprovalLink', purpose: '审批链接 — 关联 Approval Gate 记录', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no cross-gate write', futureRequirement: '跨门禁关联' },
+  { fieldName: 'ExecutionRollbackRequirement', purpose: '回滚要求 — 执行失败后的回退策略', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no rollback execute', futureRequirement: '回滚步骤+成功验证' },
+  { fieldName: 'ExecutionRuntimeBoundary', purpose: '运行时边界 — 定义执行的安全边界', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no runtime override', futureRequirement: '边界策略+违规告警' },
+  { fieldName: 'ExecutionAuditRecord', purpose: '审计记录 — 完整记录执行全链路', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no audit write', futureRequirement: '不可篡改审计追踪' },
+  { fieldName: 'ExecutionExpiry', purpose: '执行过期 — 执行请求超时失效', status: 'design-only', runtimeEffect: 'none', executePermission: 'disabled', writePath: 'disabled', stageGate: 'Stage C deferred', blockedActions: 'no auto-expire yet', futureRequirement: '超时策略+通知' },
+];
+
+// ── Execution Request Model ──
+
+export interface ExecutionRequestField {
+  field: string;
+  purpose: string;
+  status: string;
+  persisted: string;
+}
+
+export const EXECUTION_REQUEST_FIELDS: ExecutionRequestField[] = [
+  { field: 'Request ID', purpose: '执行请求唯一标识', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Requested execution', purpose: '请求的具体执行操作描述', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Target domain', purpose: '执行目标域', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Target resource', purpose: '执行目标资源', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Execution mode', purpose: '执行模式（manual/dry-run/auto）', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Preflight requirement', purpose: '预检要求', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Dry-run requirement', purpose: 'Dry-run 要求', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Approval dependency', purpose: '依赖的审批门禁', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Rollback dependency', purpose: '依赖的回滚计划', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Risk class', purpose: '风险等级分类', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Expiration policy', purpose: '过期策略', status: 'design-only', persisted: 'not persisted' },
+];
+
+// ── Execution Preflight / Dry-run Matrix ──
+
+export interface ExecutionPreflightRow {
+  area: string;
+  currentMode: string;
+  preflight: string;
+  dryRun: string;
+  execute: string;
+  write: string;
+  externalIO: string;
+  status: string;
+}
+
+export const EXECUTION_PREFLIGHT_MATRIX: ExecutionPreflightRow[] = [
+  { area: 'Navigation exposure', currentMode: 'readonly', preflight: 'future', dryRun: 'future', execute: 'no', write: 'no', externalIO: 'no', status: 'design-only' },
+  { area: 'Center access', currentMode: 'readonly', preflight: 'future', dryRun: 'future', execute: 'no', write: 'no', externalIO: 'no', status: 'design-only' },
+  { area: 'Memory candidate', currentMode: 'preview', preflight: 'required future', dryRun: 'required future', execute: 'no', write: 'no', externalIO: 'no', status: 'deferred' },
+  { area: 'Connector write', currentMode: 'disabled', preflight: 'required future', dryRun: 'required future', execute: 'no', write: 'no', externalIO: 'gated', status: 'disabled' },
+  { area: 'Lab experiment', currentMode: 'preview', preflight: 'required future', dryRun: 'required future', execute: 'no', write: 'no', externalIO: 'no', status: 'deferred' },
+  { area: 'Training job', currentMode: 'disabled', preflight: 'required future', dryRun: 'required future', execute: 'no', write: 'no', externalIO: 'no', status: 'disabled' },
+  { area: 'Deployment', currentMode: 'disabled', preflight: 'required future', dryRun: 'required future', execute: 'no', write: 'no', externalIO: 'gated', status: 'disabled' },
+  { area: 'Service control', currentMode: 'disabled', preflight: 'required future', dryRun: 'required future', execute: 'no', write: 'no', externalIO: 'local gated', status: 'disabled' },
+];
+
+// ── Execution Evidence Types ──
+
+export interface ExecutionEvidenceType {
+  evidence: string;
+  purpose: string;
+  status: string;
+}
+
+export const EXECUTION_EVIDENCE_TYPES: ExecutionEvidenceType[] = [
+  { evidence: 'Preflight result', purpose: '预检结果', status: 'design-only' },
+  { evidence: 'Dry-run result', purpose: 'Dry-run 结果', status: 'design-only' },
+  { evidence: 'Risk assessment', purpose: '风险评估', status: 'design-only' },
+  { evidence: 'Approval reference', purpose: '审批引用', status: 'design-only' },
+  { evidence: 'Rollback plan', purpose: '回滚计划', status: 'design-only' },
+  { evidence: 'Validator snapshot', purpose: '当前 validator 快照', status: 'design-only' },
+  { evidence: 'DB doctor result', purpose: '数据库健康检查结果', status: 'design-only' },
+  { evidence: 'Secret scan result', purpose: '密钥扫描结果', status: 'design-only' },
+  { evidence: 'Smoke status', purpose: '冒烟测试状态', status: 'design-only' },
+  { evidence: 'Manual reviewer note', purpose: '人工审查备注', status: 'design-only' },
+];
+
+// ── Execution Boundary Items ──
+
+export interface ExecutionBoundaryItem {
+  item: string;
+  purpose: string;
+  status: string;
+}
+
+export const EXECUTION_BOUNDARY_ITEMS: ExecutionBoundaryItem[] = [
+  { item: 'No real execution', purpose: '不执行任何真实操作', status: 'design-only' },
+  { item: 'No run action', purpose: '不启动 run 操作', status: 'design-only' },
+  { item: 'No start / stop action', purpose: '不启动/停止操作', status: 'design-only' },
+  { item: 'No service control', purpose: '不执行服务控制', status: 'design-only' },
+  { item: 'No deployment', purpose: '不执行部署', status: 'design-only' },
+  { item: 'No connector write', purpose: '不写连接器', status: 'design-only' },
+  { item: 'No LAN_SHARE sync', purpose: '不同步 LAN_SHARE', status: 'design-only' },
+  { item: 'No lab execution', purpose: '不执行 lab 操作', status: 'design-only' },
+  { item: 'No training trigger', purpose: '不触发训练', status: 'design-only' },
+  { item: 'No inference trigger', purpose: '不触发推理', status: 'design-only' },
+  { item: 'No DB write', purpose: '不写数据库', status: 'design-only' },
+  { item: 'No external write', purpose: '不写外部系统', status: 'design-only' },
+  { item: 'No Memory Hub mutation', purpose: '不变更 Memory Hub', status: 'design-only' },
+  { item: 'No tag / GitHub Release', purpose: '不创建 tag 或 Release', status: 'design-only' },
+];
+
+// ── Execution Risk Guardrail Matrix ──
+
+export interface ExecutionGuardrailRow {
+  risk: string;
+  currentExposure: string;
+  activeRisk: number;
+  guardrail: string;
+  status: string;
+}
+
+export const EXECUTION_GUARDRAIL_MATRIX: ExecutionGuardrailRow[] = [
+  { risk: 'Execution action', currentExposure: 'none', activeRisk: 0, guardrail: 'no execute path', status: 'safe' },
+  { risk: 'Service control', currentExposure: 'none', activeRisk: 0, guardrail: 'no restart/taskkill', status: 'safe' },
+  { risk: 'Deployment', currentExposure: 'none', activeRisk: 0, guardrail: 'no deploy trigger', status: 'safe' },
+  { risk: 'Lab execution', currentExposure: 'none', activeRisk: 0, guardrail: 'Stage C deferred', status: 'safe' },
+  { risk: 'Training trigger', currentExposure: 'none', activeRisk: 0, guardrail: 'disabled', status: 'safe' },
+  { risk: 'Inference trigger', currentExposure: 'none', activeRisk: 0, guardrail: 'disabled', status: 'safe' },
+  { risk: 'External write', currentExposure: 'none', activeRisk: 0, guardrail: 'disabled', status: 'safe' },
+  { risk: 'Tag/release', currentExposure: 'none', activeRisk: 0, guardrail: 'no release path', status: 'safe' },
+];
+
+// ── Execution Lifecycle Stages ──
+
+export interface ExecutionLifecycleStage {
+  stage: string;
+  purpose: string;
+  status: string;
+}
+
+export const EXECUTION_LIFECYCLE_STAGES: ExecutionLifecycleStage[] = [
+  { stage: 'Draft execution request', purpose: '草拟执行请求', status: 'design-only' },
+  { stage: 'Attach preflight requirement', purpose: '附上预检要求', status: 'design-only' },
+  { stage: 'Attach dry-run requirement', purpose: '附上 dry-run 要求', status: 'design-only' },
+  { stage: 'Attach evidence bundle', purpose: '附上证据包', status: 'design-only' },
+  { stage: 'Approval gate pending', purpose: '等待审批门禁', status: 'design-only' },
+  { stage: 'Execution deferred', purpose: '执行延后 — 待条件满足', status: 'design-only' },
+  { stage: 'Rollback requirement attached', purpose: '附上回滚要求', status: 'design-only' },
+  { stage: 'Audit record required', purpose: '需要审计记录', status: 'design-only' },
+  { stage: 'Closure review', purpose: '关闭审查', status: 'design-only' },
+];

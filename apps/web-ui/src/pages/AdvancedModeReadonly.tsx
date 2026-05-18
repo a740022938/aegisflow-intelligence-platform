@@ -722,6 +722,29 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
+      {/* ── v7.23.0-P5 Execution Gate Bridge ── */}
+      <SectionCard title="Execution Gate Bridge" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Execution Gate" value="design-only" color="#3B82F6" />
+          <KpiCard label="Execution controls" value="0" color="var(--success)" />
+          <KpiCard label="Run controls" value="0" color="var(--success)" />
+          <KpiCard label="Start/Stop controls" value="0" color="var(--success)" />
+          <KpiCard label="Service controls" value="0" color="var(--success)" />
+          <KpiCard label="Deployment triggers" value="0" color="var(--success)" />
+          <KpiCard label="Training triggers" value="0" color="var(--success)" />
+          <KpiCard label="Inference triggers" value="0" color="var(--success)" />
+          <KpiCard label="Rollback requirement" value="required future" color="#F97316" />
+          <KpiCard label="Risk guardrails" value="8 safe" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(59,130,246,0.08)', color: '#3B82F6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Execution Gate Spec →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(59,130,246,0.08)', color: '#3B82F6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep execution gate in design review</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(59,130,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Execution Gate = <strong>design-only</strong>. Execution controls = <strong>0</strong>. Run controls = <strong>0</strong>. Start/Stop = <strong>0</strong>. Service controls = <strong>0</strong>. Deployment triggers = <strong>0</strong>. Training triggers = <strong>0</strong>. Inference triggers = <strong>0</strong>. Rollback requirement = <strong>required in future</strong>. Risk guardrails = <strong>8 safe / 0 active</strong>. Recommended mode = <strong>keep execution gate in design review</strong>.
+        </div>
+      </SectionCard>
+
       {/* ── P3 + P4 + P5 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
         <strong>P3 + P4 + P5 Control Room & Governance safety notice:</strong><br />

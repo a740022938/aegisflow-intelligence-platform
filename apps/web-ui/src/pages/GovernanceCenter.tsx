@@ -22,6 +22,11 @@ import MutationRequestModel from '../components/governance/MutationRequestModel'
 import MutationDiffImpactMatrix from '../components/governance/MutationDiffImpactMatrix';
 import MutationRollbackContract from '../components/governance/MutationRollbackContract';
 import MutationRiskGuardrailMatrix from '../components/governance/MutationRiskGuardrailMatrix';
+import ExecutionGateDesignSpec from '../components/governance/ExecutionGateDesignSpec';
+import ExecutionRequestModel from '../components/governance/ExecutionRequestModel';
+import ExecutionPreflightMatrix from '../components/governance/ExecutionPreflightMatrix';
+import ExecutionBoundaryMatrix from '../components/governance/ExecutionBoundaryMatrix';
+import ExecutionRiskGuardrailMatrix from '../components/governance/ExecutionRiskGuardrailMatrix';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -274,7 +279,7 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.23.0-P4"
+      versionLabel="AIP v7.23.0-P5"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls"
@@ -512,6 +517,28 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Mutation Risk Guardrail Matrix" style={{ marginBottom: 20, border: '1px solid #A855F7' }}>
         <MutationRiskGuardrailMatrix />
+      </SectionCard>
+
+      {/* ── v7.23.0-P5 Execution Gate Design Spec Sections ── */}
+
+      <SectionCard title="Execution Gate Design Spec" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <ExecutionGateDesignSpec />
+      </SectionCard>
+
+      <SectionCard title="Execution Request Model" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <ExecutionRequestModel />
+      </SectionCard>
+
+      <SectionCard title="Execution Preflight / Dry-run Matrix" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <ExecutionPreflightMatrix />
+      </SectionCard>
+
+      <SectionCard title="Execution Boundary Matrix" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <ExecutionBoundaryMatrix />
+      </SectionCard>
+
+      <SectionCard title="Execution Risk Guardrail Matrix" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <ExecutionRiskGuardrailMatrix />
       </SectionCard>
 
       {/* Related Routes */}
