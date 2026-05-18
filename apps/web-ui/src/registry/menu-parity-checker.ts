@@ -57,6 +57,8 @@ const GOVERNANCE: Record<string, GovernanceDecision> = {
   feedback: { action: 'KEEP' },
   'knowledge-center': { action: 'KEEP' },
   'standard-output': { action: 'KEEP' },
+  'connector-center-readonly': { action: 'KEEP' },
+  'advanced-mode-readonly': { action: 'KEEP' },
 };
 
 // ── Types ──

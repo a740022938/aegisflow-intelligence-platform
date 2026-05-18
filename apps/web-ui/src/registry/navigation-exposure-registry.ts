@@ -831,6 +831,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
   },
 
+  // Navigation Preview read-only hub (URL-only, not in menu)
+  {
+    id: 'navigation-preview-readonly',
+    path: '/navigation-preview-readonly',
+    label: 'Navigation Preview',
+    component: 'NavigationPreviewReadonly',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only'],
+    reason: 'Readonly navigation preview page. Shows future Connector/Lab/Governance/Advanced grouping structure. Not added to left menu. No menu move, no sidebar change, no persistence.',
+    allowedNow: false,
+    source: 'route',
+    notes: 'P3 added as hidden direct-route. Not in sidebar. Readonly preview only.',
+  },
+
   // 隐 module placeholder routes (not in nav, from App.tsx)
   {
     id: 'workspace',

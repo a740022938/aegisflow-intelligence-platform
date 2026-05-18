@@ -65,6 +65,7 @@ const SNAPSHOT: LayoutSectionSnapshot[] = [
       { path: '/cost-routing', icon: 'route', labelKey: 'nav.costRouting' },
       { path: '/openaxiom-readonly', icon: 'label', labelKey: 'nav.openAxiomReadonly' },
       { path: '/memory-hub', icon: 'label', labelKey: 'nav.memoryHubReadonly' },
+      { path: '/connector-center-readonly', icon: 'route', labelKey: 'nav.connectorCenterReadonly' },
     ],
   },
   {
@@ -111,6 +112,7 @@ const SNAPSHOT: LayoutSectionSnapshot[] = [
       { path: '/governance-hub', icon: 'audit', labelKey: 'nav.governanceHub' },
       { path: '/audit', icon: 'audit', labelKey: 'nav.audit' },
       { path: '/feedback', icon: 'feedback', labelKey: 'nav.feedback' },
+      { path: '/advanced-mode-readonly', icon: 'audit', labelKey: 'nav.advancedModeReadonly' },
     ],
   },
   {

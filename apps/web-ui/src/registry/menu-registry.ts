@@ -346,7 +346,7 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
         label: '连接器中心',
         labelKey: 'nav.connectorCenterReadonly',
         path: '/connector-center-readonly',
-        icon: 'audit',
+        icon: 'route',
         maturity: 'preview',
         riskLevel: 'low',
         pageType: 'connector',
