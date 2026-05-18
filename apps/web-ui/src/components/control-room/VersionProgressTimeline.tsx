@@ -11,7 +11,9 @@ const VERSIONS = [
   { tag: 'v7.21.0-P5b', label: 'Final Closure / Validator Reclass', status: 'completed' },
   { tag: 'v7.22.0-P1', label: 'Center Launchpad UX', status: 'completed' },
   { tag: 'v7.22.0-P2', label: 'Connector Center Detail Polish', status: 'completed' },
-  { tag: 'v7.22.0-P3', label: 'Readonly Control Room', status: 'current' },
+  { tag: 'v7.22.0-P3', label: 'Readonly Control Room', status: 'completed' },
+  { tag: 'v7.22.0-P4', label: 'Lab Center Readonly UX + Metrics Reconciliation', status: 'completed' },
+  { tag: 'v7.22.0-P5', label: 'Governance Center Stage C Preview', status: 'current' },
 ];
 
 const STATUS_COLORS: Record<string, string> = {

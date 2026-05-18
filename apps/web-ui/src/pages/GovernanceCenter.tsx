@@ -1,11 +1,15 @@
 import React, { useMemo } from 'react';
 import PageShell from '../components/ui/PageShell';
 import SectionCard from '../components/ui/SectionCard';
+import GovernanceCenterOverview from '../components/governance/GovernanceCenterOverview';
+import StageCPreviewPanel from '../components/governance/StageCPreviewPanel';
+import GovernanceGateMatrix from '../components/governance/GovernanceGateMatrix';
+import GovernanceBoundaryPanel from '../components/governance/GovernanceBoundaryPanel';
+import DeferredControlPath from '../components/governance/DeferredControlPath';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
 
-// ── Constants ──
 const VALIDATOR_EXPECTED = { modules: 13, gates: 12, blocking: 0, warning: 0 };
 
 const C: Record<string, string> = {
@@ -37,16 +41,6 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
   );
 }
 
-function KpiCard({ label, value, color }: { label: string; value: string; color: string }) {
-  return (
-    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
-      <div style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 2 }}>{label}</div>
-      <div style={{ fontSize: 18, fontWeight: 700, color }}>{value}</div>
-    </div>
-  );
-}
-
-// ── Module Card ──
 function ModuleCard({ mod }: { mod: GovernanceModuleDefinition }) {
   const [expanded, setExpanded] = React.useState(false);
   const isHighRisk = mod.riskLevel === 'high' || mod.riskLevel === 'critical';
@@ -60,7 +54,6 @@ function ModuleCard({ mod }: { mod: GovernanceModuleDefinition }) {
       borderRadius: 8, padding: 14,
       borderLeft: `3px solid ${isHighRisk ? 'var(--danger)' : needsApproval ? '#F97316' : 'var(--border)'}`,
     }}>
-      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -79,17 +72,14 @@ function ModuleCard({ mod }: { mod: GovernanceModuleDefinition }) {
         </div>
       </div>
 
-      {/* Description */}
       <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 6 }}>{mod.description}</div>
 
-      {/* Tags row */}
       <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 6 }}>
         {mod.safetyBoundaryTags.map(t => <Badge key={t} label={t} color={C[t] || '#6B7280'} />)}
         <Badge label={mod.ownerCenter} color="#6B7280" />
         <Badge label={mod.category} color="var(--secondary)" />
       </div>
 
-      {/* Entry + flags */}
       <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>
         {mod.currentEntry !== '—' ? `入口: ${mod.currentEntry}` : '无独立入口'}
         <span style={{ marginLeft: 8 }}>
@@ -97,7 +87,6 @@ function ModuleCard({ mod }: { mod: GovernanceModuleDefinition }) {
         </span>
       </div>
 
-      {/* Risk + approval warnings inline */}
       {isHighRisk && (
         <div style={{ padding: '4px 8px', marginBottom: 6, borderRadius: 4, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 10, color: 'var(--danger)' }}>
           ⚠ 高风险模块 — 所有真实执行操作已被禁止。当前仅 dry-run / preview。
@@ -146,7 +135,6 @@ function ModuleCard({ mod }: { mod: GovernanceModuleDefinition }) {
   );
 }
 
-// ── Gate Card ──
 function GateCard({ gate }: { gate: any }) {
   const color = gate.status === 'pass' ? 'var(--success)' : gate.status === 'fail' ? 'var(--danger)' : gate.status === 'warn' ? 'var(--warning)' : '#6B7280';
   const isStageC = gate.gateId === 'stage_c_gate';
@@ -177,7 +165,6 @@ function GateCard({ gate }: { gate: any }) {
   );
 }
 
-// ── Risk Summary Section ──
 function RiskSummarySection({ summary, modules }: { summary: any; modules: GovernanceModuleDefinition[] }) {
   const groups: Record<string, string[]> = { critical: [], high: [], medium: [], low: [] };
   for (const m of modules) { (groups[m.riskLevel] || groups['low']).push(m.displayName); }
@@ -201,7 +188,6 @@ function RiskSummarySection({ summary, modules }: { summary: any; modules: Gover
           </div>
         ))}
       </div>
-      {/* High/Critical list */}
       {(groups['high'].length > 0 || groups['critical'].length > 0) && (
         <div style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
           <strong style={{ color: 'var(--danger)' }}>高风险/严重模块：</strong>
@@ -213,7 +199,6 @@ function RiskSummarySection({ summary, modules }: { summary: any; modules: Gover
   );
 }
 
-// ── Forbidden Actions Matrix ──
 function ForbiddenActionsMatrix({ modules }: { modules: GovernanceModuleDefinition[] }) {
   const allActions = Array.from(new Set(modules.flatMap(m => m.actionPolicy.forbiddenActions))).sort();
   const criticalActions = ['write_database', 'modify_layout', 'move_real_menu', 'hide_real_menu', 'delete_menu',
@@ -240,17 +225,15 @@ function ForbiddenActionsMatrix({ modules }: { modules: GovernanceModuleDefiniti
         </>
       )}
       <div style={{ marginTop: 8, fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-        for biddenActions 是治理展示，不是权限系统。页面不会执行这些动作。
+        forbiddenActions 是治理展示，不是权限系统。页面不会执行这些动作。
       </div>
     </SectionCard>
   );
 }
 
-// ── Main ──
 export default function GovernanceCenter() {
   const summary = useMemo(() => getGovernanceRegistrySummary(), []);
   const validator = useMemo(() => validateGovernanceRegistry(), []);
-
   const allGates = useMemo(() => GOVERNANCE_REGISTRY.flatMap(m => m.gates || []), []);
 
   const selfCheck = useMemo(() => {
@@ -260,31 +243,31 @@ export default function GovernanceCenter() {
     checks.push({ name: 'Validator overall === pass', status: validator.pass ? 'pass' : 'fail', detail: validator.pass ? 'pass' : 'fail' });
     checks.push({ name: 'Blocking issues === 0', status: validator.blockingCount === 0 ? 'pass' : 'fail', detail: String(validator.blockingCount) });
     checks.push({ name: 'Warning issues === 0', status: validator.warningCount === 0 ? 'pass' : 'fail', detail: String(validator.warningCount) });
-
     const statusSum = Object.values(summary.byStatus).reduce((a: number, b: number) => a + b, 0);
     checks.push({ name: 'byStatus subtotal === total', status: statusSum === summary.totalModules ? 'pass' : 'fail', detail: `${statusSum} vs ${summary.totalModules}` });
-
     const cr = GOVERNANCE_REGISTRY.find(m => m.moduleId === 'cost-routing');
     checks.push({ name: 'cost-routing currentEntry === /cost-routing', status: cr?.currentEntry === '/cost-routing' ? 'pass' : 'fail', detail: cr?.currentEntry || 'MISSING' });
-
     const stageCGate = allGates.find(g => g.gateId === 'stage_c_gate');
     checks.push({ name: 'stage_c_gate status !== pass', status: stageCGate && stageCGate.status !== 'pass' ? 'pass' : 'fail', detail: stageCGate?.status || 'MISSING' });
-
     const writesDB = GOVERNANCE_REGISTRY.filter(m => m.writesDatabase);
     checks.push({ name: 'No module writesDatabase === true', status: writesDB.length === 0 ? 'pass' : 'fail', detail: writesDB.map(m => m.moduleId).join(', ') || '0' });
-
     return { pass: checks.every(c => c.status === 'pass'), checks };
   }, [summary, validator, allGates]);
 
   return (
     <PageShell
-      title="治理中心"
-      subtitle="AIP v7.15.0-P3 Governance Center — 只读治理态势面板"
-      versionLabel="AIP v7.15.0-P3"
+      title="Governance Center"
+      subtitle="Readonly Stage C governance preview — policy review only, no real controls"
+      versionLabel="AIP v7.22.0-P5"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="只读治理中心 · 不写数据库 · 不移动菜单 · 不启用 Stage C · 不处理 Memory Hub candidate · 不发 GitHub Release · 不执行外部写入 · 不做自动修复"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls"
     >
+      {/* Governance Summary Hero */}
+      <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
+        <GovernanceCenterOverview />
+      </SectionCard>
+
       {/* Self-check */}
       {!selfCheck.pass && (
         <div style={{ padding: '10px 16px', marginBottom: 16, borderRadius: 6, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--danger)', fontSize: 12 }}>
@@ -298,34 +281,30 @@ export default function GovernanceCenter() {
         </div>
       )}
 
-      {/* KPI Overview */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
-        <KpiCard label="Modules" value={String(summary.totalModules)} color="var(--primary)" />
-        <KpiCard label="Gates" value={String(allGates.length)} color="var(--secondary)" />
-        <KpiCard label="Validator" value={validator.pass ? 'PASS' : 'FAIL'} color={validator.pass ? 'var(--success)' : 'var(--danger)'} />
-        <KpiCard label="Blocking" value={String(validator.blockingCount)} color={validator.blockingCount > 0 ? 'var(--danger)' : 'var(--success)'} />
-        <KpiCard label="Warning" value={String(validator.warningCount)} color={validator.warningCount > 0 ? 'var(--warning)' : 'var(--success)'} />
-        <KpiCard label="Info" value={String(validator.infoCount)} color="#6B7280" />
-        <KpiCard label="ApprovalReq" value={String(summary.approvalRequiredCount)} color="#F97316" />
-        <KpiCard label="HighRisk" value={String(summary.byRiskLevel['high'] || 0)} color="var(--danger)" />
-        <KpiCard label="ExtWriteBlock" value={String(summary.externalWriteBlockedCount)} color="var(--danger)" />
-        <KpiCard label="DangerBlock" value={String(summary.dangerousActionBlockedCount)} color="var(--danger)" />
-      </div>
+      {/* Stage C Preview Panel */}
+      <SectionCard title="Stage C Preview Panel" style={{ marginBottom: 20, border: '1px solid var(--warning)' }}>
+        <StageCPreviewPanel />
+      </SectionCard>
+
+      {/* Governance Gate Matrix */}
+      <SectionCard title="Governance Gate Matrix" style={{ marginBottom: 20 }}>
+        <GovernanceGateMatrix />
+      </SectionCard>
 
       {/* Risk / Safety Summary */}
       <RiskSummarySection summary={summary} modules={GOVERNANCE_REGISTRY} />
 
       {/* Governance Modules */}
-      <SectionCard title="治理模块" style={{ marginBottom: 20 }}>
+      <SectionCard title="Governance Modules" style={{ marginBottom: 20 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: 12 }}>
           {GOVERNANCE_REGISTRY.map(m => <ModuleCard key={m.moduleId} mod={m} />)}
         </div>
       </SectionCard>
 
       {/* Gates Panel */}
-      <SectionCard title="治理门禁" style={{ marginBottom: 20 }}>
+      <SectionCard title="Governance Gates" style={{ marginBottom: 20 }}>
         <div style={{ marginBottom: 8, fontSize: 11, color: 'var(--text-muted)' }}>
-          共 {allGates.length} 个门禁 · blocking gate 失败时阻止进入下一阶段 · stage_c_gate 当前为 deferred，Stage C 未开始
+          {allGates.length} gates · blocking gate failure prevents next stage · stage_c_gate is deferred, Stage C not started
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 8 }}>
           {allGates.map(g => <GateCard key={g.gateId} gate={g} />)}
@@ -346,17 +325,83 @@ export default function GovernanceCenter() {
             ))}
           </div>
         ) : (
-          <div style={{ padding: 12, textAlign: 'center', color: 'var(--success)', fontSize: 12 }}>✅ 无 issues</div>
+          <div style={{ padding: 12, textAlign: 'center', color: 'var(--success)', fontSize: 12 }}>✅ No issues</div>
         )}
       </SectionCard>
 
       {/* Forbidden Actions Matrix */}
       <ForbiddenActionsMatrix modules={GOVERNANCE_REGISTRY} />
 
+      {/* Governance Safety / Risk Matrix */}
+      <SectionCard title="Governance Safety / Risk Matrix" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'grid', gap: 2, fontSize: 9 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 60px 2fr', gap: 8, padding: '4px 8px', color: 'var(--text-muted)', fontWeight: 600 }}>
+            <span>Risk Item</span><span>Status</span><span>Evidence</span>
+          </div>
+          {[
+            { item: 'Layout mutation', pass: true, ev: 'No Layout change' },
+            { item: 'Sidebar expansion', pass: true, ev: 'No new sidebar item' },
+            { item: 'Route expansion', pass: true, ev: 'No new route' },
+            { item: 'Real approval button', pass: true, ev: 'none' },
+            { item: 'Real reject button', pass: true, ev: 'none' },
+            { item: 'DB write path', pass: true, ev: 'none' },
+            { item: 'Memory candidate mutation', pass: true, ev: 'none' },
+            { item: 'External write path', pass: true, ev: 'none' },
+            { item: 'Connector write', pass: true, ev: 'none' },
+            { item: 'LAN sync', pass: true, ev: 'none' },
+            { item: 'Lab execution', pass: true, ev: 'none' },
+            { item: 'Training trigger', pass: true, ev: 'none' },
+            { item: 'Inference trigger', pass: true, ev: 'none' },
+            { item: 'Deployment trigger', pass: true, ev: 'none' },
+            { item: 'Service control', pass: true, ev: 'none' },
+            { item: 'Stage C activation', pass: true, ev: 'false' },
+            { item: 'Tag / Release', pass: true, ev: 'none' },
+          ].map(r => (
+            <div key={r.item} style={{ display: 'grid', gridTemplateColumns: '1.5fr 60px 2fr', gap: 8, padding: '5px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.02)', alignItems: 'center' }}>
+              <span style={{ color: 'var(--text-primary)' }}>{r.item}</span>
+              <span style={{ fontWeight: 600, color: r.pass ? 'var(--success)' : 'var(--danger)' }}>{r.pass ? 'PASS' : 'FAIL'}</span>
+              <span style={{ color: 'var(--text-muted)' }}>{r.ev}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 8, fontSize: 9, color: 'var(--text-muted)', fontStyle: 'italic' }}>Smoke test: SKIP (no live server).</div>
+      </SectionCard>
+
+      {/* Governance Boundary Panel */}
+      <SectionCard title="Governance Boundary Panel" style={{ marginBottom: 20, border: '1px solid var(--warning)' }}>
+        <GovernanceBoundaryPanel />
+      </SectionCard>
+
+      {/* Deferred Control Path */}
+      <SectionCard title="Deferred Control Path" style={{ marginBottom: 20 }}>
+        <DeferredControlPath />
+      </SectionCard>
+
+      {/* Governance Governance Summary KPIs */}
+      <SectionCard title="Governance Summary" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: 8 }}>
+          {[
+            { label: 'Approval controls', value: '0', color: 'var(--success)' },
+            { label: 'Reject controls', value: '0', color: 'var(--success)' },
+            { label: 'Mutation paths', value: '0', color: 'var(--success)' },
+            { label: 'External writes', value: '0', color: 'var(--success)' },
+            { label: 'Real control buttons', value: '0', color: 'var(--success)' },
+            { label: 'Deployment triggers', value: '0', color: 'var(--success)' },
+            { label: 'Service controls', value: '0', color: 'var(--success)' },
+            { label: 'Tag / Release triggers', value: '0', color: 'var(--success)' },
+          ].map(k => (
+            <div key={k.label} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px', textAlign: 'center' }}>
+              <div style={{ fontSize: 8, color: 'var(--text-muted)', marginBottom: 1 }}>{k.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: k.color }}>{k.value}</div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
       {/* Related Routes */}
-      <SectionCard title="相关页面" style={{ marginBottom: 20 }}>
+      <SectionCard title="Related Pages" style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 12, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
-          <div>Governance Center 当前只是聚合入口，不移动这些页面，不加入左侧菜单，不改变原页面。</div>
+          <div>Governance Center is a readonly aggregation entry. Does not move pages, add sidebar items, or modify original pages.</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
             {['/cost-routing', '/menu-governance-preview', '/registry-render-preview', '/menu-move-dry-run', '/connector-center', '/lab-center'].map(p => (
               <Badge key={p} label={p} color="var(--secondary)" />
@@ -365,25 +410,10 @@ export default function GovernanceCenter() {
         </div>
       </SectionCard>
 
-      {/* Stage C Notice */}
-      <SectionCard title="Stage C 说明" style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 12, lineHeight: 1.7, color: 'var(--text-secondary)' }}>
-          <p><strong>Stage C（Feature-flagged Layout Rendering）尚未开始。</strong></p>
-          <ul style={{ margin: '4px 0', paddingLeft: 20 }}>
-            <li>stage_c_gate: <Badge label="deferred" color="#6B7280" /></li>
-            <li>本页面没有启用 Stage C 的按钮</li>
-            <li>不会改变 Layout</li>
-            <li>不会改变左侧菜单</li>
-          </ul>
-        </div>
-      </SectionCard>
-
       {/* Readonly Boundary Notice */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>只读边界声明：</strong><br />
-        Governance Center 是<u>只读治理态势面板</u>。Governance Registry 是<u>只读元数据</u>。
-        本页面不会写数据库、不会执行外部调用、不会处理 Memory Hub candidate、不会发布 GitHub Release、不会启用 Stage C、不会移动菜单、不会修改 Layout。
-        forbiddenActions 是治理展示，不是权限系统。页面不会执行这些动作。
+        <strong>Readonly boundary notice:</strong><br />
+        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, sync LAN_SHARE, restart services, or enable Stage C. All <code>forbiddenActions</code> are governance display, not a permission system.
       </div>
     </PageShell>
   );

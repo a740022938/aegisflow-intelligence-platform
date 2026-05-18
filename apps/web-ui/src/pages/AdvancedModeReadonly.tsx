@@ -51,6 +51,13 @@ import {
   getLabRegistryQualityGateSummary,
 } from '../registry/lab-registry';
 import {
+  GOVERNANCE_REGISTRY,
+} from '../registry/governance-registry';
+import {
+  getGovernanceRegistrySummary,
+  validateGovernanceRegistry,
+} from '../registry/governance-registry-validator';
+import {
   getNavigationExposureSafetySummary,
   getNavigationExposureSummary,
 } from '../registry/navigation-exposure-registry';
@@ -249,6 +256,9 @@ export default function AdvancedModeReadonly() {
   const labHold = useMemo(() => getLabHoldReview(), []);
   const labFuture = useMemo(() => getLabFuture(), []);
   const labQuality = useMemo(() => getLabRegistryQualityGateSummary(), []);
+  const governanceSummary = useMemo(() => getGovernanceRegistrySummary(), []);
+  const governanceValidator = useMemo(() => validateGovernanceRegistry(), []);
+  const governanceTotal = useMemo(() => GOVERNANCE_REGISTRY.length, []);
   const safetySummary = useMemo(() => getNavigationExposureSafetySummary(), []);
   const centerSummary = useMemo(() => getCenterAccessSummary(), []);
   const launchpadVisible = useMemo(() => getCenterAccessLaunchpadVisible(), []);
@@ -265,7 +275,7 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls"
@@ -618,10 +628,35 @@ export default function AdvancedModeReadonly() {
         <NextWorkstreamPanel />
       </SectionCard>
 
-      {/* ── P3 + P4 Control Room Safety Notice ── */}
+      {/* ── P5 Governance Bridge ── */}
+      <SectionCard title="Governance Center Bridge" style={{ marginBottom: 20, border: '1px solid #22C55E' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Governance posture" value="readonly" color="var(--success)" />
+          <KpiCard label="Governance modules" value={String(governanceTotal)} color="#22C55E" />
+          <KpiCard label="Approval controls" value="0" color="var(--success)" />
+          <KpiCard label="Reject controls" value="0" color="var(--success)" />
+          <KpiCard label="Mutation paths" value="0" color="var(--success)" />
+          <KpiCard label="External writes" value="0" color="var(--success)" />
+          <KpiCard label="Stage C controls" value="0" color="var(--success)" />
+          <KpiCard label="Validator pass" value={governanceValidator.pass ? '✅' : '❌'} color={governanceValidator.pass ? 'var(--success)' : 'var(--danger)'} />
+          <KpiCard label="Blocking issues" value={String(governanceValidator.blockingCount)} color={governanceValidator.blockingCount === 0 ? 'var(--success)' : 'var(--danger)'} />
+          <KpiCard label="High risk" value={String(governanceSummary.byRiskLevel['high'] || 0)} color="var(--danger)" />
+          <KpiCard label="Critical risk" value={String(governanceSummary.byRiskLevel['critical'] || 0)} color="#7C3AED" />
+          <KpiCard label="Dry-run only" value={String(governanceSummary.dryRunOnlyCount)} color="#8B5CF6" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(34,197,94,0.08)', color: '#22C55E', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Governance Center →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(34,197,94,0.08)', color: 'var(--success)', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep governance metadata and reports readonly</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Governance Center = <strong>readonly</strong> / Stage C deferred preview. Approval controls = <strong>0</strong>. Reject controls = <strong>0</strong>. Mutation paths = <strong>0</strong>. External writes = <strong>0</strong>. Stage C governance controls = <strong>0</strong>. Validator blocking = <strong>{governanceValidator.blockingCount}</strong>. Recommended mode = <strong>manual verification only</strong>.
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 Control Room safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}
