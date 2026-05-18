@@ -119,6 +119,14 @@ import ApiAuthPermissionBoundaryDesign from '../components/governance/ApiAuthPer
 import ApiErrorFallbackContractDesign from '../components/governance/ApiErrorFallbackContractDesign';
 import ApiAuditEvidenceBoundaryDesign from '../components/governance/ApiAuditEvidenceBoundaryDesign';
 import ApiValidationPlan from '../components/governance/ApiValidationPlan';
+import RuntimeEvaluatorImplementationPlanReview from '../components/governance/RuntimeEvaluatorImplementationPlanReview';
+import PermissionEvaluationBoundaryDesign from '../components/governance/PermissionEvaluationBoundaryDesign';
+import EvaluatorInputOutputContractReview from '../components/governance/EvaluatorInputOutputContractReview';
+import DenyByDefaultEvaluationChainDesign from '../components/governance/DenyByDefaultEvaluationChainDesign';
+import EvaluatorDependencyMatrix from '../components/governance/EvaluatorDependencyMatrix';
+import EvaluatorRiskGuardrailMatrix from '../components/governance/EvaluatorRiskGuardrailMatrix';
+import EvaluatorFailureFallbackDesign from '../components/governance/EvaluatorFailureFallbackDesign';
+import EvaluatorValidationPlan from '../components/governance/EvaluatorValidationPlan';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -1074,6 +1082,40 @@ export default function GovernanceCenter() {
         <ApiValidationPlan />
       </SectionCard>
 
+      {/* ── v7.24.0-P9 Runtime Evaluator Implementation Plan Review + Permission Evaluation Boundary Design Sections ── */}
+
+      <SectionCard title="Runtime Evaluator Implementation Plan Review (P9)" style={{ marginBottom: 20, border: '1px solid #10B981' }}>
+        <RuntimeEvaluatorImplementationPlanReview />
+      </SectionCard>
+
+      <SectionCard title="Permission Evaluation Boundary Design (P9)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <PermissionEvaluationBoundaryDesign />
+      </SectionCard>
+
+      <SectionCard title="Evaluator Input / Output Contract Review (P9)" style={{ marginBottom: 20, border: '1px solid #14B8A6' }}>
+        <EvaluatorInputOutputContractReview />
+      </SectionCard>
+
+      <SectionCard title="Deny-by-default Evaluation Chain Design (P9)" style={{ marginBottom: 20, border: '1px solid #F59E0B' }}>
+        <DenyByDefaultEvaluationChainDesign />
+      </SectionCard>
+
+      <SectionCard title="Evaluator Dependency Matrix (P9)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <EvaluatorDependencyMatrix />
+      </SectionCard>
+
+      <SectionCard title="Evaluator Risk Guardrail Matrix (P9)" style={{ marginBottom: 20, border: '1px solid #F43F5E' }}>
+        <EvaluatorRiskGuardrailMatrix />
+      </SectionCard>
+
+      <SectionCard title="Evaluator Failure / Fallback Design (P9)" style={{ marginBottom: 20, border: '1px solid #06B6D4' }}>
+        <EvaluatorFailureFallbackDesign />
+      </SectionCard>
+
+      <SectionCard title="Evaluator Validation Plan (P9)" style={{ marginBottom: 20, border: '1px solid #6366F1' }}>
+        <EvaluatorValidationPlan />
+      </SectionCard>
+
       {/* Related Routes */}
       <SectionCard title="Related Pages" style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 12, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
@@ -1089,7 +1131,7 @@ export default function GovernanceCenter() {
       {/* Readonly Boundary Notice */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
         <strong>Readonly boundary notice:</strong><br />
-        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, rollback, restore, emergency stop, pause, kill, taskkill, restart, disable, shutdown, sync LAN_SHARE, restart services, write/upload/export audit evidence, or enable Stage C. P7 storage schema implementation plan review is design-review-only — no DB schema, no migration, no API endpoint, no runtime implementation, no DB writes. P8 authorization API contract implementation plan review is review-only — no API endpoint, no route, no handler, no DB write, no runtime implementation. All <code>forbiddenActions</code> are governance display, not a permission system.
+        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, rollback, restore, emergency stop, pause, kill, taskkill, restart, disable, shutdown, sync LAN_SHARE, restart services, write/upload/export audit evidence, or enable Stage C. P7 storage schema implementation plan review is design-review-only — no DB schema, no migration, no API endpoint, no runtime implementation, no DB writes. P8 authorization API contract implementation plan review is review-only — no API endpoint, no route, no handler, no DB write, no runtime implementation. P9 runtime evaluator implementation plan review is review-only — no runtime evaluator, no permission evaluator, no allow/deny control, no DB write, no runtime implementation. All <code>forbiddenActions</code> are governance display, not a permission system.
       </div>
     </PageShell>
   );

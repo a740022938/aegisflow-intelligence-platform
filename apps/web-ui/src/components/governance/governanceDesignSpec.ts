@@ -2879,3 +2879,217 @@ export const API_VALIDATION_CHECKS: ApiValidationCheckEntry[] = [
   { validationCheck: 'Secret scan validation', currentAvailability: 'available now', futureRequirement: 'ensure no secret in API contract files', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
   { validationCheck: 'Build/typecheck/lint validation', currentAvailability: 'available now', futureRequirement: 'ensure API contract does not break build', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
 ];
+
+// ── v7.24.0-P9: Runtime Evaluator Implementation Plan Review ──
+
+export interface EvaluatorImplementationPhaseEntry {
+  phase: string;
+  futurePurpose: string;
+  currentStatus: string;
+  runtimeImpact: string;
+  dbImpact: string;
+  apiImpact: string;
+  dependency: string;
+  requiredValidation: string;
+  goNoGoStatus: string;
+}
+
+export const EVALUATOR_IMPLEMENTATION_PHASES: EvaluatorImplementationPhaseEntry[] = [
+  { phase: 'Evaluator contract freeze', futurePurpose: '冻结 evaluator contract 设计', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'v7.24.0-P8 API contract review', requiredValidation: 'evaluator contract design review sign-off', goNoGoStatus: 'No-Go' },
+  { phase: 'Scope input review', futurePurpose: '审查 scope 输入契约', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Evaluator contract freeze', requiredValidation: 'scope input validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Operator role input review', futurePurpose: '审查 operator role 输入', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Scope input review', requiredValidation: 'role input validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Risk class input review', futurePurpose: '审查 risk class 输入', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Operator role input review', requiredValidation: 'risk input validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Evidence bundle input review', futurePurpose: '审查 evidence bundle 输入', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Risk class input review', requiredValidation: 'evidence input validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Decision dependency review', futurePurpose: '审查 decision 依赖', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Evidence bundle input review', requiredValidation: 'decision dependency analysis', goNoGoStatus: 'No-Go' },
+  { phase: 'Expiry/revocation dependency review', futurePurpose: '审查 expiry/revocation 依赖', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Decision dependency review', requiredValidation: 'expiry/revocation dependency analysis', goNoGoStatus: 'No-Go' },
+  { phase: 'Deny-by-default chain review', futurePurpose: '审查 deny-by-default 执行链', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Expiry/revocation dependency review', requiredValidation: 'deny chain validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Audit handoff review', futurePurpose: '审查 audit handoff', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Deny-by-default chain review', requiredValidation: 'audit handoff validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Fallback behavior review', futurePurpose: '审查 fallback 行为', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Audit handoff review', requiredValidation: 'fallback behavior validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Final evaluator implementation approval gate', futurePurpose: '最终 evaluator 实施审批门禁', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Fallback behavior review', requiredValidation: 'final approval + go/no-go decision', goNoGoStatus: 'No-Go' },
+];
+
+// ── v7.24.0-P9: Permission Evaluation Boundary Design ──
+
+export interface PermissionEvaluationBoundaryEntry {
+  permission: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  currentPermission: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  stageGate: string;
+  riskClass: string;
+  requiredValidation: string;
+}
+
+export const PERMISSION_EVALUATION_BOUNDARY_ROWS: PermissionEvaluationBoundaryEntry[] = [
+  { permission: 'canViewRequest', futurePurpose: '允许查看授权请求', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'medium', requiredValidation: 'scope validation test' },
+  { permission: 'canSubmitRequest', futurePurpose: '允许提交授权请求', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'high', requiredValidation: 'role validation test' },
+  { permission: 'canAttachEvidence', futurePurpose: '允许附加审计证据', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'high', requiredValidation: 'evidence validation test' },
+  { permission: 'canReview', futurePurpose: '允许审查授权请求', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'high', requiredValidation: 'role validation test' },
+  { permission: 'canApproveFuture', futurePurpose: '允许批准授权（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'approval validation test' },
+  { permission: 'canRejectFuture', futurePurpose: '允许拒绝授权（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'rejection validation test' },
+  { permission: 'canMutateFuture', futurePurpose: '允许变更授权（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'mutation validation test' },
+  { permission: 'canExecuteFuture', futurePurpose: '允许执行操作（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'execution validation test' },
+  { permission: 'canExternalWriteFuture', futurePurpose: '允许外部写入（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'external write validation test' },
+  { permission: 'canDeployFuture', futurePurpose: '允许部署（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'deploy validation test' },
+  { permission: 'canRollbackFuture', futurePurpose: '允许回滚（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'rollback validation test' },
+  { permission: 'canEmergencyStopFuture', futurePurpose: '允许紧急停止（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'emergency stop validation test' },
+  { permission: 'canWriteAuditEvidenceFuture', futurePurpose: '允许写入审计证据（未来）', currentImplementation: 'none', currentPermission: 'false', runtimeEffect: 'none', writeEffect: 'none', stageGate: 'Stage C deferred', riskClass: 'critical', requiredValidation: 'audit write validation test' },
+];
+
+// ── v7.24.0-P9: Evaluator Input / Output Contract Review ──
+
+export interface EvaluatorInputOutputContractEntry {
+  contractItem: string;
+  futurePurpose: string;
+  shapeStatus: string;
+  currentImplementation: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  riskNote: string;
+  futureRequirement: string;
+}
+
+export const EVALUATOR_IO_CONTRACT_ROWS: EvaluatorInputOutputContractEntry[] = [
+  { contractItem: 'Authorization request input', futurePurpose: '授权请求输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '无效请求导致错误授权', futureRequirement: 'input schema validation' },
+  { contractItem: 'Operator role input', futurePurpose: '操作者角色输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '角色伪造风险', futureRequirement: 'role validation + auth guard' },
+  { contractItem: 'Requested action input', futurePurpose: '请求动作输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '动作越权风险', futureRequirement: 'action validation + scope guard' },
+  { contractItem: 'Scope boundary input', futurePurpose: '范围边界输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '范围逃逸风险', futureRequirement: 'scope boundary validation' },
+  { contractItem: 'Risk class input', futurePurpose: '风险分类输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '风险分类错误导致 bypass', futureRequirement: 'risk classification validation' },
+  { contractItem: 'Evidence bundle input', futurePurpose: '证据包输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '证据篡改风险', futureRequirement: 'evidence integrity validation' },
+  { contractItem: 'Decision dependency input', futurePurpose: '决策依赖输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '决策依赖缺失', futureRequirement: 'dependency validation' },
+  { contractItem: 'Expiry policy input', futurePurpose: '过期策略输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '过期策略忽略', futureRequirement: 'expiry policy validation' },
+  { contractItem: 'Revocation policy input', futurePurpose: '撤销策略输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '撤销策略忽略', futureRequirement: 'revocation policy validation' },
+  { contractItem: 'Stage C status input', futurePurpose: 'Stage C 状态输入', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: 'Stage C disabled 被忽略导致 bypass', futureRequirement: 'stage gate validation' },
+  { contractItem: 'Evaluator decision output', futurePurpose: '评估器决策输出', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '决策输出错误', futureRequirement: 'decision output validation' },
+  { contractItem: 'Evaluator audit handoff output', futurePurpose: '评估器审计交接输出', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', riskNote: '审计交接丢失', futureRequirement: 'audit handoff validation' },
+];
+
+// ── v7.24.0-P9: Deny-by-default Evaluation Chain Design ──
+
+export interface DenyByDefaultChainEntry {
+  condition: string;
+  futureDecision: string;
+  currentBehavior: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  riskIfSkipped: string;
+  status: string;
+}
+
+export const DENY_BY_DEFAULT_CHAIN_ROWS: DenyByDefaultChainEntry[] = [
+  { condition: 'Stage C disabled', futureDecision: 'deny — hard gate', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: 'Stage C bypass导致未授权执行', status: 'future package required' },
+  { condition: 'Missing scope', futureDecision: 'deny — scope required', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: 'scope逃逸导致越权', status: 'future package required' },
+  { condition: 'Unknown operator role', futureDecision: 'deny — unrecognized role', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '角色伪造导致未授权操作', status: 'future package required' },
+  { condition: 'High risk without approval', futureDecision: 'deny — approval required', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '高风险操作绕过审批', status: 'future package required' },
+  { condition: 'Missing evidence', futureDecision: 'deny — evidence required', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '无证据授权导致审计缺口', status: 'future package required' },
+  { condition: 'Expired authorization', futureDecision: 'deny — authorization expired', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '过期授权重用', status: 'future package required' },
+  { condition: 'Revoked authorization', futureDecision: 'deny — authorization revoked', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '撤销授权重用', status: 'future package required' },
+  { condition: 'Missing rollback dependency', futureDecision: 'deny — rollback not ready', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '不可恢复操作', status: 'future package required' },
+  { condition: 'External write sandbox absent', futureDecision: 'deny — sandbox required', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '外部写入逃逸', status: 'future package required' },
+  { condition: 'Emergency stop runtime absent', futureDecision: 'deny — emergency stop not ready', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '无法紧急停止', status: 'future package required' },
+  { condition: 'Fallback unknown', futureDecision: 'deny — fallback undefined', currentBehavior: 'no runtime — design-only blocked', runtimeEffect: 'none', writeEffect: 'none', riskIfSkipped: '未定义fallback导致系统不一致', status: 'future package required' },
+];
+
+// ── v7.24.0-P9: Evaluator Dependency Matrix ──
+
+export interface EvaluatorDependencyEntry {
+  dependency: string;
+  neededByEvaluator: string;
+  currentStatus: string;
+  runtimeAvailability: string;
+  blockingStatus: string;
+  futurePackage: string;
+}
+
+export const EVALUATOR_DEPENDENCY_ROWS: EvaluatorDependencyEntry[] = [
+  { dependency: 'Authorization request contract', neededByEvaluator: 'input validation', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Authorization API Package' },
+  { dependency: 'Authorization persistence', neededByEvaluator: 'state read/write', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Authorization Persistence Package' },
+  { dependency: 'API endpoint contract', neededByEvaluator: 'handler integration', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Authorization API Package' },
+  { dependency: 'Review policy', neededByEvaluator: 'review gate', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Review Policy Package' },
+  { dependency: 'Decision governance', neededByEvaluator: 'decision gate', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Decision Governance Package' },
+  { dependency: 'Evidence bundle contract', neededByEvaluator: 'evidence validation', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Evidence Package' },
+  { dependency: 'Expiry policy', neededByEvaluator: 'expiry check', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Expiry Policy Package' },
+  { dependency: 'Revocation policy', neededByEvaluator: 'revocation check', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Revocation Policy Package' },
+  { dependency: 'Audit chain contract', neededByEvaluator: 'audit handoff', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Audit Chain Package' },
+  { dependency: 'Stage C activation flag', neededByEvaluator: 'stage gate', currentStatus: 'disabled', runtimeAvailability: 'none', blockingStatus: 'blocking — Stage C disabled', futurePackage: 'Stage C Activation Package' },
+  { dependency: 'External write sandbox', neededByEvaluator: 'external write guard', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'External Write Package' },
+  { dependency: 'Rollback readiness', neededByEvaluator: 'rollback guard', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Rollback Package' },
+  { dependency: 'Emergency stop readiness', neededByEvaluator: 'emergency stop guard', currentStatus: 'design-only', runtimeAvailability: 'none', blockingStatus: 'blocking — future required', futurePackage: 'Emergency Stop Package' },
+];
+
+// ── v7.24.0-P9: Evaluator Risk Guardrail Matrix ──
+
+export interface EvaluatorRiskGuardrailEntry {
+  risk: string;
+  currentExposure: string;
+  activeRisk: number;
+  guardrail: string;
+  futureMitigation: string;
+  status: string;
+}
+
+export const EVALUATOR_RISK_GUARDRAIL_ROWS: EvaluatorRiskGuardrailEntry[] = [
+  { risk: 'Premature allow decision', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no runtime evaluator', futureMitigation: 'deny-by-default chain + approval gate', status: 'safe — future mitigation required' },
+  { risk: 'High-risk bypass', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no high-risk action handler', futureMitigation: 'risk classification + escalation guard', status: 'safe — future mitigation required' },
+  { risk: 'Scope escalation', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no permission evaluator', futureMitigation: 'scope enforcement + permission guard', status: 'safe — future mitigation required' },
+  { risk: 'Role spoofing', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no role system', futureMitigation: 'role validation + auth middleware', status: 'safe — future mitigation required' },
+  { risk: 'Evidence spoofing', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no evidence write path', futureMitigation: 'evidence integrity check + audit guard', status: 'safe — future mitigation required' },
+  { risk: 'Expired authorization accepted', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no expiry engine', futureMitigation: 'expiry validation + state check', status: 'safe — future mitigation required' },
+  { risk: 'Revoked authorization accepted', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no revocation engine', futureMitigation: 'revocation validation + state check', status: 'safe — future mitigation required' },
+  { risk: 'Stage C disabled ignored', currentExposure: 'none — Stage C disabled', activeRisk: 0, guardrail: 'stage gate not met', futureMitigation: 'stage gate check + hard deny', status: 'safe — future mitigation required' },
+  { risk: 'Audit handoff skipped', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no audit hook', futureMitigation: 'audit handoff + integrity check', status: 'safe — future mitigation required' },
+  { risk: 'External write escalated', currentExposure: 'none — no external write', activeRisk: 0, guardrail: 'no external connector', futureMitigation: 'external write guard + sandbox', status: 'safe — future mitigation required' },
+  { risk: 'Runtime state mismatch', currentExposure: 'none — no evaluator', activeRisk: 0, guardrail: 'no runtime state', futureMitigation: 'state validation + consistency check', status: 'safe — future mitigation required' },
+];
+
+// ── v7.24.0-P9: Evaluator Failure / Fallback Design ──
+
+export interface EvaluatorFailureFallbackEntry {
+  failureCase: string;
+  futureFallback: string;
+  currentBehavior: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  status: string;
+}
+
+export const EVALUATOR_FAILURE_FALLBACK_ROWS: EvaluatorFailureFallbackEntry[] = [
+  { failureCase: 'Missing request payload', futureFallback: 'deny — invalid input', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Invalid scope', futureFallback: 'deny — scope error', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Unknown role', futureFallback: 'deny — unrecognized role', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Missing evidence', futureFallback: 'deny — evidence required', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Dependency unavailable', futureFallback: 'deny — dependency failed', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Persistence unavailable', futureFallback: 'deny — storage failed', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'API unavailable', futureFallback: 'deny — API failed', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Audit chain unavailable', futureFallback: 'deny — audit failed', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Stage C disabled', futureFallback: 'deny — hard gate', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Unknown evaluator error', futureFallback: 'deny — internal error', currentBehavior: 'design-only — no evaluator', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+];
+
+// ── v7.24.0-P9: Evaluator Validation Plan ──
+
+export interface EvaluatorValidationCheckEntry {
+  validationCheck: string;
+  currentAvailability: string;
+  futureRequirement: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  status: string;
+}
+
+export const EVALUATOR_VALIDATION_CHECKS: EvaluatorValidationCheckEntry[] = [
+  { validationCheck: 'Scope validation test future', currentAvailability: 'not available (future)', futureRequirement: 'scope validation test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Role validation test future', currentAvailability: 'not available (future)', futureRequirement: 'role validation test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Risk validation test future', currentAvailability: 'not available (future)', futureRequirement: 'risk validation test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Evidence validation test future', currentAvailability: 'not available (future)', futureRequirement: 'evidence validation test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Deny-by-default test future', currentAvailability: 'not available (future)', futureRequirement: 'deny chain test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Expiry validation test future', currentAvailability: 'not available (future)', futureRequirement: 'expiry validation test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Revocation validation test future', currentAvailability: 'not available (future)', futureRequirement: 'revocation validation test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Stage C disabled hard-deny test future', currentAvailability: 'not available (future)', futureRequirement: 'stage C disabled hard-deny test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Audit handoff test future', currentAvailability: 'not available (future)', futureRequirement: 'audit handoff test', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Build/typecheck/lint validation', currentAvailability: 'available now', futureRequirement: 'ensure evaluator contract does not break build', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+  { validationCheck: 'DB doctor validation', currentAvailability: 'available now', futureRequirement: 'ensure evaluator contract does not break DB', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+  { validationCheck: 'Secret scan validation', currentAvailability: 'available now', futureRequirement: 'ensure no secret in evaluator contract files', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+];
