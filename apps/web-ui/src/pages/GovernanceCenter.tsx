@@ -54,6 +54,7 @@ import StageCReadinessBlockerMatrix from '../components/governance/StageCReadine
 import CrossGateDependencyMatrix from '../components/governance/CrossGateDependencyMatrix';
 import ControlBoundaryFinalMatrix from '../components/governance/ControlBoundaryFinalMatrix';
 import StageCNonReadinessStatement from '../components/governance/StageCNonReadinessStatement';
+import ClosureMetricsSnapshot from '../components/governance/ClosureMetricsSnapshot';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -306,7 +307,7 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.23.0-P9"
+      versionLabel="AIP v7.23.1"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement"
@@ -730,6 +731,11 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Stage C Activation Non-Readiness Statement (P9)" style={{ marginBottom: 20, border: '2px solid #EF4444' }}>
         <StageCNonReadinessStatement />
+      </SectionCard>
+
+      {/* ── v7.23.1 Closure Metrics Snapshot ── */}
+      <SectionCard title="Closure Metrics Snapshot (v7.23.1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <ClosureMetricsSnapshot />
       </SectionCard>
 
       {/* Related Routes */}
