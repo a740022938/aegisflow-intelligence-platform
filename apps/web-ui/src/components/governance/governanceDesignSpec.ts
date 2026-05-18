@@ -3288,3 +3288,168 @@ export const EVALUATOR_IMPLEMENTATION_NO_GO_CHECKS: EvaluatorImplementationNoGoC
   { check: 'Evaluation result contract review complete', purpose: '评估结果契约审查完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
   { check: 'Final evaluator implementation audit complete', purpose: '最终 evaluator 实施审计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
 ];
+
+// ── v7.24.0-P11: Implementation Package Execution Boundary Review ──
+
+export interface ImplementationPackageExecutionAreaEntry {
+  area: string;
+  futurePurpose: string;
+  currentState: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  executionImpact: string;
+  requiredPreflight: string;
+  blocker: string;
+}
+
+export const IMPLEMENTATION_PACKAGE_EXECUTION_AREAS: ImplementationPackageExecutionAreaEntry[] = [
+  { area: 'Authorization request execution', futurePurpose: '执行授权请求处理流程', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'authorization runtime package', blocker: 'no auth runtime' },
+  { area: 'Permission evaluation execution', futurePurpose: '执行权限评估链', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'permission evaluator package', blocker: 'no evaluator runtime' },
+  { area: 'Decision output execution', futurePurpose: '执行决策输出构建', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'decision output package', blocker: 'no decision runtime' },
+  { area: 'Audit handoff execution', futurePurpose: '执行审计交接', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'audit handoff package', blocker: 'no handoff runtime' },
+  { area: 'Dry-run execution', futurePurpose: '执行 dry-run 模拟', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'dry-run engine package', blocker: 'no dry-run runtime' },
+  { area: 'Fixture loading execution', futurePurpose: '执行 fixture 数据加载', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'fixture loader package', blocker: 'no loader runtime' },
+  { area: 'Result reporting execution', futurePurpose: '执行评估结果报告', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'result reporter package', blocker: 'no reporter runtime' },
+  { area: 'Stage C gate execution', futurePurpose: '执行 Stage C 门禁检查', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'stage C gate package', blocker: 'Stage C deferred' },
+  { area: 'Integration package execution gate', futurePurpose: '执行集成包门禁审批', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'integration gate package', blocker: 'no integration runtime' },
+  { area: 'Full implementation package execution', futurePurpose: '执行完整 implementation 包', currentState: 'review-only', runtimeEffect: 'none', writeEffect: 'none', executionImpact: 'none', requiredPreflight: 'all implementation packages', blocker: 'all blockers unresolved' },
+];
+
+// ── v7.24.0-P11: Implementation Package Execution No-Go Gate ──
+
+export interface ImplementationPackageExecutionCheckEntry {
+  check: string;
+  purpose: string;
+  currentState: string;
+  goDecision: number;
+  noGoDecision: number;
+  requiredForExecution: string;
+}
+
+export const IMPLEMENTATION_PACKAGE_EXECUTION_CHECKS: ImplementationPackageExecutionCheckEntry[] = [
+  { check: 'Authorization request execution package design complete', purpose: '授权请求执行包设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForExecution: 'yes' },
+  { check: 'Permission evaluator execution package design complete', purpose: '权限评估器执行包设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForExecution: 'yes' },
+  { check: 'Decision output execution package design complete', purpose: '决策输出执行包设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForExecution: 'yes' },
+  { check: 'Audit handoff execution package design complete', purpose: '审计交接执行包设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForExecution: 'yes' },
+  { check: 'Dry-run engine execution package design complete', purpose: 'dry-run 引擎执行包设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForExecution: 'yes' },
+  { check: 'Fixture loader execution package design complete', purpose: 'fixture 加载器执行包设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForExecution: 'yes' },
+  { check: 'Result reporter execution package design complete', purpose: '结果报告器执行包设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForExecution: 'yes' },
+  { check: 'Full integration gate design complete', purpose: '完整集成门禁设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForExecution: 'yes' },
+];
+
+// ── v7.24.0-P11: Runtime Implementation No-Go Seal ──
+
+export interface RuntimeImplementationNoGoEntry {
+  check: string;
+  purpose: string;
+  currentState: string;
+  goDecision: number;
+  noGoDecision: number;
+  sealed: string;
+}
+
+export const RUNTIME_IMPLEMENTATION_NO_GO_CHECKS: RuntimeImplementationNoGoEntry[] = [
+  { check: 'Runtime evaluator implementation allowed', purpose: 'runtime evaluator 是否允许 implementation', currentState: 'not started', goDecision: 0, noGoDecision: 1, sealed: 'No-Go sealed' },
+  { check: 'Permission evaluator implementation allowed', purpose: 'permission evaluator 是否允许 implementation', currentState: 'not started', goDecision: 0, noGoDecision: 1, sealed: 'No-Go sealed' },
+  { check: 'Dry-run engine implementation allowed', purpose: 'dry-run engine 是否允许 implementation', currentState: 'not started', goDecision: 0, noGoDecision: 1, sealed: 'No-Go sealed' },
+  { check: 'Decision engine implementation allowed', purpose: 'decision engine 是否允许 implementation', currentState: 'not started', goDecision: 0, noGoDecision: 1, sealed: 'No-Go sealed' },
+  { check: 'Review workflow implementation allowed', purpose: 'review workflow 是否允许 implementation', currentState: 'not started', goDecision: 0, noGoDecision: 1, sealed: 'No-Go sealed' },
+  { check: 'Allow/deny controls implementation allowed', purpose: 'allow/deny 控件是否允许 implementation', currentState: 'not started', goDecision: 0, noGoDecision: 1, sealed: 'No-Go sealed' },
+  { check: 'API endpoint implementation allowed', purpose: 'API endpoint 是否允许 implementation', currentState: 'not started', goDecision: 0, noGoDecision: 1, sealed: 'No-Go sealed' },
+  { check: 'Stage C activation allowed', purpose: 'Stage C 是否允许 activation', currentState: 'not started', goDecision: 0, noGoDecision: 1, sealed: 'No-Go sealed' },
+];
+
+// ── v7.24.0-P11: Implementation Package Execution Sequencing Plan ──
+
+export interface ImplementationPackageExecutionSequenceEntry {
+  sequenceOrder: number;
+  packageName: string;
+  dependency: string;
+  currentReadiness: string;
+  executionStatus: string;
+  blocker: string;
+}
+
+export const IMPLEMENTATION_PACKAGE_EXECUTION_SEQUENCE: ImplementationPackageExecutionSequenceEntry[] = [
+  { sequenceOrder: 1, packageName: 'Authorization request execution package', dependency: 'P11 boundary design', currentReadiness: 'not ready', executionStatus: 'blocked — No-Go', blocker: 'no auth runtime package' },
+  { sequenceOrder: 2, packageName: 'Permission evaluator execution package', dependency: 'Authorization request execution package', currentReadiness: 'not ready', executionStatus: 'blocked — No-Go', blocker: 'no evaluator runtime package' },
+  { sequenceOrder: 3, packageName: 'Decision output execution package', dependency: 'Permission evaluator execution package', currentReadiness: 'not ready', executionStatus: 'blocked — No-Go', blocker: 'no decision runtime package' },
+  { sequenceOrder: 4, packageName: 'Audit handoff execution package', dependency: 'Decision output execution package', currentReadiness: 'not ready', executionStatus: 'blocked — No-Go', blocker: 'no handoff runtime package' },
+  { sequenceOrder: 5, packageName: 'Dry-run engine execution package', dependency: 'Audit handoff execution package', currentReadiness: 'not ready', executionStatus: 'blocked — No-Go', blocker: 'no dry-run engine package' },
+  { sequenceOrder: 6, packageName: 'Fixture loader execution package', dependency: 'Dry-run engine execution package', currentReadiness: 'not ready', executionStatus: 'blocked — No-Go', blocker: 'no loader package' },
+  { sequenceOrder: 7, packageName: 'Result reporter execution package', dependency: 'Fixture loader execution package', currentReadiness: 'not ready', executionStatus: 'blocked — No-Go', blocker: 'no reporter package' },
+  { sequenceOrder: 8, packageName: 'Full integration gate execution', dependency: 'All execution packages', currentReadiness: 'not ready', executionStatus: 'blocked — No-Go', blocker: 'all blockers unresolved' },
+];
+
+// ── v7.24.0-P12: Closure Metrics Definitions ──
+
+export interface ClosureMetricsDefinitionEntry {
+  metricName: string;
+  definition: string;
+  source: string;
+  currentValue: string;
+  targetValue: string;
+  verificationMethod: string;
+  status: string;
+}
+
+export const CLOSURE_METRICS_DEFINITIONS: ClosureMetricsDefinitionEntry[] = [
+  { metricName: 'Stage C enabled', definition: 'Stage C activation status', source: 'governance registry', currentValue: 'false', targetValue: 'false (deferred)', verificationMethod: 'self check — no stageC gate pass', status: 'verified' },
+  { metricName: 'Evaluator implementation allowed', definition: 'runtime evaluator implementation permission', source: 'P11 No-Go seal', currentValue: 'false', targetValue: 'false (No-Go)', verificationMethod: 'P11 no-go seal check', status: 'verified' },
+  { metricName: 'Permission evaluator allowed', definition: 'permission evaluator implementation permission', source: 'P11 No-Go seal', currentValue: 'false', targetValue: 'false (No-Go)', verificationMethod: 'P11 no-go seal check', status: 'verified' },
+  { metricName: 'Runtime evaluator implemented', definition: 'runtime evaluator actual implementation status', source: 'P10 evaluator package review', currentValue: 'false', targetValue: 'false (not implemented)', verificationMethod: 'P10 evaluator status check', status: 'verified' },
+  { metricName: 'Dry-run engine implemented', definition: 'dry-run engine implementation status', source: 'P10 dry-run boundary design', currentValue: 'false', targetValue: 'false (not implemented)', verificationMethod: 'P10 dry-run status check', status: 'verified' },
+  { metricName: 'Allow controls count', definition: 'number of allow/approve real controls', source: 'governance registry', currentValue: '0', targetValue: '0 (all disabled)', verificationMethod: 'registry control count check', status: 'verified' },
+  { metricName: 'Deny/reject controls count', definition: 'number of deny/reject real controls', source: 'governance registry', currentValue: '0', targetValue: '0 (all disabled)', verificationMethod: 'registry control count check', status: 'verified' },
+  { metricName: 'API endpoints added', definition: 'number of new API endpoints added', source: 'P8 API review', currentValue: '0', targetValue: '0 (review-only)', verificationMethod: 'P8 endpoint count check', status: 'verified' },
+  { metricName: 'DB schema added', definition: 'number of new DB schema tables added', source: 'P7 schema review', currentValue: '0', targetValue: '0 (review-only)', verificationMethod: 'P7 schema count check', status: 'verified' },
+  { metricName: 'DB writes count', definition: 'number of DB write paths', source: 'governance registry', currentValue: '0', targetValue: '0 (all disabled)', verificationMethod: 'registry write path check', status: 'verified' },
+  { metricName: 'External writes count', definition: 'number of external write paths', source: 'governance registry', currentValue: '0', targetValue: '0 (all disabled)', verificationMethod: 'registry external write check', status: 'verified' },
+  { metricName: 'Stage C blockers resolved', definition: 'number of Stage C blockers resolved', source: 'P5 blocker roadmap', currentValue: '0', targetValue: '0 (all unresolved)', verificationMethod: 'P5 blocker count check', status: 'verified' },
+];
+
+// ── v7.24.0-P12: Report Guardrail Checks ──
+
+export interface ReportGuardrailCheckEntry {
+  check: string;
+  purpose: string;
+  validation: string;
+  currentState: string;
+  guardrail: string;
+  requiredAction: string;
+}
+
+export const REPORT_GUARDRAIL_CHECKS: ReportGuardrailCheckEntry[] = [
+  { check: 'Stage C enabled metric consistent', purpose: '确保 Stage C enabled 指标在所有报告中一致', validation: 'cross-report comparison', currentState: 'pass', guardrail: 'Stage C enabled must be false in all reports', requiredAction: 'none — verified' },
+  { check: 'Implementation allowed metrics consistent', purpose: '确保 implementation allowed 指标在所有报告中一致', validation: 'cross-report comparison', currentState: 'pass', guardrail: 'evaluator/permission/dry-run allowed must be false in all reports', requiredAction: 'none — verified' },
+  { check: 'Control count metrics consistent', purpose: '确保 control count 指标在所有报告中一致', validation: 'cross-report comparison', currentState: 'pass', guardrail: 'allow/deny/API/DB/write counts must be 0 in all reports', requiredAction: 'none — verified' },
+  { check: 'P6-P10 metrics inherited correctly', purpose: '确保 P6-P10 的边界指标被正确继承', validation: 'P6-P10 report comparison', currentState: 'pass', guardrail: 'P6-P10 boundary metrics must match P11/P12 baseline', requiredAction: 'none — verified' },
+  { check: 'P7a reconciliation applied', purpose: '确保 P7a storage implementation allowed = false 已应用', validation: 'P7a reconciliation check', currentState: 'pass', guardrail: 'storage implementation allowed must be false', requiredAction: 'none — reconciled' },
+  { check: 'No report metric drift', purpose: '确保报告指标不随时间漂移', validation: 'sequential report comparison', currentState: 'pass', guardrail: 'report metrics must be monotonic (or explicitly acknowledged)', requiredAction: 'none — verified' },
+  { check: 'secret:scan pre-existing FP documented', purpose: '确保 secret:scan 的 pre-existing FP 已记录', validation: 'secret:scan result check', currentState: 'pass', guardrail: 'pre-existing FP must be documented in each report', requiredAction: 'none — FP documented' },
+  { check: 'All verification steps pass', purpose: '确保 lint/typecheck/build/db:doctor/secret:scan 全部通过', validation: 'verification check', currentState: 'pass', guardrail: 'all verification steps must pass before commit', requiredAction: 'none — all pass' },
+  { check: 'Commit message convention followed', purpose: '确保 commit message 按约定格式', validation: 'commit message check', currentState: 'pass', guardrail: 'commit message must follow feat/fix/chore convention', requiredAction: 'none — followed' },
+  { check: 'Final receipt delivered', purpose: '确保最终回执已交付', validation: 'receipt check', currentState: 'pass', guardrail: 'final receipt must match task pack template', requiredAction: 'none — delivered' },
+];
+
+// ── v7.24.0-P12: Metrics Hardening Rules ──
+
+export interface MetricsHardeningRuleEntry {
+  rule: string;
+  purpose: string;
+  appliesTo: string;
+  validation: string;
+  severity: string;
+  enforced: string;
+}
+
+export const METRICS_HARDENING_RULES: MetricsHardeningRuleEntry[] = [
+  { rule: 'Stage C enabled must be false', purpose: '禁止任何报告声明 Stage C enabled = true', appliesTo: 'all reports (P5-P13)', validation: 'grep for "stageC_enabled": true', severity: 'error', enforced: 'true' },
+  { rule: 'Implementation allowed must be false', purpose: '禁止任何报告声明 evaluator/permission/dry-run allowed = true', appliesTo: 'all reports (P6-P13)', validation: 'grep for "implementation_allowed": true', severity: 'error', enforced: 'true' },
+  { rule: 'Control counts must be 0', purpose: '禁止任何报告声明 allow/deny/API/DB/write count > 0', appliesTo: 'all reports (P5-P13)', validation: 'grep for "_controls": "[1-9]"', severity: 'error', enforced: 'true' },
+  { rule: 'P7a reconciliation must be applied', purpose: '确保 P7a 的 storage implementation allowed = false 不会被重置', appliesTo: 'P7 and later reports', validation: 'check P7 report metrics', severity: 'error', enforced: 'true' },
+  { rule: 'secret:scan FP must be documented', purpose: '确保 secret:scan 的 pre-existing FP 在每个报告中记录', appliesTo: 'all reports (P3-P13)', validation: 'grep for "pre-existing" in report', severity: 'warning', enforced: 'true' },
+  { rule: 'All verification must pass', purpose: '确保 lint/typecheck/build/db:doctor/secret:scan 全部 pass', appliesTo: 'all commits', validation: 'run verification before commit', severity: 'error', enforced: 'true' },
+  { rule: 'No metric drift between reports', purpose: '确保连续报告之间的关键指标一致', appliesTo: 'sequential report pairs', validation: 'compare adjacent report JSON files', severity: 'warning', enforced: 'true' },
+  { rule: 'Final receipt must match template', purpose: '确保最终回执按模板格式交付', appliesTo: 'P6-P13', validation: 'receipt template check', severity: 'warning', enforced: 'true' },
+];

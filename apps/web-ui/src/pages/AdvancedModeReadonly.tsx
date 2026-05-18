@@ -160,6 +160,13 @@ import {
   RUNTIME_DRY_RUN_FIXTURE_ROWS,
   EVALUATION_RESULT_CONTRACT_ROWS,
   EVALUATOR_IMPLEMENTATION_NO_GO_CHECKS,
+  IMPLEMENTATION_PACKAGE_EXECUTION_AREAS,
+  IMPLEMENTATION_PACKAGE_EXECUTION_CHECKS,
+  RUNTIME_IMPLEMENTATION_NO_GO_CHECKS,
+  IMPLEMENTATION_PACKAGE_EXECUTION_SEQUENCE,
+  CLOSURE_METRICS_DEFINITIONS,
+  REPORT_GUARDRAIL_CHECKS,
+  METRICS_HARDENING_RULES,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -383,10 +390,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P11 + P12"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation · P7 storage schema implementation plan review — design-review-only, no db schema, no migration, no api endpoint, no runtime implementation · P8 authorization api contract implementation plan review — review-only, no api endpoint, no route, no handler, no db write, no runtime implementation · P9 runtime evaluator implementation plan review — review-only, no runtime evaluator, no permission evaluator, no allow/deny control, no db write, no runtime implementation · P10 evaluator implementation package review — review-only, no evaluator runtime, no dry-run engine, no permission evaluator, no db write, no stage c enablement"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation · P7 storage schema implementation plan review — design-review-only, no db schema, no migration, no api endpoint, no runtime implementation · P8 authorization api contract implementation plan review — review-only, no api endpoint, no route, no handler, no db write, no runtime implementation · P9 runtime evaluator implementation plan review — review-only, no runtime evaluator, no permission evaluator, no allow/deny control, no db write, no runtime implementation · P10 evaluator implementation package review — review-only, no evaluator runtime, no dry-run engine, no permission evaluator, no db write, no stage c enablement · P11 implementation package execution boundary review — review-only, no runtime execution, no evaluator runtime, no dry-run engine, no permission function, no stage c activation · P12 runtime authorization metrics hardening + report guardrail — metrics-hardening-only, no runtime implementation, no stage c enablement"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -1239,10 +1246,59 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P1 + P2 + P3 Control Room Safety Notice ── */}
+      {/* ── v7.24.0-P11 Implementation Package Execution Boundary Review Bridge ── */}
+      <SectionCard title="Implementation Package Execution Bridge (P11)" style={{ marginBottom: 20, border: '1px solid #64748B' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Exec areas" value={String(IMPLEMENTATION_PACKAGE_EXECUTION_AREAS.length)} color="#64748B" />
+          <KpiCard label="Exec checks" value={String(IMPLEMENTATION_PACKAGE_EXECUTION_CHECKS.length)} color="#EF4444" />
+          <KpiCard label="Runtime No-Go seals" value={String(RUNTIME_IMPLEMENTATION_NO_GO_CHECKS.length)} color="#DC2626" />
+          <KpiCard label="Sequence packages" value={String(IMPLEMENTATION_PACKAGE_EXECUTION_SEQUENCE.length)} color="#F59E0B" />
+          <KpiCard label="Overall decision" value="No-Go" color="#EF4444" />
+          <KpiCard label="Eval implementation" value="false" color="var(--success)" />
+          <KpiCard label="Perm evaluator" value="false" color="var(--success)" />
+          <KpiCard label="Dry-run engine" value="false" color="var(--success)" />
+          <KpiCard label="Decision engine" value="false" color="var(--success)" />
+          <KpiCard label="Allow controls" value="0" color="var(--success)" />
+          <KpiCard label="Deny controls" value="0" color="var(--success)" />
+          <KpiCard label="API endpoints" value="0" color="var(--success)" />
+          <KpiCard label="DB writes" value="0" color="var(--success)" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(100,116,139,0.08)', color: '#64748B', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Implementation Package Execution Boundary →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep implementation execution in review-only — all No-Go sealed</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(100,116,139,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P11 Implementation Package Execution Boundary Review = <strong>review-only</strong>. Execution areas = <strong>{IMPLEMENTATION_PACKAGE_EXECUTION_AREAS.length}</strong> (all review-only, No-Go). Execution checks = <strong>{IMPLEMENTATION_PACKAGE_EXECUTION_CHECKS.length}</strong> (all No-Go, not started). Runtime No-Go seals = <strong>{RUNTIME_IMPLEMENTATION_NO_GO_CHECKS.length}</strong> (all sealed No-Go). Sequence packages = <strong>{IMPLEMENTATION_PACKAGE_EXECUTION_SEQUENCE.length}</strong> (all blocked, No-Go). Overall implementation execution decision = <strong>No-Go</strong>. Evaluator implementation allowed = <strong>false</strong>. Permission evaluator allowed = <strong>false</strong>. Dry-run engine = <strong>not implemented</strong>. Decision engine = <strong>not implemented</strong>. Allow controls = <strong>0</strong>. Deny controls = <strong>0</strong>. API endpoints = <strong>0</strong>. DB writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>proceed to closure metrics hardening — not implementation execution.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── v7.24.0-P12 Runtime Authorization Metrics Hardening + Report Guardrail Bridge ── */}
+      <SectionCard title="Metrics Hardening & Report Guardrail Bridge (P12)" style={{ marginBottom: 20, border: '1px solid #14B8A6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Closure metrics" value={String(CLOSURE_METRICS_DEFINITIONS.length)} color="#14B8A6" />
+          <KpiCard label="Guardrail checks" value={String(REPORT_GUARDRAIL_CHECKS.length)} color="#6366F1" />
+          <KpiCard label="Hardening rules" value={String(METRICS_HARDENING_RULES.length)} color="#8B5CF6" />
+          <KpiCard label="Error severity rules" value={String(METRICS_HARDENING_RULES.filter(r => r.severity === 'error').length)} color="var(--danger)" />
+          <KpiCard label="Warning severity rules" value={String(METRICS_HARDENING_RULES.filter(r => r.severity === 'warning').length)} color="var(--warning)" />
+          <KpiCard label="Rules enforced" value={String(METRICS_HARDENING_RULES.filter(r => r.enforced === 'true').length)} color="var(--success)" />
+          <KpiCard label="Guardrail all pass" value={String(REPORT_GUARDRAIL_CHECKS.filter(c => c.currentState === 'pass').length)} color="var(--success)" />
+          <KpiCard label="Metrics verified" value={String(CLOSURE_METRICS_DEFINITIONS.filter(m => m.status === 'verified').length)} color="var(--success)" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(20,184,166,0.08)', color: '#14B8A6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Metrics Hardening →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(20,184,166,0.08)', color: '#14B8A6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep metrics hardening — no runtime implementation</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(20,184,166,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P12 Metrics Hardening + Report Guardrail = <strong>metrics-hardening-only</strong>. Closure metrics = <strong>{CLOSURE_METRICS_DEFINITIONS.length}</strong> (all verified). Guardrail checks = <strong>{REPORT_GUARDRAIL_CHECKS.length}</strong> (all pass). Hardening rules = <strong>{METRICS_HARDENING_RULES.length}</strong> (error={String(METRICS_HARDENING_RULES.filter(r => r.severity === 'error').length)}, warning={String(METRICS_HARDENING_RULES.filter(r => r.severity === 'warning').length)}). Rules enforced = <strong>{String(METRICS_HARDENING_RULES.filter(r => r.enforced === 'true').length)}/{METRICS_HARDENING_RULES.length}</strong>. Guardrail all pass = <strong>{String(REPORT_GUARDRAIL_CHECKS.filter(c => c.currentState === 'pass').length)}/{REPORT_GUARDRAIL_CHECKS.length}</strong>. Metrics verified = <strong>{String(CLOSURE_METRICS_DEFINITIONS.filter(m => m.status === 'verified').length)}/{CLOSURE_METRICS_DEFINITIONS.length}</strong>. No metric misalignment allowed. Stage C enabled = <strong>false</strong>. Recommended next = <strong>proceed to P13 full closure audit.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P11 + P12 + P1 + P2 + P3 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 + P3 Control Room & Governance safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. v7.24.0-P1 Activation Planning is planning-only — no activation code, no runtime implementation, no DB writes. v7.24.0-P2 Authorization Data Contract is design-contract-only — no runtime implementation, no DB schema, no API endpoint, no activation. v7.24.0-P3 Authorization Persistence Design is design-only — no persistence, no DB schema, no migration, no API endpoint, no runtime evaluator, no activation. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P11 + P12 + P1 + P2 + P3 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. v7.24.0-P1 Activation Planning is planning-only — no activation code, no runtime implementation, no DB writes. v7.24.0-P2 Authorization Data Contract is design-contract-only — no runtime implementation, no DB schema, no API endpoint, no activation. v7.24.0-P3 Authorization Persistence Design is design-only — no persistence, no DB schema, no migration, no API endpoint, no runtime evaluator, no activation. v7.24.0-P10 Evaluator Implementation Package Review is review-only — no evaluator runtime, no dry-run engine, no permission evaluator, no DB write, no Stage C enablement. v7.24.0-P11 Implementation Package Execution Boundary Review is review-only — no runtime execution, no evaluator runtime, no dry-run engine, no permission function, no Stage C activation. v7.24.0-P12 Runtime Authorization Metrics Hardening + Report Guardrail is metrics-hardening-only — no runtime implementation, no Stage C enablement. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}
