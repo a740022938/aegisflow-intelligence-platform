@@ -78,6 +78,7 @@ import { registerMahjongPredictRoutes } from './vision-bus/mahjong-predict.js';
 import { registerOpenAxiomBridgeRoutes, registerOpenAxiomHistoryRoutes } from './openaxiom-bridge/index.js';
 import { registerAssistantCenterRoutes } from './routes/assistant-center/index.js';
 import { registerMemoryHubRoutes } from './routes/memory-hub/index.js';
+import { registerAuthorizationRoutes } from './routes/authorization/index.js';
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -291,7 +292,7 @@ const PUBLIC_PATHS = new Set([
   '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status', '/api/dashboard/summary',
   '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
 ]);
-const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static', '/api/comfy/history', '/api/openaxiom', '/api/assistant-center', '/api/memory-hub'];
+const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static', '/api/comfy/history', '/api/openaxiom', '/api/assistant-center', '/api/memory-hub', '/api/authorization'];
 const DOCS_PREFIXES = ['/docs', '/swagger', '/openapi'];
 
 app.addHook('onRequest', async (request, reply) => {
@@ -388,6 +389,9 @@ registerOpenAxiomHistoryRoutes(app);
 registerAssistantCenterRoutes(app);
 // Memory Hub 只读接入
 registerMemoryHubRoutes(app);
+
+// Authorization Foundation 路由
+registerAuthorizationRoutes(app);
 
 // OpenClaw 旧路径显式兼容（防止客户端命中 /openclaw/* 返回 404）
 app.get('/openclaw/master-switch', async (_request: any, reply: any) => {

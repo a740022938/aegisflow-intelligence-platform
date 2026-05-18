@@ -142,6 +142,8 @@ import ImplementationPackageExecutionSequencingPlan from '../components/governan
 import ClosureMetricsDefinitionTable from '../components/governance/ClosureMetricsDefinitionTable';
 import ReportGuardrailChecklist from '../components/governance/ReportGuardrailChecklist';
 import MetricsHardeningRuleMatrix from '../components/governance/MetricsHardeningRuleMatrix';
+import RuntimeFoundationStatusCard from '../components/governance/RuntimeFoundationStatusCard';
+import AuthorizationDryRunStatusCard from '../components/governance/AuthorizationDryRunStatusCard';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -567,6 +569,15 @@ export default function GovernanceCenter() {
               <div style={{ fontSize: 14, fontWeight: 700, color: k.color }}>{k.value}</div>
             </div>
           ))}
+        </div>
+      </SectionCard>
+
+      {/* ── v7.25.0 Runtime Authorization Foundation ── */}
+      <SectionCard title="v7.25 Runtime Authorization Foundation" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimeFoundationStatusCard />
+        <AuthorizationDryRunStatusCard />
+        <div style={{ padding: '8px 12px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.6 }}>
+          <strong>Runtime Foundation Status:</strong> Storage schema implemented · API guarded skeleton · Synthetic dry-run only · Production runtime evaluator not implemented · Real controls: 0 · External writes: 0 · Stage C: Disabled
         </div>
       </SectionCard>
 

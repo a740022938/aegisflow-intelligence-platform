@@ -185,6 +185,7 @@ import ConnectorReadinessSummaryBridge from '../components/control-room/Connecto
 import SystemSafetyMatrix from '../components/control-room/SystemSafetyMatrix';
 import VersionProgressTimeline from '../components/control-room/VersionProgressTimeline';
 import NextWorkstreamPanel from '../components/control-room/NextWorkstreamPanel';
+import RuntimeFoundationSafetyMatrix from '../components/governance/RuntimeFoundationSafetyMatrix';
 import type { NavigationExposureEntry, NavigationExposureLevel, NavigationExposureRisk } from '../registry/navigation-exposure-registry';
 import type { CenterAccessItem, CenterAccessKind, CenterAccessRisk } from '../registry/center-access-registry';
 import type { AdvancedPlaceholderItem, AdvancedPlaceholderDecision } from '../registry/advanced-placeholder-registry';
@@ -790,6 +791,14 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
           Stage C Design Spec = <strong>design-only</strong>. Governance data models = <strong>7</strong> (all readonly). Design phase gates = <strong>6</strong> (all deferred). Lifecycle stages = <strong>8</strong> (all design-only). Readiness items = <strong>9</strong> (ready-design-only=2, not-implemented=2, deferred=5). Design controls = <strong>0</strong>. Approval controls = <strong>0</strong>. Mutation paths = <strong>0</strong>. Execution controls = <strong>0</strong>. External writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended mode = <strong>keep Stage C in design review</strong>.
+        </div>
+      </SectionCard>
+
+      {/* ── v7.25.0 Runtime Foundation Bridge ── */}
+      <SectionCard title="Runtime Foundation Bridge" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimeFoundationSafetyMatrix />
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Runtime Foundation = <strong>Started</strong> · Storage = <strong>Minimal schema implemented</strong> · API = <strong>Guarded skeleton</strong> · Dry-run = <strong>Synthetic only</strong> · Runtime Production = <strong>Blocked</strong> · Stage C = <strong>Disabled</strong> · Real Controls = <strong>0</strong>
         </div>
       </SectionCard>
 
