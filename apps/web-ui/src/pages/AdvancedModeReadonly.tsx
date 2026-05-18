@@ -265,7 +265,7 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls"
@@ -288,6 +288,8 @@ export default function AdvancedModeReadonly() {
           <KpiCard label="总中心" value={String(centerItems.length)} color="var(--primary)" />
           <KpiCard label="已入菜单" value={String(sidebarVisibleCount)} color="var(--success)" />
           <KpiCard label="隐藏直达" value={String(hiddenDirectCount)} color="var(--warning)" />
+          <KpiCard label="启动台可见" value={String(centerSummary.launchpadVisible)} color="#8B5CF6" />
+          <KpiCard label="高级中心可见" value={String(centerSummary.advancedHubVisible)} color="#F97316" />
           <KpiCard label="Quality全过" value={String(centerQualityGate.passedAll)} color="var(--success)" />
           <KpiCard label="Connector" value={String(connectorTotal)} color="#22C55E" />
           <KpiCard label="Lab" value={String(labTotal)} color="#3B82F6" />
@@ -492,7 +494,7 @@ export default function AdvancedModeReadonly() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 8, fontSize: 11 }}>
           {[
             ['Layout 未修改', centerItems.length > 0 ? '✅' : '❌'],
-            ['未新增左侧菜单', String(centerItems.filter(c => c.visibleInSidebar).length === 1)],
+            ['未新增左侧菜单', String(centerItems.filter(c => c.visibleInSidebar).length === 2)],
             ['Stage C 已禁用', '✅'],
             ['Governance Center 未入菜单', String(!centerItems.find(c => c.kind === 'governance')?.visibleInSidebar)],
             ['Connector Center 未入菜单', String(!centerItems.find(c => c.kind === 'connector')?.visibleInSidebar)],
@@ -508,7 +510,7 @@ export default function AdvancedModeReadonly() {
           ))}
         </div>
         <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.08)', fontSize: 10, color: 'var(--success)' }}>
-          v7.18.0 当前阶段具备 closure 条件。无 blocking。继续 no-tag / no-release。
+          v7.22.0-P4 当前阶段具备 closure 条件。无 blocking。继续 no-tag / no-release。
         </div>
       </SectionCard>
 
@@ -578,12 +580,34 @@ export default function AdvancedModeReadonly() {
         <GovernanceBaselinePanel />
       </SectionCard>
 
-      <SectionCard title="Connector Readiness Bridge" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
-        <ConnectorReadinessSummaryBridge />
-      </SectionCard>
-
       <SectionCard title="System Safety Matrix" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
         <SystemSafetyMatrix />
+      </SectionCard>
+
+      {/* ── P4 Lab Center Bridge ── */}
+      <SectionCard title="Lab Center Bridge" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Lab posture" value="readonly" color="var(--success)" />
+          <KpiCard label="Launchpad access" value="launchpad-only" color="#8B5CF6" />
+          <KpiCard label="Lab execution controls" value="0" color="var(--success)" />
+          <KpiCard label="Training triggers" value="0" color="var(--success)" />
+          <KpiCard label="Dataset mutations" value="0" color="var(--success)" />
+          <KpiCard label="External writes" value="0" color="var(--success)" />
+          <KpiCard label="Stage C lab controls" value="0" color="var(--success)" />
+          <KpiCard label="Total lab items" value={String(labTotal)} color="#3B82F6" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/lab-center-readonly" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(59,130,246,0.08)', color: '#3B82F6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Lab Center →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(34,197,94,0.08)', color: 'var(--success)', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep lab metadata and reports readonly</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(59,130,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Lab Center = <strong>readonly</strong> / launchpad-only overview. Lab execution controls = <strong>0</strong>. Training triggers = <strong>0</strong>. Dataset mutations = <strong>0</strong>. External writes = <strong>0</strong>. Stage C lab controls = <strong>0</strong>. Recommended mode = <strong>manual verification only</strong>.
+        </div>
+      </SectionCard>
+
+      {/* ── P3 Connector Readiness + Timeline + Workstreams ── */}
+      <SectionCard title="Connector Readiness Bridge" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <ConnectorReadinessSummaryBridge />
       </SectionCard>
 
       <SectionCard title="Version Progress Timeline" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
@@ -594,10 +618,10 @@ export default function AdvancedModeReadonly() {
         <NextWorkstreamPanel />
       </SectionCard>
 
-      {/* ── P3 Control Room Safety Notice ── */}
+      {/* ── P3 + P4 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 Control Room safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons. All panels are governance-safe display only.
+        <strong>P3 + P4 Control Room safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}

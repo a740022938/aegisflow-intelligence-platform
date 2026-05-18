@@ -32,6 +32,7 @@ export default function ReadonlyControlRoomOverview() {
           { label: 'Navigation baseline', value: 'stable', color: 'var(--success)' },
           { label: 'Sidebar centers', value: String(centerSummary.sidebarVisible), color: 'var(--success)' },
           { label: 'Launchpad centers', value: String(centerSummary.launchpadVisible), color: '#8B5CF6' },
+          { label: 'Advanced hub centers', value: String(centerSummary.advancedHubVisible), color: '#F97316' },
           { label: 'Connector Center', value: 'readonly', color: 'var(--success)' },
           { label: 'Stage C', value: 'deferred', color: 'var(--warning)' },
           { label: 'Active high-risk', value: String(activeHighRisk.length), color: activeHighRisk.length > 0 ? 'var(--danger)' : 'var(--success)' },
