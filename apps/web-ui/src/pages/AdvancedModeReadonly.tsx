@@ -88,6 +88,14 @@ import {
   RUNTIME_CONTROL_PACKAGES,
   BLOCKER_RESOLUTION_ITEMS,
   AUTHORIZATION_EVIDENCE_TYPES,
+  RUNTIME_AUTHORIZATION_CONTRACT_FIELDS,
+  AUTHORIZATION_LIFECYCLE_STAGES,
+  AUTHORIZATION_DECISION_STATES,
+  AUTHORIZATION_SCOPE_BOUNDARY_ROWS,
+  RUNTIME_PERMISSION_EVALUATION_STEPS,
+  AUTHORIZATION_REVOCATION_EXPIRY_FIELDS,
+  AUTHORIZATION_AUDIT_CHAIN_STEPS,
+  AUTHORIZATION_FAILURE_FALLBACK_ROWS,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -311,10 +319,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -916,10 +924,35 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 Control Room Safety Notice ── */}
+      {/* ── v7.24.0-P2 Authorization Contract Bridge ── */}
+      <SectionCard title="Authorization Contract Bridge (P2)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Contract fields" value={String(RUNTIME_AUTHORIZATION_CONTRACT_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Lifecycle stages" value={String(AUTHORIZATION_LIFECYCLE_STAGES.length)} color="#8B5CF6" />
+          <KpiCard label="Decision states" value={String(AUTHORIZATION_DECISION_STATES.length)} color="#8B5CF6" />
+          <KpiCard label="Scope boundary rows" value={String(AUTHORIZATION_SCOPE_BOUNDARY_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Eval steps" value={String(RUNTIME_PERMISSION_EVALUATION_STEPS.length)} color="#8B5CF6" />
+          <KpiCard label="Revoc/expiry fields" value={String(AUTHORIZATION_REVOCATION_EXPIRY_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Audit chain steps" value={String(AUTHORIZATION_AUDIT_CHAIN_STEPS.length)} color="#8B5CF6" />
+          <KpiCard label="Failure/fallback rows" value={String(AUTHORIZATION_FAILURE_FALLBACK_ROWS.length)} color="var(--danger)" />
+          <KpiCard label="Auth controls" value="0" color="var(--success)" />
+          <KpiCard label="Auth persistence" value="disabled" color="#6B7280" />
+          <KpiCard label="Runtime evaluator" value="not implemented" color="#6B7280" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Authorization Contract →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep authorization in design-contract-only — no implementation</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P2 Runtime Authorization Data Contract = <strong>design-contract-only</strong>. Contract fields = <strong>{RUNTIME_AUTHORIZATION_CONTRACT_FIELDS.length}</strong> (all design-contract-only). Lifecycle stages = <strong>{AUTHORIZATION_LIFECYCLE_STAGES.length}</strong> (all design-only). Decision states = <strong>{AUTHORIZATION_DECISION_STATES.length}</strong> (all design-only). Scope boundary rows = <strong>{AUTHORIZATION_SCOPE_BOUNDARY_ROWS.length}</strong> (all design-only). Evaluation steps = <strong>{RUNTIME_PERMISSION_EVALUATION_STEPS.length}</strong> (engine not implemented). Revocation/expiry fields = <strong>{AUTHORIZATION_REVOCATION_EXPIRY_FIELDS.length}</strong> (all design-only). Audit chain steps = <strong>{AUTHORIZATION_AUDIT_CHAIN_STEPS.length}</strong> (all design-only, writes=0). Failure/fallback rows = <strong>{AUTHORIZATION_FAILURE_FALLBACK_ROWS.length}</strong> (all blocked-future). Authorization controls = <strong>0</strong>. Persistence = <strong>disabled</strong>. Runtime evaluator = <strong>not implemented</strong>. Permission writes = <strong>0</strong>. Decision writes = <strong>0</strong>. Audit chain writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>keep authorization in design-contract-only — proceed to authorization persistence design, not implementation.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 Control Room & Governance safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. v7.24.0-P1 Activation Planning is planning-only — no activation code, no runtime implementation, no DB writes. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. v7.24.0-P1 Activation Planning is planning-only — no activation code, no runtime implementation, no DB writes. v7.24.0-P2 Authorization Data Contract is design-contract-only — no runtime implementation, no DB schema, no API endpoint, no activation. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}

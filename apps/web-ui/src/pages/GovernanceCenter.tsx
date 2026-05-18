@@ -63,6 +63,14 @@ import ActivationPreconditionsMatrix from '../components/governance/ActivationPr
 import RuntimeControlPackageBoundary from '../components/governance/RuntimeControlPackageBoundary';
 import StageCBlockerResolutionPlan from '../components/governance/StageCBlockerResolutionPlan';
 import AuthorizationEvidenceAuditDesign from '../components/governance/AuthorizationEvidenceAuditDesign';
+import RuntimeAuthorizationDataContract from '../components/governance/RuntimeAuthorizationDataContract';
+import AuthorizationRequestLifecycle from '../components/governance/AuthorizationRequestLifecycle';
+import AuthorizationDecisionStateModel from '../components/governance/AuthorizationDecisionStateModel';
+import AuthorizationScopeBoundaryMatrix from '../components/governance/AuthorizationScopeBoundaryMatrix';
+import RuntimePermissionEvaluationDesign from '../components/governance/RuntimePermissionEvaluationDesign';
+import AuthorizationRevocationExpiryDesign from '../components/governance/AuthorizationRevocationExpiryDesign';
+import AuthorizationAuditChainDesign from '../components/governance/AuthorizationAuditChainDesign';
+import AuthorizationFailureFallbackMatrix from '../components/governance/AuthorizationFailureFallbackMatrix';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -315,10 +323,10 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.24.0-P1"
+      versionLabel="AIP v7.24.0-P2"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -778,6 +786,40 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Authorization Evidence / Audit Design (P1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
         <AuthorizationEvidenceAuditDesign />
+      </SectionCard>
+
+      {/* ── v7.24.0-P2 Runtime Authorization Data Contract + Request Lifecycle Design Sections ── */}
+
+      <SectionCard title="Runtime Authorization Data Contract (P2)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimeAuthorizationDataContract />
+      </SectionCard>
+
+      <SectionCard title="Authorization Request Lifecycle Design (P2)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationRequestLifecycle />
+      </SectionCard>
+
+      <SectionCard title="Authorization Decision State Model (P2)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationDecisionStateModel />
+      </SectionCard>
+
+      <SectionCard title="Authorization Scope Boundary Matrix (P2)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationScopeBoundaryMatrix />
+      </SectionCard>
+
+      <SectionCard title="Runtime Permission Evaluation Design (P2)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimePermissionEvaluationDesign />
+      </SectionCard>
+
+      <SectionCard title="Authorization Revocation / Expiry Design (P2)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationRevocationExpiryDesign />
+      </SectionCard>
+
+      <SectionCard title="Authorization Audit Chain Design (P2)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationAuditChainDesign />
+      </SectionCard>
+
+      <SectionCard title="Authorization Failure / Fallback Matrix (P2)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <AuthorizationFailureFallbackMatrix />
       </SectionCard>
 
       {/* Related Routes */}
