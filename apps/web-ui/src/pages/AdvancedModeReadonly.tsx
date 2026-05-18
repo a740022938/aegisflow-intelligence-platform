@@ -80,6 +80,14 @@ import {
   STAGE_C_BLOCKER_MATRIX,
   CROSS_GATE_DEPENDENCIES,
   CONTROL_BOUNDARY_FINAL,
+  STAGE_C_ACTIVATION_PLANNING,
+  RUNTIME_AUTHORIZATION_FIELDS,
+  RUNTIME_PERMISSION_ENTRIES,
+  OPERATOR_ROLES,
+  ACTIVATION_PRECONDITIONS,
+  RUNTIME_CONTROL_PACKAGES,
+  BLOCKER_RESOLUTION_ITEMS,
+  AUTHORIZATION_EVIDENCE_TYPES,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -303,10 +311,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -883,10 +891,35 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 Control Room Safety Notice ── */}
+      {/* ── v7.24.0-P1 Stage C Activation Planning Bridge ── */}
+      <SectionCard title="Stage C Activation Planning Bridge (P1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Planning overview" value={String(STAGE_C_ACTIVATION_PLANNING.length)} color="#8B5CF6" />
+          <KpiCard label="Auth design fields" value={String(RUNTIME_AUTHORIZATION_FIELDS.length)} color="#8B5CF6" />
+          <KpiCard label="Permission entries" value={String(RUNTIME_PERMISSION_ENTRIES.length)} color="#8B5CF6" />
+          <KpiCard label="Operator roles" value={String(OPERATOR_ROLES.length)} color="#8B5CF6" />
+          <KpiCard label="Activation preconditions" value={String(ACTIVATION_PRECONDITIONS.length)} color="var(--danger)" />
+          <KpiCard label="Blocking preconditions" value={String(ACTIVATION_PRECONDITIONS.filter(p => p.activationImpact === 'blocking').length)} color="var(--danger)" />
+          <KpiCard label="Control packages" value={String(RUNTIME_CONTROL_PACKAGES.length)} color="#8B5CF6" />
+          <KpiCard label="Blocker items" value={String(BLOCKER_RESOLUTION_ITEMS.length)} color="var(--danger)" />
+          <KpiCard label="Evidence types" value={String(AUTHORIZATION_EVIDENCE_TYPES.length)} color="#8B5CF6" />
+          <KpiCard label="All permissions" value="false" color="var(--success)" />
+          <KpiCard label="Runtime controls" value="0" color="var(--success)" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Stage C Activation Planning →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep Stage C disabled — planning-only design review</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P1 Stage C Activation Planning = <strong>planning-only / design review</strong>. Planning overview = <strong>{STAGE_C_ACTIVATION_PLANNING.length}</strong> areas (all disabled/not implemented). Authorization design fields = <strong>{RUNTIME_AUTHORIZATION_FIELDS.length}</strong> (all design-only). Permission entries = <strong>{RUNTIME_PERMISSION_ENTRIES.length}</strong> (all false). Operator roles = <strong>{OPERATOR_ROLES.length}</strong> (all design-only, no runtime/write/control). Activation preconditions = <strong>{ACTIVATION_PRECONDITIONS.length}</strong> ({ACTIVATION_PRECONDITIONS.filter(p => p.activationImpact === 'blocking').length} blocking). Control packages = <strong>{RUNTIME_CONTROL_PACKAGES.length}</strong> (all not implemented, count=0). Blocker items = <strong>{BLOCKER_RESOLUTION_ITEMS.length}</strong> (all future). Evidence types = <strong>{AUTHORIZATION_EVIDENCE_TYPES.length}</strong> (all design-only). All permissions = <strong>false</strong>. Runtime controls = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>keep Stage C disabled — no activation package has been created.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 Control Room & Governance safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. v7.24.0-P1 Activation Planning is planning-only — no activation code, no runtime implementation, no DB writes. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}

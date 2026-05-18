@@ -55,6 +55,14 @@ import CrossGateDependencyMatrix from '../components/governance/CrossGateDepende
 import ControlBoundaryFinalMatrix from '../components/governance/ControlBoundaryFinalMatrix';
 import StageCNonReadinessStatement from '../components/governance/StageCNonReadinessStatement';
 import ClosureMetricsSnapshot from '../components/governance/ClosureMetricsSnapshot';
+import StageCActivationPlanningOverview from '../components/governance/StageCActivationPlanningOverview';
+import RuntimeAuthorizationDesignSpec from '../components/governance/RuntimeAuthorizationDesignSpec';
+import RuntimePermissionModel from '../components/governance/RuntimePermissionModel';
+import OperatorRoleScopeMatrix from '../components/governance/OperatorRoleScopeMatrix';
+import ActivationPreconditionsMatrix from '../components/governance/ActivationPreconditionsMatrix';
+import RuntimeControlPackageBoundary from '../components/governance/RuntimeControlPackageBoundary';
+import StageCBlockerResolutionPlan from '../components/governance/StageCBlockerResolutionPlan';
+import AuthorizationEvidenceAuditDesign from '../components/governance/AuthorizationEvidenceAuditDesign';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -307,10 +315,10 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.23.1"
+      versionLabel="AIP v7.24.0-P1"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -736,6 +744,40 @@ export default function GovernanceCenter() {
       {/* ── v7.23.1 Closure Metrics Snapshot ── */}
       <SectionCard title="Closure Metrics Snapshot (v7.23.1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
         <ClosureMetricsSnapshot />
+      </SectionCard>
+
+      {/* ── v7.24.0-P1 Stage C Activation Planning + Runtime Authorization Design Sections ── */}
+
+      <SectionCard title="Stage C Activation Planning Overview (P1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <StageCActivationPlanningOverview />
+      </SectionCard>
+
+      <SectionCard title="Runtime Authorization Design Fields (P1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimeAuthorizationDesignSpec />
+      </SectionCard>
+
+      <SectionCard title="Runtime Permission Model (P1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimePermissionModel />
+      </SectionCard>
+
+      <SectionCard title="Operator Role & Scope Matrix (P1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <OperatorRoleScopeMatrix />
+      </SectionCard>
+
+      <SectionCard title="Activation Preconditions Matrix (P1)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <ActivationPreconditionsMatrix />
+      </SectionCard>
+
+      <SectionCard title="Runtime Control Package Boundary (P1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimeControlPackageBoundary />
+      </SectionCard>
+
+      <SectionCard title="Stage C Blocker Resolution Plan (P1)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <StageCBlockerResolutionPlan />
+      </SectionCard>
+
+      <SectionCard title="Authorization Evidence / Audit Design (P1)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <AuthorizationEvidenceAuditDesign />
       </SectionCard>
 
       {/* Related Routes */}

@@ -1192,3 +1192,226 @@ export const CONTROL_BOUNDARY_FINAL: ControlBoundaryFinalEntry[] = [
   { controlArea: 'LAN_SHARE sync paths', count: '0', status: 'disabled' },
   { controlArea: 'Training / inference triggers', count: '0', status: 'disabled' },
 ];
+
+// ── v7.24.0-P1: Stage C Activation Planning Overview ──
+
+export interface ActivationPlanningEntry {
+  area: string;
+  currentStatus: string;
+  detail: string;
+}
+
+export const STAGE_C_ACTIVATION_PLANNING: ActivationPlanningEntry[] = [
+  { area: 'Activation status', currentStatus: 'disabled', detail: 'Stage C is not enabled. No activation toggle exists.' },
+  { area: 'Runtime authorization', currentStatus: 'not implemented', detail: 'Runtime authorization model is design-only. No approval/reject runtime exists.' },
+  { area: 'Runtime control packages', currentStatus: '0', detail: 'No runtime control package has been implemented across all 9 gates.' },
+  { area: 'Real control buttons', currentStatus: '0', detail: 'No real approve/reject/execute/write/deploy/rollback/stop button exists.' },
+  { area: 'Activation blockers', currentStatus: '13 (8 blocking, 5 delaying)', detail: '13 blockers remain unresolved. Stage C cannot be enabled.' },
+  { area: 'Planning mode', currentStatus: 'design-only / planning review', detail: 'This is a planning-only design review. Not ready for activation.' },
+];
+
+// ── v7.24.0-P1: Runtime Authorization Design Fields ──
+
+export interface RuntimeAuthorizationField {
+  fieldName: string;
+  purpose: string;
+  currentStatus: string;
+  runtimeEffect: string;
+  persistence: string;
+  approvalDependency: string;
+  stageGate: string;
+  blockedActions: string;
+  futureRequirement: string;
+}
+
+export const RUNTIME_AUTHORIZATION_FIELDS: RuntimeAuthorizationField[] = [
+  { fieldName: 'AuthorizationRequest', purpose: '授权请求 — 记录授权操作详情', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no auth request write/approve/reject', futureRequirement: 'implement auth request + approval flow' },
+  { fieldName: 'AuthorizationScope', purpose: '授权范围 — 定义授权的目标域和资源', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no scope write/mutate', futureRequirement: 'scope selection + validation' },
+  { fieldName: 'AuthorizationSubject', purpose: '授权主体 — 定义谁可以发起/审批/执行操作', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no subject write/assign', futureRequirement: 'subject registry + role binding' },
+  { fieldName: 'AuthorizationAction', purpose: '授权动作 — 定义需要授权的具体操作', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no action execute/write', futureRequirement: 'action catalog + permission mapping' },
+  { fieldName: 'AuthorizationRiskClass', purpose: '风险等级 — 定义操作的风险分类', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no risk class write/bypass', futureRequirement: 'risk scoring + classification engine' },
+  { fieldName: 'AuthorizationEvidence', purpose: '授权证据 — 附上审计证据供授权参考', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no evidence write/upload', futureRequirement: 'evidence bundle + integrity check' },
+  { fieldName: 'AuthorizationDecision', purpose: '授权决策 — approve/reject/defer', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no decision write/execute', futureRequirement: 'decision engine + policy binding' },
+  { fieldName: 'AuthorizationExpiry', purpose: '授权过期 — 授权超时自动失效', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no expiry auto-execute', futureRequirement: 'expiry policy + notification' },
+  { fieldName: 'AuthorizationRevocationPolicy', purpose: '撤销策略 — 定义授权撤销条件', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no revocation write/execute', futureRequirement: 'revocation trigger + audit' },
+  { fieldName: 'AuthorizationAuditRecord', purpose: '审计记录 — 完整记录授权全链路', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no audit write/delete', futureRequirement: 'immutable audit trail' },
+  { fieldName: 'AuthorizationFallbackPolicy', purpose: '回退策略 — 授权系统故障时的降级策略', currentStatus: 'design-only', runtimeEffect: 'none', persistence: 'disabled', approvalDependency: 'future', stageGate: 'Stage C deferred', blockedActions: 'no fallback auto-execute', futureRequirement: 'fallback rules + manual override' },
+];
+
+// ── v7.24.0-P1: Runtime Permission Entries ──
+
+export interface RuntimePermissionEntry {
+  permission: string;
+  futurePurpose: string;
+  currentValue: string;
+  runtimeImplemented: string;
+  requiredGate: string;
+  blockedAction: string;
+  riskIfEnabledPrematurely: string;
+}
+
+export const RUNTIME_PERMISSION_ENTRIES: RuntimePermissionEntry[] = [
+  { permission: 'canApprove', futurePurpose: '允许审批操作', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Approval Runtime', blockedAction: 'no approve/approve_candidate', riskIfEnabledPrematurely: 'unauthorized approval without audit' },
+  { permission: 'canReject', futurePurpose: '允许拒绝操作', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Approval Runtime', blockedAction: 'no reject/reject_candidate', riskIfEnabledPrematurely: 'unauthorized rejection without review' },
+  { permission: 'canMutate', futurePurpose: '允许变更数据/配置', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Mutation Runtime', blockedAction: 'no mutate/write/archive', riskIfEnabledPrematurely: 'uncontrolled data mutation' },
+  { permission: 'canExecute', futurePurpose: '允许执行操作/运行任务', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Execution Runtime', blockedAction: 'no run/start/stop/execute', riskIfEnabledPrematurely: 'unvalidated execution' },
+  { permission: 'canExternalWrite', futurePurpose: '允许写入外部系统', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + External Write Runtime', blockedAction: 'no external write/push/upload/sync', riskIfEnabledPrematurely: 'uncontrolled external data leak' },
+  { permission: 'canDeploy', futurePurpose: '允许部署/发布', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Deployment Runtime', blockedAction: 'no deploy/release/tag/push', riskIfEnabledPrematurely: 'unreviewed deployment to production' },
+  { permission: 'canRollback', futurePurpose: '允许回滚操作', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Rollback Runtime', blockedAction: 'no rollback/restore/reset/revert', riskIfEnabledPrematurely: 'unrecoverable rollback without plan' },
+  { permission: 'canEmergencyStop', futurePurpose: '允许紧急停止服务', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Emergency Stop Runtime', blockedAction: 'no stop/pause/kill/taskkill/restart', riskIfEnabledPrematurely: 'accidental service shutdown' },
+  { permission: 'canWriteAuditEvidence', futurePurpose: '允许写入审计证据', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Audit Evidence Runtime', blockedAction: 'no evidence write/upload/export/persist', riskIfEnabledPrematurely: 'tampered audit trail' },
+  { permission: 'canSyncLANShare', futurePurpose: '允许同步 LAN 共享目录', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + External Write Runtime', blockedAction: 'no LAN sync/share write', riskIfEnabledPrematurely: 'uncontrolled LAN data propagation' },
+  { permission: 'canTriggerTraining', futurePurpose: '允许触发训练任务', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Execution Runtime', blockedAction: 'no training trigger', riskIfEnabledPrematurely: 'unbudgeted training cost' },
+  { permission: 'canTriggerInference', futurePurpose: '允许触发推理任务', currentValue: 'false', runtimeImplemented: 'false', requiredGate: 'Stage C + Execution Runtime', blockedAction: 'no inference trigger', riskIfEnabledPrematurely: 'unbudgeted inference cost' },
+];
+
+// ── v7.24.0-P1: Operator Roles ──
+
+export interface OperatorRoleEntry {
+  role: string;
+  futurePurpose: string;
+  currentStatus: string;
+  runtimePermissions: string;
+  writePermissions: string;
+  controlPermissions: string;
+  scope: string;
+}
+
+export const OPERATOR_ROLES: OperatorRoleEntry[] = [
+  { role: 'Viewer', futurePurpose: '只读查看所有治理面板和报告', currentStatus: 'design-only', runtimePermissions: '0', writePermissions: '0', controlPermissions: '0', scope: 'readonly review — all gates' },
+  { role: 'Reviewer', futurePurpose: '审查治理请求并附上意见', currentStatus: 'design-only', runtimePermissions: '0', writePermissions: '0', controlPermissions: '0', scope: 'review — approval/mutation/execution design' },
+  { role: 'Approver', futurePurpose: '审批或拒绝治理请求', currentStatus: 'design-only', runtimePermissions: '0', writePermissions: '0', controlPermissions: '0', scope: 'approve/reject — all gates' },
+  { role: 'Operator', futurePurpose: '执行已授权的治理操作', currentStatus: 'design-only', runtimePermissions: '0', writePermissions: '0', controlPermissions: '0', scope: 'execute — mutation/execution/deployment' },
+  { role: 'Emergency Operator', futurePurpose: '执行紧急停止和恢复操作', currentStatus: 'design-only', runtimePermissions: '0', writePermissions: '0', controlPermissions: '0', scope: 'emergency stop/rollback/restore' },
+  { role: 'Auditor', futurePurpose: '审计所有治理操作记录', currentStatus: 'design-only', runtimePermissions: '0', writePermissions: '0', controlPermissions: '0', scope: 'audit — all gates, readonly' },
+  { role: 'Admin', futurePurpose: '管理角色、策略和系统配置', currentStatus: 'design-only', runtimePermissions: '0', writePermissions: '0', controlPermissions: '0', scope: 'admin — role/policy/config, no execution' },
+  { role: 'System', futurePurpose: '系统级自动化操作', currentStatus: 'design-only', runtimePermissions: '0', writePermissions: '0', controlPermissions: '0', scope: 'system — automated preflight/dry-run' },
+];
+
+// ── v7.24.0-P1: Approval Scope Entries ──
+
+export interface ApprovalScopeEntry {
+  scope: string;
+  viewer: string;
+  reviewer: string;
+  approver: string;
+  operator: string;
+  emergencyOp: string;
+  auditor: string;
+  admin: string;
+  system: string;
+}
+
+export const APPROVAL_SCOPE_ENTRIES: ApprovalScopeEntry[] = [
+  { scope: 'readonly review', viewer: '✅', reviewer: '✅', approver: '✅', operator: '✅', emergencyOp: '✅', auditor: '✅', admin: '✅', system: '✅' },
+  { scope: 'approval design', viewer: '✅', reviewer: '✅', approver: '✅', operator: '—', emergencyOp: '—', auditor: '✅', admin: '✅', system: '—' },
+  { scope: 'mutation design', viewer: '✅', reviewer: '✅', approver: '✅', operator: '—', emergencyOp: '—', auditor: '✅', admin: '✅', system: '—' },
+  { scope: 'execution design', viewer: '✅', reviewer: '✅', approver: '✅', operator: '—', emergencyOp: '—', auditor: '✅', admin: '✅', system: '—' },
+  { scope: 'external write design', viewer: '✅', reviewer: '✅', approver: '✅', operator: '—', emergencyOp: '—', auditor: '✅', admin: '✅', system: '—' },
+  { scope: 'deployment design', viewer: '✅', reviewer: '✅', approver: '✅', operator: '—', emergencyOp: '—', auditor: '✅', admin: '✅', system: '—' },
+  { scope: 'rollback design', viewer: '✅', reviewer: '✅', approver: '✅', operator: '—', emergencyOp: '—', auditor: '✅', admin: '✅', system: '—' },
+  { scope: 'emergency stop design', viewer: '✅', reviewer: '✅', approver: '✅', operator: '—', emergencyOp: '—', auditor: '✅', admin: '✅', system: '—' },
+  { scope: 'audit evidence design', viewer: '✅', reviewer: '✅', approver: '✅', operator: '—', emergencyOp: '—', auditor: '✅', admin: '✅', system: '—' },
+];
+
+// ── v7.24.0-P1: Activation Preconditions ──
+
+export interface ActivationPreconditionEntry {
+  precondition: string;
+  category: string;
+  currentState: string;
+  requiredImplementation: string;
+  validationMethod: string;
+  riskIfSkipped: string;
+  activationImpact: string;
+}
+
+export const ACTIVATION_PRECONDITIONS: ActivationPreconditionEntry[] = [
+  { precondition: 'Runtime authorization model implementation', category: 'auth', currentState: 'not implemented', requiredImplementation: 'implement approval/reject runtime + permission model', validationMethod: 'integration test + security review', riskIfSkipped: 'unauthorized gate bypass', activationImpact: 'blocking' },
+  { precondition: 'Persistent governance state', category: 'persistence', currentState: 'not implemented', requiredImplementation: 'add governance state DB + API', validationMethod: 'data integrity test', riskIfSkipped: 'no audit trail', activationImpact: 'blocking' },
+  { precondition: 'Approval storage', category: 'persistence', currentState: 'not implemented', requiredImplementation: 'add approval table + evidence store', validationMethod: 'CRUD test + backup verification', riskIfSkipped: 'no approval record', activationImpact: 'blocking' },
+  { precondition: 'Audit evidence persistence', category: 'persistence', currentState: 'not implemented', requiredImplementation: 'add evidence storage + integrity check', validationMethod: 'hash verification + retention test', riskIfSkipped: 'no audit evidence', activationImpact: 'blocking' },
+  { precondition: 'Rollback execution path', category: 'runtime', currentState: 'not implemented', requiredImplementation: 'implement rollback runtime engine', validationMethod: 'rollback simulation + restore test', riskIfSkipped: 'unrecoverable deployment failure', activationImpact: 'blocking' },
+  { precondition: 'Dry-run engine', category: 'runtime', currentState: 'not implemented', requiredImplementation: 'add dry-run simulation engine', validationMethod: 'simulation accuracy test', riskIfSkipped: 'unvalidated execution', activationImpact: 'blocking' },
+  { precondition: 'External write sandbox', category: 'runtime', currentState: 'not implemented', requiredImplementation: 'add external write sandbox + policy engine', validationMethod: 'sandbox isolation test', riskIfSkipped: 'uncontrolled external write', activationImpact: 'blocking' },
+  { precondition: 'Emergency stop runtime', category: 'runtime', currentState: 'not implemented', requiredImplementation: 'add emergency stop + service control runtime', validationMethod: 'stop simulation + recovery test', riskIfSkipped: 'no emergency response', activationImpact: 'blocking' },
+  { precondition: 'Manual approval policy', category: 'policy', currentState: 'not finalized', requiredImplementation: 'finalize manual approval policy + procedure', validationMethod: 'policy review + drill', riskIfSkipped: 'unclear approval flow', activationImpact: 'delaying' },
+  { precondition: 'Security review', category: 'security', currentState: 'not completed', requiredImplementation: 'complete security review + penetration test', validationMethod: 'pen test + vulnerability scan', riskIfSkipped: 'security vulnerability', activationImpact: 'blocking' },
+  { precondition: 'Live smoke environment', category: 'qa', currentState: 'not validated', requiredImplementation: 'validate smoke environment + test suite', validationMethod: 'smoke test run', riskIfSkipped: 'undetected integration failure', activationImpact: 'delaying' },
+  { precondition: 'Operator training', category: 'ops', currentState: 'not completed', requiredImplementation: 'complete operator training + runbook', validationMethod: 'training completion + drill', riskIfSkipped: 'operator error', activationImpact: 'delaying' },
+  { precondition: 'Final activation audit', category: 'audit', currentState: 'not completed', requiredImplementation: 'complete final activation audit + sign-off', validationMethod: 'audit review + sign-off', riskIfSkipped: 'unreviewed activation risk', activationImpact: 'blocking' },
+];
+
+// ── v7.24.0-P1: Runtime Control Packages ──
+
+export interface RuntimeControlPackage {
+  packageName: string;
+  currentStatus: string;
+  runtimeControls: string;
+  dbWrites: string;
+  externalWrites: string;
+  serviceControls: string;
+  stageGate: string;
+  blockedActions: string;
+}
+
+export const RUNTIME_CONTROL_PACKAGES: RuntimeControlPackage[] = [
+  { packageName: 'Approval Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no approve/reject/approve_candidate/reject_candidate' },
+  { packageName: 'Mutation Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no mutate/write/archive' },
+  { packageName: 'Execution Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no run/start/stop/execute' },
+  { packageName: 'External Write Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no external write/push/upload/sync' },
+  { packageName: 'Deployment Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no deploy/release/tag/push' },
+  { packageName: 'Rollback Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no rollback/restore/reset/revert' },
+  { packageName: 'Emergency Stop Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no stop/pause/kill/taskkill/restart' },
+  { packageName: 'Audit Evidence Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no evidence write/upload/export/persist' },
+  { packageName: 'Authorization Runtime', currentStatus: 'not implemented', runtimeControls: '0', dbWrites: '0', externalWrites: '0', serviceControls: '0', stageGate: 'future activation package', blockedActions: 'no auth write/approve/reject/decide' },
+];
+
+// ── v7.24.0-P1: Blocker Resolution Plan ──
+
+export interface BlockerResolutionEntry {
+  blocker: string;
+  resolutionPackage: string;
+  requiredDeliverable: string;
+  requiredValidation: string;
+  dependency: string;
+  targetStatus: string;
+}
+
+export const BLOCKER_RESOLUTION_ITEMS: BlockerResolutionEntry[] = [
+  { blocker: 'Runtime authorization model', resolutionPackage: 'v7.24.x Authorization Runtime', requiredDeliverable: 'authorization request + decision engine', requiredValidation: 'auth flow integration test + security review', dependency: 'v7.24.0-P1 design', targetStatus: 'future' },
+  { blocker: 'Persistent governance state', resolutionPackage: 'v7.24.x Governance Persistence', requiredDeliverable: 'governance state DB schema + API', requiredValidation: 'data integrity + migration test', dependency: 'v7.24.0-P1 design', targetStatus: 'future' },
+  { blocker: 'Approval storage', resolutionPackage: 'v7.24.x Governance Persistence', requiredDeliverable: 'approval table + evidence store', requiredValidation: 'CRUD + backup test', dependency: 'governance state', targetStatus: 'future' },
+  { blocker: 'Audit evidence persistence', resolutionPackage: 'v7.24.x Audit Runtime', requiredDeliverable: 'evidence storage + integrity hash', requiredValidation: 'hash verification + retention test', dependency: 'governance state', targetStatus: 'future' },
+  { blocker: 'Rollback execution path', resolutionPackage: 'v7.24.x Rollback Runtime', requiredDeliverable: 'rollback engine + restore verification', requiredValidation: 'rollback simulation + restore test', dependency: 'Deployment Runtime', targetStatus: 'future' },
+  { blocker: 'Dry-run engine', resolutionPackage: 'v7.24.x Execution Runtime', requiredDeliverable: 'dry-run simulation + result summary', requiredValidation: 'simulation accuracy test', dependency: 'Authorization Runtime', targetStatus: 'future' },
+  { blocker: 'External write sandbox', resolutionPackage: 'v7.24.x External Write Runtime', requiredDeliverable: 'write sandbox + policy engine', requiredValidation: 'sandbox isolation test', dependency: 'Authorization Runtime', targetStatus: 'future' },
+  { blocker: 'Emergency stop runtime', resolutionPackage: 'v7.24.x Emergency Stop Runtime', requiredDeliverable: 'stop engine + recovery procedure', requiredValidation: 'stop simulation + recovery test', dependency: 'Authorization Runtime', targetStatus: 'future' },
+  { blocker: 'Manual approval policy', resolutionPackage: 'v7.24.x Policy Package', requiredDeliverable: 'approval policy document + procedure', requiredValidation: 'policy review + drill', dependency: 'Authorization Runtime', targetStatus: 'future' },
+  { blocker: 'Security review', resolutionPackage: 'v7.24.x Security Package', requiredDeliverable: 'security audit report + pen test results', requiredValidation: 'pen test + vulnerability scan', dependency: 'all runtime packages', targetStatus: 'future' },
+  { blocker: 'Live smoke environment', resolutionPackage: 'v7.24.x QA Package', requiredDeliverable: 'smoke test suite + environment', requiredValidation: 'smoke test run', dependency: 'all runtime packages', targetStatus: 'future' },
+  { blocker: 'Operator training', resolutionPackage: 'v7.24.x Ops Package', requiredDeliverable: 'training materials + runbook', requiredValidation: 'training completion + drill', dependency: 'all runtime packages', targetStatus: 'future' },
+  { blocker: 'Final activation audit', resolutionPackage: 'v7.24.x Audit Package', requiredDeliverable: 'activation audit report + sign-off', requiredValidation: 'audit review + sign-off', dependency: 'all preconditions met', targetStatus: 'future' },
+];
+
+// ── v7.24.0-P1: Authorization Evidence Types ──
+
+export interface AuthorizationEvidenceType {
+  evidence: string;
+  purpose: string;
+  currentStatus: string;
+}
+
+export const AUTHORIZATION_EVIDENCE_TYPES: AuthorizationEvidenceType[] = [
+  { evidence: 'Operator identity evidence', purpose: '操作人员身份验证证据', currentStatus: 'design-only' },
+  { evidence: 'Scope evidence', purpose: '授权范围证明', currentStatus: 'design-only' },
+  { evidence: 'Risk evidence', purpose: '风险评估报告', currentStatus: 'design-only' },
+  { evidence: 'Approval chain evidence', purpose: '审批链完整性证明', currentStatus: 'design-only' },
+  { evidence: 'Preflight evidence', purpose: '预检结果', currentStatus: 'design-only' },
+  { evidence: 'Dry-run evidence', purpose: 'Dry-run 模拟执行结果', currentStatus: 'design-only' },
+  { evidence: 'Rollback evidence', purpose: '回滚计划', currentStatus: 'design-only' },
+  { evidence: 'Secret scan evidence', purpose: '密钥扫描结果', currentStatus: 'design-only' },
+  { evidence: 'DB doctor evidence', purpose: '数据库健康检查结果', currentStatus: 'design-only' },
+  { evidence: 'Smoke evidence', purpose: '冒烟测试状态', currentStatus: 'design-only' },
+  { evidence: 'Manual note evidence', purpose: '人工审查备注', currentStatus: 'design-only' },
+];
