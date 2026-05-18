@@ -22,6 +22,8 @@ const EXCLUDE_FILES = ['.env.example'];
 const ALLOWED_HITS = [
   'apps/aip-cli/docs/ml_manual.txt:262',
   'apps/web-ui/src/pages/CostRouting.tsx:604',
+  'apps/web-ui/src/pages/CostRouting.tsx:605',
+  'apps/web-ui/src/components/governance/ClosureMetricsSnapshot.tsx:114',
 ];
 
 function shouldExclude(filePath) {

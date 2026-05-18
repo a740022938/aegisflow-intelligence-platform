@@ -74,16 +74,18 @@ export default function LabCenterReadonly() {
       </SectionCard>
 
       {/* Lab Capability Groups */}
-      {Object.entries(groups).map(([groupKey, items]) => (
-        <SectionCard key={groupKey} title={`${GROUP_LABELS[groupKey] || groupKey} (${items.length})`} style={{ marginBottom: 20 }}>
-          {GROUP_DESCRIPTIONS[groupKey] && (
-            <div style={{ padding: '6px 10px', marginBottom: 8, borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              {GROUP_DESCRIPTIONS[groupKey]}
-            </div>
-          )}
-          {items.map(item => <LabCapabilityCard key={item.id} item={item} />)}
-        </SectionCard>
-      ))}
+      {Object.entries(groups).length > 0
+        ? Object.entries(groups).map(([groupKey, items]) => (
+          <SectionCard key={groupKey} title={`${GROUP_LABELS[groupKey] || groupKey} (${items.length})`} style={{ marginBottom: 20 }}>
+            {GROUP_DESCRIPTIONS[groupKey] && (
+              <div style={{ padding: '6px 10px', marginBottom: 8, borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                {GROUP_DESCRIPTIONS[groupKey]}
+              </div>
+            )}
+            {items.map(item => <LabCapabilityCard key={item.id} item={item} />)}
+          </SectionCard>
+        ))
+        : <div style={{ padding: 12, fontSize: 10, color: 'var(--text-muted)' }}>No lab items registered.</div>}
 
       {/* Lab Experiment Matrix */}
       <SectionCard title="Lab Experiment Matrix" style={{ marginBottom: 20 }}>

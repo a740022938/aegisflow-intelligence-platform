@@ -117,7 +117,9 @@ export default function ConnectorCenterReadonly() {
         <div style={{ padding: '6px 10px', marginBottom: 8, borderRadius: 4, background: 'rgba(245,158,11,0.08)', fontSize: 10, color: 'var(--warning)' }}>
           These connectors are not yet integrated. Displayed for planning and review.
         </div>
-        {futureItems.map(c => <ConnectorCard key={c.id} conn={c} />)}
+        {futureItems.length > 0
+          ? futureItems.map(c => <ConnectorCard key={c.id} conn={c} />)
+          : <div style={{ padding: 12, fontSize: 10, color: 'var(--text-muted)' }}>No future connectors registered.</div>}
       </SectionCard>
 
       {/* Integration Boundary + Safety Matrix + Recommended Path */}

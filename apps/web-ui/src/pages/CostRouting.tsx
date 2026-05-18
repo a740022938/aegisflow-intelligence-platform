@@ -1119,6 +1119,7 @@ export default function CostRoutingPage() {
       title="AI Router Console / 成本路由中心"
       subtitle="当前为只读/预览模式，不执行真实操作、不写数据库、不调外部系统。no tag / no push / no release。"
       versionLabel="AIP Core v7.3.1 · Cost Routing v7.12.3"
+      maturity="preview"
       safetyBoundary="preview"
       safetyText="预览模式 · 不写入配置 · 需要人工确认"
     >

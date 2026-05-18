@@ -341,7 +341,7 @@ function AppShell() {
               </>)}
             </div>
 
-            {/* ── 自动化 ── */}
+            {/* ── 治理与回流 ── */}
             <div className="nav-section">
               <div className="nav-section-label" onClick={() => toggleSection('governance')}>
                 {t.nav.governance}
