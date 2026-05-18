@@ -3093,3 +3093,198 @@ export const EVALUATOR_VALIDATION_CHECKS: EvaluatorValidationCheckEntry[] = [
   { validationCheck: 'DB doctor validation', currentAvailability: 'available now', futureRequirement: 'ensure evaluator contract does not break DB', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
   { validationCheck: 'Secret scan validation', currentAvailability: 'available now', futureRequirement: 'ensure no secret in evaluator contract files', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
 ];
+
+// ── v7.24.0-P10: Evaluator Implementation Package Review ──
+
+export interface EvaluatorImplementationPackageEntry {
+  packageItem: string;
+  futurePurpose: string;
+  currentStatus: string;
+  runtimeImpact: string;
+  dbImpact: string;
+  apiImpact: string;
+  dependency: string;
+  requiredValidation: string;
+  goNoGoStatus: string;
+}
+
+export const EVALUATOR_IMPLEMENTATION_PACKAGE_ROWS: EvaluatorImplementationPackageEntry[] = [
+  { packageItem: 'Evaluator input validator package', futurePurpose: '验证 evaluator 输入完整性', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'P9 evaluator IO contract', requiredValidation: 'input validator design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Scope resolver package', futurePurpose: '解析授权 scope 边界', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Input validator package', requiredValidation: 'scope resolver design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Role permission mapper package', futurePurpose: '映射操作者角色到权限', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Scope resolver package', requiredValidation: 'role mapper design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Risk classifier package', futurePurpose: '分类授权请求风险等级', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Role permission mapper package', requiredValidation: 'risk classifier design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Deny-by-default chain package', futurePurpose: '执行 deny-by-default 评估链', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Risk classifier package', requiredValidation: 'deny chain design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Decision output builder package', futurePurpose: '构建授权决策输出', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Deny-by-default chain package', requiredValidation: 'decision output design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Audit handoff package', futurePurpose: '将评估结果传递给审计链', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Decision output builder package', requiredValidation: 'audit handoff design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Dry-run engine interface package', futurePurpose: '定义 dry-run engine 接口', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Audit handoff package', requiredValidation: 'dry-run interface design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Fixture loader package', futurePurpose: '加载 dry-run fixture 数据', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Dry-run engine interface package', requiredValidation: 'fixture loader design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Result reporter package', futurePurpose: '报告 evaluator dry-run 结果', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Fixture loader package', requiredValidation: 'result reporter design review', goNoGoStatus: 'No-Go' },
+  { packageItem: 'Final evaluator package integration gate', futurePurpose: '最终 evaluator 包集成审批门禁', currentStatus: 'review-only', runtimeImpact: 'none', dbImpact: 'none', apiImpact: 'none', dependency: 'Result reporter package', requiredValidation: 'final integration approval', goNoGoStatus: 'No-Go' },
+];
+
+// ── v7.24.0-P10: Runtime Dry-run Boundary Design ──
+
+export interface RuntimeDryRunBoundaryEntry {
+  dryRunArea: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  dependency: string;
+  blocker: string;
+  requiredPackage: string;
+}
+
+export const RUNTIME_DRY_RUN_BOUNDARY_ROWS: RuntimeDryRunBoundaryEntry[] = [
+  { dryRunArea: 'Scope validation dry-run', futurePurpose: 'dry-run 测试 scope 验证逻辑', currentImplementation: 'not implemented', runtimeEffect: 'none', writeEffect: 'none', dependency: 'Scope resolver package', blocker: 'no resolver runtime', requiredPackage: 'Scope Resolver Package' },
+  { dryRunArea: 'Role mapper dry-run', futurePurpose: 'dry-run 测试角色映射逻辑', currentImplementation: 'not implemented', runtimeEffect: 'none', writeEffect: 'none', dependency: 'Role permission mapper package', blocker: 'no mapper runtime', requiredPackage: 'Role Permission Mapper Package' },
+  { dryRunArea: 'Risk classification dry-run', futurePurpose: 'dry-run 测试风险分类', currentImplementation: 'not implemented', runtimeEffect: 'none', writeEffect: 'none', dependency: 'Risk classifier package', blocker: 'no classifier runtime', requiredPackage: 'Risk Classifier Package' },
+  { dryRunArea: 'Deny chain dry-run', futurePurpose: 'dry-run 测试 deny-by-default 链', currentImplementation: 'not implemented', runtimeEffect: 'none', writeEffect: 'none', dependency: 'Deny-by-default chain package', blocker: 'no chain runtime', requiredPackage: 'Deny-by-default Chain Package' },
+  { dryRunArea: 'Decision output dry-run', futurePurpose: 'dry-run 测试决策输出', currentImplementation: 'not implemented', runtimeEffect: 'none', writeEffect: 'none', dependency: 'Decision output builder package', blocker: 'no output runtime', requiredPackage: 'Decision Output Builder Package' },
+  { dryRunArea: 'Audit handoff dry-run', futurePurpose: 'dry-run 测试审计交接', currentImplementation: 'not implemented', runtimeEffect: 'none', writeEffect: 'none', dependency: 'Audit handoff package', blocker: 'no handoff runtime', requiredPackage: 'Audit Handoff Package' },
+  { dryRunArea: 'Full evaluator chain dry-run', futurePurpose: 'dry-run 测试完整评估链', currentImplementation: 'not implemented', runtimeEffect: 'none', writeEffect: 'none', dependency: 'All evaluator packages', blocker: 'no evaluator runtime', requiredPackage: 'Evaluator Runtime Package' },
+  { dryRunArea: 'Stage C disabled gate dry-run', futurePurpose: 'dry-run 验证 Stage C disabled 硬拒绝', currentImplementation: 'not implemented', runtimeEffect: 'none', writeEffect: 'none', dependency: 'Full evaluator chain dry-run', blocker: 'no gate runtime', requiredPackage: 'Stage C Gate Package' },
+];
+
+// ── v7.24.0-P10: Permission Evaluator Package Boundary ──
+
+export interface PermissionEvaluatorPackageBoundaryEntry {
+  boundaryItem: string;
+  currentState: string;
+  blockedAction: string;
+  futurePackage: string;
+  requiredPreflight: string;
+  riskIfViolated: string;
+}
+
+export const PERMISSION_EVALUATOR_PACKAGE_BOUNDARY_ROWS: PermissionEvaluatorPackageBoundaryEntry[] = [
+  { boundaryItem: 'No evaluator runtime', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Evaluator Runtime Package', requiredPreflight: 'evaluator package design review + approval', riskIfViolated: 'unreviewed evaluator without contract' },
+  { boundaryItem: 'No permission function', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Permission Function Package', requiredPreflight: 'permission function design review', riskIfViolated: 'unauthorized permission function' },
+  { boundaryItem: 'No deny chain execution', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Deny Chain Package', requiredPreflight: 'deny chain design review', riskIfViolated: 'deny chain bypass' },
+  { boundaryItem: 'No decision output', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Decision Output Package', requiredPreflight: 'decision output design review', riskIfViolated: 'uncontrolled decision output' },
+  { boundaryItem: 'No audit handoff', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Audit Handoff Package', requiredPreflight: 'audit handoff design review', riskIfViolated: 'audit trail gap' },
+  { boundaryItem: 'No dry-run execution', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Dry-run Engine Package', requiredPreflight: 'dry-run engine design review', riskIfViolated: 'uncontrolled dry-run execution' },
+  { boundaryItem: 'No fixture loading', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Fixture Loader Package', requiredPreflight: 'fixture loader design review', riskIfViolated: 'unvalidated fixture data' },
+  { boundaryItem: 'No result reporting', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Result Reporter Package', requiredPreflight: 'result reporter design review', riskIfViolated: 'missing result accountability' },
+  { boundaryItem: 'No evaluator integration gate', currentState: 'blocked / not implemented', blockedAction: 'true', futurePackage: 'Evaluator Integration Gate', requiredPreflight: 'final integration approval', riskIfViolated: 'unreviewed integration' },
+];
+
+// ── v7.24.0-P10: Evaluator Package Dependency Review ──
+
+export interface EvaluatorPackageDependencyEntry {
+  sourcePackage: string;
+  dependsOn: string;
+  dependencyType: string;
+  currentStatus: string;
+  availability: string;
+  blockingStatus: string;
+}
+
+export const EVALUATOR_PACKAGE_DEPENDENCY_ROWS: EvaluatorPackageDependencyEntry[] = [
+  { sourcePackage: 'Input validator', dependsOn: 'P9 IO contract', dependencyType: 'interface', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Scope resolver', dependsOn: 'Input validator', dependencyType: 'composition', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Role mapper', dependsOn: 'Scope resolver', dependencyType: 'composition', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Risk classifier', dependsOn: 'Role mapper', dependencyType: 'composition', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Deny chain', dependsOn: 'Risk classifier', dependencyType: 'composition', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Decision output builder', dependsOn: 'Deny chain', dependencyType: 'composition', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Audit handoff', dependsOn: 'Decision output builder', dependencyType: 'composition', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Dry-run engine interface', dependsOn: 'Audit handoff', dependencyType: 'interface', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Fixture loader', dependsOn: 'Dry-run engine interface', dependencyType: 'interface', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Result reporter', dependsOn: 'Fixture loader', dependencyType: 'composition', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+  { sourcePackage: 'Integration gate', dependsOn: 'Result reporter', dependencyType: 'gate', currentStatus: 'design-only', availability: 'none', blockingStatus: 'blocking — future' },
+];
+
+// ── v7.24.0-P10: Evaluator Decision Trace Design ──
+
+export interface EvaluatorDecisionTraceEntry {
+  traceStep: string;
+  futurePurpose: string;
+  inputContract: string;
+  outputContract: string;
+  currentStatus: string;
+  runtimeEffect: string;
+  writeEffect: string;
+}
+
+export const EVALUATOR_DECISION_TRACE_ROWS: EvaluatorDecisionTraceEntry[] = [
+  { traceStep: 'Scope resolution trace', futurePurpose: '记录 scope 解析过程', inputContract: 'Authorization request input', outputContract: 'Resolved scope set', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { traceStep: 'Role mapping trace', futurePurpose: '记录角色映射过程', inputContract: 'Operator role input', outputContract: 'Mapped permission set', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { traceStep: 'Risk classification trace', futurePurpose: '记录风险分类过程', inputContract: 'Risk class input', outputContract: 'Classified risk level', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { traceStep: 'Deny chain execution trace', futurePurpose: '记录 deny chain 执行过程', inputContract: 'Deny chain condition set', outputContract: 'Chain decision', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { traceStep: 'Decision output trace', futurePurpose: '记录决策输出构建过程', inputContract: 'Chain decision', outputContract: 'Final evaluator decision', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { traceStep: 'Audit handoff trace', futurePurpose: '记录审计交接过程', inputContract: 'Final evaluator decision', outputContract: 'Audit record', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { traceStep: 'Full evaluator chain trace', futurePurpose: '记录完整评估链', inputContract: 'All step inputs', outputContract: 'Full trace log', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+];
+
+// ── v7.24.0-P10: Runtime Dry-run Fixture Model ──
+
+export interface RuntimeDryRunFixtureEntry {
+  fixtureName: string;
+  futurePurpose: string;
+  inputShape: string;
+  expectedDecision: string;
+  currentStatus: string;
+  runtimeEffect: string;
+  writeEffect: string;
+}
+
+export const RUNTIME_DRY_RUN_FIXTURE_ROWS: RuntimeDryRunFixtureEntry[] = [
+  { fixtureName: 'Valid request — viewer scope', futurePurpose: '测试 viewer scope 的授权请求', inputShape: 'design-only', expectedDecision: 'allow (conditional)', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'Invalid scope — missing scope', futurePurpose: '测试缺失 scope 的拒绝', inputShape: 'design-only', expectedDecision: 'deny — missing scope', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'High risk — no approval', futurePurpose: '测试高风险无审批', inputShape: 'design-only', expectedDecision: 'deny — approval required', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'Expired authorization', futurePurpose: '测试过期授权拒绝', inputShape: 'design-only', expectedDecision: 'deny — expired', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'Revoked authorization', futurePurpose: '测试撤销授权拒绝', inputShape: 'design-only', expectedDecision: 'deny — revoked', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'Stage C disabled request', futurePurpose: '测试 Stage C disabled 硬拒绝', inputShape: 'design-only', expectedDecision: 'deny — Stage C disabled', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'Missing evidence', futurePurpose: '测试证据缺失拒绝', inputShape: 'design-only', expectedDecision: 'deny — evidence required', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'Unknown operator role', futurePurpose: '测试未知角色拒绝', inputShape: 'design-only', expectedDecision: 'deny — unknown role', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'Full allow chain', futurePurpose: '测试完整通过链', inputShape: 'design-only', expectedDecision: 'allow (all checks pass)', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+  { fixtureName: 'Full deny chain', futurePurpose: '测试完整拒绝链', inputShape: 'design-only', expectedDecision: 'deny (all checks fail)', currentStatus: 'design-only', runtimeEffect: 'none', writeEffect: 'none' },
+];
+
+// ── v7.24.0-P10: Evaluation Result Contract Review ──
+
+export interface EvaluationResultContractEntry {
+  resultField: string;
+  futurePurpose: string;
+  shapeStatus: string;
+  currentImplementation: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  futureRequirement: string;
+}
+
+export const EVALUATION_RESULT_CONTRACT_ROWS: EvaluationResultContractEntry[] = [
+  { resultField: 'decision (allow/deny)', futurePurpose: '评估决策结果', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'decision output validation' },
+  { resultField: 'deny reason', futurePurpose: '拒绝原因详情', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'deny reason schema validation' },
+  { resultField: 'risk classification', futurePurpose: '风险分类结果', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'risk output validation' },
+  { resultField: 'scope resolution', futurePurpose: 'scope 解析结果', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'scope output validation' },
+  { resultField: 'role mapping', futurePurpose: '角色映射结果', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'role output validation' },
+  { resultField: 'trace log', futurePurpose: '评估追踪日志', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'trace log schema validation' },
+  { resultField: 'audit record', futurePurpose: '审计记录', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'audit record validation' },
+  { resultField: 'dry-run fixture ref', futurePurpose: 'dry-run fixture 引用', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'fixture ref validation' },
+  { resultField: 'dry-run summary', futurePurpose: 'dry-run 执行摘要', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'dry-run summary validation' },
+  { resultField: 'error detail', futurePurpose: '评估错误详情', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'error detail schema validation' },
+  { resultField: 'stage gate result', futurePurpose: 'Stage C 门禁结果', shapeStatus: 'design-only', currentImplementation: 'none', runtimeEffect: 'none', writeEffect: 'none', futureRequirement: 'stage gate result validation' },
+];
+
+// ── v7.24.0-P10: Evaluator Implementation No-Go Gate ──
+
+export interface EvaluatorImplementationNoGoCheckEntry {
+  check: string;
+  purpose: string;
+  currentState: string;
+  goDecision: number;
+  noGoDecision: number;
+  requiredForActivation: string;
+}
+
+export const EVALUATOR_IMPLEMENTATION_NO_GO_CHECKS: EvaluatorImplementationNoGoCheckEntry[] = [
+  { check: 'Evaluator package design review complete', purpose: 'evaluator 包设计审查完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Dry-run boundary design review complete', purpose: 'dry-run 边界设计审查完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Permission evaluator contract complete', purpose: '权限评估器契约完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Package dependency review complete', purpose: '包依赖审查完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Decision trace design complete', purpose: '决策追踪设计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Dry-run fixture model review complete', purpose: 'dry-run fixture 模型审查完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Evaluation result contract review complete', purpose: '评估结果契约审查完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+  { check: 'Final evaluator implementation audit complete', purpose: '最终 evaluator 实施审计完成', currentState: 'not started', goDecision: 0, noGoDecision: 1, requiredForActivation: 'yes' },
+];

@@ -127,6 +127,14 @@ import EvaluatorDependencyMatrix from '../components/governance/EvaluatorDepende
 import EvaluatorRiskGuardrailMatrix from '../components/governance/EvaluatorRiskGuardrailMatrix';
 import EvaluatorFailureFallbackDesign from '../components/governance/EvaluatorFailureFallbackDesign';
 import EvaluatorValidationPlan from '../components/governance/EvaluatorValidationPlan';
+import EvaluatorImplementationPackageReview from '../components/governance/EvaluatorImplementationPackageReview';
+import RuntimeDryRunBoundaryDesign from '../components/governance/RuntimeDryRunBoundaryDesign';
+import PermissionEvaluatorPackageBoundary from '../components/governance/PermissionEvaluatorPackageBoundary';
+import EvaluatorPackageDependencyReview from '../components/governance/EvaluatorPackageDependencyReview';
+import EvaluatorDecisionTraceDesign from '../components/governance/EvaluatorDecisionTraceDesign';
+import RuntimeDryRunFixtureModel from '../components/governance/RuntimeDryRunFixtureModel';
+import EvaluationResultContractReview from '../components/governance/EvaluationResultContractReview';
+import EvaluatorImplementationNoGoGate from '../components/governance/EvaluatorImplementationNoGoGate';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -1116,6 +1124,40 @@ export default function GovernanceCenter() {
         <EvaluatorValidationPlan />
       </SectionCard>
 
+      {/* ── v7.24.0-P10 Evaluator Implementation Package Review + Runtime Dry-run Boundary Design Sections ── */}
+
+      <SectionCard title="Evaluator Implementation Package Review (P10)" style={{ marginBottom: 20, border: '1px solid #10B981' }}>
+        <EvaluatorImplementationPackageReview />
+      </SectionCard>
+
+      <SectionCard title="Runtime Dry-run Boundary Design (P10)" style={{ marginBottom: 20, border: '1px solid #06B6D4' }}>
+        <RuntimeDryRunBoundaryDesign />
+      </SectionCard>
+
+      <SectionCard title="Permission Evaluator Package Boundary (P10)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <PermissionEvaluatorPackageBoundary />
+      </SectionCard>
+
+      <SectionCard title="Evaluator Package Dependency Review (P10)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <EvaluatorPackageDependencyReview />
+      </SectionCard>
+
+      <SectionCard title="Evaluator Decision Trace Design (P10)" style={{ marginBottom: 20, border: '1px solid #6366F1' }}>
+        <EvaluatorDecisionTraceDesign />
+      </SectionCard>
+
+      <SectionCard title="Runtime Dry-run Fixture Model (P10)" style={{ marginBottom: 20, border: '1px solid #F59E0B' }}>
+        <RuntimeDryRunFixtureModel />
+      </SectionCard>
+
+      <SectionCard title="Evaluation Result Contract Review (P10)" style={{ marginBottom: 20, border: '1px solid #14B8A6' }}>
+        <EvaluationResultContractReview />
+      </SectionCard>
+
+      <SectionCard title="Evaluator Implementation No-Go Gate (P10)" style={{ marginBottom: 20, border: '2px solid #EF4444' }}>
+        <EvaluatorImplementationNoGoGate />
+      </SectionCard>
+
       {/* Related Routes */}
       <SectionCard title="Related Pages" style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 12, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
@@ -1131,7 +1173,7 @@ export default function GovernanceCenter() {
       {/* Readonly Boundary Notice */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
         <strong>Readonly boundary notice:</strong><br />
-        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, rollback, restore, emergency stop, pause, kill, taskkill, restart, disable, shutdown, sync LAN_SHARE, restart services, write/upload/export audit evidence, or enable Stage C. P7 storage schema implementation plan review is design-review-only — no DB schema, no migration, no API endpoint, no runtime implementation, no DB writes. P8 authorization API contract implementation plan review is review-only — no API endpoint, no route, no handler, no DB write, no runtime implementation. P9 runtime evaluator implementation plan review is review-only — no runtime evaluator, no permission evaluator, no allow/deny control, no DB write, no runtime implementation. All <code>forbiddenActions</code> are governance display, not a permission system.
+        This is a <u>Governance Center readonly Stage C preview</u>. Governance Registry is readonly metadata. Does not execute approval/rejection, mutate candidates, write to databases/external systems, execute lab/training/inference, deploy, rollback, restore, emergency stop, pause, kill, taskkill, restart, disable, shutdown, sync LAN_SHARE, restart services, write/upload/export audit evidence, or enable Stage C. P7 storage schema implementation plan review is design-review-only — no DB schema, no migration, no API endpoint, no runtime implementation, no DB writes. P8 authorization API contract implementation plan review is review-only — no API endpoint, no route, no handler, no DB write, no runtime implementation. P9 runtime evaluator implementation plan review is review-only — no runtime evaluator, no permission evaluator, no allow/deny control, no DB write, no runtime implementation. P10 evaluator implementation package review is review-only — no evaluator runtime, no dry-run engine, no permission evaluator, no DB write, no Stage C enablement. All <code>forbiddenActions</code> are governance display, not a permission system.
       </div>
     </PageShell>
   );

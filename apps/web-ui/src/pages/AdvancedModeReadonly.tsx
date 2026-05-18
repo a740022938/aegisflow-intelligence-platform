@@ -152,6 +152,14 @@ import {
   EVALUATOR_RISK_GUARDRAIL_ROWS,
   EVALUATOR_FAILURE_FALLBACK_ROWS,
   EVALUATOR_VALIDATION_CHECKS,
+  EVALUATOR_IMPLEMENTATION_PACKAGE_ROWS,
+  RUNTIME_DRY_RUN_BOUNDARY_ROWS,
+  PERMISSION_EVALUATOR_PACKAGE_BOUNDARY_ROWS,
+  EVALUATOR_PACKAGE_DEPENDENCY_ROWS,
+  EVALUATOR_DECISION_TRACE_ROWS,
+  RUNTIME_DRY_RUN_FIXTURE_ROWS,
+  EVALUATION_RESULT_CONTRACT_ROWS,
+  EVALUATOR_IMPLEMENTATION_NO_GO_CHECKS,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -375,10 +383,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation · P7 storage schema implementation plan review — design-review-only, no db schema, no migration, no api endpoint, no runtime implementation · P8 authorization api contract implementation plan review — review-only, no api endpoint, no route, no handler, no db write, no runtime implementation · P9 runtime evaluator implementation plan review — review-only, no runtime evaluator, no permission evaluator, no allow/deny control, no db write, no runtime implementation"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation · P7 storage schema implementation plan review — design-review-only, no db schema, no migration, no api endpoint, no runtime implementation · P8 authorization api contract implementation plan review — review-only, no api endpoint, no route, no handler, no db write, no runtime implementation · P9 runtime evaluator implementation plan review — review-only, no runtime evaluator, no permission evaluator, no allow/deny control, no db write, no runtime implementation · P10 evaluator implementation package review — review-only, no evaluator runtime, no dry-run engine, no permission evaluator, no db write, no stage c enablement"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -1202,7 +1210,36 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 + P3 Control Room Safety Notice ── */}
+      {/* ── v7.24.0-P10 Evaluator Implementation Package Review Bridge ── */}
+      <SectionCard title="Evaluator Implementation Package Review Bridge (P10)" style={{ marginBottom: 20, border: '1px solid #10B981' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Eval packages" value={String(EVALUATOR_IMPLEMENTATION_PACKAGE_ROWS.length)} color="#10B981" />
+          <KpiCard label="Dry-run boundary areas" value={String(RUNTIME_DRY_RUN_BOUNDARY_ROWS.length)} color="#06B6D4" />
+          <KpiCard label="Perm evaluator boundaries" value={String(PERMISSION_EVALUATOR_PACKAGE_BOUNDARY_ROWS.length)} color="#EF4444" />
+          <KpiCard label="Package dependencies" value={String(EVALUATOR_PACKAGE_DEPENDENCY_ROWS.length)} color="#8B5CF6" />
+          <KpiCard label="Decision trace steps" value={String(EVALUATOR_DECISION_TRACE_ROWS.length)} color="#6366F1" />
+          <KpiCard label="Dry-run fixtures" value={String(RUNTIME_DRY_RUN_FIXTURE_ROWS.length)} color="#F59E0B" />
+          <KpiCard label="Result contract fields" value={String(EVALUATION_RESULT_CONTRACT_ROWS.length)} color="#14B8A6" />
+          <KpiCard label="No-Go checks" value={String(EVALUATOR_IMPLEMENTATION_NO_GO_CHECKS.length)} color="var(--danger)" />
+          <KpiCard label="Overall decision" value="No-Go" color="#EF4444" />
+          <KpiCard label="Eval implementation" value="false" color="var(--success)" />
+          <KpiCard label="Perm evaluator impl" value="false" color="var(--success)" />
+          <KpiCard label="Dry-run engine" value="false" color="var(--success)" />
+          <KpiCard label="Allow controls" value="0" color="var(--success)" />
+          <KpiCard label="Deny controls" value="0" color="var(--success)" />
+          <KpiCard label="DB writes" value="0" color="var(--success)" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(16,185,129,0.08)', color: '#10B981', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Evaluator Implementation Package →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep evaluator in review-only — no implementation</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(16,185,129,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P10 Evaluator Implementation Package Review = <strong>review-only</strong>. Evaluator packages = <strong>{EVALUATOR_IMPLEMENTATION_PACKAGE_ROWS.length}</strong> (all No-Go). Dry-run boundary areas = <strong>{RUNTIME_DRY_RUN_BOUNDARY_ROWS.length}</strong> (all not implemented). Permission evaluator boundaries = <strong>{PERMISSION_EVALUATOR_PACKAGE_BOUNDARY_ROWS.length}</strong> (all blocked). Package dependencies = <strong>{EVALUATOR_PACKAGE_DEPENDENCY_ROWS.length}</strong> (all blocking, none available). Decision trace steps = <strong>{EVALUATOR_DECISION_TRACE_ROWS.length}</strong> (all design-only). Dry-run fixtures = <strong>{RUNTIME_DRY_RUN_FIXTURE_ROWS.length}</strong> (all design-only). Result contract fields = <strong>{EVALUATION_RESULT_CONTRACT_ROWS.length}</strong> (all design-only). No-Go checks = <strong>{EVALUATOR_IMPLEMENTATION_NO_GO_CHECKS.length}</strong> (all No-Go, not started). Overall evaluator decision = <strong>No-Go</strong>. Evaluator implementation allowed = <strong>false</strong>. Permission evaluator implementation allowed = <strong>false</strong>. Dry-run engine = <strong>not implemented</strong>. Allow controls = <strong>0</strong>. Deny controls = <strong>0</strong>. DB writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>proceed to implementation package execution — not runtime implementation.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P1 + P2 + P3 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
         <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 + P1 + P2 + P3 Control Room & Governance safety notice:</strong><br />
         This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. v7.24.0-P1 Activation Planning is planning-only — no activation code, no runtime implementation, no DB writes. v7.24.0-P2 Authorization Data Contract is design-contract-only — no runtime implementation, no DB schema, no API endpoint, no activation. v7.24.0-P3 Authorization Persistence Design is design-only — no persistence, no DB schema, no migration, no API endpoint, no runtime evaluator, no activation. All panels are governance-safe display only.
