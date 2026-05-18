@@ -112,6 +112,14 @@ import {
   DECISION_CONFLICT_OVERRIDE_ROWS,
   REVIEW_ESCALATION_EXPIRY_REVOCATION_FIELDS,
   AUTHORIZATION_DECISION_AUDIT_ITEMS,
+  ACTIVATION_BLOCKER_ROADMAP_ITEMS,
+  RUNTIME_READINESS_SIMULATION_AREAS,
+  GO_NO_GO_DECISION_GATES,
+  BLOCKER_DEPENDENCY_SEQUENCES,
+  DRY_RUN_SIMULATION_AREAS,
+  ACTIVATION_SAFETY_CHECKLIST_ITEMS,
+  RUNTIME_READINESS_EVIDENCE_TYPES,
+  ACTIVATION_ROLLBACK_READINESS_ITEMS,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -335,10 +343,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -1012,6 +1020,33 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
           v7.24.0-P4 Authorization Review Policy + Decision Governance Design = <strong>design-only</strong>. Review policy fields = <strong>{AUTHORIZATION_REVIEW_POLICY_FIELDS.length}</strong> (all design-only). Decision governance items = <strong>{AUTHORIZATION_DECISION_GOVERNANCE_ITEMS.length}</strong> (all design-only). Review scope rows = <strong>{MANUAL_REVIEW_SCOPE_ROWS.length}</strong> (all future, not ready). Evidence requirement rows = <strong>{DECISION_EVIDENCE_REQUIREMENT_ROWS.length}</strong> (all future, disabled). Deny-by-default rules = <strong>{DENY_BY_DEFAULT_RULES.length}</strong> (all design-only, no evaluator). Conflict/override rows = <strong>{DECISION_CONFLICT_OVERRIDE_ROWS.length}</strong> (override not allowed now). Escalation/expiry/revocation fields = <strong>{REVIEW_ESCALATION_EXPIRY_REVOCATION_FIELDS.length}</strong> (all design-only, no scheduler/revocation). Audit design items = <strong>{AUTHORIZATION_DECISION_AUDIT_ITEMS.length}</strong> (all design-only, audit writes=0, export=0, hash=0). Review workflow = <strong>not implemented</strong>. Decision engine = <strong>not implemented</strong>. Override allowed now = <strong>false</strong>. Stage C = <strong>deferred</strong>. Recommended next = <strong>keep authorization review policy in design-only — no implementation work has started.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── v7.24.0-P5 Runtime Readiness Bridge ── */}
+      <SectionCard title="Runtime Readiness Bridge (P5)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Runtime readiness" value="No-Go" color="#EF4444" />
+          <KpiCard label="Activation blockers" value={String(ACTIVATION_BLOCKER_ROADMAP_ITEMS.length)} color="var(--danger)" />
+          <KpiCard label="Readiness simulation areas" value={String(RUNTIME_READINESS_SIMULATION_AREAS.length)} color="#8B5CF6" />
+          <KpiCard label="Go/No-Go gates" value={String(GO_NO_GO_DECISION_GATES.length)} color="var(--danger)" />
+          <KpiCard label="No-Go gates" value={String(GO_NO_GO_DECISION_GATES.filter(g => g.currentDecision === 'No-Go').length)} color="var(--danger)" />
+          <KpiCard label="Blocker dependencies" value={String(BLOCKER_DEPENDENCY_SEQUENCES.length)} color="#8B5CF6" />
+          <KpiCard label="Dry-run areas" value={String(DRY_RUN_SIMULATION_AREAS.length)} color="#8B5CF6" />
+          <KpiCard label="Safety checks" value={String(ACTIVATION_SAFETY_CHECKLIST_ITEMS.length)} color="var(--danger)" />
+          <KpiCard label="Evidence types" value={String(RUNTIME_READINESS_EVIDENCE_TYPES.length)} color="#8B5CF6" />
+          <KpiCard label="Rollback readiness items" value={String(ACTIVATION_ROLLBACK_READINESS_ITEMS.length)} color="var(--danger)" />
+          <KpiCard label="Runtime simulator" value="not implemented" color="#6B7280" />
+          <KpiCard label="Dry-run engine" value="not implemented" color="#6B7280" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+          <KpiCard label="Real control buttons" value="0" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Activation Blocker Roadmap →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Stage C is No-Go — keep disabled</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(239,68,68,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P5 Runtime Readiness = <strong>No-Go</strong>. Activation blockers = <strong>{ACTIVATION_BLOCKER_ROADMAP_ITEMS.length}</strong> (all not resolved). Readiness simulation areas = <strong>{RUNTIME_READINESS_SIMULATION_AREAS.length}</strong> (all 0% simulated score). Go/No-Go gates = <strong>{GO_NO_GO_DECISION_GATES.length}</strong> (all No-Go). Blocker dependencies = <strong>{BLOCKER_DEPENDENCY_SEQUENCES.length}</strong> (all future). Dry-run areas = <strong>{DRY_RUN_SIMULATION_AREAS.length}</strong> (all none). Safety checks = <strong>{ACTIVATION_SAFETY_CHECKLIST_ITEMS.length}</strong> (baseline verified not activation ready, all future required). Evidence types = <strong>{RUNTIME_READINESS_EVIDENCE_TYPES.length}</strong> (available baseline not activation ready, future evidence not available). Rollback readiness items = <strong>{ACTIVATION_ROLLBACK_READINESS_ITEMS.length}</strong> (all design-only not implemented). Runtime simulator = <strong>not implemented</strong>. Dry-run engine = <strong>not implemented</strong>. Preflight = <strong>not executed</strong>. Runtime state reads = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Real control buttons = <strong>0</strong>. Recommended next = <strong>keep Stage C disabled — address blocker resolution packages, do not enable activation.</strong>
         </div>
       </SectionCard>
 

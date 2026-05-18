@@ -2051,3 +2051,220 @@ export const AUTHORIZATION_DECISION_AUDIT_ITEMS: AuthorizationDecisionAuditItem[
   { item: 'closureNote', purpose: '关闭备注记录', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement closure note + archive' },
   { item: 'integrityMarkerFuture', purpose: '未来完整性标记', currentStatus: 'design-only', auditPersistence: 'disabled', auditWrite: '0', auditExport: '0', integrityMarker: 'future', runtimeEffect: 'none', futureRequirement: 'implement integrity marker + verification' },
 ];
+
+// ── v7.24.0-P5: Activation Blocker Resolution Roadmap ──
+
+export interface ActivationBlockerRoadmapItem {
+  blocker: string;
+  category: string;
+  currentState: string;
+  resolutionPackage: string;
+  requiredDeliverable: string;
+  requiredValidation: string;
+  dependency: string;
+  riskIfSkipped: string;
+  currentStatus: string;
+}
+
+export const ACTIVATION_BLOCKER_ROADMAP_ITEMS: ActivationBlockerRoadmapItem[] = [
+  { blocker: 'Runtime authorization model implementation', category: 'runtime', currentState: 'not resolved — design-contract-only', resolutionPackage: 'v7.24.x runtime authorization engine', requiredDeliverable: 'permission evaluator + state machine + API', requiredValidation: 'integration test + security review', dependency: 'P2 contract → P3 persistence → P4 review policy', riskIfSkipped: 'no authorization control at all', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Persistent governance state', category: 'storage', currentState: 'not resolved — design-only', resolutionPackage: 'v7.24.x authorization persistence', requiredDeliverable: 'DB schema + migration + CRUD API', requiredValidation: 'db:doctor + migration test + rollback test', dependency: 'P3 persistence design', riskIfSkipped: 'authorization state loss', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Approval storage', category: 'storage', currentState: 'not resolved — design-only', resolutionPackage: 'v7.24.x approval storage layer', requiredDeliverable: 'approval record table + migration + API', requiredValidation: 'approval persistence test + audit', dependency: 'persistent governance state', riskIfSkipped: 'approval decision loss', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Audit evidence persistence', category: 'storage', currentState: 'not resolved — design-only', resolutionPackage: 'v7.24.x audit evidence persistence', requiredDeliverable: 'evidence store + upload endpoint + integrity hash', requiredValidation: 'evidence upload test + integrity check', dependency: 'persistent governance state', riskIfSkipped: 'no audit trail for operations', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Rollback execution path', category: 'runtime', currentState: 'not resolved — design-only', resolutionPackage: 'v7.24.x rollback runtime', requiredDeliverable: 'rollback engine + restore verification', requiredValidation: 'rollback dry-run + integration test', dependency: 'runtime authorization model implementation', riskIfSkipped: 'unrecoverable deployment failure', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Dry-run engine', category: 'runtime', currentState: 'not resolved — design-only', resolutionPackage: 'v7.24.x dry-run engine', requiredDeliverable: 'dry-run executor + sandbox + result collector', requiredValidation: 'dry-run preflight test + isolation test', dependency: 'runtime authorization model implementation', riskIfSkipped: 'no preflight verification capability', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'External write sandbox', category: 'runtime', currentState: 'not resolved — design-only', resolutionPackage: 'v7.24.x external write sandbox', requiredDeliverable: 'sandbox isolation + endpoint mock + payload verification', requiredValidation: 'sandbox isolation test + endpoint mock test', dependency: 'runtime authorization model implementation', riskIfSkipped: 'uncontrolled external write to production', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Emergency stop runtime', category: 'runtime', currentState: 'not resolved — design-only', resolutionPackage: 'v7.24.x emergency stop runtime', requiredDeliverable: 'stop/kill/pause runtime + safety interlock', requiredValidation: 'emergency stop simulation + recovery test', dependency: 'runtime authorization model implementation', riskIfSkipped: 'no emergency response capability', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Manual approval policy', category: 'policy', currentState: 'not resolved — design-only', resolutionPackage: 'v7.24.x manual approval workflow', requiredDeliverable: 'approval flow engine + notification + timeout', requiredValidation: 'approval workflow simulation + timeout test', dependency: 'approval storage', riskIfSkipped: 'no human review for high-risk actions', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Security review', category: 'review', currentState: 'not resolved — not started', resolutionPackage: 'v7.24.x security audit package', requiredDeliverable: 'security review report + remediation plan', requiredValidation: 'security review sign-off', dependency: 'all runtime blockers resolved', riskIfSkipped: 'vulnerability in authorization flow', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Live smoke environment', category: 'environment', currentState: 'not resolved — not started', resolutionPackage: 'v7.24.x smoke test environment', requiredDeliverable: 'isolated smoke environment + test suite', requiredValidation: 'smoke test PASS + environment isolation', dependency: 'all runtime blockers resolved', riskIfSkipped: 'no confidence in production readiness', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Operator training', category: 'process', currentState: 'not resolved — not started', resolutionPackage: 'v7.24.x operator training program', requiredDeliverable: 'training materials + hands-on session + certification', requiredValidation: 'operator certification test', dependency: 'manual approval policy', riskIfSkipped: 'operator error during Stage C operation', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+  { blocker: 'Final activation audit', category: 'audit', currentState: 'not resolved — not started', resolutionPackage: 'v7.24.x final activation audit', requiredDeliverable: 'audit report + go/no-go recommendation', requiredValidation: 'audit sign-off + executive approval', dependency: 'all blockers above resolved', riskIfSkipped: 'unauthorized Stage C activation without readiness', currentStatus: 'not resolved — future package required — no runtime effect — Stage C deferred' },
+];
+
+// ── v7.24.0-P5: Runtime Readiness Simulation Model ──
+
+export interface ReadinessSimulationArea {
+  readinessArea: string;
+  simulatedScore: string;
+  currentState: string;
+  requiredFutureValidation: string;
+  runtimeDependency: string;
+  activationImpact: string;
+}
+
+export const RUNTIME_READINESS_SIMULATION_AREAS: ReadinessSimulationArea[] = [
+  { readinessArea: 'Authorization readiness', simulatedScore: '0%', currentState: 'design-contract-only — no runtime evaluator', requiredFutureValidation: 'permission evaluator + state machine + API integration test', runtimeDependency: 'runtime authorization model implementation', activationImpact: 'blocking' },
+  { readinessArea: 'Persistence readiness', simulatedScore: '0%', currentState: 'design-only — no DB schema, no migration, no API', requiredFutureValidation: 'DB schema + migration + CRUD API + db:doctor test', runtimeDependency: 'persistent governance state', activationImpact: 'blocking' },
+  { readinessArea: 'Review workflow readiness', simulatedScore: '0%', currentState: 'design-only — no review workflow engine', requiredFutureValidation: 'approval flow engine + notification + timeout simulation', runtimeDependency: 'manual approval policy', activationImpact: 'blocking' },
+  { readinessArea: 'Decision governance readiness', simulatedScore: '0%', currentState: 'design-only — no decision state machine', requiredFutureValidation: 'decision engine + transition validation + audit', runtimeDependency: 'runtime authorization model implementation', activationImpact: 'blocking' },
+  { readinessArea: 'Dry-run readiness', simulatedScore: '0%', currentState: 'design-only — no dry-run engine', requiredFutureValidation: 'dry-run executor + sandbox + result collector integration test', runtimeDependency: 'dry-run engine', activationImpact: 'blocking' },
+  { readinessArea: 'External write sandbox readiness', simulatedScore: '0%', currentState: 'design-only — no sandbox implementation', requiredFutureValidation: 'sandbox isolation + endpoint mock + payload verification test', runtimeDependency: 'external write sandbox', activationImpact: 'blocking' },
+  { readinessArea: 'Rollback readiness', simulatedScore: '0%', currentState: 'design-only — no rollback runtime', requiredFutureValidation: 'rollback engine + restore verification integration test', runtimeDependency: 'rollback execution path', activationImpact: 'blocking' },
+  { readinessArea: 'Emergency stop readiness', simulatedScore: '0%', currentState: 'design-only — no emergency stop runtime', requiredFutureValidation: 'stop/kill/pause runtime + safety interlock simulation', runtimeDependency: 'emergency stop runtime', activationImpact: 'blocking' },
+  { readinessArea: 'Audit evidence readiness', simulatedScore: '0%', currentState: 'design-only — no evidence persistence', requiredFutureValidation: 'evidence store + upload + integrity hash integration test', runtimeDependency: 'audit evidence persistence', activationImpact: 'blocking' },
+  { readinessArea: 'Operator readiness', simulatedScore: '0%', currentState: 'not started — no training program', requiredFutureValidation: 'training materials + certification test', runtimeDependency: 'operator training', activationImpact: 'delaying' },
+  { readinessArea: 'Smoke readiness', simulatedScore: '0%', currentState: 'not started — no smoke environment', requiredFutureValidation: 'smoke environment + test suite PASS', runtimeDependency: 'live smoke environment', activationImpact: 'blocking' },
+  { readinessArea: 'Final audit readiness', simulatedScore: '0%', currentState: 'not started — no audit report', requiredFutureValidation: 'audit report + go/no-go recommendation', runtimeDependency: 'final activation audit', activationImpact: 'blocking' },
+];
+
+// ── v7.24.0-P5: Go / No-Go Decision Matrix ──
+
+export interface GoNoGoDecisionGate {
+  decisionGate: string;
+  currentDecision: string;
+  requiredEvidence: string;
+  currentBlocker: string;
+  futureOwner: string;
+  activationImpact: string;
+}
+
+export const GO_NO_GO_DECISION_GATES: GoNoGoDecisionGate[] = [
+  { decisionGate: 'Authorization implemented', currentDecision: 'No-Go', requiredEvidence: 'permission evaluator + API integration test PASS', currentBlocker: 'Runtime authorization model implementation', futureOwner: 'Engineering', activationImpact: 'blocking' },
+  { decisionGate: 'Persistence implemented', currentDecision: 'No-Go', requiredEvidence: 'DB schema + migration + CRUD API + db:doctor PASS', currentBlocker: 'Persistent governance state', futureOwner: 'Engineering', activationImpact: 'blocking' },
+  { decisionGate: 'DB migration reviewed', currentDecision: 'No-Go', requiredEvidence: 'migration script reviewed + rollback test PASS', currentBlocker: 'Persistent governance state', futureOwner: 'Engineering + DBA', activationImpact: 'blocking' },
+  { decisionGate: 'API endpoint reviewed', currentDecision: 'No-Go', requiredEvidence: 'API security review + rate limit test PASS', currentBlocker: 'Runtime authorization model implementation', futureOwner: 'Engineering + Security', activationImpact: 'blocking' },
+  { decisionGate: 'Permission evaluator reviewed', currentDecision: 'No-Go', requiredEvidence: 'evaluator unit test + integration test PASS', currentBlocker: 'Runtime authorization model implementation', futureOwner: 'Engineering', activationImpact: 'blocking' },
+  { decisionGate: 'Review workflow reviewed', currentDecision: 'No-Go', requiredEvidence: 'approval flow simulation + timeout test PASS', currentBlocker: 'Manual approval policy', futureOwner: 'Engineering + Product', activationImpact: 'blocking' },
+  { decisionGate: 'Dry-run engine reviewed', currentDecision: 'No-Go', requiredEvidence: 'dry-run preflight test + isolation test PASS', currentBlocker: 'Dry-run engine', futureOwner: 'Engineering', activationImpact: 'blocking' },
+  { decisionGate: 'External sandbox reviewed', currentDecision: 'No-Go', requiredEvidence: 'sandbox isolation test + endpoint mock test PASS', currentBlocker: 'External write sandbox', futureOwner: 'Engineering + Security', activationImpact: 'blocking' },
+  { decisionGate: 'Rollback path reviewed', currentDecision: 'No-Go', requiredEvidence: 'rollback dry-run + restore verification test PASS', currentBlocker: 'Rollback execution path', futureOwner: 'Engineering', activationImpact: 'blocking' },
+  { decisionGate: 'Emergency stop reviewed', currentDecision: 'No-Go', requiredEvidence: 'emergency stop simulation + recovery test PASS', currentBlocker: 'Emergency stop runtime', futureOwner: 'Engineering + Operations', activationImpact: 'blocking' },
+  { decisionGate: 'Audit evidence persistence reviewed', currentDecision: 'No-Go', requiredEvidence: 'evidence store + upload + integrity test PASS', currentBlocker: 'Audit evidence persistence', futureOwner: 'Engineering', activationImpact: 'blocking' },
+  { decisionGate: 'Smoke environment validated', currentDecision: 'No-Go', requiredEvidence: 'smoke test PASS + environment isolation verified', currentBlocker: 'Live smoke environment', futureOwner: 'Engineering + QA', activationImpact: 'blocking' },
+  { decisionGate: 'Security review completed', currentDecision: 'No-Go', requiredEvidence: 'security review sign-off + remediation closed', currentBlocker: 'Security review', futureOwner: 'Security', activationImpact: 'blocking' },
+  { decisionGate: 'Operator training completed', currentDecision: 'No-Go', requiredEvidence: 'operator certification test PASS', currentBlocker: 'Operator training', futureOwner: 'Product + Operations', activationImpact: 'delaying' },
+  { decisionGate: 'Final activation audit completed', currentDecision: 'No-Go', requiredEvidence: 'audit sign-off + executive approval', currentBlocker: 'Final activation audit', futureOwner: 'Audit + Leadership', activationImpact: 'blocking' },
+];
+
+// ── v7.24.0-P5: Blocker Dependency Sequencing Matrix ──
+
+export interface BlockerDependencySequence {
+  sequence: number;
+  blocker: string;
+  dependsOn: string;
+  unlocks: string;
+  currentStatus: string;
+  riskNote: string;
+}
+
+export const BLOCKER_DEPENDENCY_SEQUENCES: BlockerDependencySequence[] = [
+  { sequence: 1, blocker: 'Authorization data contract', dependsOn: 'P2 contract completed (done)', unlocks: 'P3 persistence design, runtime evaluator design', currentStatus: 'design-contract-only — P2 done', riskNote: 'must be finalized before any runtime implementation' },
+  { sequence: 2, blocker: 'Persistence schema design', dependsOn: 'P3 design completed (done)', unlocks: 'DB schema + migration + CRUD API', currentStatus: 'design-only — P3 done', riskNote: 'schema design must support all authorization operations' },
+  { sequence: 3, blocker: 'Runtime evaluator design', dependsOn: 'P1 + P2 + P3 designs completed', unlocks: 'permission evaluator + decision state machine', currentStatus: 'future / not implemented', riskNote: 'evaluator must enforce deny-by-default' },
+  { sequence: 4, blocker: 'Review workflow design', dependsOn: 'P4 design completed (done)', unlocks: 'approval flow + notification + timeout', currentStatus: 'future / not implemented', riskNote: 'review workflow must support manual approval policy' },
+  { sequence: 5, blocker: 'Audit evidence persistence design', dependsOn: 'persistence schema design', unlocks: 'evidence store + upload + integrity hash', currentStatus: 'future / not implemented', riskNote: 'audit evidence must be immutable' },
+  { sequence: 6, blocker: 'Dry-run engine design', dependsOn: 'runtime evaluator design', unlocks: 'dry-run executor + sandbox + result collector', currentStatus: 'future / not implemented', riskNote: 'dry-run must be isolated from production' },
+  { sequence: 7, blocker: 'External write sandbox design', dependsOn: 'runtime evaluator design', unlocks: 'sandbox isolation + endpoint mock + payload verification', currentStatus: 'future / not implemented', riskNote: 'sandbox must prevent production writes' },
+  { sequence: 8, blocker: 'Rollback runtime design', dependsOn: 'runtime evaluator design', unlocks: 'rollback engine + restore verification', currentStatus: 'future / not implemented', riskNote: 'rollback must be verified before deployment' },
+  { sequence: 9, blocker: 'Emergency stop runtime design', dependsOn: 'runtime evaluator design', unlocks: 'stop/kill/pause runtime + safety interlock', currentStatus: 'future / not implemented', riskNote: 'emergency stop must be fail-safe' },
+  { sequence: 10, blocker: 'Smoke environment validation', dependsOn: 'all runtime blockers resolved', unlocks: 'confidence in production readiness', currentStatus: 'future / not implemented', riskNote: 'smoke environment must mirror production' },
+  { sequence: 11, blocker: 'Security review', dependsOn: 'all runtime blockers resolved + smoke PASS', unlocks: 'security sign-off', currentStatus: 'future / not started', riskNote: 'vulnerability must be remediated before activation' },
+  { sequence: 12, blocker: 'Operator training', dependsOn: 'review workflow design', unlocks: 'operator certification', currentStatus: 'future / not started', riskNote: 'operator error during Stage C operation' },
+  { sequence: 13, blocker: 'Final activation audit', dependsOn: 'all above resolved', unlocks: 'go/no-go decision', currentStatus: 'future / not started', riskNote: 'unauthorized activation without readiness' },
+];
+
+// ── v7.24.0-P5: Stage C Dry-run Simulation Design ──
+
+export interface DryRunSimulationArea {
+  dryRunArea: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  runtimeEffect: string;
+  writePath: string;
+  requiredFutureValidation: string;
+}
+
+export const DRY_RUN_SIMULATION_AREAS: DryRunSimulationArea[] = [
+  { dryRunArea: 'Authorization request dry-run', futurePurpose: '模拟授权请求的完整生命周期', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'authorization request dry-run engine + result collector' },
+  { dryRunArea: 'Permission evaluation dry-run', futurePurpose: '模拟权限评估引擎的决策过程', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'permission evaluator dry-run + deny-by-default verification' },
+  { dryRunArea: 'Review workflow dry-run', futurePurpose: '模拟审查流程的完整工作流', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'review workflow dry-run + timeout + escalation simulation' },
+  { dryRunArea: 'Mutation dry-run', futurePurpose: '模拟变更操作的差异和影响', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'mutation diff + impact dry-run + rollback simulation' },
+  { dryRunArea: 'Execution dry-run', futurePurpose: '模拟执行操作的预检和结果', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'execution preflight + dry-run + result verification' },
+  { dryRunArea: 'External write dry-run', futurePurpose: '模拟外部写入操作的沙箱验证', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'external write sandbox dry-run + payload verification' },
+  { dryRunArea: 'Deployment dry-run', futurePurpose: '模拟部署发布的完整流程', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'deployment dry-run + release plan + rollback simulation' },
+  { dryRunArea: 'Rollback dry-run', futurePurpose: '模拟回滚操作的完整流程', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'rollback dry-run + restore verification + audit' },
+  { dryRunArea: 'Emergency stop dry-run', futurePurpose: '模拟紧急停止的安全中断', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'emergency stop dry-run + safety interlock + recovery' },
+  { dryRunArea: 'Audit evidence dry-run', futurePurpose: '模拟审计证据的收集和完整性校验', currentImplementation: 'none', runtimeEffect: 'none', writePath: 'disabled', requiredFutureValidation: 'audit evidence dry-run + integrity hash + export' },
+];
+
+// ── v7.24.0-P5: Activation Safety Review Checklist ──
+
+export interface ActivationSafetyChecklistItem {
+  checkItem: string;
+  currentStatus: string;
+  requiredBeforeActivation: string;
+  evidence: string;
+  riskIfSkipped: string;
+}
+
+export const ACTIVATION_SAFETY_CHECKLIST_ITEMS: ActivationSafetyChecklistItem[] = [
+  { checkItem: 'Metrics contract verified', currentStatus: 'baseline verified, not activation ready', requiredBeforeActivation: 'metrics contract reviewed + signed off', evidence: 'P3a metrics reconciliation report', riskIfSkipped: 'unverified metrics baseline for activation' },
+  { checkItem: 'HighRisk validator verified', currentStatus: 'baseline verified, not activation ready', requiredBeforeActivation: 'highRisk validator PASS + no new high risk', evidence: 'navigation validator report P3a', riskIfSkipped: 'unverified high-risk entries exposed after activation' },
+  { checkItem: 'Secret scan FP classified', currentStatus: 'baseline verified, not activation ready', requiredBeforeActivation: 'secret scan PASS with FP classified', evidence: 'secret scan report P3a', riskIfSkipped: 'potential secret leak during activation' },
+  { checkItem: 'DB migration review required', currentStatus: 'future required', requiredBeforeActivation: 'DB migration script reviewed + rollback test PASS', evidence: 'migration review report', riskIfSkipped: 'schema drift + migration failure' },
+  { checkItem: 'API endpoint review required', currentStatus: 'future required', requiredBeforeActivation: 'API security review + rate limit test PASS', evidence: 'API security review report', riskIfSkipped: 'unauthorized API access' },
+  { checkItem: 'Runtime evaluator review required', currentStatus: 'future required', requiredBeforeActivation: 'permission evaluator unit + integration test PASS', evidence: 'evaluator test report', riskIfSkipped: 'authorization bypass vulnerability' },
+  { checkItem: 'Permission denied-by-default review required', currentStatus: 'future required', requiredBeforeActivation: 'deny-by-default policy enforced + audit verified', evidence: 'deny-by-default audit report', riskIfSkipped: 'unintended permission grant' },
+  { checkItem: 'Audit evidence persistence review required', currentStatus: 'future required', requiredBeforeActivation: 'evidence store + integrity hash + upload test PASS', evidence: 'evidence persistence test report', riskIfSkipped: 'no audit trail after activation' },
+  { checkItem: 'Emergency stop safety review required', currentStatus: 'future required', requiredBeforeActivation: 'emergency stop simulation + recovery test PASS', evidence: 'emergency stop simulation report', riskIfSkipped: 'no emergency response after activation' },
+  { checkItem: 'Rollback plan review required', currentStatus: 'future required', requiredBeforeActivation: 'rollback dry-run + restore verification PASS', evidence: 'rollback plan + simulation report', riskIfSkipped: 'unrecoverable failure after activation' },
+  { checkItem: 'External write sandbox review required', currentStatus: 'future required', requiredBeforeActivation: 'sandbox isolation + endpoint mock test PASS', evidence: 'sandbox isolation test report', riskIfSkipped: 'uncontrolled external write after activation' },
+  { checkItem: 'Live smoke review required', currentStatus: 'future required', requiredBeforeActivation: 'smoke test PASS + environment isolation verified', evidence: 'smoke test report', riskIfSkipped: 'no confidence in production readiness' },
+  { checkItem: 'Final go/no-go review required', currentStatus: 'future required', requiredBeforeActivation: 'all checks PASS + audit sign-off + executive approval', evidence: 'final audit report + go/no-go decision', riskIfSkipped: 'unauthorized Stage C activation' },
+];
+
+// ── v7.24.0-P5: Runtime Readiness Evidence Matrix ──
+
+export interface RuntimeReadinessEvidenceType {
+  evidenceType: string;
+  currentAvailability: string;
+  persistence: string;
+  runtimeEffect: string;
+  requiredForGoNoGo: string;
+  status: string;
+}
+
+export const RUNTIME_READINESS_EVIDENCE_TYPES: RuntimeReadinessEvidenceType[] = [
+  { evidenceType: 'Metrics contract evidence', currentAvailability: 'available — P3a metrics reconciliation report', persistence: 'report file', runtimeEffect: 'none', requiredForGoNoGo: 'baseline verification', status: 'available baseline — not activation ready' },
+  { evidenceType: 'Validator evidence', currentAvailability: 'available — navigation validator report', persistence: 'report file', runtimeEffect: 'none', requiredForGoNoGo: 'baseline verification', status: 'available baseline — not activation ready' },
+  { evidenceType: 'Secret scan evidence', currentAvailability: 'available — secret scan report', persistence: 'report file', runtimeEffect: 'none', requiredForGoNoGo: 'baseline verification', status: 'available baseline — not activation ready' },
+  { evidenceType: 'DB doctor evidence', currentAvailability: 'available — db:doctor report', persistence: 'report file', runtimeEffect: 'none', requiredForGoNoGo: 'baseline verification', status: 'available baseline — not activation ready' },
+  { evidenceType: 'Build/typecheck/lint evidence', currentAvailability: 'available — CI pipeline output', persistence: 'CI log', runtimeEffect: 'none', requiredForGoNoGo: 'baseline verification', status: 'available baseline — not activation ready' },
+  { evidenceType: 'DB migration review evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'API endpoint review evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Runtime evaluator evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Permission evaluator evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Review workflow evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Dry-run evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Rollback evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Emergency stop evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Smoke evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Security review evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+  { evidenceType: 'Operator training evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'delaying', status: 'future required' },
+  { evidenceType: 'Final audit evidence', currentAvailability: 'not available — future required', persistence: 'disabled', runtimeEffect: 'none', requiredForGoNoGo: 'blocking', status: 'future required' },
+];
+
+// ── v7.24.0-P5: Activation Rollback Readiness Plan ──
+
+export interface ActivationRollbackItem {
+  planItem: string;
+  currentStatus: string;
+  requiredFutureDeliverable: string;
+  runtimeDependency: string;
+  blockedAction: string;
+  riskNote: string;
+}
+
+export const ACTIVATION_ROLLBACK_READINESS_ITEMS: ActivationRollbackItem[] = [
+  { planItem: 'Activation rollback trigger', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'rollback trigger mechanism + rollback policy', runtimeDependency: 'rollback execution path', blockedAction: 'no rollback action available', riskNote: 'no way to un-enable Stage C if activated prematurely' },
+  { planItem: 'Stage C disable plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'Stage C disable procedure + verification steps', runtimeDependency: 'rollback execution path', blockedAction: 'no disable button available', riskNote: 'Stage C cannot be disabled without manual intervention' },
+  { planItem: 'Runtime authorization rollback plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'authorization state rollback + restore procedure', runtimeDependency: 'runtime authorization model implementation', blockedAction: 'no authorization rollback action', riskNote: 'authorization state cannot be rolled back' },
+  { planItem: 'DB migration rollback plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'migration rollback script + restore verification', runtimeDependency: 'persistent governance state', blockedAction: 'no migration rollback action', riskNote: 'DB schema cannot be reverted safely' },
+  { planItem: 'API endpoint rollback plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'API version rollback + traffic switch', runtimeDependency: 'runtime authorization model implementation', blockedAction: 'no API rollback action', riskNote: 'API cannot be reverted to previous version' },
+  { planItem: 'External write rollback plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'external write undo + compensation procedure', runtimeDependency: 'external write sandbox', blockedAction: 'no external write rollback', riskNote: 'external writes cannot be undone automatically' },
+  { planItem: 'Emergency stop fallback plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'emergency stop fallback + manual override', runtimeDependency: 'emergency stop runtime', blockedAction: 'no emergency stop action', riskNote: 'no emergency response during rollback' },
+  { planItem: 'Audit evidence rollback plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'audit evidence rollback + integrity verification', runtimeDependency: 'audit evidence persistence', blockedAction: 'no audit evidence rollback', riskNote: 'audit evidence consistency after rollback' },
+  { planItem: 'Operator communication plan', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'operator notification + escalation during rollback', runtimeDependency: 'manual approval policy', blockedAction: 'no notification action', riskNote: 'operators not informed during rollback' },
+  { planItem: 'Final rollback verification', currentStatus: 'design-only — not implemented', requiredFutureDeliverable: 'rollback verification + recovery sign-off', runtimeDependency: 'rollback execution path', blockedAction: 'no rollback verification action', riskNote: 'no confidence in rollback completeness' },
+];

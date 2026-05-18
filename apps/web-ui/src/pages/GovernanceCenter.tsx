@@ -87,6 +87,14 @@ import DenyByDefaultPolicyDesign from '../components/governance/DenyByDefaultPol
 import DecisionConflictOverrideBoundaryMatrix from '../components/governance/DecisionConflictOverrideBoundaryMatrix';
 import ReviewEscalationExpiryRevocationPolicy from '../components/governance/ReviewEscalationExpiryRevocationPolicy';
 import AuthorizationDecisionAuditDesign from '../components/governance/AuthorizationDecisionAuditDesign';
+import ActivationBlockerResolutionRoadmap from '../components/governance/ActivationBlockerResolutionRoadmap';
+import RuntimeReadinessSimulationModel from '../components/governance/RuntimeReadinessSimulationModel';
+import GoNoGoDecisionMatrix from '../components/governance/GoNoGoDecisionMatrix';
+import BlockerDependencySequencingMatrix from '../components/governance/BlockerDependencySequencingMatrix';
+import StageCDryRunSimulationDesign from '../components/governance/StageCDryRunSimulationDesign';
+import ActivationSafetyReviewChecklist from '../components/governance/ActivationSafetyReviewChecklist';
+import RuntimeReadinessEvidenceMatrix from '../components/governance/RuntimeReadinessEvidenceMatrix';
+import ActivationRollbackReadinessPlan from '../components/governance/ActivationRollbackReadinessPlan';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -342,7 +350,7 @@ export default function GovernanceCenter() {
       versionLabel="AIP v7.24.0-P2"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence · v7.24.0-P4 Authorization Review Policy + Decision Governance Design — design-only, no runtime"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence · v7.24.0-P4 Authorization Review Policy + Decision Governance Design — design-only, no runtime · v7.24.0-P5 Activation Blocker Roadmap + Readiness Simulation — planning-only, no activation, no implement"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -904,6 +912,40 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Authorization Decision Audit Design (P4)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
         <AuthorizationDecisionAuditDesign />
+      </SectionCard>
+
+      {/* ── v7.24.0-P5 Activation Blocker Resolution Roadmap + Runtime Readiness Simulation Sections ── */}
+
+      <SectionCard title="Activation Blocker Resolution Roadmap (P5)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <ActivationBlockerResolutionRoadmap />
+      </SectionCard>
+
+      <SectionCard title="Runtime Readiness Simulation Model (P5)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimeReadinessSimulationModel />
+      </SectionCard>
+
+      <SectionCard title="Go / No-Go Decision Matrix (P5)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <GoNoGoDecisionMatrix />
+      </SectionCard>
+
+      <SectionCard title="Blocker Dependency Sequencing Matrix (P5)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <BlockerDependencySequencingMatrix />
+      </SectionCard>
+
+      <SectionCard title="Stage C Dry-run Simulation Design (P5)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <StageCDryRunSimulationDesign />
+      </SectionCard>
+
+      <SectionCard title="Activation Safety Review Checklist (P5)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <ActivationSafetyReviewChecklist />
+      </SectionCard>
+
+      <SectionCard title="Runtime Readiness Evidence Matrix (P5)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RuntimeReadinessEvidenceMatrix />
+      </SectionCard>
+
+      <SectionCard title="Activation Rollback Readiness Plan (P5)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <ActivationRollbackReadinessPlan />
       </SectionCard>
 
       {/* Related Routes */}
