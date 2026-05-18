@@ -674,7 +674,7 @@ export default function AdvancedModeReadonly() {
           <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep Stage C in design review</span>
         </div>
         <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          Stage C Design Spec = <strong>design-only</strong>. Governance data models = <strong>7</strong> (all readonly). Design phase gates = <strong>6</strong> (all deferred). Lifecycle stages = <strong>8</strong> (all design-only). Readiness items = <strong>9</strong> (all not started / design-only / deferred). Design controls = <strong>0</strong>. Approval controls = <strong>0</strong>. Mutation paths = <strong>0</strong>. Execution controls = <strong>0</strong>. External writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended mode = <strong>keep Stage C in design review</strong>.
+          Stage C Design Spec = <strong>design-only</strong>. Governance data models = <strong>7</strong> (all readonly). Design phase gates = <strong>6</strong> (all deferred). Lifecycle stages = <strong>8</strong> (all design-only). Readiness items = <strong>9</strong> (ready-design-only=2, not-implemented=2, deferred=5). Design controls = <strong>0</strong>. Approval controls = <strong>0</strong>. Mutation paths = <strong>0</strong>. Execution controls = <strong>0</strong>. External writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended mode = <strong>keep Stage C in design review</strong>.
         </div>
       </SectionCard>
 

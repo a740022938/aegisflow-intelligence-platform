@@ -75,15 +75,15 @@ export const LIFECYCLE_STAGES: LifecycleStage[] = [
 ];
 
 export const READINESS_CHECKLIST: ReadinessChecklistItem[] = [
-  { item: 'Dedicated Stage C design package', status: 'not started', notes: '需独立 Stage C 设计包' },
-  { item: 'Governance data model reviewed', status: 'design-only', notes: '7 个数据模型已定义（只读规格）' },
-  { item: 'Audit evidence model reviewed', status: 'design-only', notes: 'GovernanceEvidence 模型已定义' },
+  { item: 'Dedicated Stage C design package', status: 'not-implemented', notes: '需独立 Stage C 设计包' },
+  { item: 'Governance data model reviewed', status: 'ready-design-only', notes: '7 个数据模型已定义（只读规格）' },
+  { item: 'Audit evidence model reviewed', status: 'ready-design-only', notes: 'GovernanceEvidence 模型已定义' },
   { item: 'Rollback plan required', status: 'deferred', notes: 'GovernanceRollbackPlan 已定义' },
   { item: 'Dry-run mode required', status: 'deferred', notes: 'Execution Gate 需要 dry-run' },
   { item: 'Manual approval policy required', status: 'deferred', notes: 'Approval Gate 需要人工审批策略' },
   { item: 'External write policy required', status: 'deferred', notes: 'External Write Gate 需要外部写入策略' },
   { item: 'Emergency stop policy required', status: 'deferred', notes: 'Emergency Stop Gate 需要紧急停止策略' },
-  { item: 'Final safety audit required', status: 'not started', notes: 'Stage C 启用前需最终安全审计' },
+  { item: 'Final safety audit required', status: 'not-implemented', notes: 'Stage C 启用前需最终安全审计' },
 ];
 
 export const RISK_ACCEPTANCE_MATRIX: RiskAcceptanceRow[] = [

@@ -2,7 +2,7 @@ import React from 'react';
 import { READINESS_CHECKLIST } from './governanceDesignSpec';
 
 const C: Record<string, string> = {
-  'not started': '#6B7280', 'design-only': '#8B5CF6', deferred: '#F97316',
+  'ready-design-only': '#8B5CF6', 'not-implemented': '#6B7280', deferred: '#F97316', 'requires future package': '#EC4899',
 };
 
 function Badge({ label, color }: { label: string; color?: string }) {
@@ -15,7 +15,7 @@ export default function StageCReadinessChecklist() {
   return (
     <div>
       <div style={{ marginBottom: 8, fontSize: 11, color: 'var(--text-muted)' }}>
-        Stage C readiness checklist — all items currently <strong>not started / design-only / deferred</strong>.
+        Stage C readiness checklist — all items currently <strong>ready-design-only / not-implemented / deferred</strong>.
       </div>
       <div style={{ display: 'grid', gap: 4 }}>
         {READINESS_CHECKLIST.map(item => (
