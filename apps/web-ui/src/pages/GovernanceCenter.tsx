@@ -396,10 +396,10 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.24.0-P2"
+      versionLabel="AIP v7.25.1"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence · v7.24.0-P4 Authorization Review Policy + Decision Governance Design — design-only, no runtime · v7.24.0-P5 Activation Blocker Roadmap + Readiness Simulation — planning-only, no activation, no implement · v7.24.0-P6 Implementation Boundary + Storage/API Design Review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement · v7.25.0 Runtime Authorization Foundation — schema implemented, API guarded skeleton, synthetic dry-run only, no runtime evaluator, no permission evaluator · v7.25.1 Controlled Dry-run Validation — 4 safe tables, deny-by-default evaluator, synthetic dry-run fixtures, API rejection gates, no production side effects · v7.24.0-P1 Activation Planning — planning-only, no activation · v7.24.0-P2 Authorization Data Contract — design-contract-only, no runtime · v7.24.0-P3 Authorization Persistence Design — design-only, no persistence · v7.24.0-P4 Authorization Review Policy + Decision Governance Design — design-only, no runtime · v7.24.0-P5 Activation Blocker Roadmap + Readiness Simulation — planning-only, no activation, no implement · v7.24.0-P6 Implementation Boundary + Storage/API Design Review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -577,7 +577,8 @@ export default function GovernanceCenter() {
         <RuntimeFoundationStatusCard />
         <AuthorizationDryRunStatusCard />
         <div style={{ padding: '8px 12px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic', lineHeight: 1.6 }}>
-          <strong>Runtime Foundation Status:</strong> Storage schema implemented · API guarded skeleton · Synthetic dry-run only · Production runtime evaluator not implemented · Real controls: 0 · External writes: 0 · Stage C: Disabled
+          <strong>Foundation (v7.25.0):</strong> Storage schema implemented · API guarded skeleton · Synthetic dry-run only · Production runtime evaluator not implemented · Real controls: 0 · External writes: 0 · Stage C: Disabled<br/>
+          <strong>Dry-run Validation (v7.25.1 Detail-Complete Candidate):</strong> 8 synthetic fixtures hardened · 4 safe DB tables · Deny-by-default evaluator · API rejection gates · 5 guarded endpoints · Controlled synthetic dry-run only · Stage C: Disabled · Production Runtime: Blocked · Real Controls: 0 · External Writes: 0 · Final Seal: Pending
         </div>
       </SectionCard>
 

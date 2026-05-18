@@ -1,8 +1,11 @@
 import type { SyntheticDecision } from './authorizationSyntheticEvaluator.js'
 import type { AuthorizationDryRunFixture } from './authorizationDryRunFixtures.js'
 
+export const TRACE_SCHEMA_VERSION = '1.0.0'
+
 export interface DecisionTrace {
   trace_id: string
+  trace_schema_version: string
   fixture_id: string
   input_summary: string
   matched_rules: string[]
@@ -10,6 +13,7 @@ export interface DecisionTrace {
   stage_c_state: string
   runtime_state: string
   external_write_state: string
+  production_action_state: string
   result: SyntheticDecision
   created_at: string
 }
@@ -53,6 +57,10 @@ export function buildTrace(fixture: AuthorizationDryRunFixture, decision: Synthe
     rules.push('production_runtime_blocked')
     blocked.push('Production runtime implementation is blocked by policy')
   }
+  if (decision.productionActionAllowed === false) {
+    rules.push('production_action_blocked')
+    blocked.push('Production action not allowed — synthetic dry-run mode')
+  }
 
   rules.push('deny_by_default')
 
@@ -62,6 +70,7 @@ export function buildTrace(fixture: AuthorizationDryRunFixture, decision: Synthe
 
   return {
     trace_id: hashInput(fixture),
+    trace_schema_version: TRACE_SCHEMA_VERSION,
     fixture_id: fixture.fixture_id,
     input_summary: `${fixture.actor_role}@${fixture.requested_scope}:${fixture.requested_action}`,
     matched_rules: [...new Set(rules)],
@@ -69,6 +78,7 @@ export function buildTrace(fixture: AuthorizationDryRunFixture, decision: Synthe
     stage_c_state: decision.stageCAllowed ? 'allowed' : 'disabled',
     runtime_state: decision.runtimeAllowed ? 'allowed' : 'blocked',
     external_write_state: decision.externalWriteAllowed ? 'allowed' : 'blocked',
+    production_action_state: decision.productionActionAllowed ? 'allowed' : 'blocked',
     result: decision,
     created_at: nowIso(),
   }

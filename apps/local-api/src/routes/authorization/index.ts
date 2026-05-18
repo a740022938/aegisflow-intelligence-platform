@@ -4,6 +4,7 @@ import {
   getFixtures,
   getFixtureById,
   validateFixture,
+  validateDryRunRequest,
   evaluateFixture,
   buildTrace,
   buildResultContract,
@@ -66,12 +67,35 @@ export function registerAuthorizationRoutes(app: FastifyInstance) {
         stage_c_activation_toggle_added: false,
         stage_c_activation_allowed: false,
       },
+      safeDefaults: {
+        runtime_allowed: false,
+        stage_c_allowed: false,
+        external_write_allowed: false,
+        production_action_allowed: false,
+      },
     }
   })
+
+  function rejectionError(code: string, field: string | null, reason: string) {
+    return {
+      ok: false,
+      error: { code, field, reason, safeDefault: 'DENY', runtimeAllowed: false, stageCAllowed: false, externalWriteAllowed: false, productionActionAllowed: false },
+    }
+  }
 
   app.post('/api/authorization/dry-run', async (request: any, reply) => {
     const body = request.body || {}
     const fixtureId = String(body.fixture_id || '').trim()
+
+    if (!FEATURE_FLAGS.AUTHORIZATION_FOUNDATION_ENABLED) {
+      return reply.code(503).send(rejectionError('AUTHORIZATION_FOUNDATION_DISABLED', null, 'Authorization foundation is disabled'))
+    }
+
+    // Body-level validation (16 rejection cases)
+    const reqVal = validateDryRunRequest(body)
+    if (!reqVal.valid) {
+      return reply.code(400).send(rejectionError(reqVal.error, reqVal.field, reqVal.reason))
+    }
 
     if (!fixtureId) {
       const allFixtures = getFixtures()
@@ -93,31 +117,12 @@ export function registerAuthorizationRoutes(app: FastifyInstance) {
 
     const fixture = getFixtureById(fixtureId)
     if (!fixture) {
-      return reply.code(404).send({
-        ok: false,
-        error: `FIXTURE_NOT_FOUND`,
-        message: `Fixture "${fixtureId}" not found`,
-        availableFixtures: getFixtures().map(f => f.fixture_id),
-      })
+      return reply.code(404).send(rejectionError('FIXTURE_NOT_FOUND', 'fixture_id', `Fixture "${fixtureId}" not found`))
     }
 
     const validation = validateFixture(fixture)
     if (!validation.valid) {
-      return reply.code(400).send({
-        ok: false,
-        error: 'FIXTURE_VALIDATION_FAILED',
-        message: `Fixture "${fixtureId}" validation failed`,
-        errors: validation.errors,
-        warnings: validation.warnings,
-      })
-    }
-
-    if (!FEATURE_FLAGS.AUTHORIZATION_FOUNDATION_ENABLED) {
-      return reply.code(503).send({
-        ok: false,
-        error: 'AUTHORIZATION_FOUNDATION_DISABLED',
-        message: 'Authorization foundation is disabled',
-      })
+      return reply.code(400).send(rejectionError('FIXTURE_VALIDATION_FAILED', null, `Fixture "${fixtureId}" validation failed`))
     }
 
     const decision = evaluateFixture(fixture)
@@ -141,7 +146,7 @@ export function registerAuthorizationRoutes(app: FastifyInstance) {
         'dry_run',
         fixture.risk_level,
         JSON.stringify({ fixture_id: fixture.fixture_id }),
-        decision.runtimeAllowed ? 1 : 0,
+        decision.productionActionAllowed ? 1 : 0,
         decision.stageCAllowed ? 1 : 0,
         nowIso(),
         nowIso(),
@@ -203,8 +208,7 @@ export function registerAuthorizationRoutes(app: FastifyInstance) {
     } catch (err: any) {
       return reply.code(500).send({
         ok: false,
-        error: 'DRY_RUN_WRITE_FAILED',
-        message: String(err?.message || err),
+        error: { code: 'DRY_RUN_WRITE_FAILED', field: null, reason: String(err?.message || err), safeDefault: 'DENY', runtimeAllowed: false, stageCAllowed: false, externalWriteAllowed: false, productionActionAllowed: false },
         result: contract,
         matched: decision.decision === fixture.expected_decision,
         expected: fixture.expected_decision,
@@ -219,7 +223,7 @@ export function registerAuthorizationRoutes(app: FastifyInstance) {
       const ddb = db.getDatabase()
       const row = ddb.prepare(`SELECT * FROM authorization_dry_run_results WHERE id = ?`).get(id) as any
       if (!row) {
-        return reply.code(404).send({ ok: false, error: 'DRY_RUN_RESULT_NOT_FOUND', message: `Dry-run result "${id}" not found` })
+        return reply.code(404).send({ ok: false, error: { code: 'DRY_RUN_RESULT_NOT_FOUND', field: 'id', reason: `Dry-run result "${id}" not found`, safeDefault: 'DENY', runtimeAllowed: false, stageCAllowed: false, externalWriteAllowed: false, productionActionAllowed: false } })
       }
       return {
         ok: true,
@@ -236,7 +240,7 @@ export function registerAuthorizationRoutes(app: FastifyInstance) {
         },
       }
     } catch (err: any) {
-      return reply.code(500).send({ ok: false, error: 'DRY_RUN_READ_FAILED', message: String(err?.message || err) })
+      return reply.code(500).send({ ok: false, error: { code: 'DRY_RUN_READ_FAILED', field: null, reason: String(err?.message || err), safeDefault: 'DENY', runtimeAllowed: false, stageCAllowed: false, externalWriteAllowed: false, productionActionAllowed: false } })
     }
   })
 
@@ -260,7 +264,7 @@ export function registerAuthorizationRoutes(app: FastifyInstance) {
         count: rows.length,
       }
     } catch (err: any) {
-      return reply.code(500).send({ ok: false, error: 'AUDIT_READ_FAILED', message: String(err?.message || err) })
+      return reply.code(500).send({ ok: false, error: { code: 'AUDIT_READ_FAILED', field: null, reason: String(err?.message || err), safeDefault: 'DENY', runtimeAllowed: false, stageCAllowed: false, externalWriteAllowed: false, productionActionAllowed: false } })
     }
   })
 }
