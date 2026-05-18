@@ -1039,3 +1039,156 @@ export const EMERGENCY_STOP_AUDIT_LIFECYCLE_STAGES: EmergencyStopAuditLifecycleS
   { stage: 'Final safety audit required', purpose: '需要最终安全审计', status: 'design-only / no runtime effect' },
   { stage: 'Closure review', purpose: '关闭审查', status: 'design-only / no runtime effect' },
 ];
+
+// ── P9: Gate Coverage Overview ──
+
+export interface GateCoverageEntry {
+  gate: string;
+  coveredBy: string;
+  currentMode: string;
+  runtimeEffect: string;
+  realControls: string;
+  writePath: string;
+  stageGate: string;
+  coverageStatus: string;
+  remainingBlocker: string;
+}
+
+export const GATE_COVERAGE_OVERVIEW: GateCoverageEntry[] = [
+  { gate: 'Approval Gate', coveredBy: 'P3', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'runtime authorization model missing' },
+  { gate: 'Mutation Gate', coveredBy: 'P4', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'mutation write path not implemented' },
+  { gate: 'Execution Gate', coveredBy: 'P5', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'dry-run engine not implemented' },
+  { gate: 'External Write Gate', coveredBy: 'P6', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'external write sandbox not implemented' },
+  { gate: 'Connector Write Policy', coveredBy: 'P6', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'connector write engine not implemented' },
+  { gate: 'Deployment Gate', coveredBy: 'P7', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'deployment runtime not implemented' },
+  { gate: 'Rollback Gate', coveredBy: 'P7', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'rollback execution path not implemented' },
+  { gate: 'Emergency Stop Gate', coveredBy: 'P8', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'emergency stop runtime not implemented' },
+  { gate: 'Audit Evidence Gate', coveredBy: 'P8', currentMode: 'design-only', runtimeEffect: 'none', realControls: '0', writePath: 'disabled', stageGate: 'Stage C deferred', coverageStatus: 'complete-design', remainingBlocker: 'audit evidence persistence not implemented' },
+];
+
+// ── P9: P1–P8 Design Spec Coverage Audit ──
+
+export interface CoverageAuditEntry {
+  pack: string;
+  scope: string;
+  designSpec: string;
+  dataModel: string;
+  boundary: string;
+  evidence: string;
+  rollback: string;
+  runtimeControl: string;
+  status: string;
+}
+
+export const COVERAGE_AUDIT_MATRIX: CoverageAuditEntry[] = [
+  { pack: 'P1', scope: 'Governance model + Stage C design spec', designSpec: 'yes', dataModel: 'yes', boundary: 'yes', evidence: 'partial', rollback: 'partial', runtimeControl: 'no', status: 'complete-design' },
+  { pack: 'P3', scope: 'Approval gate', designSpec: 'yes', dataModel: 'yes', boundary: 'yes', evidence: 'yes', rollback: 'yes', runtimeControl: 'no', status: 'complete-design' },
+  { pack: 'P4', scope: 'Mutation gate', designSpec: 'yes', dataModel: 'yes', boundary: 'yes', evidence: 'yes', rollback: 'yes', runtimeControl: 'no', status: 'complete-design' },
+  { pack: 'P5', scope: 'Execution gate', designSpec: 'yes', dataModel: 'yes', boundary: 'yes', evidence: 'yes', rollback: 'yes', runtimeControl: 'no', status: 'complete-design' },
+  { pack: 'P6', scope: 'External write gate + connector write policy', designSpec: 'yes', dataModel: 'yes', boundary: 'yes', evidence: 'yes', rollback: 'yes', runtimeControl: 'no', status: 'complete-design' },
+  { pack: 'P7', scope: 'Deployment gate + rollback gate', designSpec: 'yes', dataModel: 'yes', boundary: 'yes', evidence: 'yes', rollback: 'yes', runtimeControl: 'no', status: 'complete-design' },
+  { pack: 'P8', scope: 'Emergency stop gate + audit evidence gate', designSpec: 'yes', dataModel: 'yes', boundary: 'yes', evidence: 'yes', rollback: 'yes', runtimeControl: 'no', status: 'complete-design' },
+];
+
+// ── P9: Stage C Readiness Blocker Matrix ──
+
+export interface StageCBlockerEntry {
+  blocker: string;
+  category: string;
+  currentState: string;
+  requiredFutureWork: string;
+  riskIfIgnored: string;
+  activationImpact: string;
+}
+
+export const STAGE_C_BLOCKER_MATRIX: StageCBlockerEntry[] = [
+  { blocker: 'Runtime authorization model missing', category: 'auth', currentState: 'not implemented', requiredFutureWork: 'implement approval/reject runtime model', riskIfIgnored: 'unauthorized gate bypass', activationImpact: 'blocking' },
+  { blocker: 'Persistent governance state not implemented', category: 'persistence', currentState: 'not implemented', requiredFutureWork: 'add governance state DB + API', riskIfIgnored: 'no audit trail', activationImpact: 'blocking' },
+  { blocker: 'Approval storage not implemented', category: 'persistence', currentState: 'not implemented', requiredFutureWork: 'add approval table + evidence store', riskIfIgnored: 'no approval record', activationImpact: 'blocking' },
+  { blocker: 'Audit evidence persistence not implemented', category: 'persistence', currentState: 'not implemented', requiredFutureWork: 'add evidence storage + integrity', riskIfIgnored: 'no audit evidence', activationImpact: 'blocking' },
+  { blocker: 'Rollback execution path not implemented', category: 'runtime', currentState: 'not implemented', requiredFutureWork: 'implement rollback runtime engine', riskIfIgnored: 'unrecoverable deployment failure', activationImpact: 'blocking' },
+  { blocker: 'Dry-run engine not implemented', category: 'runtime', currentState: 'not implemented', requiredFutureWork: 'add dry-run simulation engine', riskIfIgnored: 'unvalidated execution', activationImpact: 'blocking' },
+  { blocker: 'External write sandbox not implemented', category: 'runtime', currentState: 'not implemented', requiredFutureWork: 'add external write sandbox + policy engine', riskIfIgnored: 'uncontrolled external write', activationImpact: 'blocking' },
+  { blocker: 'Emergency stop runtime not implemented', category: 'runtime', currentState: 'not implemented', requiredFutureWork: 'add emergency stop + service control runtime', riskIfIgnored: 'no emergency response', activationImpact: 'blocking' },
+  { blocker: 'Manual approval policy not finalized', category: 'policy', currentState: 'not finalized', requiredFutureWork: 'finalize manual approval policy + procedure', riskIfIgnored: 'unclear approval flow', activationImpact: 'delaying' },
+  { blocker: 'Security review not completed', category: 'security', currentState: 'not completed', requiredFutureWork: 'complete security review + penetration test', riskIfIgnored: 'security vulnerability', activationImpact: 'blocking' },
+  { blocker: 'Live smoke environment not validated', category: 'qa', currentState: 'not validated', requiredFutureWork: 'validate smoke environment + test suite', riskIfIgnored: 'undetected integration failure', activationImpact: 'delaying' },
+  { blocker: 'Operator training not completed', category: 'ops', currentState: 'not completed', requiredFutureWork: 'complete operator training + runbook', riskIfIgnored: 'operator error', activationImpact: 'delaying' },
+  { blocker: 'Final activation audit not completed', category: 'audit', currentState: 'not completed', requiredFutureWork: 'complete final activation audit + sign-off', riskIfIgnored: 'unreviewed activation risk', activationImpact: 'blocking' },
+];
+
+// ── P9: Missing Gate / Overlap / Duplicate Audit ──
+
+export interface MissingGateAuditEntry {
+  area: string;
+  covered: string;
+  notes: string;
+}
+
+export const MISSING_GATE_AUDIT: MissingGateAuditEntry[] = [
+  { area: 'Approval coverage', covered: 'yes (P3)', notes: 'design-only, no runtime' },
+  { area: 'Mutation coverage', covered: 'yes (P4)', notes: 'design-only, no runtime' },
+  { area: 'Execution coverage', covered: 'yes (P5)', notes: 'design-only, no runtime' },
+  { area: 'External write coverage', covered: 'yes (P6)', notes: 'design-only, no runtime' },
+  { area: 'Connector write coverage', covered: 'yes (P6)', notes: 'design-only, no runtime' },
+  { area: 'Deployment coverage', covered: 'yes (P7)', notes: 'design-only, no runtime' },
+  { area: 'Rollback coverage', covered: 'yes (P7)', notes: 'design-only, no runtime' },
+  { area: 'Emergency stop coverage', covered: 'yes (P8)', notes: 'design-only, no runtime' },
+  { area: 'Audit evidence coverage', covered: 'yes (P8)', notes: 'design-only, no runtime' },
+];
+
+export const MISSING_GATE_STATS = {
+  missingGateCount: 0,
+  overlapConcernCount: 1,
+  duplicateConcernCount: 0,
+  acceptedOverlap: 'evidence shared across gates (execution, external write, deployment, rollback, emergency stop, audit evidence)',
+  acceptedByDesign: true,
+  reason: 'shared evidence contract — all gates reference the same audit evidence model',
+  requiresFollowUp: false,
+} as const;
+
+// ── P9: Cross-Gate Dependency Matrix ──
+
+export interface CrossGateDependencyEntry {
+  sourceGate: string;
+  dependentGate: string;
+  dependencyReason: string;
+  currentMode: string;
+  runtimeEffect: string;
+  futureRequirement: string;
+}
+
+export const CROSS_GATE_DEPENDENCIES: CrossGateDependencyEntry[] = [
+  { sourceGate: 'Approval Gate', dependentGate: 'Mutation / Execution / External Write / Deployment', dependencyReason: 'approval required before gate action', currentMode: 'design-only', runtimeEffect: 'none', futureRequirement: 'implement approval runtime' },
+  { sourceGate: 'Mutation Gate', dependentGate: 'Write actions', dependencyReason: 'mutation gate must pass before write', currentMode: 'design-only', runtimeEffect: 'none', futureRequirement: 'implement mutation runtime' },
+  { sourceGate: 'Execution Gate', dependentGate: 'Runtime action', dependencyReason: 'execution gate must pass before run', currentMode: 'design-only', runtimeEffect: 'none', futureRequirement: 'implement dry-run + execution' },
+  { sourceGate: 'External Write Gate', dependentGate: 'Connector write / Upload / Sync', dependencyReason: 'external write gate must pass before external IO', currentMode: 'design-only', runtimeEffect: 'none', futureRequirement: 'implement write sandbox' },
+  { sourceGate: 'Deployment Gate', dependentGate: 'Build evidence + Approval', dependencyReason: 'deployment gate requires evidence + approval', currentMode: 'design-only', runtimeEffect: 'none', futureRequirement: 'implement deployment runtime' },
+  { sourceGate: 'Rollback Gate', dependentGate: 'Deployment', dependencyReason: 'rollback plan required before deployment', currentMode: 'design-only', runtimeEffect: 'none', futureRequirement: 'implement rollback runtime' },
+  { sourceGate: 'Emergency Stop Gate', dependentGate: 'Runtime control', dependencyReason: 'emergency stop gate required before any runtime control', currentMode: 'design-only', runtimeEffect: 'none', futureRequirement: 'implement stop runtime' },
+  { sourceGate: 'Audit Evidence Gate', dependentGate: 'All Stage C actions', dependencyReason: 'audit evidence required across all Stage C actions', currentMode: 'design-only', runtimeEffect: 'none', futureRequirement: 'implement evidence persistence' },
+];
+
+// ── P9: Control Boundary Final Matrix ──
+
+export interface ControlBoundaryFinalEntry {
+  controlArea: string;
+  count: string;
+  status: string;
+}
+
+export const CONTROL_BOUNDARY_FINAL: ControlBoundaryFinalEntry[] = [
+  { controlArea: 'Approval / Reject controls', count: '0', status: 'disabled' },
+  { controlArea: 'Mutation / Write controls', count: '0', status: 'disabled' },
+  { controlArea: 'Execution / Run controls', count: '0', status: 'disabled' },
+  { controlArea: 'External write / Upload / Sync controls', count: '0', status: 'disabled' },
+  { controlArea: 'Deployment / Release / Tag controls', count: '0', status: 'disabled' },
+  { controlArea: 'Rollback / Restore controls', count: '0', status: 'disabled' },
+  { controlArea: 'Emergency Stop / Kill / Restart controls', count: '0', status: 'disabled' },
+  { controlArea: 'Audit Evidence Write / Export controls', count: '0', status: 'disabled' },
+  { controlArea: 'DB write paths', count: '0', status: 'disabled' },
+  { controlArea: 'External system writes', count: '0', status: 'disabled' },
+  { controlArea: 'Memory Hub candidate mutations', count: '0', status: 'disabled' },
+  { controlArea: 'LAN_SHARE sync paths', count: '0', status: 'disabled' },
+  { controlArea: 'Training / inference triggers', count: '0', status: 'disabled' },
+];

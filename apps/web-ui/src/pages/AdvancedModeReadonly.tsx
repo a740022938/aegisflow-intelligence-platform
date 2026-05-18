@@ -75,6 +75,11 @@ import {
   AUDIT_EVIDENCE_RETENTION_ROWS,
   EMERGENCY_STOP_AUDIT_GUARDRAIL_MATRIX,
   EMERGENCY_STOP_AUDIT_LIFECYCLE_STAGES,
+  GATE_COVERAGE_OVERVIEW,
+  COVERAGE_AUDIT_MATRIX,
+  STAGE_C_BLOCKER_MATRIX,
+  CROSS_GATE_DEPENDENCIES,
+  CONTROL_BOUNDARY_FINAL,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -301,7 +306,7 @@ export default function AdvancedModeReadonly() {
       versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -853,10 +858,35 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── P3 + P4 + P5 + P6 + P7 + P8 Control Room Safety Notice ── */}
+      {/* ── v7.23.0-P9 Gate Coverage Closure Audit Bridge ── */}
+      <SectionCard title="Gate Coverage Closure Audit Bridge" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="P9 Audit pack" value="closure" color="#8B5CF6" />
+          <KpiCard label="Gates covered" value={String(GATE_COVERAGE_OVERVIEW.length)} color="#8B5CF6" />
+          <KpiCard label="Design packages" value={String(COVERAGE_AUDIT_MATRIX.length)} color="#8B5CF6" />
+          <KpiCard label="Missing gates" value="0" color="var(--success)" />
+          <KpiCard label="Activation blockers" value={String(STAGE_C_BLOCKER_MATRIX.length)} color="var(--danger)" />
+          <KpiCard label="Blocking items" value={String(STAGE_C_BLOCKER_MATRIX.filter(b => b.activationImpact === 'blocking').length)} color="var(--danger)" />
+          <KpiCard label="Delaying items" value={String(STAGE_C_BLOCKER_MATRIX.filter(b => b.activationImpact === 'delaying').length)} color="#F97316" />
+          <KpiCard label="Cross-gate deps" value={String(CROSS_GATE_DEPENDENCIES.length)} color="#8B5CF6" />
+          <KpiCard label="Control areas" value={String(CONTROL_BOUNDARY_FINAL.length)} color="var(--success)" />
+          <KpiCard label="Control total" value="0" color="var(--success)" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+          <KpiCard label="Stage C ready" value="false" color="var(--danger)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Gate Coverage Closure Audit →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep Stage C disabled — not ready for activation</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          P9 Gate Coverage Closure Audit = <strong>audit-only closure pack</strong>. Gates covered = <strong>{GATE_COVERAGE_OVERVIEW.length}</strong> (all design-only). Design packages = <strong>{COVERAGE_AUDIT_MATRIX.length}</strong> (all complete-design, runtimeControl=no). Missing gates = <strong>0</strong>. Overlap/duplicate = <strong>0</strong>. Activation blockers = <strong>{STAGE_C_BLOCKER_MATRIX.length}</strong> (blocking={String(STAGE_C_BLOCKER_MATRIX.filter(b => b.activationImpact === 'blocking').length)}, delaying={String(STAGE_C_BLOCKER_MATRIX.filter(b => b.activationImpact === 'delaying').length)}). Cross-gate dependencies = <strong>{CROSS_GATE_DEPENDENCIES.length}</strong> (all design-only). Control areas = <strong>{CONTROL_BOUNDARY_FINAL.length}</strong> (all count=0, disabled). Stage C enabled = <strong>false</strong>. Stage C ready = <strong>false</strong>. Recommended next = <strong>keep Stage C disabled — no activation package has been created.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── P3 + P4 + P5 + P6 + P7 + P8 + P9 Control Room Safety Notice ── */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>P3 + P4 + P5 + P6 + P7 + P8 Control Room & Governance safety notice:</strong><br />
-        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. All panels are governance-safe display only.
+        <strong>P3 + P4 + P5 + P6 + P7 + P8 + P9 Control Room & Governance safety notice:</strong><br />
+        This is a <u>readonly control room / system overview</u>. All data is from static registries. Does not change Layout, sidebar, routes, or enable Stage C. No DB writes, no external calls, no candidate mutation, no LAN sync, no service control, no tag/release, no version mutation, no real control buttons, no experiment execution, no training, no inference, no approval/reject controls, no external write, no connector write, no upload, no deploy, no push, no rollback, no restore, no emergency stop, no pause, no kill, no taskkill, no restart, no disable, no shutdown, no audit evidence write/upload/export/persist. P9 Gate Coverage Closure Audit does not enable Stage C — all blockers remain unresolved. All panels are governance-safe display only.
       </div>
 
       {/* Boundary Notice */}

@@ -48,6 +48,12 @@ import AuditEvidenceGateDesignSpec from '../components/governance/AuditEvidenceG
 import AuditEvidenceRetentionMatrix from '../components/governance/AuditEvidenceRetentionMatrix';
 import EmergencyStopAuditGuardrailMatrix from '../components/governance/EmergencyStopAuditGuardrailMatrix';
 import EmergencyStopAuditLifecycleDesign from '../components/governance/EmergencyStopAuditLifecycleDesign';
+import GateCoverageOverview from '../components/governance/GateCoverageOverview';
+import GateCoverageAuditMatrix from '../components/governance/GateCoverageAuditMatrix';
+import StageCReadinessBlockerMatrix from '../components/governance/StageCReadinessBlockerMatrix';
+import CrossGateDependencyMatrix from '../components/governance/CrossGateDependencyMatrix';
+import ControlBoundaryFinalMatrix from '../components/governance/ControlBoundaryFinalMatrix';
+import StageCNonReadinessStatement from '../components/governance/StageCNonReadinessStatement';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -300,10 +306,10 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.23.0-P8"
+      versionLabel="AIP v7.23.0-P9"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only"
+      safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · External Write Gate design-only · Deployment Gate design-only · Rollback Gate design-only · Emergency Stop Gate design-only · Audit Evidence Gate design-only · P9 Gate Coverage Closure Audit · Stage C not ready · No runtime enablement"
     >
       {/* Governance Summary Hero */}
       <SectionCard title="Governance Center Overview" style={{ marginBottom: 20 }}>
@@ -462,6 +468,11 @@ export default function GovernanceCenter() {
             { label: 'Evidence retention rows', value: '8', color: '#3B82F6' },
             { label: 'Emergency/audit guardrails', value: '8', color: '#EF4444' },
             { label: 'Emergency/audit stages', value: '11', color: '#EF4444' },
+            { label: 'P9 — Gates covered', value: '9', color: '#8B5CF6' },
+            { label: 'P9 — Design packages', value: '7', color: '#8B5CF6' },
+            { label: 'P9 — Activation blockers', value: '13', color: 'var(--danger)' },
+            { label: 'P9 — Missing gates', value: '0', color: 'var(--success)' },
+            { label: 'P9 — Control count total', value: '0', color: 'var(--success)' },
           ].map(k => (
             <div key={k.label} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 10px', textAlign: 'center' }}>
               <div style={{ fontSize: 8, color: 'var(--text-muted)', marginBottom: 1 }}>{k.label}</div>
@@ -693,6 +704,32 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Emergency Stop + Audit Lifecycle Design" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
         <EmergencyStopAuditLifecycleDesign />
+      </SectionCard>
+
+      {/* ── v7.23.0-P9 Gate Coverage Closure Audit Sections ── */}
+
+      <SectionCard title="Gate Coverage Overview (P9)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <GateCoverageOverview />
+      </SectionCard>
+
+      <SectionCard title="P1–P8 Design Spec Coverage Audit (P9)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <GateCoverageAuditMatrix />
+      </SectionCard>
+
+      <SectionCard title="Stage C Readiness Blocker Matrix (P9)" style={{ marginBottom: 20, border: '1px solid #EF4444' }}>
+        <StageCReadinessBlockerMatrix />
+      </SectionCard>
+
+      <SectionCard title="Cross-Gate Dependency Matrix (P9)" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <CrossGateDependencyMatrix />
+      </SectionCard>
+
+      <SectionCard title="Control Boundary Final Matrix (P9)" style={{ marginBottom: 20, border: '1px solid var(--success)' }}>
+        <ControlBoundaryFinalMatrix />
+      </SectionCard>
+
+      <SectionCard title="Stage C Activation Non-Readiness Statement (P9)" style={{ marginBottom: 20, border: '2px solid #EF4444' }}>
+        <StageCNonReadinessStatement />
       </SectionCard>
 
       {/* Related Routes */}
