@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import PageShell from '../components/ui/PageShell';
 import SectionCard from '../components/ui/SectionCard';
 import {
@@ -54,6 +54,9 @@ import {
   getNavigationExposureSafetySummary,
   getNavigationExposureSummary,
 } from '../registry/navigation-exposure-registry';
+import CenterLaunchpadOverview from '../components/advanced/CenterLaunchpadOverview';
+import CenterLaunchpadCard from '../components/advanced/CenterLaunchpadCard';
+import CenterLaunchpadDecisionPath from '../components/advanced/CenterLaunchpadDecisionPath';
 import type { NavigationExposureEntry, NavigationExposureLevel, NavigationExposureRisk } from '../registry/navigation-exposure-registry';
 import type { CenterAccessItem, CenterAccessKind, CenterAccessRisk } from '../registry/center-access-registry';
 import type { AdvancedPlaceholderItem, AdvancedPlaceholderDecision } from '../registry/advanced-placeholder-registry';
@@ -205,6 +208,7 @@ function LaunchpadCenterCard({ center }: { center: CenterAccessItem }) {
 }
 
 export default function AdvancedModeReadonly() {
+  const [centerFilter, setCenterFilter] = useState<string>('all');
   const stats = useMemo(() => getNavigationExposureStats(), []);
   const centerItems = useMemo(() => CENTER_ACCESS_REGISTRY, []);
   const readinessSummary = useMemo(() => getCenterAccessFinalReadinessSummary(), []);
@@ -254,11 +258,11 @@ export default function AdvancedModeReadonly() {
   return (
     <PageShell
       title="高级模式入口总控"
-      subtitle="只读查看中心入口、隐藏路由与 Advanced placeholder 的曝光状态；本页面不启用高级模式，不改变导航。"
-      versionLabel="AIP v7.21.0-P4a"
+      subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
+      versionLabel="AIP v7.22.0-P1"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="只读总控 · 不改变菜单 · 不启用 Stage C · 不执行高风险动作"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -324,99 +328,68 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── A4. Center Launchpad Preview ── */}
-      <SectionCard title="中心入口预览 (Center Launchpad Preview)" style={{ marginBottom: 20, border: '1px solid var(--secondary)' }}>
-        <div style={{ padding: '6px 10px', marginBottom: 8, borderRadius: 4, background: 'rgba(139,92,246,0.08)', fontSize: 10, color: '#8B5CF6' }}>
-          当前中心入口策略预览。不改变 Layout，不改变左侧菜单，不新增 route，不移动菜单。
+      {/* ── A4. Center Launchpad Preview (enhanced v7.22.0-P1) ── */}
+      <SectionCard title="Center Launchpad Preview" style={{ marginBottom: 20, border: '1px solid var(--secondary)' }}>
+        <CenterLaunchpadOverview />
+        {/* Filter tabs */}
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+          {[
+            { key: 'all', label: 'All centers' },
+            { key: 'sidebar', label: 'Sidebar' },
+            { key: 'launchpad_only', label: 'Launchpad only' },
+            { key: 'governance_gated', label: 'Governance gated' },
+            { key: 'readonly_preview', label: 'Readonly preview' },
+          ].map(f => (
+            <button
+              key={f.key}
+              onClick={() => setCenterFilter(f.key)}
+              style={{
+                padding: '4px 12px', borderRadius: 14, border: 'none',
+                fontSize: 10, fontWeight: 600, cursor: 'pointer',
+                background: centerFilter === f.key ? '#8B5CF6' : 'rgba(139,92,246,0.1)',
+                color: centerFilter === f.key ? '#fff' : '#8B5CF6',
+              }}
+            >{f.label}</button>
+          ))}
         </div>
-        {/* Summary Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 10, marginBottom: 16 }}>
-          <KpiCard label="总中心" value={String(centerItems.length)} color="var(--primary)" />
-          <KpiCard label="已入菜单" value={String(centerSummary.sidebarVisible)} color="var(--success)" />
-          <KpiCard label="启动台可见" value={String(centerSummary.launchpadVisible)} color="#8B5CF6" />
-          <KpiCard label="高级中心可见" value={String(centerSummary.advancedHubVisible)} color="#F97316" />
-          <KpiCard label="高风险主菜单" value={String(centerSummary.highRiskPrimaryNav)} color={centerSummary.highRiskPrimaryNav > 0 ? 'var(--danger)' : 'var(--success)'} />
-          <KpiCard label="Stage C 主菜单" value={String(stageCPrimaryNav)} color={stageCPrimaryNav > 0 ? 'var(--danger)' : 'var(--success)'} />
-          <KpiCard label="Validator B/W/I" value={`${validatorBlocking}/${validatorWarning}/${validatorInfo}`} color={validatorBlocking > 0 ? 'var(--danger)' : validatorWarning > 0 ? 'var(--warning)' : 'var(--success)'} />
-        </div>
-        {/* Center Cards */}
-        {centerItems.map(c => <LaunchpadCenterCard key={c.id} center={c} />)}
-        {/* Access Level Matrix */}
-        <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>Access Level 矩阵</div>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 10, fontSize: 10 }}>
-            <Badge label={`已对齐: ${centerItems.filter(c => c.accessLevel === c.recommendedAccessLevel).length}/${centerItems.length}`} color="var(--success)" />
-            <Badge label={`待迁移: ${centerItems.filter(c => c.accessLevel !== c.recommendedAccessLevel).length}/${centerItems.length}`} color="var(--warning)" />
-            <span style={{ color: 'var(--text-muted)', lineHeight: '20px' }}>
-              {centerItems.filter(c => c.accessLevel !== c.recommendedAccessLevel).map(c => c.name).join(', ') || '全部已对齐'}
-            </span>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 6, fontSize: 10 }}>
-            {Object.entries(ACCESS_LEVEL_LABELS).map(([level, label]) => {
-              const current = centerItems.filter(c => c.accessLevel === level);
-              const recommended = centerItems.filter(c => c.recommendedAccessLevel === level);
-              if (current.length === 0 && recommended.length === 0) return null;
-              return <div key={level} style={{ padding: '8px', borderRadius: 4, border: `1px solid ${ACCESS_LEVEL_COLORS[level] || 'var(--border)'}`, background: 'rgba(139,92,246,0.04)' }}>
-                <div style={{ fontWeight: 600, color: ACCESS_LEVEL_COLORS[level], marginBottom: 4, fontSize: 12 }}>{label}</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                  <div>
-                    <div style={{ color: 'var(--text-muted)', marginBottom: 1, fontSize: 9 }}>当前 ({current.length})</div>
-                    {current.length > 0 ? current.map(c => {
-                      const diff = c.accessLevel !== c.recommendedAccessLevel;
-                      return <div key={c.id} style={{ padding: '1px 0', color: diff ? 'var(--warning)' : 'var(--success)', fontWeight: diff ? 600 : 400 }}>
-                        {c.name}{diff ? ' →' : ''}
-                      </div>;
-                    }) : <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>无</div>}
-                  </div>
-                  <div>
-                    <div style={{ color: 'var(--text-muted)', marginBottom: 1, fontSize: 9 }}>推荐 ({recommended.length})</div>
-                    {recommended.length > 0 ? recommended.map(c => <div key={c.id} style={{ color: '#8B5CF6' }}>{c.name}</div>)
-                      : <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>无</div>}
-                  </div>
-                </div>
-              </div>;
-            })}
-          </div>
-        </div>
-        {/* Exposure Decision Panel */}
-        <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>曝光决策面板 (Exposure Decision Panel)</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-            {Object.entries(DECISION_LABELS).map(([decision, label]) => {
-              const count = centerItems.filter(c => c.exposureDecision === decision).length;
-              return <Badge key={decision} label={`${label} ${count}`} color={count > 0 ? DECISION_COLORS[decision] : '#6B7280'} />;
-            })}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 6, fontSize: 10 }}>
-            {Object.entries(DECISION_LABELS).map(([decision, label]) => {
-              const items = centerItems.filter(c => c.exposureDecision === decision);
-              if (items.length === 0) return null;
-              return <div key={decision} style={{ padding: 8, borderRadius: 4, border: `1px solid ${DECISION_COLORS[decision]}`, background: `rgba(${decision === 'approved' ? '34,197,94' : decision === 'hold' ? '245,158,11' : decision === 'rejected' ? '239,68,68' : '107,114,128'},0.06)` }}>
-                <div style={{ fontWeight: 600, color: DECISION_COLORS[decision], marginBottom: 4, fontSize: 11 }}>{label} ({items.length})</div>
-                {items.map(c => <div key={c.id} style={{ marginBottom: 4, padding: 4, borderRadius: 3, background: 'rgba(255,255,255,0.04)' }}>
-                  <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{c.name}</div>
-                  <div style={{ color: 'var(--text-muted)' }}>阶段: {STAGE_LABELS[c.exposureStage]} | 目标: {c.targetContainer}</div>
-                  <div style={{ color: 'var(--text-secondary)', lineHeight: 1.4, marginTop: 1 }}>{c.exposureReason}</div>
-                </div>)}
-              </div>;
-            })}
-          </div>
-        </div>
-        {/* Exposure Safety Notice */}
+        {/* Grouped cards */}
+        {[
+          { group: 'primary', title: 'Primary Sidebar Centers', filterKey: 'sidebar' },
+          { group: 'connector', title: 'Primary Capability Entry', filterKey: 'sidebar' },
+          { group: 'lab', title: 'Launchpad-Only Centers', filterKey: 'launchpad_only' },
+          { group: 'governance', title: 'Governance / Deferred Centers', filterKey: 'governance_gated' },
+          { group: 'navigation', title: 'Readonly Preview Centers', filterKey: 'readonly_preview' },
+        ].map(({ group, title, filterKey }) => {
+          if (centerFilter !== 'all' && centerFilter !== filterKey) return null;
+          const items = centerItems.filter(c => c.group === group);
+          if (items.length === 0) return null;
+          return (
+            <div key={group} style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, borderBottom: '1px solid var(--border)', paddingBottom: 4 }}>{title} ({items.length})</div>
+              {items.map(c => <CenterLaunchpadCard key={c.id} center={c} />)}
+            </div>
+          );
+        })}
+        {centerFilter === 'all' && centerItems.filter(c => c.group === 'primary').length === 0 && (
+          <div style={{ padding: 12, textAlign: 'center', color: 'var(--text-muted)', fontSize: 11 }}>No centers match current filter.</div>
+        )}
+        {/* Decision Path + Safety Matrix */}
+        <CenterLaunchpadDecisionPath />
+        {/* Safety Notice */}
         <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 4, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-          <strong>只读安全声明：</strong><br />
-          本区块是<u>中心入口预览</u>，数据来源于 center-access-registry（只读元数据）。本区块不改变 Layout，不改变左侧菜单，不新增 route，不移动菜单，不启用 Stage C，不写 DB，不控制外部工具。
+          <strong>Readonly safety notice:</strong><br />
+          This section is a <u>Center Launchpad preview</u>. Data from center-access-registry (readonly metadata). Does not change Layout, sidebar, routes, or enable Stage C. No DB writes. No external control.
         </div>
         {/* Recommended Next Actions */}
         <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>推荐下一步动作</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>Next posture (readonly guidance)</div>
           <ul style={{ margin: 0, paddingLeft: 16, fontSize: 10, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
-            <li>Connector Center — <strong>保持 primary_nav</strong>（已入菜单）</li>
-            <li>Advanced Mode — <strong>保持 primary_nav</strong>（已入菜单）</li>
-            <li>Lab Center — <strong>保持 launchpad_card</strong>（不入菜单）</li>
-            <li>Governance Center — <strong>保持 launchpad_card</strong>（不入菜单）</li>
-            <li>Navigation Preview — <strong>保持 direct_url_only</strong>（不入菜单）</li>
-            <li>Stage C — <strong>deferred</strong>（不启用）</li>
+            <li>Connector Center — <strong>keep primary_nav</strong> (sidebar pilot)</li>
+            <li>Advanced Mode — <strong>keep primary_nav</strong> (sidebar pilot)</li>
+            <li>Lab Center — <strong>keep launchpad_card</strong> (no sidebar)</li>
+            <li>Governance Center — <strong>keep launchpad_card</strong> (no sidebar)</li>
+            <li>Navigation Preview — <strong>keep direct_url_only</strong> (no sidebar)</li>
+            <li>Stage C — <strong>deferred</strong> (not enabled)</li>
           </ul>
         </div>
       </SectionCard>
@@ -590,9 +563,8 @@ export default function AdvancedModeReadonly() {
 
       {/* Boundary Notice */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-        <strong>只读边界声明：</strong><br />
-        本页面是<u>高级模式入口总控页面</u>。所有注册数据为<u>只读元数据</u>。
-        本页面不启用高级模式、不改变左侧菜单、不启用 Stage C、不执行高风险动作、不写数据库。所有 allowedNow=false 的条目仅做只读展示。
+        <strong>Readonly boundary notice:</strong><br />
+        This is a <u>readonly governance launchpad</u>. All registry data is readonly metadata. Does not enable Advanced Mode, change sidebar, enable Stage C, execute high-risk actions, or write to database. All <code>allowedNow=false</code> entries are displayed for readonly assessment only.
       </div>
     </PageShell>
   );
