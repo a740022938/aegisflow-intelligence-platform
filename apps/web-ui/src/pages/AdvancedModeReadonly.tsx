@@ -136,6 +136,14 @@ import {
   SCHEMA_ROLLBACK_PLANNING_ITEMS,
   STORAGE_VALIDATION_CHECKS,
   DB_DOCTOR_EXTENSION_CHECKS,
+  API_IMPLEMENTATION_PHASES,
+  AUTHORIZATION_ENDPOINT_BOUNDARY_ROWS,
+  API_CONTRACT_ROWS,
+  API_HANDLER_RISK_ROWS,
+  API_AUTH_BOUNDARY_ROWS,
+  API_ERROR_FALLBACK_ROWS,
+  API_AUDIT_EVIDENCE_ROWS,
+  API_VALIDATION_CHECKS,
 } from '../components/governance/governanceDesignSpec';
 import {
   getGovernanceRegistrySummary,
@@ -359,10 +367,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6 + P7"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1 + P3 / v7.24.0-P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation · P7 storage schema implementation plan review — design-review-only, no db schema, no migration, no api endpoint, no runtime implementation"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · P9 audit — no enablement · P1 activation planning — planning-only, no activation · P2 auth contract — design-contract-only, no runtime · P3 auth persistence design — design-only, no persistence · P4 auth review policy + decision governance design — design-only, no runtime · P5 activation blocker roadmap + readiness simulation — planning-only, no activation, no implement · P6 implementation boundary + storage/api design review — implementation-boundary-only, no db schema, no api endpoint, no runtime implementation · P7 storage schema implementation plan review — design-review-only, no db schema, no migration, no api endpoint, no runtime implementation · P8 authorization api contract implementation plan review — review-only, no api endpoint, no route, no handler, no db write, no runtime implementation"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
@@ -1125,6 +1133,35 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
           v7.24.0-P7 Storage Schema Implementation Plan Review = <strong>design-review-only</strong>. Schema implementation phases = <strong>{SCHEMA_IMPLEMENTATION_PHASES.length}</strong> (all review-only, No-Go). Authorization table designs = <strong>{AUTHORIZATION_TABLE_DESIGN_ROWS.length}</strong> (all not added, disabled). Migration boundaries = <strong>{MIGRATION_BOUNDARY_ITEMS.length}</strong> (all blocked, not implemented). Schema change risks = <strong>{SCHEMA_CHANGE_RISK_ROWS.length}</strong> (all activeRisk=0, safe). Retention/cleanup policies = <strong>{RETENTION_CLEANUP_POLICY_AREAS.length}</strong> (all none, not implemented). Rollback planning items = <strong>{SCHEMA_ROLLBACK_PLANNING_ITEMS.length}</strong> (all design-only, blocked). Storage validation checks = <strong>{STORAGE_VALIDATION_CHECKS.length}</strong> (most future, baseline available). DB doctor extension checks = <strong>{DB_DOCTOR_EXTENSION_CHECKS.length}</strong> (all not implemented, read-only probes). Overall implementation decision = <strong>No-Go</strong>. Implementation planning allowed = <strong>true</strong>. Runtime execution allowed = <strong>false</strong>. DB schema added = <strong>0</strong>. Migration added = <strong>0</strong>. API endpoints added = <strong>0</strong>. Storage writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>proceed to activation safety review and runtime readiness validation — not implementation.</strong>
+        </div>
+      </SectionCard>
+
+      {/* ── v7.24.0-P8 Authorization API Contract Implementation Plan Review Bridge ── */}
+      <SectionCard title="Authorization API Contract Review Bridge (P8)" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="API implementation phases" value={String(API_IMPLEMENTATION_PHASES.length)} color="#3B82F6" />
+          <KpiCard label="Future API endpoints" value={String(AUTHORIZATION_ENDPOINT_BOUNDARY_ROWS.length)} color="#EF4444" />
+          <KpiCard label="Request/response contracts" value={String(API_CONTRACT_ROWS.length)} color="#14B8A6" />
+          <KpiCard label="Handler risks" value={String(API_HANDLER_RISK_ROWS.length)} color="var(--success)" />
+          <KpiCard label="Auth boundary rows" value={String(API_AUTH_BOUNDARY_ROWS.length)} color="#F59E0B" />
+          <KpiCard label="Error/fallback cases" value={String(API_ERROR_FALLBACK_ROWS.length)} color="#F43F5E" />
+          <KpiCard label="Audit/evidence items" value={String(API_AUDIT_EVIDENCE_ROWS.length)} color="#06B6D4" />
+          <KpiCard label="Validation checks" value={String(API_VALIDATION_CHECKS.length)} color="#6366F1" />
+          <KpiCard label="Overall API decision" value="No-Go" color="#EF4444" />
+          <KpiCard label="API implementation allowed" value="false" color="var(--success)" />
+          <KpiCard label="Endpoint implementation" value="false" color="var(--success)" />
+          <KpiCard label="API endpoints added" value="0" color="var(--success)" />
+          <KpiCard label="Route handlers added" value="0" color="var(--success)" />
+          <KpiCard label="API client mutations" value="0" color="var(--success)" />
+          <KpiCard label="DB write paths" value="0" color="var(--success)" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(59,130,246,0.08)', color: '#3B82F6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Authorization API Contract Plan →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', color: '#EF4444', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep API in review-only — no endpoint implementation</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(59,130,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          v7.24.0-P8 Authorization API Contract Review = <strong>review-only</strong>. API implementation phases = <strong>{API_IMPLEMENTATION_PHASES.length}</strong> (all review-only, No-Go). Future API endpoints = <strong>{AUTHORIZATION_ENDPOINT_BOUNDARY_ROWS.length}</strong> (all not implemented). Request/response contracts = <strong>{API_CONTRACT_ROWS.length}</strong> (all design-only). Handler risks = <strong>{API_HANDLER_RISK_ROWS.length}</strong> (all activeRisk=0, safe). Auth boundary rows = <strong>{API_AUTH_BOUNDARY_ROWS.length}</strong> (all no access, Stage C deferred). Error/fallback cases = <strong>{API_ERROR_FALLBACK_ROWS.length}</strong> (all design-only, future package). Audit/evidence items = <strong>{API_AUDIT_EVIDENCE_ROWS.length}</strong> (all none, disabled). Validation checks = <strong>{API_VALIDATION_CHECKS.length}</strong> (baseline available, future required). Overall API decision = <strong>No-Go</strong>. API implementation allowed = <strong>false</strong>. Endpoint implementation allowed = <strong>false</strong>. API endpoints added = <strong>0</strong>. Route handlers added = <strong>0</strong>. API client mutations = <strong>0</strong>. Request handlers added = <strong>0</strong>. DB schema added = <strong>0</strong>. Migration added = <strong>0</strong>. DB write paths = <strong>0</strong>. External system writes = <strong>0</strong>. Runtime evaluator = <strong>not implemented</strong>. Review workflow = <strong>not implemented</strong>. Decision engine = <strong>not implemented</strong>. Permission evaluator = <strong>not implemented</strong>. Stage C enabled = <strong>false</strong>. Recommended next = <strong>proceed to endpoint implementation plan review — not implementation.</strong>
         </div>
       </SectionCard>
 

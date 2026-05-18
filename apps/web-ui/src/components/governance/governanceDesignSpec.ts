@@ -2676,3 +2676,206 @@ export const DB_DOCTOR_EXTENSION_CHECKS: DbDoctorExtensionCheckEntry[] = [
   { futureCheck: 'Authorization schema drift check', purpose: '检查 authorization schema 与 ORM 模型一致性', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'schema-model mismatch undetected' },
   { futureCheck: 'Authorization migration status check', purpose: '检查 authorization 相关 migration 状态', currentImplementation: 'not implemented', dbReadWriteEffect: 'none — read-only probe', requiredFuturePackage: 'Authorization Persistence Package', riskIfMissing: 'pending migration undetected' },
 ];
+
+// ── v7.24.0-P8: Authorization API Implementation Plan Review ──
+
+export interface ApiImplementationPhaseEntry {
+  phase: string;
+  futurePurpose: string;
+  currentStatus: string;
+  apiImpact: string;
+  dbImpact: string;
+  runtimeImpact: string;
+  dependency: string;
+  requiredValidation: string;
+  goNoGoStatus: string;
+}
+
+export const API_IMPLEMENTATION_PHASES: ApiImplementationPhaseEntry[] = [
+  { phase: 'API contract freeze', futurePurpose: '冻结 API contract 设计，进入 endpoint 草案阶段', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'v7.24.0-P7 schema review', requiredValidation: 'API contract design review sign-off', goNoGoStatus: 'No-Go' },
+  { phase: 'Endpoint ownership review', futurePurpose: '审查 endpoint 所有权归属', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'API contract freeze', requiredValidation: 'ownership matrix review', goNoGoStatus: 'No-Go' },
+  { phase: 'Request schema review', futurePurpose: '审查请求 schema 设计', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'Endpoint ownership review', requiredValidation: 'request schema validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Response schema review', futurePurpose: '审查响应 schema 设计', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'Request schema review', requiredValidation: 'response schema validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Auth requirement review', futurePurpose: '审查认证需求', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'Response schema review', requiredValidation: 'auth requirement validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Permission boundary review', futurePurpose: '审查权限边界', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'Auth requirement review', requiredValidation: 'permission boundary validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Handler risk review', futurePurpose: '审查 handler 风险', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'Permission boundary review', requiredValidation: 'handler risk analysis', goNoGoStatus: 'No-Go' },
+  { phase: 'DB dependency review', futurePurpose: '审查 DB 依赖', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'Handler risk review', requiredValidation: 'DB dependency analysis', goNoGoStatus: 'No-Go' },
+  { phase: 'Audit dependency review', futurePurpose: '审查审计依赖', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'DB dependency review', requiredValidation: 'audit dependency analysis', goNoGoStatus: 'No-Go' },
+  { phase: 'Fallback contract review', futurePurpose: '审查 fallback 契约', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'Audit dependency review', requiredValidation: 'fallback contract validation', goNoGoStatus: 'No-Go' },
+  { phase: 'Final API implementation approval gate', futurePurpose: '最终 API 实施审批门禁', currentStatus: 'review-only', apiImpact: 'none', dbImpact: 'none', runtimeImpact: 'none', dependency: 'Fallback contract review', requiredValidation: 'final approval + go/no-go decision', goNoGoStatus: 'No-Go' },
+];
+
+// ── v7.24.0-P8: Authorization Endpoint Boundary Design ──
+
+export interface AuthorizationEndpointBoundaryEntry {
+  futureEndpoint: string;
+  method: string;
+  futurePurpose: string;
+  currentStatus: string;
+  handlerStatus: string;
+  writeImpact: string;
+  dbDependency: string;
+  authRequirement: string;
+  riskClass: string;
+  requiredValidation: string;
+}
+
+export const AUTHORIZATION_ENDPOINT_BOUNDARY_ROWS: AuthorizationEndpointBoundaryEntry[] = [
+  { futureEndpoint: '/authorization/requests', method: 'POST', futurePurpose: '创建授权请求', currentStatus: 'not implemented', handlerStatus: 'not added', writeImpact: 'disabled', dbDependency: 'authorization_requests', authRequirement: 'reviewer+', riskClass: 'high', requiredValidation: 'request schema review + auth boundary review' },
+  { futureEndpoint: '/authorization/requests/:id', method: 'GET', futurePurpose: '查询授权请求详情', currentStatus: 'not implemented', handlerStatus: 'not added', writeImpact: 'disabled', dbDependency: 'authorization_requests', authRequirement: 'viewer+', riskClass: 'medium', requiredValidation: 'response schema review + permission boundary review' },
+  { futureEndpoint: '/authorization/requests', method: 'GET', futurePurpose: '列出授权请求', currentStatus: 'not implemented', handlerStatus: 'not added', writeImpact: 'disabled', dbDependency: 'authorization_requests', authRequirement: 'viewer+', riskClass: 'medium', requiredValidation: 'response schema review + permission boundary review' },
+  { futureEndpoint: '/authorization/requests/:id/evidence', method: 'POST', futurePurpose: '附加审计证据到授权请求', currentStatus: 'not implemented', handlerStatus: 'not added', writeImpact: 'disabled', dbDependency: 'authorization_evidence_refs', authRequirement: 'reviewer+', riskClass: 'high', requiredValidation: 'evidence schema review + write guard review' },
+  { futureEndpoint: '/authorization/requests/:id/decision', method: 'POST', futurePurpose: '提交授权决策', currentStatus: 'not implemented', handlerStatus: 'not added', writeImpact: 'disabled', dbDependency: 'authorization_decisions', authRequirement: 'approver+', riskClass: 'critical', requiredValidation: 'decision schema review + integrity guard review' },
+  { futureEndpoint: '/authorization/requests/:id/revoke', method: 'POST', futurePurpose: '撤销授权请求', currentStatus: 'not implemented', handlerStatus: 'not added', writeImpact: 'disabled', dbDependency: 'authorization_revocations', authRequirement: 'operator+', riskClass: 'critical', requiredValidation: 'revocation schema review + audit guard review' },
+  { futureEndpoint: '/authorization/audit/:id', method: 'GET', futurePurpose: '查询审计链', currentStatus: 'not implemented', handlerStatus: 'not added', writeImpact: 'disabled', dbDependency: 'authorization_audit_chain', authRequirement: 'auditor+', riskClass: 'high', requiredValidation: 'audit schema review + integrity validation' },
+  { futureEndpoint: '/authorization/policies', method: 'GET', futurePurpose: '列出授权策略', currentStatus: 'not implemented', handlerStatus: 'not added', writeImpact: 'disabled', dbDependency: 'authorization_scopes', authRequirement: 'viewer+', riskClass: 'medium', requiredValidation: 'policy schema review + permission validation' },
+];
+
+// ── v7.24.0-P8: API Request / Response Contract Review ──
+
+export interface ApiContractRowEntry {
+  contractItem: string;
+  futurePurpose: string;
+  requestShapeStatus: string;
+  responseShapeStatus: string;
+  validationStatus: string;
+  currentImplementation: string;
+  riskNote: string;
+  futureRequirement: string;
+}
+
+export const API_CONTRACT_ROWS: ApiContractRowEntry[] = [
+  { contractItem: 'Authorization request create payload', futurePurpose: '创建授权请求的请求体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '无效请求体可能导致错误授权', futureRequirement: 'request schema validation + auth guard' },
+  { contractItem: 'Authorization request detail response', futurePurpose: '授权请求详情的响应体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '响应体泄露敏感信息', futureRequirement: 'response schema validation + permission filter' },
+  { contractItem: 'Authorization request list response', futurePurpose: '授权请求列表的响应体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '列表泄露未授权请求', futureRequirement: 'list response validation + scope filter' },
+  { contractItem: 'Evidence attach payload', futurePurpose: '附加审计证据的请求体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '证据篡改风险', futureRequirement: 'evidence integrity validation + audit guard' },
+  { contractItem: 'Decision record payload', futurePurpose: '提交授权决策的请求体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '决策伪造风险', futureRequirement: 'decision integrity validation + approval guard' },
+  { contractItem: 'Revocation payload', futurePurpose: '撤销授权请求的请求体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '撤销滥用风险', futureRequirement: 'revocation validation + operator guard' },
+  { contractItem: 'Audit chain response', futurePurpose: '审计链查询的响应体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '审计链泄露风险', futureRequirement: 'audit chain validation + integrity check' },
+  { contractItem: 'Policy list response', futurePurpose: '策略列表的响应体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '策略信息泄露', futureRequirement: 'policy response validation + scope filter' },
+  { contractItem: 'Error response', futurePurpose: '通用错误响应体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '错误信息泄露实现细节', futureRequirement: 'error response standardization' },
+  { contractItem: 'Validation failure response', futurePurpose: '校验失败响应体', requestShapeStatus: 'design-only', responseShapeStatus: 'design-only', validationStatus: 'none', currentImplementation: 'none', riskNote: '校验信息泄露业务规则', futureRequirement: 'validation response standardization' },
+];
+
+// ── v7.24.0-P8: API Handler Risk Matrix ──
+
+export interface ApiHandlerRiskEntry {
+  risk: string;
+  currentExposure: string;
+  activeRisk: number;
+  handlerGuardrail: string;
+  futureMitigation: string;
+  status: string;
+}
+
+export const API_HANDLER_RISK_ROWS: ApiHandlerRiskEntry[] = [
+  { risk: 'Unauthorized request creation', currentExposure: 'none — no endpoint', activeRisk: 0, handlerGuardrail: 'no handler registered', futureMitigation: 'auth middleware + request validation', status: 'safe — future mitigation required' },
+  { risk: 'Scope escalation', currentExposure: 'none — no endpoint', activeRisk: 0, handlerGuardrail: 'no permission evaluator', futureMitigation: 'scope enforcement + permission guard', status: 'safe — future mitigation required' },
+  { risk: 'Evidence tampering', currentExposure: 'none — no endpoint', activeRisk: 0, handlerGuardrail: 'no evidence write path', futureMitigation: 'evidence integrity check + audit guard', status: 'safe — future mitigation required' },
+  { risk: 'Decision spoofing', currentExposure: 'none — no endpoint', activeRisk: 0, handlerGuardrail: 'no decision write path', futureMitigation: 'decision integrity + approval guard', status: 'safe — future mitigation required' },
+  { risk: 'Revocation misuse', currentExposure: 'none — no endpoint', activeRisk: 0, handlerGuardrail: 'no revocation write path', futureMitigation: 'revocation policy + operator guard', status: 'safe — future mitigation required' },
+  { risk: 'Audit chain leakage', currentExposure: 'none — no endpoint', activeRisk: 0, handlerGuardrail: 'no audit read path', futureMitigation: 'audit access control + encryption', status: 'safe — future mitigation required' },
+  { risk: 'Expired authorization reuse', currentExposure: 'none — design-only', activeRisk: 0, handlerGuardrail: 'no expiry engine', futureMitigation: 'expiry validation + state check', status: 'safe — future mitigation required' },
+  { risk: 'High-risk action bypass', currentExposure: 'none — no endpoint', activeRisk: 0, handlerGuardrail: 'no high-risk action handler', futureMitigation: 'risk classification + escalation guard', status: 'safe — future mitigation required' },
+  { risk: 'DB write corruption', currentExposure: 'none — no DB write path', activeRisk: 0, handlerGuardrail: 'no ORM write', futureMitigation: 'write validation + integrity check', status: 'safe — future mitigation required' },
+  { risk: 'External write escalation', currentExposure: 'none — no external write', activeRisk: 0, handlerGuardrail: 'no external connector', futureMitigation: 'external write guard + audit', status: 'safe — future mitigation required' },
+  { risk: 'Stage C premature enablement', currentExposure: 'none — Stage C disabled', activeRisk: 0, handlerGuardrail: 'stage gate not met', futureMitigation: 'stage gate check + activation policy', status: 'safe — future mitigation required' },
+];
+
+// ── v7.24.0-P8: API Auth / Permission Boundary Design ──
+
+export interface ApiAuthBoundaryEntry {
+  actor: string;
+  futureApiAccess: string;
+  currentApiAccess: string;
+  permissionEnforcement: string;
+  writePermission: string;
+  decisionPermission: string;
+  stageGate: string;
+  status: string;
+}
+
+export const API_AUTH_BOUNDARY_ROWS: ApiAuthBoundaryEntry[] = [
+  { actor: 'Anonymous access', futureApiAccess: 'none', currentApiAccess: 'none', permissionEnforcement: 'not implemented', writePermission: 'false', decisionPermission: 'false', stageGate: 'Stage C deferred', status: 'safe — no access' },
+  { actor: 'Viewer access', futureApiAccess: 'GET endpoints (read-only)', currentApiAccess: 'none', permissionEnforcement: 'not implemented', writePermission: 'false', decisionPermission: 'false', stageGate: 'Stage C deferred', status: 'safe — no access' },
+  { actor: 'Reviewer access', futureApiAccess: 'POST evidence + GET requests', currentApiAccess: 'none', permissionEnforcement: 'not implemented', writePermission: 'false', decisionPermission: 'false', stageGate: 'Stage C deferred', status: 'safe — no access' },
+  { actor: 'Approver access', futureApiAccess: 'POST decision + POST evidence', currentApiAccess: 'none', permissionEnforcement: 'not implemented', writePermission: 'false', decisionPermission: 'false', stageGate: 'Stage C deferred', status: 'safe — no access' },
+  { actor: 'Operator access', futureApiAccess: 'POST revoke + all reviewer', currentApiAccess: 'none', permissionEnforcement: 'not implemented', writePermission: 'false', decisionPermission: 'false', stageGate: 'Stage C deferred', status: 'safe — no access' },
+  { actor: 'Admin access', futureApiAccess: 'all endpoints', currentApiAccess: 'none', permissionEnforcement: 'not implemented', writePermission: 'false', decisionPermission: 'false', stageGate: 'Stage C deferred', status: 'safe — no access' },
+  { actor: 'System access', futureApiAccess: 'internal endpoints + audit chain', currentApiAccess: 'none', permissionEnforcement: 'not implemented', writePermission: 'false', decisionPermission: 'false', stageGate: 'Stage C deferred', status: 'safe — no access' },
+  { actor: 'External connector access', futureApiAccess: 'restricted connector endpoints', currentApiAccess: 'none', permissionEnforcement: 'not implemented', writePermission: 'false', decisionPermission: 'false', stageGate: 'Stage C deferred', status: 'safe — no access' },
+];
+
+// ── v7.24.0-P8: API Error / Fallback Contract Design ──
+
+export interface ApiErrorFallbackEntry {
+  failureCase: string;
+  futureResponse: string;
+  currentBehavior: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  status: string;
+}
+
+export const API_ERROR_FALLBACK_ROWS: ApiErrorFallbackEntry[] = [
+  { failureCase: 'Missing scope', futureResponse: '403 Forbidden + scope required', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Invalid request payload', futureResponse: '400 Bad Request + validation detail', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Missing evidence', futureResponse: '422 Unprocessable + evidence required', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Unauthorized actor', futureResponse: '401 Unauthorized', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Forbidden scope', futureResponse: '403 Forbidden + scope error', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Stage C disabled', futureResponse: '503 Service Unavailable + stage gate', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Storage unavailable', futureResponse: '503 Service Unavailable', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Decision conflict', futureResponse: '409 Conflict + existing decision', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Expired authorization', futureResponse: '410 Gone + expired detail', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Revoked authorization', futureResponse: '410 Gone + revoked detail', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+  { failureCase: 'Unknown error', futureResponse: '500 Internal Server Error', currentBehavior: 'design-only — no endpoint', runtimeEffect: 'none', writeEffect: 'none', status: 'future package required' },
+];
+
+// ── v7.24.0-P8: API Audit / Evidence Boundary Design ──
+
+export interface ApiAuditEvidenceEntry {
+  auditItem: string;
+  futurePurpose: string;
+  currentImplementation: string;
+  persistence: string;
+  exportUpload: string;
+  writeEffect: string;
+  requiredValidation: string;
+}
+
+export const API_AUDIT_EVIDENCE_ROWS: ApiAuditEvidenceEntry[] = [
+  { auditItem: 'Request creation audit', futurePurpose: '审计授权请求创建', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'audit schema review + persistence guard' },
+  { auditItem: 'Evidence attachment audit', futurePurpose: '审计证据附加操作', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'evidence audit review + integrity guard' },
+  { auditItem: 'Decision audit', futurePurpose: '审计授权决策', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'decision audit review + approval guard' },
+  { auditItem: 'Revocation audit', futurePurpose: '审计撤销操作', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'revocation audit review + operator guard' },
+  { auditItem: 'Expiry audit', futurePurpose: '审计过期处理', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'expiry audit review + scheduler guard' },
+  { auditItem: 'Scope audit', futurePurpose: '审计权限范围变更', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'scope audit review + permission guard' },
+  { auditItem: 'Risk classification audit', futurePurpose: '审计风险分类', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'risk audit review + classification guard' },
+  { auditItem: 'Fallback audit', futurePurpose: '审计 fallback 行为', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'fallback audit review + error guard' },
+  { auditItem: 'Manual reviewer note audit', futurePurpose: '审计人工审查备注', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'reviewer note audit + integrity guard' },
+  { auditItem: 'Final closure audit', futurePurpose: '审计最终关闭操作', currentImplementation: 'none', persistence: 'disabled', exportUpload: 'disabled', writeEffect: 'none', requiredValidation: 'closure audit review + finality guard' },
+];
+
+// ── v7.24.0-P8: API Validation Plan ──
+
+export interface ApiValidationCheckEntry {
+  validationCheck: string;
+  currentAvailability: string;
+  futureRequirement: string;
+  runtimeEffect: string;
+  writeEffect: string;
+  status: string;
+}
+
+export const API_VALIDATION_CHECKS: ApiValidationCheckEntry[] = [
+  { validationCheck: 'Route registration review', currentAvailability: 'available now', futureRequirement: 'ensure no unauthorized route added', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+  { validationCheck: 'Handler no-op boundary review', currentAvailability: 'available now', futureRequirement: 'ensure handler is no-op / disabled', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+  { validationCheck: 'Request schema validation future', currentAvailability: 'not available (future)', futureRequirement: 'request schema lint + validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Response schema validation future', currentAvailability: 'not available (future)', futureRequirement: 'response schema lint + validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Auth middleware validation future', currentAvailability: 'not available (future)', futureRequirement: 'auth middleware + token validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Permission evaluator validation future', currentAvailability: 'not available (future)', futureRequirement: 'permission evaluator + scope guard', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'DB write guard validation future', currentAvailability: 'not available (future)', futureRequirement: 'DB write guard + ORM validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Audit write guard validation future', currentAvailability: 'not available (future)', futureRequirement: 'audit write guard + integrity validation', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available / future required' },
+  { validationCheck: 'Secret scan validation', currentAvailability: 'available now', futureRequirement: 'ensure no secret in API contract files', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+  { validationCheck: 'Build/typecheck/lint validation', currentAvailability: 'available now', futureRequirement: 'ensure API contract does not break build', runtimeEffect: 'none', writeEffect: 'none', status: 'baseline available' },
+];
