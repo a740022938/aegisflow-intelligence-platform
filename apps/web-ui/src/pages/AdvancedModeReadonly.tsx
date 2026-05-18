@@ -90,6 +90,22 @@ const READINESS_COLORS: Record<string, string> = {
   ready: 'var(--success)', preview_ready: 'var(--warning)', hold_review: 'var(--danger)', blocked: '#6B7280',
 };
 
+const DECISION_COLORS: Record<string, string> = {
+  approved: 'var(--success)', hold: 'var(--warning)', rejected: 'var(--danger)', deferred: '#6B7280',
+};
+
+const STAGE_COLORS: Record<string, string> = {
+  design: '#8B5CF6', pilot: '#F97316', stable: 'var(--success)', retired: '#6B7280',
+};
+
+const DECISION_LABELS: Record<string, string> = {
+  approved: '已批准', hold: '暂持', rejected: '已拒绝', deferred: '已推迟',
+};
+
+const STAGE_LABELS: Record<string, string> = {
+  design: '设计阶段', pilot: '试点阶段', stable: '稳定阶段', retired: '已退役',
+};
+
 function Badge({ label, color }: { label: string; color?: string }) {
   return <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600, color: '#fff', background: color || '#6B7280', lineHeight: '16px', whiteSpace: 'nowrap' }}>{label}</span>;
 }
@@ -150,17 +166,22 @@ function EntryGroup({ title, entries }: { title: string; entries: NavigationExpo
 }
 
 function LaunchpadCenterCard({ center }: { center: CenterAccessItem }) {
+  const needsTransition = center.accessLevel !== center.recommendedAccessLevel;
   return <div style={{ padding: 12, borderRadius: 8, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderLeft: `3px solid ${RISK_COLORS[center.risk]}`, fontSize: 11, marginBottom: 8 }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 4 }}>
       <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 13 }}>{center.name}</span>
       <Badge label={center.accessLevel} color={ACCESS_LEVEL_COLORS[center.accessLevel] || '#6B7280'} />
-      <Badge label={`→ ${center.recommendedAccessLevel}`} color={ACCESS_LEVEL_COLORS[center.recommendedAccessLevel] || '#6B7280'} />
+      {needsTransition && <Badge label={`→ ${center.recommendedAccessLevel}`} color={ACCESS_LEVEL_COLORS[center.recommendedAccessLevel] || '#6B7280'} />}
       <Badge label={center.risk} color={RISK_COLORS[center.risk]} />
+      <Badge label={DECISION_LABELS[center.exposureDecision]} color={DECISION_COLORS[center.exposureDecision]} />
+      <Badge label={STAGE_LABELS[center.exposureStage]} color={STAGE_COLORS[center.exposureStage]} />
       {center.visibleInSidebar ? <Badge label="已入菜单" color="var(--success)" /> : <Badge label="未入菜单" color="var(--warning)" />}
       {center.launchpadVisible && <Badge label="启动台可见" color="var(--success)" />}
       {center.advancedHubVisible && <Badge label="高级中心可见" color="#F97316" />}
     </div>
-    <div style={{ color: 'var(--text-secondary)', marginBottom: 2 }}>路由: {center.route} | owner: {center.owner} | maturity: {center.maturity}</div>
+    <div style={{ color: 'var(--text-secondary)', marginBottom: 2 }}>路由: {center.route} | {center.targetContainer} | owner: {center.owner} | maturity: {center.maturity}</div>
+    <div style={{ color: 'var(--text-secondary)', marginBottom: 2, fontSize: 10 }}>影响: {center.userImpact}</div>
+    {center.statusBadges.length > 0 && <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 2 }}>{center.statusBadges.map(s => <Badge key={s} label={s} color="#6B7280" />)}</div>}
     <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 2 }}>
       {center.safetyBoundary.map(s => <Badge key={s} label={s} color="#6B7280" />)}
     </div>
@@ -168,6 +189,16 @@ function LaunchpadCenterCard({ center }: { center: CenterAccessItem }) {
       <span style={{ color: 'var(--text-muted)' }}>qualityGate: </span>
       {Object.entries(center.qualityGate).map(([k, v]) => <Badge key={k} label={`${k}=${v}`} color={v ? 'var(--success)' : 'var(--danger)'} />)}
     </div>
+    {center.releaseGate.length > 0 && <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 2 }}>
+      <span style={{ color: 'var(--text-muted)' }}>releaseGate: </span>
+      {center.releaseGate.map(g => <Badge key={g} label={g} color="#6B7280" />)}
+    </div>}
+    {needsTransition && <div style={{ marginBottom: 2 }}>
+      <div style={{ fontSize: 9, color: 'var(--warning)', marginBottom: 1 }}>待迁移: {center.accessLevel} → {center.recommendedAccessLevel}</div>
+      <div style={{ height: 4, borderRadius: 2, background: 'var(--border)', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: '40%', borderRadius: 2, background: 'var(--warning)' }} />
+      </div>
+    </div>}
     <div style={{ marginTop: 2, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{center.exposureReason}</div>
     <div style={{ marginTop: 2, color: 'var(--text-muted)', fontStyle: 'italic' }}>回滚: {center.rollbackPlan}</div>
   </div>;
@@ -224,7 +255,7 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="只读查看中心入口、隐藏路由与 Advanced placeholder 的曝光状态；本页面不启用高级模式，不改变导航。"
-      versionLabel="AIP v7.21.0-P4"
+      versionLabel="AIP v7.21.0-P4a"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="只读总控 · 不改变菜单 · 不启用 Stage C · 不执行高风险动作"
@@ -253,16 +284,22 @@ export default function AdvancedModeReadonly() {
         </div>
       </SectionCard>
 
-      {/* ── A2. Cross-Center Safety Matrix ── */}
-      <SectionCard title="跨中心安全矩阵" style={{ marginBottom: 20 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8, fontSize: 10 }}>
-          {centerItems.map(c => <div key={c.id} style={{ padding: '8px 10px', borderRadius: 6, background: 'var(--bg-surface)', border: `1px solid ${c.visibleInSidebar ? 'var(--success)' : 'var(--warning)'}`, fontSize: 10 }}>
-            <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>{c.name}</div>
+      {/* ── A2. Cross-Center Safety & Risk Matrix ── */}
+      <SectionCard title="跨中心安全与风险矩阵" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 8, fontSize: 10 }}>
+          {centerItems.map(c => <div key={c.id} style={{ padding: '8px 10px', borderRadius: 6, background: 'var(--bg-surface)', border: `1px solid ${RISK_COLORS[c.risk]}`, borderLeft: `4px solid ${RISK_COLORS[c.risk]}`, fontSize: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 4 }}>
+              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{c.name}</span>
+              <Badge label={c.risk} color={RISK_COLORS[c.risk]} />
+              <Badge label={c.operationalMode} color="#6B7280" />
+              <Badge label={`${c.readinessScore}%`} color={c.readinessScore >= 80 ? 'var(--success)' : c.readinessScore >= 50 ? 'var(--warning)' : 'var(--danger)'} />
+            </div>
             {[
               ['只读', String(c.qualityGate.readonly)],
               ['无写DB', String(c.qualityGate.noDbWrite)],
               ['无外部控制', String(c.qualityGate.noExternalControl)],
               ['无Stage C', String(c.qualityGate.noStageC)],
+              ['无危险操作', String(c.qualityGate.noDangerousActions)],
               ['已入菜单', String(c.visibleInSidebar)],
               ['可开放', String(c.allowedNow)],
             ].map(([label, val]) => <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '1px 0' }}>
@@ -337,6 +374,30 @@ export default function AdvancedModeReadonly() {
                       : <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>无</div>}
                   </div>
                 </div>
+              </div>;
+            })}
+          </div>
+        </div>
+        {/* Exposure Decision Panel */}
+        <div style={{ marginTop: 12, padding: 10, borderRadius: 6, background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>曝光决策面板 (Exposure Decision Panel)</div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+            {Object.entries(DECISION_LABELS).map(([decision, label]) => {
+              const count = centerItems.filter(c => c.exposureDecision === decision).length;
+              return <Badge key={decision} label={`${label} ${count}`} color={count > 0 ? DECISION_COLORS[decision] : '#6B7280'} />;
+            })}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 6, fontSize: 10 }}>
+            {Object.entries(DECISION_LABELS).map(([decision, label]) => {
+              const items = centerItems.filter(c => c.exposureDecision === decision);
+              if (items.length === 0) return null;
+              return <div key={decision} style={{ padding: 8, borderRadius: 4, border: `1px solid ${DECISION_COLORS[decision]}`, background: `rgba(${decision === 'approved' ? '34,197,94' : decision === 'hold' ? '245,158,11' : decision === 'rejected' ? '239,68,68' : '107,114,128'},0.06)` }}>
+                <div style={{ fontWeight: 600, color: DECISION_COLORS[decision], marginBottom: 4, fontSize: 11 }}>{label} ({items.length})</div>
+                {items.map(c => <div key={c.id} style={{ marginBottom: 4, padding: 4, borderRadius: 3, background: 'rgba(255,255,255,0.04)' }}>
+                  <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{c.name}</div>
+                  <div style={{ color: 'var(--text-muted)' }}>阶段: {STAGE_LABELS[c.exposureStage]} | 目标: {c.targetContainer}</div>
+                  <div style={{ color: 'var(--text-secondary)', lineHeight: 1.4, marginTop: 1 }}>{c.exposureReason}</div>
+                </div>)}
               </div>;
             })}
           </div>
