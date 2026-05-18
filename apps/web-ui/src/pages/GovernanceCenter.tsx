@@ -6,6 +6,12 @@ import StageCPreviewPanel from '../components/governance/StageCPreviewPanel';
 import GovernanceGateMatrix from '../components/governance/GovernanceGateMatrix';
 import GovernanceBoundaryPanel from '../components/governance/GovernanceBoundaryPanel';
 import DeferredControlPath from '../components/governance/DeferredControlPath';
+import GovernanceDataModelPanel from '../components/governance/GovernanceDataModelPanel';
+import StageCDesignSpecPanel from '../components/governance/StageCDesignSpecPanel';
+import GovernanceLifecycleMatrix from '../components/governance/GovernanceLifecycleMatrix';
+import ControlBoundaryContract from '../components/governance/ControlBoundaryContract';
+import StageCReadinessChecklist from '../components/governance/StageCReadinessChecklist';
+import RiskAcceptanceMatrix from '../components/governance/RiskAcceptanceMatrix';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -258,7 +264,7 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.22.0-P5"
+      versionLabel="AIP v7.23.0-P1"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls"
@@ -396,6 +402,62 @@ export default function GovernanceCenter() {
             </div>
           ))}
         </div>
+      </SectionCard>
+
+      {/* ── v7.23.0-P1 Design Spec Sections ── */}
+
+      <SectionCard title="Governance Data Model" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <GovernanceDataModelPanel />
+      </SectionCard>
+
+      <SectionCard title="Stage C Design Spec" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <StageCDesignSpecPanel />
+      </SectionCard>
+
+      <SectionCard title="Approval / Mutation / Execution Gate Matrix" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ display: 'grid', gap: 2, fontSize: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 70px 60px 60px 80px 1.2fr 80px', gap: 8, padding: '5px 8px', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid var(--border)' }}>
+            <span>Gate</span><span>Mode</span><span>Approval</span><span>Write</span><span>Execute</span><span>Ext.IO</span><span>Evidence</span><span>Stage</span>
+          </div>
+          {[
+            { gate: 'Approval Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'no', evidence: 'policy + audit', stage: 'deferred' },
+            { gate: 'Mutation Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'no', evidence: 'diff + rollback', stage: 'deferred' },
+            { gate: 'Execution Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'no', evidence: 'dry-run + approval', stage: 'deferred' },
+            { gate: 'External Write Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'gated', evidence: 'endpoint + audit', stage: 'deferred' },
+            { gate: 'Deployment Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'gated', evidence: 'release plan', stage: 'deferred' },
+            { gate: 'Rollback Gate', mode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', extIO: 'no', evidence: 'restore plan', stage: 'deferred' },
+          ].map(r => (
+            <div key={r.gate} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 70px 60px 60px 80px 1.2fr 80px', gap: 8, padding: '5px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.02)', alignItems: 'center' }}>
+              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{r.gate}</span>
+              <span style={{ color: '#8B5CF6' }}>{r.mode}</span>
+              <span style={{ color: '#F97316' }}>{r.approval}</span>
+              <span style={{ color: 'var(--success)' }}>{r.write}</span>
+              <span style={{ color: 'var(--success)' }}>{r.execute}</span>
+              <span style={{ color: r.extIO === 'gated' ? 'var(--warning)' : 'var(--success)' }}>{r.extIO}</span>
+              <span style={{ color: 'var(--text-muted)' }}>{r.evidence}</span>
+              <span style={{ color: '#F97316' }}>{r.stage}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 6, padding: '4px 8px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+          Design-only gate matrix. No buttons or controls exist for any gate. All gates deferred.
+        </div>
+      </SectionCard>
+
+      <SectionCard title="Governance Lifecycle Matrix" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <GovernanceLifecycleMatrix />
+      </SectionCard>
+
+      <SectionCard title="Control Boundary Contract" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <ControlBoundaryContract />
+      </SectionCard>
+
+      <SectionCard title="Stage C Readiness Checklist" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <StageCReadinessChecklist />
+      </SectionCard>
+
+      <SectionCard title="Risk Acceptance Matrix" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <RiskAcceptanceMatrix />
       </SectionCard>
 
       {/* Related Routes */}

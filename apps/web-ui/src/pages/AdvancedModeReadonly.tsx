@@ -275,7 +275,7 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5"
+      versionLabel="AIP v7.22.0-P2 + P3 + P4 + P5 / v7.23.0-P1"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls"
@@ -650,6 +650,31 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
           Governance Center = <strong>readonly</strong> / Stage C deferred preview. Approval controls = <strong>0</strong>. Reject controls = <strong>0</strong>. Mutation paths = <strong>0</strong>. External writes = <strong>0</strong>. Stage C governance controls = <strong>0</strong>. Validator blocking = <strong>{governanceValidator.blockingCount}</strong>. Recommended mode = <strong>manual verification only</strong>.
+        </div>
+      </SectionCard>
+
+      {/* ── v7.23.0-P1 Stage C Design Bridge ── */}
+      <SectionCard title="Stage C Design Bridge" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 12 }}>
+          <KpiCard label="Stage C Design Spec" value="design-only" color="#8B5CF6" />
+          <KpiCard label="Governance data models" value="7" color="#8B5CF6" />
+          <KpiCard label="Design phase gates" value="6" color="#8B5CF6" />
+          <KpiCard label="Lifecycle stages" value="8" color="#8B5CF6" />
+          <KpiCard label="Readiness items" value="9" color="#F97316" />
+          <KpiCard label="Design controls" value="0" color="var(--success)" />
+          <KpiCard label="Approval controls" value="0" color="var(--success)" />
+          <KpiCard label="Mutation paths" value="0" color="var(--success)" />
+          <KpiCard label="Execution controls" value="0" color="var(--success)" />
+          <KpiCard label="External writes" value="0" color="var(--success)" />
+          <KpiCard label="Stage C controls" value="0" color="var(--success)" />
+          <KpiCard label="Stage C enabled" value="false" color="var(--success)" />
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <a href="/governance-center" style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'default' }} onClick={e => e.preventDefault()}>Review Governance Data Model →</a>
+          <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', color: '#8B5CF6', fontWeight: 500, fontSize: 9, whiteSpace: 'nowrap' }}>Keep Stage C in design review</span>
+        </div>
+        <div style={{ padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.04)', fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          Stage C Design Spec = <strong>design-only</strong>. Governance data models = <strong>7</strong> (all readonly). Design phase gates = <strong>6</strong> (all deferred). Lifecycle stages = <strong>8</strong> (all design-only). Readiness items = <strong>9</strong> (all not started / design-only / deferred). Design controls = <strong>0</strong>. Approval controls = <strong>0</strong>. Mutation paths = <strong>0</strong>. Execution controls = <strong>0</strong>. External writes = <strong>0</strong>. Stage C enabled = <strong>false</strong>. Recommended mode = <strong>keep Stage C in design review</strong>.
         </div>
       </SectionCard>
 
