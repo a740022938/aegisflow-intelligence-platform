@@ -12,6 +12,11 @@ import GovernanceLifecycleMatrix from '../components/governance/GovernanceLifecy
 import ControlBoundaryContract from '../components/governance/ControlBoundaryContract';
 import StageCReadinessChecklist from '../components/governance/StageCReadinessChecklist';
 import RiskAcceptanceMatrix from '../components/governance/RiskAcceptanceMatrix';
+import ApprovalGateDesignSpec from '../components/governance/ApprovalGateDesignSpec';
+import ApprovalEvidenceModel from '../components/governance/ApprovalEvidenceModel';
+import ApprovalRollbackPlan from '../components/governance/ApprovalRollbackPlan';
+import ApprovalAuditTrailSpec from '../components/governance/ApprovalAuditTrailSpec';
+import ApprovalGateMatrixTable from '../components/governance/ApprovalGateMatrixTable';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
 import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
@@ -264,7 +269,7 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.23.0-P1"
+      versionLabel="AIP v7.23.0-P3"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls"
@@ -458,6 +463,28 @@ export default function GovernanceCenter() {
 
       <SectionCard title="Risk Acceptance Matrix" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
         <RiskAcceptanceMatrix />
+      </SectionCard>
+
+      {/* ── v7.23.0-P3 Approval Gate Design Spec Sections ── */}
+
+      <SectionCard title="Approval Gate Design Spec" style={{ marginBottom: 20, border: '1px solid #EC4899' }}>
+        <ApprovalGateDesignSpec />
+      </SectionCard>
+
+      <SectionCard title="Approval Evidence Model" style={{ marginBottom: 20, border: '1px solid #EC4899' }}>
+        <ApprovalEvidenceModel />
+      </SectionCard>
+
+      <SectionCard title="Approval Rollback Plan Spec" style={{ marginBottom: 20, border: '1px solid #EC4899' }}>
+        <ApprovalRollbackPlan />
+      </SectionCard>
+
+      <SectionCard title="Approval Audit Trail Spec" style={{ marginBottom: 20, border: '1px solid #EC4899' }}>
+        <ApprovalAuditTrailSpec />
+      </SectionCard>
+
+      <SectionCard title="Approval Gate Matrix" style={{ marginBottom: 20, border: '1px solid #EC4899' }}>
+        <ApprovalGateMatrixTable />
       </SectionCard>
 
       {/* Related Routes */}

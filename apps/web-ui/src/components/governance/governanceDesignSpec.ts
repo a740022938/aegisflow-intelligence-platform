@@ -107,3 +107,109 @@ export const GATE_MATRIX_ROWS = [
   { gate: 'Deployment Gate', currentMode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', externalIO: 'gated', evidence: 'release plan', stageStatus: 'deferred' },
   { gate: 'Rollback Gate', currentMode: 'design-only', approval: 'deferred', write: 'no', execute: 'no', externalIO: 'no', evidence: 'restore plan', stageStatus: 'deferred' },
 ];
+
+// ── Approval Gate Design Spec ──
+
+export interface ApprovalField {
+  fieldName: string;
+  purpose: string;
+  status: string;
+  runtimeEffect: string;
+  writePath: string;
+  stageGate: string;
+  futureRequirement: string;
+}
+
+export const APPROVAL_DESIGN_FIELDS: ApprovalField[] = [
+  { fieldName: 'ApprovalRequest', purpose: '审批请求 — 记录待审批操作详情', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '人工提交审批请求' },
+  { fieldName: 'ApprovalEvidence', purpose: '审批证据 — 附上审计证据供审批参考', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '证据上传+摘要生成' },
+  { fieldName: 'ApprovalPolicy', purpose: '审批策略 — 定义审批条件与通过规则', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '策略引擎+条件匹配' },
+  { fieldName: 'ApprovalRiskReview', purpose: '风险审查 — 评估操作风险等级', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '风险评分+建议措施' },
+  { fieldName: 'ApprovalRollbackPlan', purpose: '回滚计划 — 定义审批失败后的回退策略', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '回滚步骤+验证方法' },
+  { fieldName: 'ApprovalAuditRecord', purpose: '审计记录 — 完整记录审批全链路', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '审计追踪+不可篡改' },
+  { fieldName: 'ApprovalExpiration', purpose: '审批过期 — 审批超时自动失效', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '超时策略+通知机制' },
+  { fieldName: 'ApprovalScopeBoundary', purpose: '审批边界 — 定义审批范围与权限', status: 'design-only', runtimeEffect: 'none', writePath: 'disabled', stageGate: 'Stage C deferred', futureRequirement: '权限模型+范围校验' },
+];
+
+// ── Approval Evidence Types ──
+
+export interface ApprovalEvidenceType {
+  evidence: string;
+  purpose: string;
+  status: string;
+}
+
+export const APPROVAL_EVIDENCE_TYPES: ApprovalEvidenceType[] = [
+  { evidence: 'Diff evidence', purpose: '变更差异对比', status: 'design-only' },
+  { evidence: 'Dry-run result', purpose: '模拟执行结果', status: 'design-only' },
+  { evidence: 'Risk assessment', purpose: '风险评估报告', status: 'design-only' },
+  { evidence: 'Rollback plan', purpose: '回滚策略说明', status: 'design-only' },
+  { evidence: 'Owner note', purpose: '操作负责人说明', status: 'design-only' },
+  { evidence: 'Validator snapshot', purpose: '当前 validator 快照', status: 'design-only' },
+  { evidence: 'Secret scan result', purpose: '密钥扫描结果', status: 'design-only' },
+  { evidence: 'DB doctor result', purpose: '数据库健康检查结果', status: 'design-only' },
+  { evidence: 'Smoke test status', purpose: '冒烟测试状态', status: 'design-only' },
+  { evidence: 'Manual approval note', purpose: '人工审批备注', status: 'design-only' },
+];
+
+// ── Approval Rollback Plan Spec ──
+
+export interface RollbackField {
+  field: string;
+  purpose: string;
+  status: string;
+}
+
+export const APPROVAL_ROLLBACK_FIELDS: RollbackField[] = [
+  { field: 'Rollback target', purpose: '回滚目标 — 定义回滚到哪个基线', status: 'design-only' },
+  { field: 'Restore point', purpose: '恢复点 — 定义可恢复的快照标识', status: 'design-only' },
+  { field: 'Affected scope', purpose: '影响范围 — 回滚操作影响哪些系统', status: 'design-only' },
+  { field: 'Manual rollback owner', purpose: '手动回滚负责人 — 指定执行回滚的人', status: 'design-only' },
+  { field: 'Verification command', purpose: '验证命令 — 回滚后验证成功的命令', status: 'design-only' },
+  { field: 'Audit evidence', purpose: '审计证据 — 回滚操作证据记录', status: 'design-only' },
+  { field: 'Blocked automation', purpose: '禁止自动化 — 明确不允许自动回滚的操作', status: 'design-only' },
+];
+
+// ── Approval Audit Trail Spec ──
+
+export interface AuditTrailField {
+  field: string;
+  purpose: string;
+  status: string;
+  persisted: string;
+}
+
+export const APPROVAL_AUDIT_TRAIL_FIELDS: AuditTrailField[] = [
+  { field: 'Request ID', purpose: '审批请求唯一标识', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Requested action', purpose: '请求的具体操作描述', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Requester', purpose: '发起审批的用户', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Review state', purpose: '当前审批状态', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Evidence summary', purpose: '已附证据摘要', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Risk level', purpose: '操作风险等级', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Decision state', purpose: '审批决策（approve/reject/defer）', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Timestamp', purpose: '操作时间戳', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Rollback link', purpose: '关联回滚计划链接', status: 'design-only', persisted: 'not persisted' },
+  { field: 'Final audit note', purpose: '最终审计备注', status: 'design-only', persisted: 'not persisted' },
+];
+
+// ── Approval Gate Matrix ──
+
+export interface ApprovalGateMatrixRow {
+  area: string;
+  currentMode: string;
+  approval: string;
+  reject: string;
+  write: string;
+  execute: string;
+  evidence: string;
+  status: string;
+}
+
+export const APPROVAL_GATE_MATRIX: ApprovalGateMatrixRow[] = [
+  { area: 'Navigation exposure', currentMode: 'readonly', approval: 'no', reject: 'no', write: 'no', execute: 'no', evidence: 'validator snapshot', status: 'design-only' },
+  { area: 'Memory candidate', currentMode: 'preview', approval: 'deferred', reject: 'deferred', write: 'no', execute: 'no', evidence: 'candidate diff', status: 'deferred' },
+  { area: 'Connector write', currentMode: 'preview', approval: 'deferred', reject: 'deferred', write: 'no', execute: 'no', evidence: 'endpoint + risk', status: 'deferred' },
+  { area: 'Lab execution', currentMode: 'preview', approval: 'deferred', reject: 'deferred', write: 'no', execute: 'no', evidence: 'dry-run + report', status: 'deferred' },
+  { area: 'Deployment', currentMode: 'disabled', approval: 'deferred', reject: 'deferred', write: 'no', execute: 'no', evidence: 'release plan', status: 'disabled' },
+  { area: 'Service control', currentMode: 'disabled', approval: 'deferred', reject: 'deferred', write: 'no', execute: 'no', evidence: 'recovery plan', status: 'disabled' },
+];
