@@ -6,11 +6,14 @@ Before any commit, all gates must pass:
 
 | Gate | Command | Required |
 |------|---------|----------|
-| Lint | `npm run lint` | PASS |
-| Typecheck | `npm run typecheck` | PASS |
-| Build | `npm run build` | PASS |
-| DB Doctor | `npm run db:doctor` | PASS |
-| Secret Scan | Manual grep for tokens | CLEAN |
+| Lint | `npm run lint` (defined) | PASS |
+| Typecheck | `npm run typecheck` (defined) | PASS |
+| Build | `npm run build` (defined) | PASS |
+| DB Doctor | `npm run db:doctor` (NOT defined in package.json) | SKIP |
+| Secret Scan | `npm run secret:scan` (NOT defined in package.json) | SKIP |
+| Smoke | `npm run test:smoke` (NOT defined in package.json) | SKIP |
+
+注：`db:doctor`、`secret:scan`、`smoke` 脚本在 `apps/web-ui/package.json` 中未定义。早期报告可能因 `--if-present` 掩码而误标为 PASS，实际状态为 SKIP（script not defined）。详见 `AIP_VALIDATION_SCRIPT_PARITY_AUDIT.md`。
 
 ## Seal Audit Criteria (15 checks)
 

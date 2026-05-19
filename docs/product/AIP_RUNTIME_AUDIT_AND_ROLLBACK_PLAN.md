@@ -1,6 +1,6 @@
 # AIP Runtime Audit and Rollback Plan (v7.27.0-D1)
 
-> 设计文档，非实现。当前阶段不实现，只设计。v7.27.0-P1 Runtime Registry Preview 定义了 audit log 和 rollback 的元数据字段，但不执行真实审计或回滚。
+> 设计文档，非实现。当前阶段不实现，只设计。v7.27.0-P1 Runtime Registry Preview 定义了 audit log 和 rollback 的元数据字段，但不执行真实审计或回滚。v7.27.0-P3 Audit Log Preview 新增了 18 个审计事件模型的只读预览，但依然不写审计库。
 
 ## 1. 审计日志要求
 
@@ -120,6 +120,7 @@ DB 写入操作必须：
 | 功能 | 当前 | 设计 | 实现 |
 |------|------|------|------|
 | CostRouting 模拟日志 | 已实现 | — | — |
+| Audit Log UI Preview | P3 已实现 | — | — |
 | 完整 audit log 框架 | 未实现 | v7.27-D1 | v7.28+ |
 | Human approval 队列 | 未实现 | v7.27-D1 | v7.28+ |
 | Rollback 引擎 | 未实现 | v7.27-D1 | 待定 |

@@ -195,6 +195,8 @@ export default function PermissionEvaluatorPreview() {
                     <p><strong>门禁规则:</strong></p>
                     <p>- runtime-registry-preview: hidden direct / readonly — 不运行外部工具 · 不写数据库 · 不启用 Stage C</p>
                     <p>- dry-run-plan-preview: hidden direct / readonly — 不运行 dry-run · 不写数据库 · 不控制外部工具</p>
+                    <p>- audit-log-preview: hidden direct / readonly — 不写审计库 · 不写数据库 · 不控制外部工具</p>
+                    <p>- audit-write-now: deny — 审计日志写入在只读模式下永久禁止</p>
                     <p>- db-write: deny — 数据库写入在只读模式下永久禁止</p>
                     <p>- external-tool-control: deny — 外部工具控制永久禁止</p>
                     <p>- stage-c-transition: deny — Stage C 永久禁用</p>

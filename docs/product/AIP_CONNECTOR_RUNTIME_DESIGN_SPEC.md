@@ -61,7 +61,7 @@ Dry-run 是 runtime 第一阶段的门禁能力：
 5. Audit log 记录 dry-run 结果
 6. 不执行真实外部操作
 
-**当前状态：** CostRouting 已有模拟 dry-run。P1 已实现 Runtime Registry 只读预览（20 targets, 7 action levels, 5 gate types）。未来 connector dry-run 需要 runtime registry 扩展。
+**当前状态：** CostRouting 已有模拟 dry-run。P1 已实现 Runtime Registry 只读预览（20 targets, 7 action levels, 5 gate types）。P2 已实现 Dry-run Plan Preview（16 plans, 5 modes）。P3 已实现 Audit Log Preview（18 audit events）。未来 connector dry-run 需要 runtime registry 扩展。
 
 ## 6. Human Approval 模式
 
@@ -127,4 +127,5 @@ Human approval 是执行前的强制门禁：
 | v7.27.0-D1 | 设计 spec | 否 | 否 | 否 | 否 |
 | v7.27.0-P1 | Runtime Registry Preview | 仅前端 registry + page + route | 否 | 否 | 否 |
 | v7.27.0-P2 | Dry-run Plan Preview | 仅前端 UI | 否 | 否 | 否 |
+| v7.27.0-P3 | Audit Log UI Preview | 仅前端 registry + page + route | 否 | 否 | 否 |
 | v7.28+ | 实现 dry-run + approval | 需要 | 需要 | 需要 | 需要 |

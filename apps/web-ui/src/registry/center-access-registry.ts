@@ -327,6 +327,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     owner: 'governance',
   },
   {
+    id: 'audit-log-preview',
+    name: 'Audit Log Preview',
+    kind: 'runtime_registry',
+    route: '/audit-log-preview',
+    status: 'hidden_direct',
+    risk: 'medium',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_audit_write', 'no_db_write', 'no_external_control', 'no_stage_c'],
+    allowedActions: ['view_audit_events', 'view_event_sources', 'view_traceability'],
+    blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'control_external_tools', 'write_audit_log', 'call_external_api', 'release'],
+    requiredBeforeExposure: ['readonly_only', 'no_audit_implementation'],
+    releaseGate: [],
+    displayOrder: 8,
+    group: 'navigation',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 80,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '当前可开放', 'preview_ready'],
+    description: '只读审计日志预览。展示所有审计事件模型、来源、保留类和可追溯性。未入左侧菜单。hidden direct route。',
+    notes: 'Audit Log Preview — 未入左侧菜单。hidden direct route。只读预览。不写审计库。不写 DB。不启用 Stage C。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'Audit Log Preview is design-only. Keep hidden direct until audit log preview is validated and human approval is given.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove from launchpad if needed.',
+    userImpact: 'Low — preview page for audit event model planning. No real audit logging.',
+    maturity: 'preview',
+    owner: 'governance',
+  },
+  {
     id: 'runtime-registry-preview',
     name: 'Runtime Registry Preview',
     kind: 'runtime_registry',
@@ -557,6 +596,9 @@ export function validateCenterAccess(): CenterAccessValidationIssue[] {
     }
     if (c.id === 'dry-run-plan-preview' && c.visibleInSidebar) {
       issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'dry-run-plan-preview should NOT be visible in sidebar.' });
+    }
+    if (c.id === 'audit-log-preview' && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'audit-log-preview should NOT be visible in sidebar.' });
     }
     if (c.id === 'lab-center-readonly' || c.id === 'governance-center' || c.id === 'navigation-preview-readonly') {
       if (c.visibleInSidebar) {

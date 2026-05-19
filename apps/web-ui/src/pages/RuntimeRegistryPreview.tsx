@@ -21,6 +21,9 @@ import {
 import {
   getDryRunPlanSummary,
 } from '../registry/dry-run-plan-registry';
+import {
+  getAuditLogPreviewSummary,
+} from '../registry/audit-log-registry';
 
 const RISK_COLORS: Record<string, string> = {
   low: 'var(--success)',
@@ -234,6 +237,30 @@ export default function RuntimeRegistryPreview() {
         </div>
         <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(59,130,246,0.06)', fontSize: 10, color: '#3B82F6', textAlign: 'center' }}>
           Dry-run Plan — 只读预览 · 不运行 dry-run · 不控制外部工具
+        </div>
+      </SectionCard>
+
+      {/* I. Audit Log Preview Snapshot */}
+      <SectionCard title="审计日志预览快照" style={{ marginBottom: 16, border: '1px solid #DC2626' }}>
+        {(() => {
+          const as = getAuditLogPreviewSummary();
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 8, marginBottom: 12 }}>
+              <KpiCard label="总事件" value={String(as.total)} color="#8B5CF6" />
+              <KpiCard label="当前允许" value={String(as.allowedNow)} color="var(--success)" />
+              <KpiCard label="高/严重风险" value={String(as.highOrCritical)} color="#DC2626" />
+              <KpiCard label="需 DB 写" value={String(as.requiresDbWrite)} color="#8B5CF6" />
+              <KpiCard label="需 Stage C" value={String(as.requiresStageC)} color="#DC2626" />
+            </div>
+          );
+        })()}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/audit-log-preview" style={{ fontSize: 11, color: '#DC2626', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(220,38,38,0.3)' }}>
+            打开审计日志预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(220,38,38,0.06)', fontSize: 10, color: '#DC2626', textAlign: 'center' }}>
+          Audit Log — 只读预览 · 不写审计库 · 不写数据库 · 不控制外部工具 · 不启用 Stage C
         </div>
       </SectionCard>
 
