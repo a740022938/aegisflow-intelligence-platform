@@ -204,6 +204,9 @@ export default function PermissionEvaluatorPreview() {
                     <p><strong>治理状态机参考:</strong></p>
                     <p>- governance-state-machine-preview: hidden direct / readonly — 不迁移状态 · 不处理审批 · 不写数据库 · 不启用 Stage C</p>
                     <p>- 7 states, 18 transitions, all approval/execution transitions blocked</p>
+                    <p><strong>人工审批流程参考:</strong></p>
+                    <p>- human-approval-workflow-preview: hidden direct / readonly — 不创建审批队列 · 不处理 candidate · 不写数据库 · 不启用 Stage C</p>
+                    <p>- 20 items, all execution/approval/candidate/Stage C transitions blocked</p>
                   </div>
                 );
               })()}

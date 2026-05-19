@@ -37,7 +37,9 @@ export type NavigationExposureGate =
   | 'no_external_control'
   | 'no_db_write'
   | 'no_audit_write'
-  | 'no_state_transition';
+  | 'no_state_transition'
+  | 'no_approval_queue'
+  | 'no_candidate_processing';
 
 export interface NavigationExposureEntry {
   id: string;
@@ -937,6 +939,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     notes: 'v7.28.0-P1 added as hidden direct-route. Not in sidebar. Readonly preview only. No real governance execution.',
   },
 
+  // Human Approval Workflow Preview (hidden route, not in sidebar)
+  {
+    id: 'human-approval-workflow-preview',
+    path: '/human-approval-workflow-preview',
+    label: 'Human Approval Workflow Preview',
+    component: 'HumanApprovalWorkflowPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_approval_queue', 'no_candidate_processing', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly human approval workflow preview page. Shows 20 approval workflow items, state board, request kinds, decision matrix, evidence/rollback board, and validator summary. Not added to left menu. No approval queue, no candidate processing, no action execution, no DB write, no external control, no Stage C.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.28.0-P2 added as hidden direct-route. Not in sidebar. Readonly preview only. No real approval processing.',
+  },
+
   // 隐 module placeholder routes (not in nav, from App.tsx)
   {
     id: 'workspace',
@@ -1230,6 +1249,11 @@ export function validateNavigationExposure(): ExposureValidationIssue[] {
     if (entry.id === 'governance-state-machine-preview') {
       if (entry.currentExposure !== 'direct_route') {
         issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'governance-state-machine-preview should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'human-approval-workflow-preview') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'human-approval-workflow-preview should have currentExposure=direct_route (not in sidebar).' });
       }
     }
   }

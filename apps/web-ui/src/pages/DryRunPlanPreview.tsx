@@ -239,6 +239,21 @@ export default function DryRunPlanPreview() {
         </div>
       </SectionCard>
 
+      {/* H. Human Approval Requirement Snapshot */}
+      <SectionCard title="人工审批需求快照" style={{ marginBottom: 16, border: '1px solid #EC4899' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+          20 approval workflow items · Critical transitions (execution, candidate processing, Stage C) are permanently blocked.
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/human-approval-workflow-preview" style={{ fontSize: 11, color: '#EC4899', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(236,72,153,0.3)' }}>
+            打开人工审批流程预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(236,72,153,0.06)', fontSize: 10, color: '#EC4899', textAlign: 'center' }}>
+          Human Approval — 只读门禁预览 · 不创建审批队列 · 不处理 candidate · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
       {/* F. Validator Summary */}
       <SectionCard title="校验摘要" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>

@@ -46,6 +46,7 @@ const RuntimeRegistryPreview = lazy(() => import('./pages/RuntimeRegistryPreview
 const DryRunPlanPreview = lazy(() => import('./pages/DryRunPlanPreview'));
 const AuditLogPreview = lazy(() => import('./pages/AuditLogPreview'));
 const GovernanceStateMachinePreview = lazy(() => import('./pages/GovernanceStateMachinePreview'));
+const HumanApprovalWorkflowPreview = lazy(() => import('./pages/HumanApprovalWorkflowPreview'));
 
 function RouteFallback() {
   return (
@@ -156,6 +157,7 @@ const App: React.FC = () => {
             <Route path="dry-run-plan-preview" element={<DryRunPlanPreview />} />
             <Route path="audit-log-preview" element={<AuditLogPreview />} />
             <Route path="governance-state-machine-preview" element={<GovernanceStateMachinePreview />} />
+            <Route path="human-approval-workflow-preview" element={<HumanApprovalWorkflowPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

@@ -271,6 +271,8 @@ const GovernanceStateMachinePreview: React.FC = () => {
           <Link to="/audit-log-preview" style={{ color: '#DC2626', textDecoration: 'none' }}>Audit Log →</Link>
           {' | '}
           <Link to="/permission-evaluator-preview" style={{ color: '#8B5CF6', textDecoration: 'none' }}>Permission Evaluator →</Link>
+          {' | '}
+          <Link to="/human-approval-workflow-preview" style={{ color: '#EC4899', textDecoration: 'none' }}>Human Approval →</Link>
         </div>
       </SectionCard>
 

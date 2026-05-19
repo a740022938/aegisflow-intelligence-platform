@@ -241,11 +241,12 @@ const CENTER_KIND_LABELS: Record<CenterAccessKind, string> = {
   governance: 'Governance Center', navigation_preview: 'Navigation Preview',
   runtime_registry: 'Runtime Registry',
   governance_state_machine: 'Governance State Machine',
+  human_approval: 'Human Approval',
 };
 
 const CENTER_KIND_COLORS: Record<CenterAccessKind, string> = {
   advanced: '#F97316', connector: '#22C55E', lab: '#3B82F6', governance: '#22C55E', navigation_preview: '#8B5CF6',
-  runtime_registry: '#8B5CF6', governance_state_machine: '#8B5CF6',
+  runtime_registry: '#8B5CF6', governance_state_machine: '#8B5CF6', human_approval: '#EC4899',
 };
 
 const READINESS_COLORS: Record<string, string> = {
@@ -987,6 +988,21 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
           Governance State Machine — 只读状态机预览 · 不迁移状态 · 不处理审批 · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
+      {/* Human Approval Workflow Preview Summary */}
+      <SectionCard title="人工审批流程预览" style={{ marginBottom: 20, border: '1px solid #EC4899' }}>
+        <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          只读人工审批流程预览 — 不创建审批队列 · 不处理 candidate · 不写数据库 · 不启用 Stage C
+        </div>
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/human-approval-workflow-preview" style={{ fontSize: 11, color: '#EC4899', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(236,72,153,0.3)' }}>
+            打开人工审批流程预览 [只读]
+          </Link>
+        </div>
+        <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(236,72,153,0.06)', border: '1px solid rgba(236,72,153,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
+          Human Approval Workflow — 只读审批流程预览 · 不创建审批队列 · 不处理 candidate · 不写数据库 · 不启用 Stage C
         </div>
       </SectionCard>
 
