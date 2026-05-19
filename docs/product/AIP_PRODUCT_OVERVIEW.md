@@ -88,4 +88,13 @@ All v7.28 work remains **design-only**. No implementation, no external tool cont
 - Internal audits and seal reviews
 - PL decision-making for exposure changes
 - UI preview at Advanced Mode > Permission Evaluator Preview
+
+---
+
+## v7.28+ Status
+
+- **v7.28.0 SEAL:** PASS (V7_28_FINAL_SEAL_READY) — Commit `349b20a`, 2026-05-19
+- **v7.29.0-D1 Governance Console:** See `AIP_GOVERNANCE_CONSOLE_MASTER_BLUEPRINT.md` — design-only, not implemented
+- **Stage C:** Remains disabled. No DB write. No external control. No executor implementation.
+- **Sidebar:** Governance Console will not enter sidebar until human decision after v7.29 Final Seal.
 - Connector runtime design review (v7.27)

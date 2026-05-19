@@ -77,3 +77,12 @@ The Governance State Machine Preview is a readonly frontend page that visualizes
 ## v7.28.0-P4 Rollback Preview
 
 **P4 Rollback Preview** is now established at /rollback-preview (hidden direct, readonly). It provides a static display of rollback states and idempotency keys as a readonly model — **no rollback executor, no file restore, no git mutation, no DB write, no external control, and Stage C disabled**. This P4 preview follows the same hidden-direct-readonly pattern as the P1 governance state machine and P3 evidence schema previews.
+
+---
+
+## v7.28+ Status
+
+- **v7.28.0 SEAL:** PASS (V7_28_FINAL_SEAL_READY) — Commit `349b20a`, 2026-05-19
+- **v7.29.0-D1 Governance Console:** See `AIP_GOVERNANCE_CONSOLE_MASTER_BLUEPRINT.md` — design-only, not implemented
+- **Stage C:** Remains disabled. No DB write. No external control. No executor implementation.
+- **Sidebar:** Governance Console will not enter sidebar until human decision after v7.29 Final Seal.

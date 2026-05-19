@@ -94,3 +94,12 @@ P3 Evidence Schema Preview is now established at `/evidence-schema-preview` (hid
 ## v7.28.0-P4 Rollback Preview
 
 P4 Rollback Preview is now established at /rollback-preview (hidden direct, readonly). It provides a static display of rollback states and idempotency keys as a readonly model — **no rollback executor, no file restore, no git mutation, no DB write, no external control, Stage C disabled**. The same validation gates (lint, typecheck, build) apply before any P4 commit. No new seal checks are required for this preview; all 15 seal audit criteria remain unchanged.
+
+---
+
+## v7.28+ Status
+
+- **v7.28.0 SEAL:** PASS (V7_28_FINAL_SEAL_READY) — Commit `349b20a`, 2026-05-19
+- **v7.29.0-D1 Governance Console:** See `AIP_GOVERNANCE_CONSOLE_MASTER_BLUEPRINT.md` — design-only, not implemented
+- **Stage C:** Remains disabled. No DB write. No external control. No executor implementation.
+- **Sidebar:** Governance Console will not enter sidebar until human decision after v7.29 Final Seal.

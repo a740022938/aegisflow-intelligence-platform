@@ -134,3 +134,12 @@ Rollback Preview 为 AIP 提供**只读回滚风险评估预览**。它定义了
 - [Audit Log Preview](/audit-log-preview)
 - [Dry-Run Plan Preview](/dry-run-plan-preview)
 - [Permission Evaluator Preview](/permission-evaluator-preview)
+
+---
+
+## v7.28+ Status
+
+- **v7.28.0 SEAL:** PASS (V7_28_FINAL_SEAL_READY) — Commit `349b20a`, 2026-05-19
+- **v7.29.0-D1 Governance Console:** See `AIP_GOVERNANCE_CONSOLE_MASTER_BLUEPRINT.md` — design-only, not implemented
+- **Stage C:** Remains disabled. No DB write. No external control. No executor implementation.
+- **Sidebar:** Governance Console will not enter sidebar until human decision after v7.29 Final Seal.
