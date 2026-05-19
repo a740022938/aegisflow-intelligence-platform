@@ -1,7 +1,7 @@
 # AIP Backend Readonly API P1 Skeleton Scope Freeze
 
-> **Phase:** v7.31.0-D2
-> **Status:** PENDING_HUMAN_OWNER_REVIEW
+> **Phase:** v7.31.0-P1
+> **Status:** IMPLEMENTED
 > **Purpose:** Freeze the minimum scope for v7.31.0-P1 backend skeleton implementation
 
 ## 1. Allowed in P1 (if human owner approves)

@@ -1,7 +1,7 @@
 # AIP Backend Readonly API Security Boundary
 
-> **Phase:** v7.31.0-D1
-> **Status:** Design-only — no security controls implemented
+> **Phase:** v7.31.0-P1
+> **Status:** P1 skeleton live — security boundary enforced (no JWT for runtime paths, all POST blocked by design)
 > **Purpose:** Define the security boundary for future readonly backend API implementation
 
 ## 1. Threat Model

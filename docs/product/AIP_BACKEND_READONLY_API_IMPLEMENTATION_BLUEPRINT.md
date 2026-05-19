@@ -1,7 +1,7 @@
 # AIP Backend Readonly API Implementation Blueprint
 
-> **Phase:** v7.31.0-D1
-> **Status:** Design-only — no backend code written
+> **Phase:** v7.31.0-P1
+> **Status:** P1 skeleton implemented — 4 GET readonly endpoints (v7.31.0-P1)
 > **Goal:** Define the implementation plan for a readonly status-only backend API service
 
 ## 1. Goal

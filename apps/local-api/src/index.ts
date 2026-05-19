@@ -79,6 +79,7 @@ import { registerOpenAxiomBridgeRoutes, registerOpenAxiomHistoryRoutes } from '.
 import { registerAssistantCenterRoutes } from './routes/assistant-center/index.js';
 import { registerMemoryHubRoutes } from './routes/memory-hub/index.js';
 import { registerAuthorizationRoutes } from './routes/authorization/index.js';
+import { registerReadonlyStatusRoutes } from './runtime/readonly-status.js';
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -291,8 +292,10 @@ const PUBLIC_PATHS = new Set([
   '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2', '/api/openclaw/master-switch',
   '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status', '/api/dashboard/summary',
   '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
+  '/api/runtime/status', '/api/runtime/readiness', '/api/runtime/gates', '/api/runtime/blockers',
 ]);
-const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static', '/api/comfy/history', '/api/openaxiom', '/api/assistant-center', '/api/memory-hub', '/api/authorization'];
+const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static', '/api/comfy/history',
+  '/api/openaxiom', '/api/assistant-center', '/api/memory-hub', '/api/authorization'];
 const DOCS_PREFIXES = ['/docs', '/swagger', '/openapi'];
 
 app.addHook('onRequest', async (request, reply) => {
@@ -3549,6 +3552,9 @@ registerBrainRouterRoutes(app); // Brain router V1
 registerSystemRoutes(app);
   experiments.registerExperimentsRoutes(app);
   models.registerModelsRoutes(app);
+
+// ── Runtime Readonly Status (v7.31.0-P1) ─────────────────────────────────
+registerReadonlyStatusRoutes(app);
 
 // ══ v6.0.0: Plugin System ════════════════════════════════════════════════════
 // M6: 插件系统默认启用，不再依赖环境变量

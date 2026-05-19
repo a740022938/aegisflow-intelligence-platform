@@ -1,7 +1,7 @@
 # AIP Backend Readonly API Endpoint Whitelist
 
-> **Phase:** v7.31.0-D1
-> **Status:** Design-only — no endpoint implemented
+> **Phase:** v7.31.0-P1
+> **Status:** P1 endpoints implemented — 4 GET readonly endpoints live at /api/runtime/*
 > **Purpose:** Define which future endpoints are allowed and which are permanently blocked
 
 ## Allowed Future Endpoints

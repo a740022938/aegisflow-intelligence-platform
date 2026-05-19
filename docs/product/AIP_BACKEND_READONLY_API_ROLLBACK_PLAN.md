@@ -1,7 +1,7 @@
 # AIP Backend Readonly API Rollback Plan
 
-> **Phase:** v7.31.0-D1
-> **Status:** Design-only — no rollback performed
+> **Phase:** v7.31.0-P1
+> **Status:** P1 live — rollback plan available if needed (remove 3 files, revert 1 file)
 > **Purpose:** Define the rollback strategy for future readonly backend API implementation
 
 ## 1. Rollback Triggers

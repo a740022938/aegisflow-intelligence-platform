@@ -1,9 +1,9 @@
 # AIP Runtime API Contract Freeze
 
 > **Contract Version:** v1.freeze
-> **AIP Baseline:** v7.30.0-D2
-> **Date:** 2026-05-19
-> **Status:** docs-only contract freeze — no backend implementation
+> **AIP Baseline:** v7.31.0-P1
+> **Date:** 2026-05-20
+> **Status:** P1 backend skeleton implemented (4 GET readonly endpoints)
 
 ## 1. Contract Freeze Purpose
 

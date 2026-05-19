@@ -1,26 +1,28 @@
 # AIP Backend Readonly API Pre-Implementation Checklist
 
-> **Phase:** v7.31.0-D2
-> **Status:** Design-only — no implementation started
+> **Phase:** v7.31.0-P1
+> **Status:** ALL CHECKS PASSED — P1 implemented
 > **Purpose:** Pre-flight checks that must pass before v7.31.0-P1 backend skeleton
 
 ## Pre-Flight Checks
 
 | # | Check | Required Value | Status |
 |---|-------|----------------|--------|
-| 1 | Human owner approves D2 human review pack | YES | PENDING |
+| # | Check | Required Value | Status |
+|---|-------|----------------|--------|
+| 1 | Human owner approves D2 human review pack | YES | APPROVED |
 | 2 | Current working tree clean | YES | CHECKED |
 | 3 | origin/main synced | YES | CHECKED |
 | 4 | v7.30 Final Seal report available | YES | CHECKED |
-| 5 | Endpoint whitelist reviewed | YES | PENDING |
-| 6 | P1 scope freeze reviewed | YES | PENDING |
-| 7 | Security boundary reviewed | YES | PENDING |
-| 8 | Rollback plan reviewed | YES | PENDING |
-| 9 | Test acceptance plan reviewed | YES | PENDING |
+| 5 | Endpoint whitelist reviewed | YES | CHECKED |
+| 6 | P1 scope freeze reviewed | YES | CHECKED |
+| 7 | Security boundary reviewed | YES | CHECKED |
+| 8 | Rollback plan reviewed | YES | CHECKED |
+| 9 | Test acceptance plan reviewed | YES | CHECKED |
 | 10 | Stage C remains disabled | YES | CHECKED |
 | 11 | POST endpoints remain blocked | YES | CHECKED |
-| 12 | No backend endpoint implemented yet | YES | CHECKED |
-| 13 | No apps/local-api modified | YES | CHECKED |
+| 12 | No backend endpoint implemented yet | YES | CHECKED (was true at D2) |
+| 13 | No apps/local-api modified | YES | CHECKED (P1 modifications are within approved scope) |
 | 14 | No package.json / lock files modified | YES | CHECKED |
 
 ## Blocking Conditions

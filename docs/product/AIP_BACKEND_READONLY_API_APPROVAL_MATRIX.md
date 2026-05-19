@@ -1,15 +1,15 @@
 # AIP Backend Readonly API Implementation Approval Matrix
 
-> **Phase:** v7.31.0-D2
-> **Status:** PENDING_HUMAN_OWNER_REVIEW
+> **Phase:** v7.31.0-P1
+> **Status:** APPROVED_AND_IMPLEMENTED
 > **Purpose:** Define which capabilities can enter P1 backend skeleton and which remain blocked
 
 | # | Capability | Endpoint | Method | Current Status | Can Enter P1 Skeleton? | Requires Human Approval? | Requires Stage C? | Writes DB? | External Control? | Mutation? | Risk | Decision | Reason |
 |---|------------|----------|--------|----------------|------------------------|-------------------------|-------------------|------------|-------------------|------------|------|----------|--------|
-| 1 | Runtime status summary | /runtime/status | GET | Blueprint only | Candidate | Yes | No | No | No | No | Low | PENDING | Readonly status summary from static registry |
-| 2 | Runtime readiness | /runtime/readiness | GET | Blueprint only | Candidate | Yes | No | No | No | No | Low | PENDING | Readonly readiness indicators |
-| 3 | Gate overview | /runtime/gates | GET | Blueprint only | Candidate | Yes | No | No | No | No | Low | PENDING | Readonly gate status from gate model |
-| 4 | Blocker summary | /runtime/blockers | GET | Blueprint only | Candidate | Yes | No | No | No | No | Low | PENDING | Readonly blocker list from blocker matrix |
+| 1 | Runtime status summary | /runtime/status | GET | v7.31-P1 implemented | Candidate | Yes | No | No | No | No | Low | APPROVED | Readonly status summary from static registry |
+| 2 | Runtime readiness | /runtime/readiness | GET | v7.31-P1 implemented | Candidate | Yes | No | No | No | No | Low | APPROVED | Readonly readiness indicators |
+| 3 | Gate overview | /runtime/gates | GET | v7.31-P1 implemented | Candidate | Yes | No | No | No | No | Low | APPROVED | Readonly gate status from gate model |
+| 4 | Blocker summary | /runtime/blockers | GET | v7.31-P1 implemented | Candidate | Yes | No | No | No | No | Low | APPROVED | Readonly blocker list from blocker matrix |
 | 5 | Registry list | /runtime/registries | GET | Not designed | Defer | Yes | No | No | No | No | Medium | DEFERRED | Needs scope expansion |
 | 6 | Risk summary | /runtime/risks | GET | Not designed | Defer | Yes | No | No | No | No | Medium | DEFERRED | Needs scope expansion |
 | 7 | Audit preview | /runtime/audit-preview | GET | Not designed | Defer | Yes | No | No | No | No | Medium | DEFERRED | Needs scope expansion |

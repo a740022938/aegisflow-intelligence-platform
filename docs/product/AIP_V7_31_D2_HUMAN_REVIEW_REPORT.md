@@ -70,11 +70,55 @@ No POST, no DB, no external control, no Stage C.
 
 ## Decision Status
 
-**PENDING_HUMAN_OWNER_REVIEW**
+**APPROVED** (2026-05-19, human project owner)
 
-## Next Step Recommendation
+## Human Owner Decision Record
 
-After human owner review:
-- If APPROVED: v7.31.0-P1 Backend Readonly Status API Skeleton
-- If CHANGES REQUESTED: Update docs and re-submit for D2 review
-- If BLOCKED: Stop until further human decision
+```
+Date: 2026-05-19
+Reviewer: human project owner
+
+Decisions:
+- P1 skeleton approved: YES
+- GET /runtime/status included: YES
+- GET /runtime/readiness included: YES
+- GET /runtime/gates included: YES
+- GET /runtime/blockers included: YES
+- Additional endpoints: NONE (scope frozen to 4 endpoints)
+- Conditions:
+  1. Readonly GET skeleton only
+  2. No POST endpoint of any kind
+  3. No DB write
+  4. No external control
+  5. No Stage C
+  6. No candidate processing
+  7. No approval queue
+  8. No evidence store
+  9. No runtime execute / dry-run execute / rollback execute
+```
+
+## Approved Scope
+
+| Endpoint | Method | Allowed |
+|----------|--------|---------|
+| /runtime/status | GET | YES |
+| /runtime/readiness | GET | YES |
+| /runtime/gates | GET | YES |
+| /runtime/blockers | GET | YES |
+
+## Explicitly Excluded
+
+- All POST endpoints
+- DB write
+- External control
+- Stage C
+- Candidate processing
+- Approval queue
+- Evidence store
+- Runtime execute / dry-run execute / rollback execute
+
+## Next Step (Completed)
+
+v7.31.0-P1 Backend Readonly Status API Skeleton has been **IMPLEMENTED** (2026-05-20). Human owner approved the construction pack and the 4 readonly GET endpoints were implemented in `apps/local-api`. See `AIP_BACKEND_READONLY_STATUS_API_SKELETON.md` and `AIP_V7_31_P1_BACKEND_READONLY_STATUS_API_SKELETON_REPORT.md` for details.
+
+Next: v7.31.0-P2 (await human decision).

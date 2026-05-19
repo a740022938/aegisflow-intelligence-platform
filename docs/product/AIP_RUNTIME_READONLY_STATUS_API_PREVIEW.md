@@ -1,9 +1,9 @@
 # AIP Runtime Readonly Status API Preview
 
 > **Preview Version:** v1.0-preview
-> **AIP Baseline:** v7.30.0-P1
-> **Date:** 2026-05-19
-> **Status:** frontend readonly preview only — no backend endpoint
+> **AIP Baseline:** v7.31.0-P1
+> **Date:** 2026-05-20
+> **Status:** frontend preview + P1 backend skeleton live (4 GET endpoints at /api/runtime/*)
 
 ## 1. Preview Purpose
 

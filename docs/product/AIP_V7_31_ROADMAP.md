@@ -1,7 +1,7 @@
 # AIP v7.31 Roadmap
 
-> **Roadmap Version:** v7.31.0-D1
-> **Date:** 2026-05-19
+> **Roadmap Version:** v7.31.0-P1 (updated)
+> **Date:** 2026-05-20
 > **Previous:** v7.30.0 Final Seal (V7_30_FINAL_SEAL_READY)
 > **Scope:** Backend Readonly API Implementation Blueprint
 
@@ -125,7 +125,7 @@
 ## 4. Dependency Chain
 
 ```
-D1 (blueprint — COMPLETED) → D2 (human review pack) → P1 (backend skeleton) → P2 (contract tests) → P3 (frontend linkage) → P4 (final seal)
+D1 (blueprint — COMPLETED) → D2 (human review pack — APPROVED) → P1 (backend skeleton — IMPLEMENTED) → P2 (contract tests) → P3 (frontend linkage) → P4 (final seal)
 ```
 
 Each phase requires human project owner approval before proceeding. Phases can be reordered or skipped.
@@ -143,9 +143,9 @@ Each phase requires human project owner approval before proceeding. Phases can b
 
 ## v7.31-D2 Human Review Pack
 
-- **Status:** PENDING_HUMAN_OWNER_REVIEW
-- **P1 skeleton:** Not yet approved
-- **Backend endpoint:** NOT implemented (human review pack only)
+- **Status:** APPROVED_AND_IMPLEMENTED
+- **P1 skeleton:** Implemented (v7.31.0-P1)
+- **Backend endpoint:** 4 GET readonly endpoints live at /api/runtime/*
 - **Stage C:** Permanently disabled
 - **DB write:** Not performed
 - **External control:** Not enabled

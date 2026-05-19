@@ -1,7 +1,7 @@
 # AIP Backend Readonly API Test Strategy
 
-> **Phase:** v7.31.0-D1
-> **Status:** Design-only — no test code written
+> **Phase:** v7.31.0-P1
+> **Status:** P1 tests implemented — 6 contract tests (Vitest)
 > **Purpose:** Define the testing strategy for future readonly backend API implementation
 
 ## 1. Unit Tests
