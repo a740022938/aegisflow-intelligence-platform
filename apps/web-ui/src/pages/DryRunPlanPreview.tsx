@@ -285,6 +285,22 @@ export default function DryRunPlanPreview() {
         ))}
       </SectionCard>
 
+      {/* H. Evidence Input/Output Traceability */}
+      <SectionCard title="证据输入/输出可追溯性" style={{ marginBottom: 16, border: '1px solid #22C55E' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+          证据 schema 定义了 dry-run plan preview 的输入和输出可追溯性模型。
+          相关证据项: dry-run-plan-preview-evidence, dry-run-validator-summary
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/evidence-schema-preview" style={{ fontSize: 11, color: '#22C55E', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(34,197,94,0.3)' }}>
+            打开证据模型预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.06)', fontSize: 10, color: '#22C55E', textAlign: 'center' }}>
+          Evidence Schema — 只读证据模型预览 · 不执行 dry-run · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
       {/* G. Forbidden Dry-run Notice */}
       <SectionCard title="当前阶段禁止事项" style={{ marginBottom: 16, border: '1px solid var(--danger)' }}>
         <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)' }}>

@@ -73,3 +73,7 @@
 - No token/API key storage in approval requests
 - Approval records are for display only
 - All approval data is ephemeral (not persisted)
+
+## 9. v7.28.0-P3 Evidence Schema Preview
+
+**P3 Evidence Schema Preview** is established as a readonly preview at `/evidence-schema-preview` (hidden direct). It provides a static display of evidence types and schema draft only — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C disabled**.

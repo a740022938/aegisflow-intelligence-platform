@@ -289,6 +289,9 @@ export default function AuditLogPreview() {
           <Link to="/human-approval-workflow-preview" style={{ fontSize: 11, color: '#EC4899', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(236,72,153,0.3)' }}>
             打开人工审批流程预览
           </Link>
+          <Link to="/evidence-schema-preview" style={{ fontSize: 11, color: '#22C55E', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(34,197,94,0.3)' }}>
+            打开证据模型预览
+          </Link>
         </div>
       </SectionCard>
     </PageShell>

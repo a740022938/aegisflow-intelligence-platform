@@ -69,3 +69,7 @@ The Governance State Machine Preview is a readonly frontend page that visualizes
 ## Commit
 
 `feat(governance): add readonly governance state machine preview`
+
+## v7.28.0-P3 Evidence Schema Preview
+
+**P3 Evidence Schema Preview** is now established at `/evidence-schema-preview` (hidden direct, readonly). It shows evidence types and schema draft as a static model — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C disabled**. This P3 preview follows the same hidden-direct-readonly pattern as the P1 governance state machine preview.

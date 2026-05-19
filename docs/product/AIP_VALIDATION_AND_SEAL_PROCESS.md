@@ -85,4 +85,8 @@ Blocking: 0  Warning: 0  Info: 0
 
 ## v7.28 Governance Blueprint — Validation Process
 
-v7.28.0-D1 docs-only phase follows the same validation process. All gates must pass before commit. The `db:doctor`, `secret:scan`, `smoke` scripts remain undefined in `apps/web-ui/package.json` and will be recorded as SKIP in all v7.28 reports.|
+v7.28.0-D1 docs-only phase follows the same validation process. All gates must pass before commit. The `db:doctor`, `secret:scan`, `smoke` scripts remain undefined in `apps/web-ui/package.json` and will be recorded as SKIP in all v7.28 reports.
+
+## v7.28.0-P3 Evidence Schema Preview
+
+P3 Evidence Schema Preview is now established at `/evidence-schema-preview` (hidden direct, readonly). The preview shows evidence types and schema as a static model — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, Stage C disabled**. The same validation gates (lint, typecheck, build) apply before any P3 commit. No new seal checks are required for this preview; all 15 seal audit criteria remain unchanged.|

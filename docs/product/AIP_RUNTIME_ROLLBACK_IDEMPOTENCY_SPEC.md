@@ -90,3 +90,7 @@ Before any external system write:
 - No recovery mechanism
 - All operations are readonly
 - Stage C permanently disabled
+
+## 12. v7.28.0-P3 Evidence Schema Preview
+
+**P3 Evidence Schema Preview** is now live at `/evidence-schema-preview` (hidden direct, readonly). It shows evidence types and schema as a static model — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C disabled**. This P3 preview does not change any rollback or idempotency behavior.

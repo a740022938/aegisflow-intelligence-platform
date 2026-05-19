@@ -199,3 +199,7 @@
 - Stage C is disabled in v7.28
 - No endpoint shall execute without passing all required gates
 - v7.28.0-P1 Governance State Machine Preview uses static registry data — no API calls to any endpoint
+
+## 7. v7.28.0-P3 Evidence Schema Preview
+
+**P3 Evidence Schema Preview** is available as a readonly page at `/evidence-schema-preview` (hidden direct). The preview displays evidence types and schema draft only — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C is disabled**. No API endpoint is associated with this preview.

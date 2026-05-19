@@ -1,6 +1,6 @@
 # v7.28 Roadmap — Runtime Governance Blueprint
 
-**Status:** P1 Completed (P2-P3 planned, Final pending)
+**Status:** P1-P2-P3 Completed (Final pending)
 
 ## Overview
 
@@ -58,19 +58,22 @@ Files:
 - No real transitions
 - No sidebar changes
 
-### P2: Approval Workflow Preview
+### P2: Approval Workflow Preview (Completed)
 
 - New hidden route `/approval-workflow-preview`
 - Readonly display of approval states
 - No candidate processing
+- No evidence writer, no evidence store, no secret capture, no DB write, no external control, Stage C disabled
 
 **Commit policy:** `feat(runtime): add approval workflow preview`
 
-### P3: Evidence Schema Preview
+### P3: Evidence Schema Preview (Completed)
 
 - New hidden route `/evidence-schema-preview`
 - Readonly display of evidence types and schema
 - No evidence collection
+- No evidence writer, no evidence store, no secret capture, no DB write, no external control, Stage C disabled
+- Evidence schema is a static readonly model — no persistent storage, no retrieval API
 
 **Commit policy:** `feat(runtime): add evidence schema preview`
 

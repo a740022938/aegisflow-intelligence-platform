@@ -207,6 +207,9 @@ export default function PermissionEvaluatorPreview() {
                     <p><strong>人工审批流程参考:</strong></p>
                     <p>- human-approval-workflow-preview: hidden direct / readonly — 不创建审批队列 · 不处理 candidate · 不写数据库 · 不启用 Stage C</p>
                     <p>- 20 items, all execution/approval/candidate/Stage C transitions blocked</p>
+                    <p><strong>证据模型参考:</strong></p>
+                    <p>- evidence-schema-preview: hidden direct / readonly — 不采集证据 · 不保存 secret · 不写 evidence store · 不写数据库 · 不启用 Stage C</p>
+                    <p>- 23 items, all forbidden_secret hard-blocked, token/API key/password capture forbidden</p>
                   </div>
                 );
               })()}

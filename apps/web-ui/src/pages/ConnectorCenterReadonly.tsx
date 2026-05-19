@@ -285,6 +285,22 @@ export default function ConnectorCenterReadonly() {
         </div>
       </SectionCard>
 
+      {/* Evidence Readiness Summary */}
+      <SectionCard title="证据准备度摘要" style={{ marginBottom: 16, border: '1px solid #22C55E' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+          证据 schema 定义了连接器 readiness snapshot 的结构、脱敏策略和门禁条件。
+          当前版本为只读模型，不采集证据，不写 evidence store。
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/evidence-schema-preview" style={{ fontSize: 11, color: '#22C55E', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(34,197,94,0.3)' }}>
+            打开证据模型预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.06)', fontSize: 10, color: '#22C55E', textAlign: 'center' }}>
+          Evidence Schema — 只读证据模型预览 · 不采集证据 · 不保存 secret · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
       {/* Human Approval Gate Summary */}
       <SectionCard title="人工审批门禁摘要" style={{ marginBottom: 16, border: '1px solid #EC4899' }}>
         <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>

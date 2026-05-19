@@ -67,3 +67,7 @@ All are set to `allowedNow=false` and will remain so until Stage C is enabled.
 - Registry items correctly gated
 - Clear prohibition against auto-enablement
 - Traceability for future human decision
+
+## 8. v7.28.0-P3 Evidence Schema Preview
+
+P3 Evidence Schema Preview does **not** enable Stage C. It is a readonly preview at `/evidence-schema-preview` (hidden direct) showing evidence types and schema as a static model — **no evidence writer, no evidence store, no secret capture, no DB write, no external control**. Stage C remains permanently disabled. All Stage C gated items (db-write, external-tool-execute, git-tag-release, etc.) remain `allowedNow=false`.

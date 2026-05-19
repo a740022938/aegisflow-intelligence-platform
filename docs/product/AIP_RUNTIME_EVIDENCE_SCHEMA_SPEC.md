@@ -72,3 +72,7 @@
 - No persistent storage
 - No evidence retrieval API
 - All evidence is ephemeral (report files only)
+
+## 8. v7.28.0-P3 Evidence Schema Preview
+
+**P3 Evidence Schema Preview** is available as a readonly preview at `/evidence-schema-preview` (hidden direct route, not in sidebar). The preview shows evidence types and schema draft only — there is **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C is disabled**.

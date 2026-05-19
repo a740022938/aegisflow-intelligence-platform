@@ -10,7 +10,8 @@ export type CenterAccessKind =
   | 'navigation_preview'
   | 'runtime_registry'
   | 'governance_state_machine'
-  | 'human_approval';
+  | 'human_approval'
+  | 'evidence_schema';
 
 export type CenterAccessStatus =
   | 'available_route'
@@ -484,6 +485,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     maturity: 'preview',
     owner: 'governance',
   },
+  {
+    id: 'evidence-schema-preview',
+    name: 'Evidence Schema Preview',
+    kind: 'evidence_schema',
+    route: '/evidence-schema-preview',
+    status: 'hidden_direct',
+    risk: 'medium',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_evidence_capture', 'no_secret_storage', 'no_db_write', 'no_external_control', 'no_stage_c'],
+    allowedActions: ['view_evidence_schema', 'view_evidence_types', 'view_sources', 'view_sensitivity_retention', 'view_redaction_policy', 'view_attestation'],
+    blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'control_external_tools', 'capture_evidence', 'save_evidence', 'store_secret', 'call_external_api', 'release'],
+    requiredBeforeExposure: ['readonly_only', 'no_evidence_implementation'],
+    releaseGate: [],
+    displayOrder: 11,
+    group: 'navigation',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 80,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '当前可开放', 'preview_ready'],
+    description: '只读证据模型预览。展示 23 个证据 schema 项目、证据类型面板、来源矩阵、敏感度/保留策略、脱敏策略、证明面板和验证摘要。未入左侧菜单。hidden direct route。',
+    notes: 'Evidence Schema Preview — 未入左侧菜单。hidden direct route。只读预览。不采集证据。不保存 secret。不写 evidence store。不写 DB。不启用 Stage C。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'Evidence Schema Preview is design-only. Keep hidden direct until evidence schema is validated and human approval is given.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove from launchpad if needed.',
+    userImpact: 'Low — preview page for evidence schema model planning. No evidence capture or secret storage.',
+    maturity: 'preview',
+    owner: 'governance',
+  },
 ];
 
 export function getCenterAccessItemCount(): number {
@@ -679,6 +719,9 @@ export function validateCenterAccess(): CenterAccessValidationIssue[] {
     }
     if (c.id === 'human-approval-workflow-preview' && c.visibleInSidebar) {
       issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'human-approval-workflow-preview should NOT be visible in sidebar.' });
+    }
+    if (c.id === 'evidence-schema-preview' && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'evidence-schema-preview should NOT be visible in sidebar.' });
     }
     if (c.id === 'dry-run-plan-preview' && c.visibleInSidebar) {
       issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'dry-run-plan-preview should NOT be visible in sidebar.' });

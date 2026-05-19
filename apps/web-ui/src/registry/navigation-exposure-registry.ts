@@ -39,7 +39,9 @@ export type NavigationExposureGate =
   | 'no_audit_write'
   | 'no_state_transition'
   | 'no_approval_queue'
-  | 'no_candidate_processing';
+  | 'no_candidate_processing'
+  | 'no_evidence_capture'
+  | 'no_secret_storage';
 
 export interface NavigationExposureEntry {
   id: string;
@@ -956,6 +958,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     notes: 'v7.28.0-P2 added as hidden direct-route. Not in sidebar. Readonly preview only. No real approval processing.',
   },
 
+  // Evidence Schema Preview (hidden route, not in sidebar)
+  {
+    id: 'evidence-schema-preview',
+    path: '/evidence-schema-preview',
+    label: 'Evidence Schema Preview',
+    component: 'EvidenceSchemaPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_evidence_capture', 'no_secret_storage', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly evidence schema preview page. Shows 23 evidence schema items, evidence type board, source matrix, sensitivity/retention board, redaction policy, attestation board, blocked evidence board, and validator summary. Not added to left menu. No evidence capture, no secret storage, no DB write, no external control, no Stage C.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.28.0-P3 added as hidden direct-route. Not in sidebar. Readonly preview only. No evidence writer, no evidence store, no secret capture.',
+  },
+
   // 隐 module placeholder routes (not in nav, from App.tsx)
   {
     id: 'workspace',
@@ -1254,6 +1273,11 @@ export function validateNavigationExposure(): ExposureValidationIssue[] {
     if (entry.id === 'human-approval-workflow-preview') {
       if (entry.currentExposure !== 'direct_route') {
         issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'human-approval-workflow-preview should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'evidence-schema-preview') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'evidence-schema-preview should have currentExposure=direct_route (not in sidebar).' });
       }
     }
   }

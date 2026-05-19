@@ -98,3 +98,7 @@ Each state must satisfy the following from `permission-evaluator-registry`:
 - No Governance Center state mutation
 - Stage C permanently disabled
 - P1 preview page at `/governance-state-machine-preview` shows 7 states and 18 transitions as static model
+
+## 11. v7.28.0-P3 Evidence Schema Preview
+
+**P3 Evidence Schema Preview** is now available at `/evidence-schema-preview` (hidden direct, readonly). It displays evidence types and schema as a static model only — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C remains disabled**.

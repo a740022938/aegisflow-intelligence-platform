@@ -31,6 +31,7 @@
 | Navigation Preview | allow_hidden_direct | low | info | preview_only | No |
 | Permission Evaluator Preview | allow_hidden_direct | low | info | preview_only | No |
 | Governance State Machine Preview | allow_hidden_direct | low | info | preview_only | Yes |
+| Evidence Schema Preview | allow_hidden_direct | low | info | preview_only | Yes |
 
 ## Hold Review (3 targets)
 
@@ -113,4 +114,7 @@ Gates: readonly_gate, dry_run_gate, human_approval_gate, audit_log_gate, rollbac
 v7.28.0-P1 governance state machine preview adds 1 new hidden direct target:
 - Governance State Machine Preview added as preview_only hidden direct target (low risk, info, allowed now)
 - No changes to existing allow/deny/hold_review decisions
-- All v7.28 P1 work is readonly preview — no state transitions, no approval processing, no DB write|
+- All v7.28 P1 work is readonly preview — no state transitions, no approval processing, no DB write
+
+v7.28.0-P3 evidence schema preview adds 1 new hidden direct target:
+- Evidence Schema Preview added as preview_only hidden direct target (low risk, info, allowed_now=true, no evidence writer, no evidence store, no secret capture, no DB write, no external control, Stage C disabled)|

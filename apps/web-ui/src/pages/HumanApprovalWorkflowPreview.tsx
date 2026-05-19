@@ -268,6 +268,9 @@ const HumanApprovalWorkflowPreview: React.FC = () => {
           <Link to="/audit-log-preview" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(139,92,246,0.3)' }}>
             打开审计日志预览
           </Link>
+          <Link to="/evidence-schema-preview" style={{ fontSize: 11, color: '#22C55E', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(34,197,94,0.3)' }}>
+            打开证据模型预览
+          </Link>
         </div>
       </SectionCard>
     </PageShell>

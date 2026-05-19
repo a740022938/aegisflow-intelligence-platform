@@ -147,4 +147,8 @@ v7.28.0-D1 adds 5 audit/rollback-related design docs:
 - `AIP_RUNTIME_API_CONTRACT_SPEC.md` — API contracts including audit endpoints
 - `AIP_RUNTIME_GOVERNANCE_STATE_MACHINE.md` — state machine for audit transitions
 
-All are design-only. No audit log write, no rollback execution, no DB write.|
+All are design-only. No audit log write, no rollback execution, no DB write.
+
+## 12. v7.28.0-P3 Evidence Schema Preview
+
+P3 Evidence Schema Preview is now established as a readonly preview at `/evidence-schema-preview` (hidden direct). It displays evidence types and schema draft only — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C is disabled**. This is a frontend-only preview with no audit log write or rollback execution.|
