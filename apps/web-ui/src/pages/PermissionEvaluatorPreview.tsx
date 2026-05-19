@@ -210,6 +210,9 @@ export default function PermissionEvaluatorPreview() {
                     <p><strong>证据模型参考:</strong></p>
                     <p>- evidence-schema-preview: hidden direct / readonly — 不采集证据 · 不保存 secret · 不写 evidence store · 不写数据库 · 不启用 Stage C</p>
                     <p>- 23 items, all forbidden_secret hard-blocked, token/API key/password capture forbidden</p>
+                    <p><strong>回滚参考:</strong></p>
+                    <p>- rollback-preview: hidden direct / readonly — 不执行回滚 · 不恢复文件 · 不写数据库 · 不控制外部工具 · 不启用 Stage C</p>
+                    <p>- 22 items, 9 blocked irreversible, all executesRollback=false, all modifiesFiles=false, all modifiesGit=false</p>
                   </div>
                 );
               })()}

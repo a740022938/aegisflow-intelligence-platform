@@ -73,3 +73,7 @@ The Governance State Machine Preview is a readonly frontend page that visualizes
 ## v7.28.0-P3 Evidence Schema Preview
 
 **P3 Evidence Schema Preview** is now established at `/evidence-schema-preview` (hidden direct, readonly). It shows evidence types and schema draft as a static model — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C disabled**. This P3 preview follows the same hidden-direct-readonly pattern as the P1 governance state machine preview.
+
+## v7.28.0-P4 Rollback Preview
+
+**P4 Rollback Preview** is now established at /rollback-preview (hidden direct, readonly). It provides a static display of rollback states and idempotency keys as a readonly model — **no rollback executor, no file restore, no git mutation, no DB write, no external control, and Stage C disabled**. This P4 preview follows the same hidden-direct-readonly pattern as the P1 governance state machine and P3 evidence schema previews.

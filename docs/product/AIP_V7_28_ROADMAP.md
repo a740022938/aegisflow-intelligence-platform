@@ -1,6 +1,6 @@
 # v7.28 Roadmap — Runtime Governance Blueprint
 
-**Status:** P1-P2-P3 Completed (Final pending)
+**Status:** P1-P2-P3-P4 Completed (Final pending)
 
 ## Overview
 
@@ -11,6 +11,7 @@
 | P1 | Governance State Machine Preview | Frontend preview page for state machine visualization | Yes (new page) | No | No | No | No | Low |
 | P2 | Approval Workflow Preview | Frontend preview page for approval workflow | Yes (new page) | No | No | No | No | Low |
 | P3 | Evidence Schema Preview | Frontend preview page for evidence schema | Yes (new page) | No | No | No | No | Low |
+| P4 | Rollback Preview | Frontend preview page for rollback states and idempotency keys | Yes (new page) | No | No | No | No | Low |
 | Final | v7.28 Final Seal Recheck | Audit all v7.28 phases, verify gates, seal | No | No | No | No | No | Low |
 
 ## Phase Details
@@ -76,6 +77,17 @@ Files:
 - Evidence schema is a static readonly model — no persistent storage, no retrieval API
 
 **Commit policy:** `feat(runtime): add evidence schema preview`
+
+### P4: Rollback Preview (Completed)
+
+- New hidden route `/rollback-preview`
+- Readonly display of rollback states and idempotency keys
+- No rollback executor
+- No file restore
+- No git mutation
+- No evidence writer, no evidence store, no secret capture, no DB write, no external control, Stage C disabled
+
+**Commit policy:** `feat(runtime): add rollback preview`
 
 ## Constraints
 

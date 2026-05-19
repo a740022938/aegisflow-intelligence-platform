@@ -275,6 +275,8 @@ const GovernanceStateMachinePreview: React.FC = () => {
           <Link to="/human-approval-workflow-preview" style={{ color: '#EC4899', textDecoration: 'none' }}>Human Approval →</Link>
           {' | '}
           <Link to="/evidence-schema-preview" style={{ color: '#22C55E', textDecoration: 'none' }}>Evidence Schema →</Link>
+          {' | '}
+          <Link to="/rollback-preview" style={{ color: '#F97316', textDecoration: 'none' }}>Rollback →</Link>
         </div>
       </SectionCard>
 

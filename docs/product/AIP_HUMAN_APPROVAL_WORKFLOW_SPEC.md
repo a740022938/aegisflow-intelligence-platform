@@ -77,3 +77,7 @@
 ## 9. v7.28.0-P3 Evidence Schema Preview
 
 **P3 Evidence Schema Preview** is established as a readonly preview at `/evidence-schema-preview` (hidden direct). It provides a static display of evidence types and schema draft only — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C disabled**.
+
+## 10. v7.28.0-P4 Rollback Preview
+
+**P4 Rollback Preview** is now established at /rollback-preview (hidden direct, readonly). It provides a static display of rollback states and idempotency keys as a readonly model — **no rollback executor, no file restore, no git mutation, no DB write, no external control, and Stage C disabled**. This P4 preview does not change approval workflow behavior; all approval states remain display-only and no approval execution occurs.

@@ -358,6 +358,7 @@ const EvidenceSchemaPreview: React.FC = () => {
           <Link to="/permission-evaluator-preview" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Permission Evaluator Preview →</Link>
           <Link to="/advanced-mode-readonly" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Advanced Mode Readonly →</Link>
           <Link to="/connector-center-readonly" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Connector Center Readonly →</Link>
+          <Link to="/rollback-preview" style={{ color: '#F97316', textDecoration: 'none' }}>Rollback Preview →</Link>
         </div>
       </SectionCard>
     </PageShell>

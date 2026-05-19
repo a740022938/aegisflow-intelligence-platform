@@ -152,3 +152,7 @@ All are design-only. No audit log write, no rollback execution, no DB write.
 ## 12. v7.28.0-P3 Evidence Schema Preview
 
 P3 Evidence Schema Preview is now established as a readonly preview at `/evidence-schema-preview` (hidden direct). It displays evidence types and schema draft only — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C is disabled**. This is a frontend-only preview with no audit log write or rollback execution.|
+
+## 13. v7.28.0-P4 Rollback Preview
+
+**P4 Rollback Preview** is now established at /rollback-preview (hidden direct, readonly). It provides a static display of rollback states and idempotency keys as a readonly model — **no rollback executor, no file restore, no git mutation, no DB write, no external control, and Stage C disabled**. This P4 preview does not write to the audit log or execute any rollback; all audit and rollback operations remain design-only.

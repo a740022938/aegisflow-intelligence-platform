@@ -102,3 +102,7 @@ Each state must satisfy the following from `permission-evaluator-registry`:
 ## 11. v7.28.0-P3 Evidence Schema Preview
 
 **P3 Evidence Schema Preview** is now available at `/evidence-schema-preview` (hidden direct, readonly). It displays evidence types and schema as a static model only — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, and Stage C remains disabled**.
+
+## 12. v7.28.0-P4 Rollback Preview
+
+**P4 Rollback Preview** is now established at /rollback-preview (hidden direct, readonly). It provides a static display of rollback states and idempotency keys as a readonly model — **no rollback executor, no file restore, no git mutation, no DB write, no external control, and Stage C disabled**. This P4 preview does not change governance state machine behavior; all states and transitions remain static and display-only.

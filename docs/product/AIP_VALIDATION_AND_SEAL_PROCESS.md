@@ -90,3 +90,7 @@ v7.28.0-D1 docs-only phase follows the same validation process. All gates must p
 ## v7.28.0-P3 Evidence Schema Preview
 
 P3 Evidence Schema Preview is now established at `/evidence-schema-preview` (hidden direct, readonly). The preview shows evidence types and schema as a static model — **no evidence writer, no evidence store, no secret capture, no DB write, no external control, Stage C disabled**. The same validation gates (lint, typecheck, build) apply before any P3 commit. No new seal checks are required for this preview; all 15 seal audit criteria remain unchanged.|
+
+## v7.28.0-P4 Rollback Preview
+
+P4 Rollback Preview is now established at /rollback-preview (hidden direct, readonly). It provides a static display of rollback states and idempotency keys as a readonly model — **no rollback executor, no file restore, no git mutation, no DB write, no external control, Stage C disabled**. The same validation gates (lint, typecheck, build) apply before any P4 commit. No new seal checks are required for this preview; all 15 seal audit criteria remain unchanged.

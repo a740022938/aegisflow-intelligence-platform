@@ -32,6 +32,7 @@
 | Permission Evaluator Preview | allow_hidden_direct | low | info | preview_only | No |
 | Governance State Machine Preview | allow_hidden_direct | low | info | preview_only | Yes |
 | Evidence Schema Preview | allow_hidden_direct | low | info | preview_only | Yes |
+| Rollback Preview | allow_hidden_direct | low | info | preview_only | Yes |
 
 ## Hold Review (3 targets)
 
@@ -117,4 +118,7 @@ v7.28.0-P1 governance state machine preview adds 1 new hidden direct target:
 - All v7.28 P1 work is readonly preview — no state transitions, no approval processing, no DB write
 
 v7.28.0-P3 evidence schema preview adds 1 new hidden direct target:
-- Evidence Schema Preview added as preview_only hidden direct target (low risk, info, allowed_now=true, no evidence writer, no evidence store, no secret capture, no DB write, no external control, Stage C disabled)|
+- Evidence Schema Preview added as preview_only hidden direct target (low risk, info, allowed_now=true, no evidence writer, no evidence store, no secret capture, no DB write, no external control, Stage C disabled)
+
+v7.28.0-P4 rollback preview adds 1 new hidden direct target:
+- Rollback Preview added as preview_only hidden direct target (low risk, info, allowed_now=true, no rollback executor, no file restore, no git mutation, no DB write, no external control, Stage C disabled)|

@@ -11,7 +11,8 @@ export type CenterAccessKind =
   | 'runtime_registry'
   | 'governance_state_machine'
   | 'human_approval'
-  | 'evidence_schema';
+  | 'evidence_schema'
+  | 'rollback';
 
 export type CenterAccessStatus =
   | 'available_route'
@@ -524,6 +525,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     maturity: 'preview',
     owner: 'governance',
   },
+  {
+    id: 'rollback-preview',
+    name: 'Rollback Preview',
+    kind: 'rollback',
+    route: '/rollback-preview',
+    status: 'hidden_direct',
+    risk: 'medium',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_rollback_execution', 'no_file_restore', 'no_git_mutation', 'no_db_write', 'no_external_control', 'no_stage_c'],
+    allowedActions: ['view_rollback_risk', 'view_idempotency', 'view_preconditions', 'view_evidence_requirements', 'view_blocked_rollback'],
+    blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'control_external_tools', 'execute_rollback', 'restore_file', 'git_reset', 'git_revert', 'git_tag', 'git_release', 'call_external_api', 'release'],
+    requiredBeforeExposure: ['readonly_only', 'no_rollback_implementation'],
+    releaseGate: [],
+    displayOrder: 12,
+    group: 'navigation',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 80,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '当前可开放', 'preview_ready'],
+    description: '只读回滚风险评估预览。展示 22 个回滚注册表项目、回滚目标面板、幂等性检查、前置条件、证据需求、阻断回滚面板和验证摘要。未入左侧菜单。hidden direct route。',
+    notes: 'Rollback Preview — 未入左侧菜单。hidden direct route。只读预览。不执行回滚。不恢复文件。不执行 Git reset/revert/tag/release。不写 DB。不启用 Stage C。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'Rollback Preview is design-only. Keep hidden direct until rollback risk assessment is validated and human approval is given.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove from launchpad if needed.',
+    userImpact: 'Low — preview page for rollback risk assessment planning. No rollback execution or file restore.',
+    maturity: 'preview',
+    owner: 'governance',
+  },
 ];
 
 export function getCenterAccessItemCount(): number {
@@ -722,6 +762,9 @@ export function validateCenterAccess(): CenterAccessValidationIssue[] {
     }
     if (c.id === 'evidence-schema-preview' && c.visibleInSidebar) {
       issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'evidence-schema-preview should NOT be visible in sidebar.' });
+    }
+    if (c.id === 'rollback-preview' && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'rollback-preview should NOT be visible in sidebar.' });
     }
     if (c.id === 'dry-run-plan-preview' && c.visibleInSidebar) {
       issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'dry-run-plan-preview should NOT be visible in sidebar.' });

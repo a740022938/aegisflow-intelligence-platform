@@ -279,6 +279,21 @@ export default function RuntimeRegistryPreview() {
         </div>
       </SectionCard>
 
+      {/* J. Rollback Gate Summary */}
+      <SectionCard title="回滚门禁摘要" style={{ marginBottom: 16, border: '1px solid #F97316' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+          22 rollback items · 9 blocked irreversible · Targets: runtime_registry, dry_run_plan, audit_log, human_approval, governance_state, evidence_schema, permission_evaluator, connector_center, git, database, external_tool, stage_c, local_file
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/rollback-preview" style={{ fontSize: 11, color: '#F97316', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(249,115,22,0.3)' }}>
+            打开回滚预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(249,115,22,0.06)', fontSize: 10, color: '#F97316', textAlign: 'center' }}>
+          Rollback — 只读回滚风险评估预览 · 不执行回滚 · 不恢复文件 · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
       {/* I. Evidence Schema Source Snapshot */}
       <SectionCard title="证据模型来源快照" style={{ marginBottom: 16, border: '1px solid #22C55E' }}>
         <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>

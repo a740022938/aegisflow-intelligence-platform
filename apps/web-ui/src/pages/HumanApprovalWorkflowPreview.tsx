@@ -271,6 +271,9 @@ const HumanApprovalWorkflowPreview: React.FC = () => {
           <Link to="/evidence-schema-preview" style={{ fontSize: 11, color: '#22C55E', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(34,197,94,0.3)' }}>
             打开证据模型预览
           </Link>
+          <Link to="/rollback-preview" style={{ fontSize: 11, color: '#F97316', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(249,115,22,0.3)' }}>
+            打开回滚预览
+          </Link>
         </div>
       </SectionCard>
     </PageShell>

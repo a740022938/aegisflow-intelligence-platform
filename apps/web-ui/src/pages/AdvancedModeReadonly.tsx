@@ -243,11 +243,12 @@ const CENTER_KIND_LABELS: Record<CenterAccessKind, string> = {
   governance_state_machine: 'Governance State Machine',
   human_approval: 'Human Approval',
   evidence_schema: 'Evidence Schema',
+  rollback: 'Rollback',
 };
 
 const CENTER_KIND_COLORS: Record<CenterAccessKind, string> = {
   advanced: '#F97316', connector: '#22C55E', lab: '#3B82F6', governance: '#22C55E', navigation_preview: '#8B5CF6',
-  runtime_registry: '#8B5CF6', governance_state_machine: '#8B5CF6', human_approval: '#EC4899', evidence_schema: '#22C55E',
+  runtime_registry: '#8B5CF6', governance_state_machine: '#8B5CF6', human_approval: '#EC4899', evidence_schema: '#22C55E', rollback: '#F97316',
 };
 
 const READINESS_COLORS: Record<string, string> = {
@@ -989,6 +990,22 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
           Governance State Machine — 只读状态机预览 · 不迁移状态 · 不处理审批 · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
+      {/* Rollback Preview Summary */}
+      <SectionCard title="回滚预览" style={{ marginBottom: 20, border: '1px solid #F97316' }}>
+        <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          只读回滚风险评估预览 — 22 项回滚注册表，覆盖 13 个回滚目标（runtime、dry-run、audit、approval、governance、evidence、permission、connector、git、database、external_tool、stage_c、local_file）。
+          不执行回滚 · 不恢复文件 · 不写 DB · 不控制外部工具 · 不启用 Stage C
+        </div>
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/rollback-preview" style={{ fontSize: 11, color: '#F97316', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(249,115,22,0.3)' }}>
+            打开回滚预览 [只读]
+          </Link>
+        </div>
+        <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(249,115,22,0.06)', border: '1px solid rgba(249,115,22,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
+          Rollback — 只读回滚风险评估预览 · 不执行回滚 · 不恢复文件 · 不写数据库 · 不启用 Stage C
         </div>
       </SectionCard>
 

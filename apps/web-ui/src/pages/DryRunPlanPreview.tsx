@@ -285,6 +285,22 @@ export default function DryRunPlanPreview() {
         ))}
       </SectionCard>
 
+      {/* I. Rollback Plan Requirements */}
+      <SectionCard title="回滚计划需求" style={{ marginBottom: 16, border: '1px solid #F97316' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+          Rollback registry 定义了 dry-run plan preview 的回滚需求：idempotency check、rollback evidence、rollback audit trace。
+          相关 rollback 项: dry-run-plan-preview-rollback, idempotency-key-check-preview, rollback-evidence-requirement-preview
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/rollback-preview" style={{ fontSize: 11, color: '#F97316', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(249,115,22,0.3)' }}>
+            打开回滚预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(249,115,22,0.06)', fontSize: 10, color: '#F97316', textAlign: 'center' }}>
+          Rollback — 只读回滚风险评估 · 不执行 rollback · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
       {/* H. Evidence Input/Output Traceability */}
       <SectionCard title="证据输入/输出可追溯性" style={{ marginBottom: 16, border: '1px solid #22C55E' }}>
         <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>

@@ -285,6 +285,22 @@ export default function ConnectorCenterReadonly() {
         </div>
       </SectionCard>
 
+      {/* Rollback Readiness Summary */}
+      <SectionCard title="回滚准备度摘要" style={{ marginBottom: 16, border: '1px solid #F97316' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+          Rollback registry 定义了连接器回滚的准备度模型。当前版本为 blocked_irreversible — 不执行回滚，不控制外部工具。
+          相关 rollback 项: connector-center-preview-rollback, external-tool-control-rollback-blocked
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/rollback-preview" style={{ fontSize: 11, color: '#F97316', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(249,115,22,0.3)' }}>
+            打开回滚预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(249,115,22,0.06)', fontSize: 10, color: '#F97316', textAlign: 'center' }}>
+          Rollback — 只读回滚风险评估 · 不执行回滚 · 不控制外部工具 · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
       {/* Evidence Readiness Summary */}
       <SectionCard title="证据准备度摘要" style={{ marginBottom: 16, border: '1px solid #22C55E' }}>
         <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>

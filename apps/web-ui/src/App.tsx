@@ -48,6 +48,7 @@ const AuditLogPreview = lazy(() => import('./pages/AuditLogPreview'));
 const GovernanceStateMachinePreview = lazy(() => import('./pages/GovernanceStateMachinePreview'));
 const HumanApprovalWorkflowPreview = lazy(() => import('./pages/HumanApprovalWorkflowPreview'));
 const EvidenceSchemaPreview = lazy(() => import('./pages/EvidenceSchemaPreview'));
+const RollbackPreview = lazy(() => import('./pages/RollbackPreview'));
 
 function RouteFallback() {
   return (
@@ -160,6 +161,7 @@ const App: React.FC = () => {
             <Route path="governance-state-machine-preview" element={<GovernanceStateMachinePreview />} />
             <Route path="human-approval-workflow-preview" element={<HumanApprovalWorkflowPreview />} />
             <Route path="evidence-schema-preview" element={<EvidenceSchemaPreview />} />
+            <Route path="rollback-preview" element={<RollbackPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
