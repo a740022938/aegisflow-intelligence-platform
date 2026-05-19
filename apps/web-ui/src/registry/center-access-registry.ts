@@ -877,6 +877,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     maturity: 'preview',
     owner: 'governance',
   },
+  {
+    id: 'operator-console-registry-preview',
+    name: 'Operator Console Registry Preview',
+    kind: 'runtime_registry',
+    route: '/operator-console-registry-preview',
+    status: 'hidden_direct',
+    risk: 'medium',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_execute', 'no_db_write', 'no_external_control', 'no_stage_c'],
+    allowedActions: ['view_registry', 'view_validator', 'view_boundary_cards', 'view_seal_baseline'],
+    blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'control_external_tools', 'call_external_api', 'implement_post_endpoint', 'release'],
+    requiredBeforeExposure: ['readonly_only', 'no_post', 'no_db_write', 'validator_pass', 'registry_complete'],
+    releaseGate: [],
+    displayOrder: 999,
+    group: 'governance',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 95,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '当前可开放', 'preview_ready'],
+    description: 'Operator Console Registry Preview — 20 个只读 registry 条目，覆盖 system/runtime/governance/approval/permission/evidence/audit/rollback/risk/boundary/operator/docs 领域。未入左侧菜单。hidden direct route。',
+    notes: 'Operator Console Registry Preview — P1 readonly registry preview。20 items，全部 readonly/actionAllowed=false/mutationAllowed=false。不入 sidebar。不启用 Stage C。不写 DB。不控制外部工具。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'Operator Console Registry Preview — P1 readonly registry preview. Keep hidden direct. Not in sidebar.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove route from App.tsx if needed.',
+    userImpact: 'Low — readonly registry preview page. Shows 20 registry items with validator. No action, no mutation, no POST.',
+    maturity: 'preview',
+    owner: 'governance',
+  },
 ];
 
 export function getCenterAccessItemCount(): number {
@@ -1105,6 +1144,9 @@ export function validateCenterAccess(): CenterAccessValidationIssue[] {
     }
     if (c.id === 'stage-c-preenable-review-preview' && c.visibleInSidebar) {
       issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'stage-c-preenable-review-preview should NOT be visible in sidebar.' });
+    }
+    if (c.id === 'operator-console-registry-preview' && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'operator-console-registry-preview should NOT be visible in sidebar.' });
     }
     if (c.id === 'lab-center-readonly' || c.id === 'governance-center' || c.id === 'navigation-preview-readonly') {
       if (c.visibleInSidebar) {

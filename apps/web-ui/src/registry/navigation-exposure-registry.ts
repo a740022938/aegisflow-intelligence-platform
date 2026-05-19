@@ -1211,6 +1211,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.30.0-P4 added as hidden direct-route. Not in sidebar. Readonly Stage C pre-enable review pack only. Does NOT enable Stage C.',
   },
+
+  // Operator Console Registry Preview (hidden route, not in sidebar)
+  {
+    id: 'operator-console-registry-preview',
+    path: '/operator-console-registry-preview',
+    label: 'Operator Console Registry Preview',
+    component: 'OperatorConsoleRegistryPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Operator Console registry preview page. 20 registry items across 12 domains. All items readonly, actionAllowed=false, mutationAllowed=false. No backend endpoint, no API call, no DB write, no external control, no Stage C. Not added to left menu.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.33.0-P1 added as hidden direct-route. Not in sidebar. Readonly registry preview. No action, no mutation, no POST.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {
@@ -1468,6 +1485,11 @@ export function validateNavigationExposure(): ExposureValidationIssue[] {
     if (entry.id === 'governance-console-report-pack-preview') {
       if (entry.currentExposure !== 'direct_route') {
         issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'governance-console-report-pack-preview should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'operator-console-registry-preview') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'operator-console-registry-preview should have currentExposure=direct_route (not in sidebar).' });
       }
     }
   }

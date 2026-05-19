@@ -15,10 +15,14 @@ v7.33 focuses on productizing the Operator Console — a read-only unified entry
 - Spec evidence panel and rollback/recovery panel
 - **Verdict:** V7_33_D1_OPERATOR_CONSOLE_BLUEPRINT_READY
 
-### P1 — Operator Console Registry Preview
-- Create hidden preview registry routes for Operator Console modules
-- Link registries to existing backend data
-- No UI changes, no sidebar changes
+### P1 — Operator Console Registry Preview (COMPLETED)
+- 20-item readonly registry across 12 domains
+- Registry validator with 15 checks (blocking=0, pass=true)
+- Readonly preview page: OperatorConsoleRegistryPreview
+- Hidden direct route: `/operator-console-registry-preview`
+- center-access-registry.ts + navigation-exposure-registry.ts entries added
+- No sidebar exposure, no backend changes, no Stage C
+- **Verdict:** V7_33_P1_OPERATOR_CONSOLE_REGISTRY_PREVIEW_READY
 
 ### P2 — Operator Console Readonly UI Preview
 - Create readonly preview UI components

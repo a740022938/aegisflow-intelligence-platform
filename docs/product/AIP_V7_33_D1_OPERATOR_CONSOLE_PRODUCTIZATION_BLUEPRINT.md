@@ -51,9 +51,9 @@ The Operator Console is NOT:
 
 | Phase | Scope | Description |
 |-------|-------|-------------|
-| D1 | Blueprint | Operator Console productization blueprint (current) |
-| P1 | Registry | Operator Console readonly preview registry |
-| P2 | UI Preview | Operator Console readonly UI preview |
+| D1 | Blueprint | Operator Console productization blueprint (completed) |
+| P1 | Registry | Operator Console readonly preview registry (COMPLETED) |
+| P2 | UI Preview | Operator Console readonly UI preview (next) |
 | P3 | Checklist | Operator checklist + evidence linkage preview |
 | P4 | Seal | Operator Console seal candidate |
 | Final | Seal recheck | v7.33 Final Seal Recheck |

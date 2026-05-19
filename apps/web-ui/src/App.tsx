@@ -57,6 +57,7 @@ const RuntimeReadonlyStatusApiPreview = lazy(() => import('./pages/RuntimeReadon
 const RuntimeDryRunContractPreview = lazy(() => import('./pages/RuntimeDryRunContractPreview'));
 const RuntimeAuditStoreContractPreview = lazy(() => import('./pages/RuntimeAuditStoreContractPreview'));
 const StageCPreEnableReviewPreview = lazy(() => import('./pages/StageCPreEnableReviewPreview'));
+const OperatorConsoleRegistryPreview = lazy(() => import('./pages/OperatorConsoleRegistryPreview'));
 
 function RouteFallback() {
   return (
@@ -178,6 +179,7 @@ const App: React.FC = () => {
             <Route path="runtime-dry-run-contract-preview" element={<RuntimeDryRunContractPreview />} />
             <Route path="runtime-audit-store-contract-preview" element={<RuntimeAuditStoreContractPreview />} />
             <Route path="stage-c-preenable-review-preview" element={<StageCPreEnableReviewPreview />} />
+            <Route path="operator-console-registry-preview" element={<OperatorConsoleRegistryPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
