@@ -867,6 +867,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     notes: 'v7.27.0-P1 added as hidden direct-route. Not in sidebar. Readonly preview only. No real runtime execution.',
   },
 
+  // Dry-run Plan Preview (hidden route, not in sidebar)
+  {
+    id: 'dry-run-plan-preview',
+    path: '/dry-run-plan-preview',
+    label: 'Dry-run Plan Preview',
+    component: 'DryRunPlanPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_external_control', 'no_db_write', 'stage_c_disabled'],
+    reason: 'Readonly dry-run plan preview page. Shows all dry-run plans, modes, planSteps, gates, risk status, and validator summary. Not added to left menu. No real dry-run execution.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.27.0-P2 added as hidden direct-route. Not in sidebar. Readonly preview only. No real dry-run execution.',
+  },
+
   // Permission Evaluator Preview (hidden route, not in sidebar)
   {
     id: 'permission-evaluator-preview',

@@ -17,6 +17,9 @@ import {
   getRuntimeRegistryValidationSummary,
 } from '../registry/runtime-registry-validator';
 import {
+  getDryRunPlanSummary,
+} from '../registry/dry-run-plan-registry';
+import {
   NAVIGATION_EXPOSURE_REGISTRY,
   NAVIGATION_EXPOSURE_LEVELS,
   getNavigationExposureStats,
@@ -839,6 +842,50 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
           Runtime Registry — 只读注册表预览 · 不运行外部工具 · 不写数据库 · 不控制连接器
+        </div>
+      </SectionCard>
+
+      {/* Dry-run Plan Preview Summary */}
+      <SectionCard title="Dry-run 计划预览" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          只读 Dry-run 计划注册表预览 — 不运行 dry-run · 不写数据库 · 不启用 Stage C · 不控制外部工具 · 不控制连接器
+        </div>
+        {(() => {
+          const ds = getDryRunPlanSummary();
+          return (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 8, marginBottom: 12 }}>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#3B82F6' }}>{ds.total}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>总计划</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--success)' }}>{ds.allowedNow}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>当前允许</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{ds.blocked}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>已拦截</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#DC2626' }}>{ds.highOrCritical}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>高/严重风险</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#DC2626' }}>{ds.requiresStageC}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>需 Stage C</div>
+                </div>
+              </div>
+            </>
+          );
+        })()}
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/dry-run-plan-preview" style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(59,130,246,0.3)' }}>
+            打开 Dry-run 计划预览 [只读]
+          </Link>
+        </div>
+        <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
+          Dry-run Plan — 只读计划预览 · 不运行 dry-run · 不写数据库 · 不启用 Stage C
         </div>
       </SectionCard>
 

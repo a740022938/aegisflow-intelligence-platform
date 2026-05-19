@@ -43,6 +43,7 @@ const ConnectorCenterReadonly = lazy(() => import('./pages/ConnectorCenterReadon
 const LabCenterReadonly = lazy(() => import('./pages/LabCenterReadonly'));
 const PermissionEvaluatorPreview = lazy(() => import('./pages/PermissionEvaluatorPreview'));
 const RuntimeRegistryPreview = lazy(() => import('./pages/RuntimeRegistryPreview'));
+const DryRunPlanPreview = lazy(() => import('./pages/DryRunPlanPreview'));
 
 function RouteFallback() {
   return (
@@ -150,6 +151,7 @@ const App: React.FC = () => {
             <Route path="lab-center-readonly" element={<LabCenterReadonly />} />
             <Route path="permission-evaluator-preview" element={<PermissionEvaluatorPreview />} />
             <Route path="runtime-registry-preview" element={<RuntimeRegistryPreview />} />
+            <Route path="dry-run-plan-preview" element={<DryRunPlanPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

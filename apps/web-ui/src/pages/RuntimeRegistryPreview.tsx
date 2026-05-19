@@ -18,6 +18,9 @@ import {
   validateRuntimeRegistry,
   getRuntimeRegistryValidationSummary,
 } from '../registry/runtime-registry-validator';
+import {
+  getDryRunPlanSummary,
+} from '../registry/dry-run-plan-registry';
 
 const RISK_COLORS: Record<string, string> = {
   low: 'var(--success)',
@@ -91,6 +94,7 @@ export default function RuntimeRegistryPreview() {
   const validationResult = useMemo(() => validateRuntimeRegistry(), []);
   const targetKindSummary = useMemo(() => getRuntimeRegistryTargetKindSummary(), []);
   const actionLevelSummary = useMemo(() => getRuntimeRegistryActionLevelSummary(), []);
+  const dryRunSummary = useMemo(() => getDryRunPlanSummary(), []);
 
   return (
     <PageShell
@@ -212,6 +216,25 @@ export default function RuntimeRegistryPreview() {
         {validationResult.info.map((msg, i) => (
           <div key={`i-${i}`} style={{ fontSize: 10, color: 'var(--text-muted)', padding: '2px 6px' }}>info: {msg}</div>
         ))}
+      </SectionCard>
+
+      {/* H. Dry-run Plan Preview Snapshot */}
+      <SectionCard title="Dry-run 计划预览快照" style={{ marginBottom: 16, border: '1px solid #3B82F6' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 8, marginBottom: 12 }}>
+          <KpiCard label="总计划" value={String(dryRunSummary.total)} color="#8B5CF6" />
+          <KpiCard label="当前允许" value={String(dryRunSummary.allowedNow)} color="var(--success)" />
+          <KpiCard label="已拦截" value={String(dryRunSummary.blocked)} color="var(--danger)" />
+          <KpiCard label="高/严重风险" value={String(dryRunSummary.highOrCritical)} color="#DC2626" />
+          <KpiCard label="需 Stage C" value={String(dryRunSummary.requiresStageC)} color="#DC2626" />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/dry-run-plan-preview" style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(59,130,246,0.3)' }}>
+            打开 Dry-run 计划预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(59,130,246,0.06)', fontSize: 10, color: '#3B82F6', textAlign: 'center' }}>
+          Dry-run Plan — 只读预览 · 不运行 dry-run · 不控制外部工具
+        </div>
       </SectionCard>
 
       {/* G. Forbidden Runtime Notice */}

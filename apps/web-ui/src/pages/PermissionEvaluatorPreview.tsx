@@ -194,6 +194,7 @@ export default function PermissionEvaluatorPreview() {
                     <p>总目标: {summary.total} | 当前允许: {summary.allowedNow} | 已拦截: {summary.blocked} | 高/严重风险: {summary.highOrCritical} | 需 Stage C: {summary.requiresStageC} | 需人工批准: {summary.requiresHumanApproval} | 外部写入: {summary.externalWrite}</p>
                     <p><strong>门禁规则:</strong></p>
                     <p>- runtime-registry-preview: hidden direct / readonly — 不运行外部工具 · 不写数据库 · 不启用 Stage C</p>
+                    <p>- dry-run-plan-preview: hidden direct / readonly — 不运行 dry-run · 不写数据库 · 不控制外部工具</p>
                     <p>- db-write: deny — 数据库写入在只读模式下永久禁止</p>
                     <p>- external-tool-control: deny — 外部工具控制永久禁止</p>
                     <p>- stage-c-transition: deny — Stage C 永久禁用</p>

@@ -6,6 +6,7 @@ import ConnectorCenterOverview from '../components/advanced/ConnectorCenterOverv
 import ConnectorCapabilityMatrix from '../components/advanced/ConnectorCapabilityMatrix';
 import ConnectorIntegrationBoundary from '../components/advanced/ConnectorIntegrationBoundary';
 import { getRuntimeRegistrySummary } from '../registry/runtime-registry';
+import { getDryRunPlanSummary } from '../registry/dry-run-plan-registry';
 import {
   CONNECTOR_REGISTRY_NEW as CONNECTOR_REGISTRY,
   getConnectorRegistryCount,
@@ -186,6 +187,45 @@ export default function ConnectorCenterReadonly() {
         })()}
         <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.06)', fontSize: 10, color: '#8B5CF6', textAlign: 'center' }}>
           Runtime Registry — 只读预览 · 不控制外部工具 · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
+      {/* Dry-run Plan Preview Snapshot */}
+      <SectionCard title="Dry-run 计划预览快照" style={{ marginBottom: 20, border: '1px solid #3B82F6' }}>
+        {(() => {
+          const ds = getDryRunPlanSummary();
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 8, marginBottom: 12 }}>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#3B82F6' }}>{ds.total}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>总计划</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--success)' }}>{ds.allowedNow}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>当前允许</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{ds.blocked}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>已拦截</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#DC2626' }}>{ds.highOrCritical}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>高/严重风险</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#DC2626' }}>{ds.requiresStageC}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>需 Stage C</div>
+              </div>
+            </div>
+          );
+        })()}
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/dry-run-plan-preview" style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(59,130,246,0.3)' }}>
+            打开完整 Dry-run 计划预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(59,130,246,0.06)', fontSize: 10, color: '#3B82F6', textAlign: 'center' }}>
+          Dry-run Plan — 只读预览 · 不控制外部工具 · 不写数据库 · 不启用 Stage C
         </div>
       </SectionCard>
 
