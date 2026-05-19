@@ -170,3 +170,14 @@
 The Runtime API v1 contract has been frozen (v1.freeze) in v7.30.0-D2. The contract freeze does not resolve any blocker — all 12 blockers remain active. The freeze document explicitly requires Stage C + human approval for all POST endpoints. No implementation blocker has been lifted.
 
 **Conclusion:** All 12 blockers are active. All require Stage C + human review. No runtime implementation is possible under current policy.
+
+## v7.30 Final Seal + v7.31 Blueprint
+
+- **v7.30 Final Seal Status:** V7_30_FINAL_SEAL_READY (commit f55f952)
+- **v7.31 Backend Readonly API Blueprint:** See `AIP_BACKEND_READONLY_API_IMPLEMENTATION_BLUEPRINT.md` — design-only, not implemented
+- **Backend endpoint:** NOT implemented (blueprint only)
+- **Runtime implementation:** NOT implemented (blueprint only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created

@@ -231,3 +231,14 @@ The v7.30.0-P2/P3/P4 Runtime Contract Acceleration Pack extends P1 with three mo
 | P4 | `/stage-c-preenable-review-preview` | 18 Stage C pre-enable review items (11 areas) |
 
 All follow the same pattern as P1: hidden direct route, static registry + validator, cross-page and metadata sync.
+
+## v7.30 Final Seal + v7.31 Blueprint
+
+- **v7.30 Final Seal Status:** V7_30_FINAL_SEAL_READY (commit f55f952)
+- **v7.31 Backend Readonly API Blueprint:** See `AIP_BACKEND_READONLY_API_IMPLEMENTATION_BLUEPRINT.md` — design-only, not implemented
+- **Backend endpoint:** NOT implemented (blueprint only)
+- **Runtime implementation:** NOT implemented (blueprint only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created

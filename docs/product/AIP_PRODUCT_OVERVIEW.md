@@ -159,3 +159,14 @@ All v7.28 work remains **design-only**. No implementation, no external tool cont
 - P4 Report Pack Preview — `/governance-console-report-pack-preview`
 - All 4: readonly, hidden direct, not in sidebar, validators pass (0 blocking)
 - Stage C permanently disabled
+
+## v7.30 Final Seal + v7.31 Blueprint
+
+- **v7.30 Final Seal Status:** V7_30_FINAL_SEAL_READY (commit f55f952)
+- **v7.31 Backend Readonly API Blueprint:** See `AIP_BACKEND_READONLY_API_IMPLEMENTATION_BLUEPRINT.md` — design-only, not implemented
+- **Backend endpoint:** NOT implemented (blueprint only)
+- **Runtime implementation:** NOT implemented (blueprint only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created
