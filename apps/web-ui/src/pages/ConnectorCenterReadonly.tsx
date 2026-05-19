@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import PageShell from '../components/ui/PageShell';
 import SectionCard from '../components/ui/SectionCard';
 import ConnectorCenterOverview from '../components/advanced/ConnectorCenterOverview';
 import ConnectorCapabilityMatrix from '../components/advanced/ConnectorCapabilityMatrix';
 import ConnectorIntegrationBoundary from '../components/advanced/ConnectorIntegrationBoundary';
+import { getRuntimeRegistrySummary } from '../registry/runtime-registry';
 import {
   CONNECTOR_REGISTRY_NEW as CONNECTOR_REGISTRY,
   getConnectorRegistryCount,
@@ -139,6 +141,51 @@ export default function ConnectorCenterReadonly() {
         </div>
         <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.06)', fontSize: 10, color: 'var(--success)' }}>
           All governance gates pass. Connector Center is a fully readonly metadata overview.
+        </div>
+      </SectionCard>
+
+      {/* Runtime Registry Preview Snapshot */}
+      <SectionCard title="Runtime Registry Preview Snapshot" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        {(() => {
+          const summary = getRuntimeRegistrySummary();
+          return (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 8, marginBottom: 12 }}>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#8B5CF6' }}>{summary.total}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>总目标</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--success)' }}>{summary.allowedNow}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>当前允许</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{summary.blocked}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>已拦截</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{summary.requiresStageC}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>需 Stage C</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--warning)' }}>{summary.requiresHumanApproval}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>需人工批准</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{summary.externalWrite}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>外部写入</div>
+                </div>
+              </div>
+              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <Link to="/runtime-registry-preview" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(139,92,246,0.3)' }}>
+                  打开完整 Runtime Registry 预览
+                </Link>
+              </div>
+            </>
+          );
+        })()}
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.06)', fontSize: 10, color: '#8B5CF6', textAlign: 'center' }}>
+          Runtime Registry — 只读预览 · 不控制外部工具 · 不写数据库 · 不启用 Stage C
         </div>
       </SectionCard>
 

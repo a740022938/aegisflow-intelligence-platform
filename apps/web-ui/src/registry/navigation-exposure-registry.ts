@@ -33,7 +33,9 @@ export type NavigationExposureGate =
   | 'stage_c_disabled'
   | 'human_approval_required'
   | 'readonly_only'
-  | 'feature_flag_required';
+  | 'feature_flag_required'
+  | 'no_external_control'
+  | 'no_db_write';
 
 export interface NavigationExposureEntry {
   id: string;
@@ -848,6 +850,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     notes: 'P3 added as hidden direct-route. Not in sidebar. Readonly preview only.',
   },
 
+  // Runtime Registry Preview (hidden route, not in sidebar)
+  {
+    id: 'runtime-registry-preview',
+    path: '/runtime-registry-preview',
+    label: 'Runtime Registry Preview',
+    component: 'RuntimeRegistryPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_external_control', 'no_db_write', 'stage_c_disabled'],
+    reason: 'Readonly runtime registry preview page. Shows all runtime targets, action levels, gates, risk status, and validator summary. Not added to left menu. No real runtime execution.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.27.0-P1 added as hidden direct-route. Not in sidebar. Readonly preview only. No real runtime execution.',
+  },
+
   // Permission Evaluator Preview (hidden route, not in sidebar)
   {
     id: 'permission-evaluator-preview',
@@ -1148,6 +1167,11 @@ export function validateNavigationExposure(): ExposureValidationIssue[] {
     if (entry.id === 'navigation-preview-readonly') {
       if (entry.currentExposure !== 'direct_route') {
         issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'info', message: 'navigation-preview-readonly expected direct_route.' });
+      }
+    }
+    if (entry.id === 'runtime-registry-preview') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'runtime-registry-preview should have currentExposure=direct_route (not in sidebar).' });
       }
     }
   }

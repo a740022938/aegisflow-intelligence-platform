@@ -1,6 +1,6 @@
 # AIP Connector Runtime Design Spec (v7.27.0-D1)
 
-> 设计文档，非实现。当前版本不实现 runtime，不控制外部工具，不写 DB。
+> 设计文档，非实现。当前版本不实现 runtime，不控制外部工具，不写 DB。v7.27.0-P1 已创建 Runtime Registry 前端只读预览。
 
 ## 1. 目标
 
@@ -42,12 +42,12 @@
 
 ## 4. Connector Registry vs Runtime Registry
 
-| 维度 | Connector Registry (当前) | Runtime Registry (设计) |
-|------|--------------------------|------------------------|
-| 状态 | 已实现 readonly metadata | 设计阶段，未实现 |
-| 数据源 | Static registry | Runtime 实例状态 |
-| 功能 | 展示连接器信息 | 跟踪运行时执行 |
-| DB 写入 | 否 | 未来需要 |
+| 维度 | Connector Registry (当前) | Runtime Registry (P1 已实现) |
+|------|--------------------------|------------------------------|
+| 状态 | 已实现 readonly metadata | P1 已实现 readonly preview |
+| 数据源 | Static registry | Static registry (v7.27.0-D1 设计) |
+| 功能 | 展示连接器信息 | 展示运行目标、动作等级、门禁 |
+| DB 写入 | 否 | 否 (静态注册表) |
 | Stage C | 否 | 需要 |
 
 ## 5. Dry-run 模式
@@ -61,7 +61,7 @@ Dry-run 是 runtime 第一阶段的门禁能力：
 5. Audit log 记录 dry-run 结果
 6. 不执行真实外部操作
 
-**当前状态：** CostRouting 已有模拟 dry-run。未来 connector dry-run 需要 runtime registry。
+**当前状态：** CostRouting 已有模拟 dry-run。P1 已实现 Runtime Registry 只读预览（20 targets, 7 action levels, 5 gate types）。未来 connector dry-run 需要 runtime registry 扩展。
 
 ## 6. Human Approval 模式
 
@@ -125,6 +125,6 @@ Human approval 是执行前的强制门禁：
 | 阶段 | 内容 | 源码修改 | DB 写入 | 外部控制 | Stage C |
 |------|------|---------|---------|---------|---------|
 | v7.27.0-D1 | 设计 spec | 否 | 否 | 否 | 否 |
-| v7.27.0-P1 | Runtime Registry Preview | 仅前端 registry | 否 | 否 | 否 |
+| v7.27.0-P1 | Runtime Registry Preview | 仅前端 registry + page + route | 否 | 否 | 否 |
 | v7.27.0-P2 | Dry-run Plan Preview | 仅前端 UI | 否 | 否 | 否 |
 | v7.28+ | 实现 dry-run + approval | 需要 | 需要 | 需要 | 需要 |

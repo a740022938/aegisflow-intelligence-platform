@@ -7,7 +7,8 @@ export type CenterAccessKind =
   | 'connector'
   | 'lab'
   | 'governance'
-  | 'navigation_preview';
+  | 'navigation_preview'
+  | 'runtime_registry';
 
 export type CenterAccessStatus =
   | 'available_route'
@@ -286,6 +287,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     maturity: 'preview',
     owner: 'navigation',
   },
+  {
+    id: 'runtime-registry-preview',
+    name: 'Runtime Registry Preview',
+    kind: 'runtime_registry',
+    route: '/runtime-registry-preview',
+    status: 'hidden_direct',
+    risk: 'low',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_runtime_execution', 'no_db_write', 'no_external_control', 'no_stage_c'],
+    allowedActions: ['view_runtime_registry', 'view_target_capabilities', 'view_gate_model'],
+    blockedActions: ['enable_stage_c', 'write_database', 'modify_sidebar', 'control_external_tools', 'execute_runtime', 'call_external_api', 'release'],
+    requiredBeforeExposure: ['readonly_only', 'no_runtime_implementation'],
+    releaseGate: [],
+    displayOrder: 6,
+    group: 'navigation',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 80,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '当前可开放', 'preview_ready'],
+    description: '只读运行时注册表预览。展示连接器运行时目标、动作等级、门禁和风险状态。未入左侧菜单。hidden direct route。',
+    notes: 'Runtime Registry Preview — 未入左侧菜单。hidden direct route。只读预览。不运行外部工具。不写 DB。不启用 Stage C。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'Runtime Registry Preview is design-only. Keep hidden direct until runtime preview is validated and human approval is given.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove from launchpad if needed.',
+    userImpact: 'Low — preview page for runtime capability planning. No real runtime execution.',
+    maturity: 'preview',
+    owner: 'governance',
+  },
 ];
 
 export function getCenterAccessItemCount(): number {
@@ -472,6 +512,9 @@ export function validateCenterAccess(): CenterAccessValidationIssue[] {
       if (!c.visibleInSidebar) {
         issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: `${c.id} should be visible in sidebar per Layout.tsx.` });
       }
+    }
+    if (c.id === 'runtime-registry-preview' && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'runtime-registry-preview should NOT be visible in sidebar.' });
     }
     if (c.id === 'lab-center-readonly' || c.id === 'governance-center' || c.id === 'navigation-preview-readonly') {
       if (c.visibleInSidebar) {

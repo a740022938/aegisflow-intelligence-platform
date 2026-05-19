@@ -1,6 +1,6 @@
 # AIP Connector Action Taxonomy (v7.27.0-D1)
 
-> 设计文档，非实现。定义动作级别与当前允许范围。
+> 设计文档，非实现。定义动作级别与当前允许范围。v7.27.0-P1 将 L0-L6 模型实现于 Runtime Registry 只读预览中。
 
 ## Action 级别
 
@@ -37,6 +37,16 @@
 | L4 | 不允许 | 设计 | 允许 |
 | L5 | 不允许 | 不允许 | 设计 |
 | L6 | 不允许 | 不允许 | 需政策讨论 |
+
+## P1 Runtime Registry Preview
+
+v7.27.0-P1 已将上述 L0-L6 模型实现为 Runtime Registry 前端只读预览：
+
+- Route: `/runtime-registry-preview` (hidden direct)
+- 20 runtime targets 覆盖 7 个 action levels
+- Registry 校验确保 L4/L5/L6 的 allowedNow=false
+- 展示当前能力、未来能力、门禁和风险状态
+- 无真实运行时执行
 
 ## 各工具当前支持级别
 

@@ -11,6 +11,12 @@ import {
   getPermissionEvaluatorValidationSummary,
 } from '../registry/permission-evaluator-validator';
 import {
+  getRuntimeRegistrySummary,
+} from '../registry/runtime-registry';
+import {
+  getRuntimeRegistryValidationSummary,
+} from '../registry/runtime-registry-validator';
+import {
   NAVIGATION_EXPOSURE_REGISTRY,
   NAVIGATION_EXPOSURE_LEVELS,
   getNavigationExposureStats,
@@ -221,10 +227,12 @@ const ACCESS_LEVEL_COLORS: Record<string, string> = {
 const CENTER_KIND_LABELS: Record<CenterAccessKind, string> = {
   advanced: 'Advanced Mode', connector: 'Connector Center', lab: 'Lab Center',
   governance: 'Governance Center', navigation_preview: 'Navigation Preview',
+  runtime_registry: 'Runtime Registry',
 };
 
 const CENTER_KIND_COLORS: Record<CenterAccessKind, string> = {
   advanced: '#F97316', connector: '#22C55E', lab: '#3B82F6', governance: '#22C55E', navigation_preview: '#8B5CF6',
+  runtime_registry: '#8B5CF6',
 };
 
 const READINESS_COLORS: Record<string, string> = {
@@ -764,6 +772,73 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
           Permission Evaluator — 只读评估预览 · 不执行权限变更 · 不改变菜单 · 不写数据库 · 不控制外部工具
+        </div>
+      </SectionCard>
+
+      {/* Runtime Registry Preview */}
+      <SectionCard title="Runtime Registry Preview" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          只读运行时注册表预览 — 不运行外部工具 · 不写数据库 · 不启用 Stage C · 不控制连接器
+        </div>
+        {(() => {
+          const summary = getRuntimeRegistrySummary();
+          const vs = getRuntimeRegistryValidationSummary();
+          return (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 8, marginBottom: 12 }}>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#8B5CF6' }}>{summary.total}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>总目标</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--success)' }}>{summary.allowedNow}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>当前允许</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{summary.blocked}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>已拦截</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{summary.highOrCritical}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>高/严重风险</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{summary.requiresStageC}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>需 Stage C</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--warning)' }}>{summary.requiresHumanApproval}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>需人工批准</div>
+                </div>
+                <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{summary.externalWrite}</div>
+                  <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>外部写入</div>
+                </div>
+              </div>
+              <div style={{ marginTop: 8, display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, background: vs.blocking > 0 ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)', border: `1px solid ${vs.blocking > 0 ? 'rgba(239,68,68,0.3)' : 'rgba(34,197,94,0.3)'}`, color: vs.blocking > 0 ? 'var(--danger)' : 'var(--success)' }}>
+                  blocking: {vs.blocking}
+                </div>
+                <div style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, background: vs.warning > 0 ? 'rgba(245,158,11,0.1)' : 'rgba(34,197,94,0.1)', border: `1px solid ${vs.warning > 0 ? 'rgba(245,158,11,0.3)' : 'rgba(34,197,94,0.3)'}`, color: vs.warning > 0 ? 'var(--warning)' : 'var(--success)' }}>
+                  warning: {vs.warning}
+                </div>
+                <div style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', color: '#8B5CF6' }}>
+                  info: {vs.info}
+                </div>
+                <div style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, background: vs.pass ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${vs.pass ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, color: vs.pass ? 'var(--success)' : 'var(--danger)' }}>
+                  {vs.pass ? 'PASS' : 'FAIL'}
+                </div>
+              </div>
+            </>
+          );
+        })()}
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/runtime-registry-preview" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(139,92,246,0.3)' }}>
+            打开运行时注册表预览 [只读]
+          </Link>
+        </div>
+        <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
+          Runtime Registry — 只读注册表预览 · 不运行外部工具 · 不写数据库 · 不控制连接器
         </div>
       </SectionCard>
 

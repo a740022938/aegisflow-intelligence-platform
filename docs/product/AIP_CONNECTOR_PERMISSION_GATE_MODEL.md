@@ -1,6 +1,6 @@
 # AIP Connector Permission Gate Model (v7.27.0-D1)
 
-> 设计文档，非实现。定义门禁类型与 Permission Evaluator 的关系。
+> 设计文档，非实现。定义门禁类型与 Permission Evaluator 的关系。v7.27.0-P1 Runtime Registry Preview 实现了 gate 模型的只读展示。
 
 ## 1. Gate 类型
 
@@ -51,7 +51,21 @@
 | rollback_gate | action_id, strategy | rolled_back | manual intervention |
 | stage_c_gate | stage_c_status | allow | deny (permanently) |
 
-## 3. Gate 与 Permission Evaluator 的关系
+## 3. P1 Runtime Registry Gate Integration
+
+v7.27.0-P1 Runtime Registry Preview 包含 5 个 gate 类型的只读展示：
+
+| Gate 类型 | Runtime Registry items | 状态 |
+|-----------|----------------------|------|
+| readonly_only | 所有 L0 items | 已启用 |
+| human_approval_required | L4+ items | 已定义但不执行 |
+| audit_log_required | high/critical items | 已定义但不执行 |
+| rollback_plan_required | L5/L6 items | 已定义但不执行 |
+| stage_c_disabled | requiresStageC items | 永久禁用 |
+
+所有 gate 在 runtime registry 中仅作为元数据展示，不执行真实门禁逻辑。
+
+## 4. Gate 与 Permission Evaluator 的关系
 
 ```
 Permission Evaluator (当前)
