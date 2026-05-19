@@ -1117,8 +1117,8 @@ export default function CostRoutingPage() {
   return (
     <PageShell
       title="AI Router Console / 成本路由中心"
-      subtitle="当前为只读/预览模式，不执行真实操作、不写数据库、不调外部系统。no tag / no push / no release。"
-      versionLabel="AIP Core v7.3.1 · Cost Routing v7.12.3"
+      subtitle="AI Router Console — 只读/预览模式，不执行真实路由，不写入数据库，不调用外部系统"
+      versionLabel="AIP v7.25.2 · Cost Routing v7.12.3"
       maturity="preview"
       safetyBoundary="preview"
       safetyText="预览模式 · 不写入配置 · 需要人工确认"
@@ -1127,7 +1127,7 @@ export default function CostRoutingPage() {
       <div className={`cr-router-status role-card ${roleClass('exec')}`}>
         <div>
           <span>版本</span>
-          <b>AIP Core v7.3.1 · Cost Routing v7.12.3 (preview_only)</b>
+          <b>AIP v7.25.2 · Cost Routing v7.12.3 (preview_only)</b>
         </div>
         <div>
           <span>当前模式</span>
@@ -1151,7 +1151,7 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-          <b>v7.12.3 UX Sanity Hotfix</b>
+          <b>Cost Routing v7.12.3 UX Sanity</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">当前模式</span>
@@ -1184,22 +1184,14 @@ export default function CostRoutingPage() {
         </div>
       </SectionCard>
 
-      <div className={`cr-registry-disclaimer role-card ${roleClass('warn')}`}>
-        <div className="cr-disclaimer-content">
-          <span className="cr-disclaimer-icon">&#x26A0;</span>
-          <span className="cr-disclaimer-text">
-            <b>安全边界提示：</b>本页面所有内容均为<u>只读建议 / dry-run / preview only</u>。
-            不执行真实操作、不写数据库、不触碰外部项目。高风险任务必须人工确认，禁止自动执行。
-          </span>
-        </div>
-      </div>
+
 
       <SectionCard className={`role-card ${roleClass('exec')}`} title="只读状态面板 Readonly Status Dashboard / Self-check">
         <div className="cr-registry-note">AIP 只读自检状态面板 + 质量门禁。不写数据库、不改配置、不重启服务、不触碰外部项目。</div>
         <div className="cr-selfcheck-grid">
           <div className="cr-selfcheck-controls">
             <button className="ui-btn ui-btn-primary" type="button" onClick={handleSelfCheck} disabled={selfCheckLoading}>
-              {selfCheckLoading ? '自检中...' : '运行 AIP 只读自检'}
+              {selfCheckLoading ? '生成中...' : '生成自检预览'}
             </button>
           </div>
           {selfCheckResult ? (
@@ -1732,7 +1724,7 @@ export default function CostRoutingPage() {
             <input className="ui-input" type="number" value={policyPriority} onChange={(e) => setPolicyPriority(Number(e.target.value || 100))} placeholder="优先级" />
           </div>
           <input className="ui-input" value={policyReasonTpl} onChange={(e) => setPolicyReasonTpl(e.target.value)} placeholder="命中原因模板" />
-          <button className="ui-btn ui-btn-primary" type="submit" disabled={creating}>{creating ? '创建中...' : '创建策略'}</button>
+          <button className="ui-btn ui-btn-primary" type="submit" disabled={creating}>{creating ? '生成中...' : '生成策略草案'}</button>
         </form>
         </SectionCard>
 
@@ -1765,7 +1757,7 @@ export default function CostRoutingPage() {
           <textarea className="ui-textarea" value={simulateInputJson} onChange={(e) => setSimulateInputJson(e.target.value)} rows={4} placeholder='输入 JSON（input_json）' />
           <div className="cr-action-row">
             <button className="ui-btn" type="button" onClick={handlePracticalSimulate} disabled={resolving}>{resolving ? '模拟中...' : '只模拟解释'}</button>
-            <button className="ui-btn ui-btn-primary" type="submit" disabled={resolving}>{resolving ? '决策中...' : '写入路由决策'}</button>
+            <button className="ui-btn ui-btn-primary" type="submit" disabled={resolving}>{resolving ? '生成中...' : '生成决策草案'}</button>
           </div>
         </form>
         {practicalDecision ? (

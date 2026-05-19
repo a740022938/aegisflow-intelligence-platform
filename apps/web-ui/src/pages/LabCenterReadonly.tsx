@@ -63,7 +63,7 @@ export default function LabCenterReadonly() {
     <PageShell
       title="Lab Center"
       subtitle="Readonly experiment and capability overview — no executable controls, no training, no inference"
-      versionLabel="AIP v7.22.0-P4"
+      versionLabel="AIP v7.25.2 · Lab Preview"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="No real experiment execution · No training · No inference · No dataset mutation"

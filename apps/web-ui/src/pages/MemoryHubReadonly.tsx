@@ -145,7 +145,7 @@ function MemoryHubReadonly() {
     <PageShell
       title="Memory Hub 只读查看"
       subtitle="查看 Memory Hub 导出、Bootstrap、Profiles、Manifest 与候选状态，不直接写入 sqlite。"
-      versionLabel="AIP Core v7.3.1"
+      versionLabel="AIP v7.25.2 · Memory Hub Integration"
       maturity="external"
       safetyBoundary="readonly"
       safetyText="只读模式 · 不写入 Memory Hub sqlite · 不处理 candidate"
