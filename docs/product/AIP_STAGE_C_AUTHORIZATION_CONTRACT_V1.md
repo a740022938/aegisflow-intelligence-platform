@@ -23,7 +23,7 @@
 | 13 | Origin drift blocker | blocker | Yes | required |
 | 14 | Validator blocking > 0 blocker | blocker | Yes | required |
 | 15 | Typecheck/test/build failure blocker | blocker | Yes | required |
-| 16 | Stage C already enabled blocker | blocker | Yes | required |
+| 16 | Stage C already enabled blocker | blocker | Yes | forbidden |
 | 17 | POST implementation blocker | blocker | Yes | forbidden |
 | 18 | DB write blocker | blocker | Yes | forbidden |
 | 19 | Executor presence blocker | blocker | Yes | forbidden |
@@ -36,12 +36,18 @@
 | 26 | Release/tag forbidden | forbidden_automation | No | forbidden |
 | 27 | No automatic enablement | forbidden_automation | Yes | forbidden |
 | 28 | No mutation allowed | forbidden_automation | Yes | forbidden |
+| 29 | No approve/deny mutation | forbidden_automation | Yes | forbidden |
 
-## Contract Invariants
+## Chain (v7.35 Layers)
 
-```
-Authorization does NOT enable Stage C.
-No approve/deny mutation is implemented.
-No authorization auto-approval exists.
-No POST, DB write, executor, external control.
-```
+- D1: V7_35_D1_STAGE_C_HUMAN_AUTHORIZATION_PACKAGE_READY
+- D2: V7_35_D2_STAGE_C_AUTHORIZATION_CONTRACT_FROZEN (this)
+- P1: V7_35_P1_STAGE_C_AUTHORIZATION_REVIEW_CONSOLE_PREVIEW_READY
+- P2: V7_35_P2_..._READY_WITH_AUTHORIZATION_PENDING
+- P3: V7_35_P3_..._READY
+- P4: V7_35_P4_..._READY_WITH_AUTHORIZATION_PENDING
+- Final Seal: V7_35_FINAL_SEAL_READY_WITH_AUTHORIZATION_PENDING
+
+## Notes
+
+Authorization remains PENDING. No real human owner authorization text has been provided.

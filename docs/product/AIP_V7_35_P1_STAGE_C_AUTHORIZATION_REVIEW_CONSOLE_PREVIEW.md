@@ -18,24 +18,18 @@
 5. Required Fields Matrix — 5 required fields
 6. Blocker Checklist — 10 blocker items
 7. Evidence Requirements — 5 evidence requirements
-8. Forbidden Automation Contract — 10 forbidden automation items
-9. Safety Boundary — 13 safety declarations
-10. Validator Summary — 19 validation checks
-11. Contract Items by Category — 7 categories
-12. Human Owner Next Step + Final Warning
+8. Forbidden Automation Contract — 10 forbidden items
+9. Safety Boundary — 13 safety items
+10. Validator Summary — 19 checks
+11. Contract Items by Category — all 28 items
+12. Human Owner Next Step — final warning
 
-## Safety
+## Subsequent Phases
 
-- `readonly: true` on all registry items
-- `canAuthorize: false` on all items
-- `canEnableStageC: false` on all items
-- `actionAllowed: false` on all items
-- `mutationAllowed: false` on all items
-- No authorize/enable/approve/deny buttons
-- No POST, DB write, executor, external control
-- Hidden direct route only
-- Not in sidebar
-- Authorization is NOT execution
+- **P2:** Authorization Artifact Review Pack (32 items, authorization state: PENDING)
+- **P3:** Enablement Implementation Planning Preview (33 items, planning only, no implementation)
+- **P4:** Authorization Gate Seal Candidate (42 items, authorization state: PENDING)
+- **v7.35 Final Seal:** V7_35_FINAL_SEAL_READY_WITH_AUTHORIZATION_PENDING
 
 ## Verdict
 
