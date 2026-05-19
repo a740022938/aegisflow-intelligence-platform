@@ -2,6 +2,12 @@ import React, { useMemo, useState } from 'react';
 import PageShell from '../components/ui/PageShell';
 import SectionCard from '../components/ui/SectionCard';
 import {
+  PERMISSION_EVALUATION_RULES,
+  getPermissionEvaluationSummary,
+  getPermissionEvaluationRulesByDecision,
+  getPermissionEvaluationRulesByRisk,
+} from '../registry/permission-evaluator-registry';
+import {
   NAVIGATION_EXPOSURE_REGISTRY,
   NAVIGATION_EXPOSURE_LEVELS,
   getNavigationExposureStats,
@@ -636,7 +642,101 @@ export default function AdvancedModeReadonly() {
           ))}
         </div>
         <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.08)', fontSize: 10, color: 'var(--success)' }}>
-          v7.22.0-P4 当前阶段具备 closure 条件。无 blocking。继续 no-tag / no-release。
+          当前阶段具备 closure 条件 — 仅只读审计，无 blocking。no-tag / no-release。
+        </div>
+      </SectionCard>
+
+      {/* Permission Evaluator Preview */}
+      <SectionCard title="Permission Evaluator Preview" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          只读权限评估预览 — 不改变菜单 · 不执行权限变更 · 不写数据库 · 不启用 Stage C · 不控制外部工具
+        </div>
+        {(() => {
+          const summary = getPermissionEvaluationSummary();
+          const primaryNavRules = getPermissionEvaluationRulesByDecision('allow_primary_nav');
+          const sidebarVisibleRules = getPermissionEvaluationRulesByDecision('allow_sidebar_visible');
+          const hiddenDirectRules = getPermissionEvaluationRulesByDecision('allow_hidden_direct');
+          const holdReviewRules = getPermissionEvaluationRulesByDecision('hold_review');
+          const deniedRules = getPermissionEvaluationRulesByDecision('deny');
+          const highRiskRules = getPermissionEvaluationRulesByRisk('high');
+          return (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 16 }}>
+                <div style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#8B5CF6' }}>{summary.total}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>总规则</div>
+                </div>
+                <div style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--success)' }}>{summary.allowedPrimaryNav + summary.sidebarVisible}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>允许菜单</div>
+                </div>
+                <div style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#3B82F6' }}>{summary.hiddenDirect + summary.launchpadCard}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>隐藏直达</div>
+                </div>
+                <div style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--warning)' }}>{summary.holdReview}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>待审查</div>
+                </div>
+                <div style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--danger)' }}>{summary.denied}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>拒绝</div>
+                </div>
+                <div style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--danger)' }}>{summary.highRisk}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>高风险</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {primaryNavRules.concat(sidebarVisibleRules).map(rule => (
+                  <div key={rule.id} style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(34,197,94,0.04)', border: '1px solid rgba(34,197,94,0.15)', fontSize: 11 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong>{rule.label}</strong>
+                      <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: 'rgba(34,197,94,0.15)', color: 'var(--success)' }}>{rule.recommendedDecision}</span>
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{rule.reason}</div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 2 }}><strong>next:</strong> {rule.nextAction}</div>
+                  </div>
+                ))}
+                {hiddenDirectRules.map(rule => (
+                  <div key={rule.id} style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)', fontSize: 11 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong>{rule.label}</strong>
+                      <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: 'rgba(59,130,246,0.15)', color: '#3B82F6' }}>{rule.recommendedDecision}</span>
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{rule.reason}</div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 2 }}><strong>next:</strong> {rule.nextAction}</div>
+                  </div>
+                ))}
+                {holdReviewRules.map(rule => (
+                  <div key={rule.id} style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.2)', fontSize: 11 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong>{rule.label}</strong>
+                      <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: 'rgba(245,158,11,0.15)', color: 'var(--warning)' }}>{rule.recommendedDecision}</span>
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{rule.reason}</div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 2 }}><strong>blocking:</strong> {rule.blockingConditions.join('; ') || 'none'}</div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 2 }}><strong>next:</strong> {rule.nextAction}</div>
+                  </div>
+                ))}
+                {deniedRules.map(rule => (
+                  <div key={rule.id} style={{ padding: '8px 12px', borderRadius: 6, background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 11 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong>{rule.label}</strong>
+                      <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600, background: 'rgba(239,68,68,0.15)', color: 'var(--danger)' }}>{rule.recommendedDecision}</span>
+                    </div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 4 }}>{rule.reason}</div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 2 }}><strong>blocking:</strong> {rule.blockingConditions.join('; ') || 'none'}</div>
+                    <div style={{ color: 'var(--text-muted)', marginTop: 2 }}><strong>next:</strong> {rule.nextAction}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          );
+        })()}
+        <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
+          Permission Evaluator — 只读评估预览 · 不执行权限变更 · 不改变菜单 · 不写数据库 · 不控制外部工具
         </div>
       </SectionCard>
 

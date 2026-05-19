@@ -1263,7 +1263,7 @@ export default function CostRoutingPage() {
               <div className="cr-next-action" style={{ marginTop: '6px' }}>{selfCheckResult.nextSafeStep}</div>
             </div>
           ) : (
-            <div className="cost-routing-policy-meta">尚未执行自检。点击"运行 AIP 只读自检"按钮获取状态面板和质量门禁结果。</div>
+            <div className="cost-routing-policy-meta">尚未执行自检。点击"生成自检预览"按钮获取状态面板和质量门禁结果。</div>
           )}
         </div>
       </SectionCard>
