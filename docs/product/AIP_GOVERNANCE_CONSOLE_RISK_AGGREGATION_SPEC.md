@@ -76,3 +76,15 @@ Rollback          │ 22    │ 13         │ 9       │ 9             │ 3  
 - No gates are triggered by aggregation
 - No actions are taken based on aggregation
 - Aggregation is for display and report generation only
+
+---
+
+## v7.29.0-P1 Governance Console Aggregator Preview
+
+- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
+- **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
+- **Validator:** `governance-console-validator.ts` — blocking checks enforced
+- **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
+- **Stage C:** Remains disabled
+- **Sidebar:** Governance Console Preview not in sidebar

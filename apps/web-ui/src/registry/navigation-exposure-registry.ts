@@ -44,7 +44,9 @@ export type NavigationExposureGate =
   | 'no_secret_storage'
   | 'no_rollback_execution'
   | 'no_file_modification'
-  | 'no_git_mutation';
+  | 'no_git_mutation'
+  | 'no_registry_mutation'
+  | 'no_execution';
 
 export interface NavigationExposureEntry {
   id: string;
@@ -995,6 +997,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     notes: 'v7.28.0-P4 added as hidden direct-route. Not in sidebar. Readonly preview only. No rollback executor, no file restore, no git reset/revert/tag/release.',
   },
 
+  // Governance Console Preview (hidden route, not in sidebar)
+  {
+    id: 'governance-console-preview',
+    path: '/governance-console-preview',
+    label: 'Governance Console Preview',
+    component: 'GovernanceConsolePreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_registry_mutation', 'no_execution', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly governance console aggregator preview. Aggregates all registry data into a single readonly view. No registry mutation, no execution, no DB write, no external control, no Stage C.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.29.0-P1 added as hidden direct-route. Not in sidebar. Readonly aggregation preview only. No registry mutation, no console executor.',
+  },
+
   // 隐 module placeholder routes (not in nav, from App.tsx)
   {
     id: 'workspace',
@@ -1303,6 +1322,11 @@ export function validateNavigationExposure(): ExposureValidationIssue[] {
     if (entry.id === 'rollback-preview') {
       if (entry.currentExposure !== 'direct_route') {
         issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'rollback-preview should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'governance-console-preview') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'governance-console-preview should have currentExposure=direct_route (not in sidebar).' });
       }
     }
   }

@@ -53,6 +53,7 @@ export interface CenterAccessQualityGate {
   noExternalControl: boolean;
   noStageC: boolean;
   noDangerousActions: boolean;
+  noRegistryMutation?: boolean;
 }
 
 export interface CenterAccessItem {
@@ -564,6 +565,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     maturity: 'preview',
     owner: 'governance',
   },
+  {
+    id: 'governance-console-preview',
+    name: 'Governance Console Preview',
+    kind: 'governance',
+    route: '/governance-console-preview',
+    status: 'hidden_direct',
+    risk: 'low',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_registry_mutation', 'no_execution', 'no_db_write', 'no_external_control', 'no_stage_c'],
+    allowedActions: ['view_console_overview', 'view_registry_chain', 'view_risk_aggregation', 'view_decision_panel', 'view_traceability', 'view_validator_summary'],
+    blockedActions: ['mutate_registry', 'execute_action', 'write_database', 'control_external_tools', 'enable_stage_c', 'approve', 'reject', 'rollback', 'modify_sidebar'],
+    requiredBeforeExposure: ['readonly_only', 'no_console_implementation'],
+    releaseGate: [],
+    displayOrder: 13,
+    group: 'navigation',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 85,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true, noRegistryMutation: true },
+    statusBadges: ['未入菜单', '当前可开放', 'preview_ready'],
+    description: '治理总控台只读聚合预览。展示权限注册表、运行时、dry-run、审计、状态机、审批、证据、回滚的整体状态，风险聚合、决策面板和验证摘要。未入左侧菜单。hidden direct route。',
+    notes: 'Governance Console Preview — 未入左侧菜单。hidden direct route。只读聚合。不改变 registry。不执行 action。不写 DB。不控制外部工具。不启用 Stage C。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'Governance Console Preview is readonly aggregation. Keep hidden direct until human decision after v7.29 Final Seal.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove from launchpad if needed.',
+    userImpact: 'Low — preview page for governance console aggregation. No registry mutation or execution.',
+    maturity: 'preview',
+    owner: 'governance',
+  },
 ];
 
 export function getCenterAccessItemCount(): number {
@@ -765,6 +805,9 @@ export function validateCenterAccess(): CenterAccessValidationIssue[] {
     }
     if (c.id === 'rollback-preview' && c.visibleInSidebar) {
       issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'rollback-preview should NOT be visible in sidebar.' });
+    }
+    if (c.id === 'governance-console-preview' && c.visibleInSidebar) {
+      issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'governance-console-preview should NOT be visible in sidebar.' });
     }
     if (c.id === 'dry-run-plan-preview' && c.visibleInSidebar) {
       issues.push({ centerId: c.id, field: 'visibleInSidebar', severity: 'blocking', message: 'dry-run-plan-preview should NOT be visible in sidebar.' });

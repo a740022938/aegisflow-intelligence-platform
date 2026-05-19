@@ -103,3 +103,16 @@ P4 Rollback Preview is now established at /rollback-preview (hidden direct, read
 - **v7.29.0-D1 Governance Console:** See `AIP_GOVERNANCE_CONSOLE_MASTER_BLUEPRINT.md` — design-only, not implemented
 - **Stage C:** Remains disabled. No DB write. No external control. No executor implementation.
 - **Sidebar:** Governance Console will not enter sidebar until human decision after v7.29 Final Seal.
+
+---
+
+## v7.29.0-P1 Governance Console Aggregator Preview
+
+- **Status:** Established — v7.29.0-P1 complete
+- **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
+- **Registry:** `governance-console-registry.ts` — 18 items
+- **Validator:** `governance-console-validator.ts` — blocking=0, passes
+- **TypeScript:** 0 errors
+- **ESLint:** 0 errors
+- **Build:** Success
+- **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C

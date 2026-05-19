@@ -121,3 +121,15 @@ After v7.29 Final Seal:
 - Human decision on whether Console enters sidebar
 - Human decision on whether to begin runtime implementation (v7.30+)
 - Stage C remains disabled until explicit human decision after full governance review
+
+---
+
+## v7.29.0-P1 Governance Console Aggregator Preview
+
+- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
+- **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
+- **Validator:** `governance-console-validator.ts` — blocking checks enforced
+- **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
+- **Stage C:** Remains disabled
+- **Sidebar:** Governance Console Preview not in sidebar

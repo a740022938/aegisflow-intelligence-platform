@@ -361,6 +361,15 @@ const EvidenceSchemaPreview: React.FC = () => {
           <Link to="/rollback-preview" style={{ color: '#F97316', textDecoration: 'none' }}>Rollback Preview →</Link>
         </div>
       </SectionCard>
+
+      {/* J. Governance Console Evidence Trace */}
+      <SectionCard title="治理控制台证据追溯" style={{ marginBottom: 16, border: '1px solid rgba(139,92,246,0.3)' }}>
+        <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+          - Governance Console: Evidence schema is in Governance Console evidence trace at{' '}
+          <Link to="/governance-console-preview" style={{ color: '#8B5CF6', textDecoration: 'none' }}>/governance-console-preview</Link>
+          {' '}(hidden direct, readonly, not in sidebar)
+        </div>
+      </SectionCard>
     </PageShell>
   );
 };

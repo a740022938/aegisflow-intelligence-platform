@@ -1716,6 +1716,11 @@ export default function AdvancedModeReadonly() {
         <strong>Readonly boundary notice:</strong><br />
         This is a <u>readonly governance launchpad</u>. All registry data is readonly metadata. Does not enable Advanced Mode, change sidebar, enable Stage C, execute high-risk actions, or write to database. All <code>allowedNow=false</code> entries are displayed for readonly assessment only.
       </div>
+
+      {/* Governance Console Traceability */}
+      <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
+        - Governance Console: Aggregated readiness view available at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
+      </div>
     </PageShell>
   );
 }

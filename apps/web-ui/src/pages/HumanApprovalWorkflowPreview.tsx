@@ -276,6 +276,15 @@ const HumanApprovalWorkflowPreview: React.FC = () => {
           </Link>
         </div>
       </SectionCard>
+
+      {/* J. Governance Console Human Approval Requirement */}
+      <SectionCard title="治理控制台人工审批需求" style={{ marginBottom: 16, border: '1px solid rgba(139,92,246,0.3)' }}>
+        <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+          - Governance Console: Human approval requirements are aggregated in Governance Console at{' '}
+          <Link to="/governance-console-preview" style={{ color: '#8B5CF6', textDecoration: 'none' }}>/governance-console-preview</Link>
+          {' '}(hidden direct, readonly, not in sidebar)
+        </div>
+      </SectionCard>
     </PageShell>
   );
 };

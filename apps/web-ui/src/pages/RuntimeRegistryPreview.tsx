@@ -335,6 +335,11 @@ export default function RuntimeRegistryPreview() {
           <p><strong>不创建标签/发布：</strong>不创建 Git 标签或 GitHub Release。</p>
         </div>
       </SectionCard>
+
+      {/* Governance Console Traceability */}
+      <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
+        - Governance Console: Runtime registry is included in Governance Console registry chain at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
+      </div>
     </PageShell>
   );
 }

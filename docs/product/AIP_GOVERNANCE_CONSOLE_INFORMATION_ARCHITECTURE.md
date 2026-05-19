@@ -93,3 +93,15 @@ Displays:
 - No section controls external tools
 - No section triggers real actions
 - All sections are purely aggregative/display
+
+---
+
+## v7.29.0-P1 Governance Console Aggregator Preview
+
+- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
+- **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
+- **Validator:** `governance-console-validator.ts` — blocking checks enforced
+- **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
+- **Stage C:** Remains disabled
+- **Sidebar:** Governance Console Preview not in sidebar

@@ -338,6 +338,11 @@ export default function ConnectorCenterReadonly() {
         <strong>Readonly boundary notice:</strong><br />
         This is a <u>Connector Center readonly overview</u>. Connector Registry is readonly metadata. Does not call external APIs, write to external systems, control connectors, process Memory Hub candidates, or enable Stage C. All <code>actionsBlocked</code> are governance display, not a permission system.
       </div>
+
+      {/* Governance Console Traceability */}
+      <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
+        - Governance Console: Aggregated registry chain available at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
+      </div>
     </PageShell>
   );
 }

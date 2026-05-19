@@ -297,6 +297,15 @@ export default function AuditLogPreview() {
           </Link>
         </div>
       </SectionCard>
+
+      {/* J. Governance Console Traceability */}
+      <SectionCard title="治理控制台可追溯性" style={{ marginBottom: 16, border: '1px solid rgba(139,92,246,0.3)' }}>
+        <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+          - Governance Console: Audit log is in Governance Console traceability board at{' '}
+          <Link to="/governance-console-preview" style={{ color: '#8B5CF6', textDecoration: 'none' }}>/governance-console-preview</Link>
+          {' '}(hidden direct, readonly, not in sidebar)
+        </div>
+      </SectionCard>
     </PageShell>
   );
 }

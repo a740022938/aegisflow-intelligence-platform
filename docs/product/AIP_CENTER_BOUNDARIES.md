@@ -72,3 +72,15 @@ v7.28.0-P1 governance state machine preview adds one new center entry:
 - **v7.29.0-D1 Governance Console:** See `AIP_GOVERNANCE_CONSOLE_MASTER_BLUEPRINT.md` — design-only, not implemented
 - **Stage C:** Remains disabled. No DB write. No external control. No executor implementation.
 - **Sidebar:** Governance Console will not enter sidebar until human decision after v7.29 Final Seal.
+
+---
+
+## v7.29.0-P1 Governance Console Aggregator Preview
+
+- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
+- **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
+- **Validator:** `governance-console-validator.ts` — blocking checks enforced
+- **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
+- **Stage C:** Remains disabled
+- **Sidebar:** Governance Console Preview not in sidebar

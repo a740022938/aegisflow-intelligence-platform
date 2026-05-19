@@ -103,3 +103,15 @@ No phase implements real execution, DB write, external control, or Stage C.
 - Console may enter sidebar after v7.29 Final Seal and human decision
 - Console may gain export capability (JSON/Markdown reports) in future versions
 - Console may gain real-time refresh if backend endpoints become available in post-v7.30
+
+---
+
+## v7.29.0-P1 Governance Console Aggregator Preview
+
+- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
+- **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
+- **Validator:** `governance-console-validator.ts` — blocking checks enforced
+- **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
+- **Stage C:** Remains disabled
+- **Sidebar:** Governance Console Preview not in sidebar
