@@ -1408,6 +1408,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.36.0-P1 added as hidden direct-route. Not in sidebar. Readonly simulation preview. Simulation NOT EXECUTED. Authorization PENDING. No enablement, no mutation, no POST. Stage C remains disabled.',
   },
+  {
+    id: 'stage-c-first-slice-implementation-preview',
+    path: '/stage-c-first-slice-implementation-preview',
+    label: 'Stage C First Slice Implementation Preview',
+    component: 'StageCFirstSliceImplementationPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Stage C First Slice Implementation Preview page. 6 UI sections: authorization scope, feature flag toggle, kill switch, status API, audit event review, validation summary. Based on D1 implementation pack. 15 items, 5 categories, 6 validator checks. No POST/DB/executor/external. Authorization PENDING. Stage C remains disabled.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.38.0-D1 added as hidden direct-route. Not in sidebar. Readonly implementation pack preview. Authorization PENDING. No enablement, no mutation, no POST. Stage C remains disabled.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {
