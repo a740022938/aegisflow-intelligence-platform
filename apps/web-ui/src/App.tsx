@@ -205,7 +205,7 @@ const App: React.FC = () => {
             <Route path="stage-c-enablement-planning-preview" element={<StageCEnablementPlanningPreview />} />
             <Route path="stage-c-authorization-gate-seal-preview" element={<StageCAuthorizationGateSealPreview />} />
             <Route path="stage-c-enablement-simulation-console-preview" element={<StageCEnablementSimulationConsolePreview />} />
-            <Route path="stage-c-first-slice-implementation-preview" element={<StageCFirstSliceImplementationPreview />} />
+            <Route path="stage-c-minimal-first-slice-v7-39-preview" element={<StageCFirstSliceImplementationPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

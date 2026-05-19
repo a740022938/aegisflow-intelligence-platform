@@ -80,6 +80,7 @@ import { registerAssistantCenterRoutes } from './routes/assistant-center/index.j
 import { registerMemoryHubRoutes } from './routes/memory-hub/index.js';
 import { registerAuthorizationRoutes } from './routes/authorization/index.js';
 import { registerReadonlyStatusRoutes } from './runtime/readonly-status.js';
+import { registerStageCStatusRoutes } from './stage-c/status.js';
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -293,6 +294,7 @@ const PUBLIC_PATHS = new Set([
   '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status', '/api/dashboard/summary',
   '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
   '/api/runtime/status', '/api/runtime/readiness', '/api/runtime/gates', '/api/runtime/blockers',
+  '/api/stage-c/status',
 ]);
 const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static', '/api/comfy/history',
   '/api/openaxiom', '/api/assistant-center', '/api/memory-hub', '/api/authorization'];
@@ -3555,6 +3557,9 @@ registerSystemRoutes(app);
 
 // ── Runtime Readonly Status (v7.31.0-P1) ─────────────────────────────────
 registerReadonlyStatusRoutes(app);
+
+// ── Stage C First Slice Status (v7.39) ──────────────────────────────────────
+registerStageCStatusRoutes(app);
 
 // ══ v6.0.0: Plugin System ════════════════════════════════════════════════════
 // M6: 插件系统默认启用，不再依赖环境变量
