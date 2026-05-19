@@ -67,6 +67,28 @@
 | `warning` | Review recommended before changes | 1 |
 | `blocking` | Must not be allowed | 6 |
 
+## Connector Action Taxonomy (v7.27.0-D1)
+
+Connector actions are classified into 7 levels. See `AIP_CONNECTOR_ACTION_TAXONOMY.md` for full details.
+
+| Level | Name | Current State |
+|-------|------|---------------|
+| L0 | view_static | Allowed |
+| L1 | view_runtime_status | Partially allowed (no external API calls) |
+| L2 | generate_task_package | Allowed (text/JSON only) |
+| L3 | dry_run_plan | Design only, not implemented |
+| L4 | human_approved_execute | Blocked (needs Stage C) |
+| L5 | autonomous_execute | Blocked (needs Stage C) |
+| L6 | destructive_or_external_write | Permanently denied |
+
+## Permission Gate Model
+
+See `AIP_CONNECTOR_PERMISSION_GATE_MODEL.md` for full gate model design.
+
+Gates: readonly_gate, dry_run_gate, human_approval_gate, audit_log_gate, rollback_gate, stage_c_gate.
+
+**Permission Evaluator** only recommends, does not execute gates. Gates are a separate execution layer.
+
 ## Key Rules
 
 1. **Stage C is permanently disabled.** No activation package exists. All v7.24.0+ work is planning/design-only.
@@ -75,3 +97,4 @@
 4. **Permission Evaluator is hidden direct only.** Not in sidebar, not primary_nav.
 5. **All denied and hold_review rules have documented blocking conditions.**
 6. **All rules have a reason and nextAction.**
+7. **Connector runtime is design-only in v7.27.** No real execution, no external tool control, no DB write.

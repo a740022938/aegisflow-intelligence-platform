@@ -32,11 +32,26 @@ AIP is organized around centers, pages, and actions — all operating under read
 |----------|---------|
 | `navigation-exposure-registry.ts` | Exposure rules for all nav items |
 | `center-access-registry.ts` | Center access definitions (5 centers, 2 visible, 3 hidden) |
-| `permission-evaluator-registry.ts` | Static permission evaluation rules (17 rules, 4 decisions) |
+| `permission-evaluator-registry.ts` | Static permission evaluation rules (18 rules, 7 decisions) |
+| `permission-evaluator-validator.ts` | Pure validation functions (10 checks) |
 | `product-metadata-registry.ts` | Unified product version metadata |
+
+## Connector Runtime Design (v7.27.0-D1)
+
+v7.27 introduces connector runtime boundary design — runtime not implemented. See:
+
+- `AIP_CONNECTOR_RUNTIME_DESIGN_SPEC.md` — Runtime architecture blueprint
+- `AIP_TOOL_CONTROL_BOUNDARY_PLAN.md` — External tool control boundaries
+- `AIP_CONNECTOR_ACTION_TAXONOMY.md` — Action level classification (L0-L6)
+- `AIP_CONNECTOR_PERMISSION_GATE_MODEL.md` — Gate model for runtime
+- `AIP_RUNTIME_AUDIT_AND_ROLLBACK_PLAN.md` — Audit log and rollback design
+- `AIP_V7_27_ROADMAP.md` — Roadmap from design to implementation
+
+All v7.27 work is **design-only**. No runtime implementation, no external tool control, no DB write, no Stage C.
 
 ## Target Consumers
 
 - Internal audits and seal reviews
 - PL decision-making for exposure changes
 - UI preview at Advanced Mode > Permission Evaluator Preview
+- Connector runtime design review (v7.27)

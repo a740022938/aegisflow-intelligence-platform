@@ -30,3 +30,18 @@
 | Lab Center | Lab experiment overview | No training/inference/label-save | Disabled |
 | Governance Center | 13 governance modules | 12 gates | Deferred |
 | Navigation Preview | Audit-only readout | No menu change | Disabled |
+
+## Connector Runtime Design Boundaries (v7.27.0-D1)
+
+Connector runtime is in design-only phase. Current boundaries:
+
+| Runtime Component | Current State | Future State | Stage C Needed |
+|------------------|---------------|--------------|----------------|
+| Connector runtime registry | Not implemented | Design spec complete | No |
+| Dry-run executor | Not implemented | Design spec complete | No (preview) |
+| Human approval queue | Not implemented | Design spec complete | No (preview) |
+| Audit log | CostRouting mock only | Full audit framework | Yes |
+| Rollback engine | Not implemented | Design spec complete | Yes |
+| External tool control | Denied | Requires Stage C + runtime | Yes |
+
+**Key rule:** Connector runtime design does not enable real execution, external tool control, or DB write in v7.27.

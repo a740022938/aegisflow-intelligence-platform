@@ -26,13 +26,28 @@
 - [x] Navigation exposure registry updated for permission evaluator
 - [x] Product documentation expanded (permission matrix, construction protocol, version seal handbook, center roadmap)
 
-### Next Phase (v7.26.0-Final or M3)
+### v7.26.0 Final Seal Recheck (当前)
+
+v7.26.0-M2 final seal recheck complete. Verdict: **FINAL_SEAL_RECHECK_READY** (blocking=0).
+
+### v7.27.0-D1 Connector Runtime Design
+
+**Goal:** Design connector runtime boundaries, action taxonomy, gate model, audit/rollback plan, and roadmap. No runtime implementation.
+
+- [x] Runtime design spec (`AIP_CONNECTOR_RUNTIME_DESIGN_SPEC.md`)
+- [x] Tool control boundary plan (`AIP_TOOL_CONTROL_BOUNDARY_PLAN.md`)
+- [x] Action taxonomy (L0-L6) (`AIP_CONNECTOR_ACTION_TAXONOMY.md`)
+- [x] Permission gate model (`AIP_CONNECTOR_PERMISSION_GATE_MODEL.md`)
+- [x] Audit and rollback plan (`AIP_RUNTIME_AUDIT_AND_ROLLBACK_PLAN.md`)
+- [x] v7.27 roadmap (`AIP_V7_27_ROADMAP.md`)
+
+### Next Phase (v7.27.0-P1 Runtime Registry Preview)
 
 **Candidate tasks (human decision required):**
 
-- Permission Evaluator UX polish (visual refinements, i18n)
-- Product documentation polish
-- Final seal recheck
+- Runtime Registry frontend preview (readonly, no backend)
+- Dry-run plan UI preview extension
+- Audit log UI preview
 
 ### Deferred / Blocked
 
