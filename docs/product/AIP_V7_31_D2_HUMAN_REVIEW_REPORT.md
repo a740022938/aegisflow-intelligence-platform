@@ -121,4 +121,4 @@ Decisions:
 
 v7.31.0-P1 Backend Readonly Status API Skeleton has been **IMPLEMENTED** (2026-05-20). Human owner approved the construction pack and the 4 readonly GET endpoints were implemented in `apps/local-api`. See `AIP_BACKEND_READONLY_STATUS_API_SKELETON.md` and `AIP_V7_31_P1_BACKEND_READONLY_STATUS_API_SKELETON_REPORT.md` for details.
 
-Next: v7.31.0-P2 (await human decision).
+P2/P3/P4 Acceleration Pack has also been **IMPLEMENTED** (2026-05-20) — contract tests (16), frontend viewer linkage, and backend hardening. Next: v7.31.0 Final Seal Recheck.

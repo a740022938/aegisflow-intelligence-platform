@@ -1152,11 +1152,11 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     recommendedExposure: 'direct_route',
     recommendation: 'keep_direct_route',
     risk: 'medium',
-    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
-    reason: 'Readonly runtime status API contract preview page. Shows endpoint catalog, schema board, mock responses, gate model, error model, and validator summary. Not added to left menu. No backend endpoint, no API call, no DB write, no external control, no Stage C.',
+    gates: ['readonly_only', 'get_only', 'no_post', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly runtime status API contract preview page. Shows endpoint catalog, schema board, mock responses, gate model, error model, and validator summary. Not added to left menu. P1 backend skeleton live with 4 GET readonly endpoints. No POST, no DB write, no external control, no Stage C.',
     allowedNow: true,
     source: 'route',
-    notes: 'v7.30.0-P1 added as hidden direct-route. Not in sidebar. Readonly contract preview only. No real API endpoint implementation.',
+    notes: 'v7.30.0-P1 added as hidden direct-route. Not in sidebar. v7.31.0-P1 backend skeleton live. Readonly contract preview with backend status.',
   },
 
   // Runtime Dry-run Contract Preview (hidden route, not in sidebar)

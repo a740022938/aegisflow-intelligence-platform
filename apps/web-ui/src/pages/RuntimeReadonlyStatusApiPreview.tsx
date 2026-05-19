@@ -346,17 +346,57 @@ const RuntimeReadonlyStatusApiPreview: React.FC = () => {
         </div>
       </div>
 
+      {/* K. Backend Skeleton Status */}
+      <div style={{ ...sectionStyle, border: '1px solid #66bb6a' }}>
+        <div style={{ ...headerStyle, color: '#66bb6a' }}>K. Backend Skeleton Status (v7.31.0-P1)</div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary, #8892b0)', marginBottom: 12 }}>
+          P1 backend readonly status API skeleton — live in apps/local-api
+        </div>
+        <div style={gridStyle}>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>P1 Commit</div>
+            <div style={{ ...statValueStyle, fontSize: 14 }}>52ff808</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>Mounted Path</div>
+            <div style={{ ...statValueStyle, fontSize: 14 }}>/api/runtime/*</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>GET Endpoints</div>
+            <div style={{ ...statValueStyle, color: '#4fc3f7' }}>4</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>POST Endpoints</div>
+            <div style={{ ...statValueStyle, color: '#ef5350' }}>0</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>Contract Tests</div>
+            <div style={{ ...statValueStyle, color: '#66bb6a' }}>15 tests</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>Contract Version</div>
+            <div style={{ ...statValueStyle, fontSize: 14 }}>v7.31.0-P1</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 13, lineHeight: 2 }}>
+          <div><strong>Backend module:</strong> apps/local-api/src/runtime/readonly-status.ts</div>
+          <div><strong>Route registration:</strong> registerReadonlyStatusRoutes(app) in index.ts</div>
+          <div><strong>Response source:</strong> Static contract summaries (no DB, no external API)</div>
+          <div><strong>Auth:</strong> Public (no JWT required for these paths)</div>
+        </div>
+      </div>
+
       {/* I. Forbidden API Notice */}
       <div style={{ ...sectionStyle, border: '2px solid #ef5350' }}>
         <div style={{ ...headerStyle, color: '#ef5350' }}>I. Forbidden API Notice</div>
         <ul style={{ fontSize: 13, lineHeight: 1.8, margin: 0, paddingLeft: 20 }}>
-          <li>当前不新增 backend endpoint — 所有 endpoint 仅存在于 contract freeze 文档中</li>
-          <li>当前不实现 mock server — mock 数据仅存在于文档中</li>
-          <li>当前不写 DB — db_write 在所有 endpoint 中均为 false（GET）或 blocked（POST）</li>
-          <li>当前不控制外部工具 — external_control 在所有 endpoint 中均为 false（GET）或 blocked（POST）</li>
-          <li>当前不启用 Stage C — stage_c 在所有 endpoint 中均被禁用</li>
+          <li>P1 backend skeleton 仅包含 4 个 GET readonly endpoint，无 POST endpoint</li>
+          <li>后端不写 DB — db_write 在所有 endpoint 中均为 false（GET）或 blocked（POST）</li>
+          <li>后端不控制外部工具 — external_control 在所有 endpoint 中均为 false（GET）或 blocked（POST）</li>
+          <li>后端不启用 Stage C — stage_c 在所有 endpoint 中均被禁用</li>
           <li>无 Send Request / Call API / Execute / Apply / Enable Stage C 按钮</li>
           <li>无 token / API key 输入框</li>
+          <li>前端不做自动 fetch — viewer 仅展示契约说明</li>
         </ul>
       </div>
     </PageShell>

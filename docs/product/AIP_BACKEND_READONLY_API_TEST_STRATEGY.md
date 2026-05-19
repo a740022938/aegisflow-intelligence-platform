@@ -1,7 +1,7 @@
 # AIP Backend Readonly API Test Strategy
 
 > **Phase:** v7.31.0-P1
-> **Status:** P1 tests implemented — 6 contract tests (Vitest)
+> **Status:** P2/P3/P4 acceleration — 16 contract tests implemented (Vitest)
 > **Purpose:** Define the testing strategy for future readonly backend API implementation
 
 ## 1. Unit Tests

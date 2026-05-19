@@ -1,7 +1,7 @@
 # AIP Backend Readonly API Contract Test Acceptance Plan
 
 > **Phase:** v7.31.0-P1
-> **Status:** P1 implemented — 6 contract tests written (v7.31.0-P1)
+> **Status:** P2/P3/P4 acceleration — 16 contract tests written (v7.31.0-P2)
 > **Purpose:** Define the acceptance criteria for future P1/P2 backend readonly API contract tests
 
 ## 1. Route Existence Tests
@@ -90,4 +90,4 @@
 | Schema shape (contract fields) | 4 | `src/__tests__/runtime-readonly-status.test.ts` |
 | Path registration | 1 | `src/__tests__/runtime-readonly-status.test.ts` |
 
-6 contract tests implemented in P1 using the existing Vitest framework. POST blocking, DB absence, external control absence, and Stage C disabled tests are addressed by the architectural design (no POST/DB/Stage C code exists). Additional test coverage deferred to v7.31.0-P2.
+16 contract tests implemented in P2/P3/P4 acceleration pack (38 total across all test files). Coverage includes schema validation, POST blocking, secret absence, and Cache-Control headers.

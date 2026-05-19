@@ -121,7 +121,17 @@
 | Warning | 0 |
 | Info | 0 |
 
+## Acceleration (P2/P3/P4)
+
+P2/P3/P4 have been merged and implemented as an acceleration pack:
+
+- **P2:** 16 contract tests (schema, security, headers) — 38 tests total
+- **P3:** Frontend viewer linkage updated with backend skeleton status
+- **P4:** Backend hardening (contractVersion, readonly, no-store headers)
+
+See `AIP_V7_31_ACCELERATION_PACK.md` for full details.
+
 ## Recommendations
 
-- **Next step:** A. v7.31.0-P2 Backend Readonly Status API Contract Tests (if more coverage needed)
+- **Next step:** A. v7.31.0 Final Seal Recheck
 - **Tag/Release:** Not recommended at this stage

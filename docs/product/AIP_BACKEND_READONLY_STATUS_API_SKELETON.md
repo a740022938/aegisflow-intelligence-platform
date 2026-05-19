@@ -107,3 +107,13 @@ The P1 skeleton implements 4 readonly GET endpoints that return static contract-
 - No runtime execution
 - No secret/token handling
 - No file system access
+
+## Acceleration (P2/P3/P4)
+
+| Phase | Scope | Status |
+|-------|-------|--------|
+| P2 | Contract tests (16 tests) | IMPLEMENTED |
+| P3 | Frontend viewer linkage | IMPLEMENTED |
+| P4 | Backend hardening (contractVersion, readonly, no-store) | IMPLEMENTED |
+
+See `AIP_V7_31_ACCELERATION_PACK.md` for details.

@@ -654,10 +654,10 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     evidenceSource: 'registry',
     uiSurface: 'hidden_route',
     allowedNow: true,
-    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
-    blockingConditions: ['Readonly only', 'No backend endpoint', 'No API call', 'No DB write', 'No external control', 'Stage C disabled'],
+    gates: ['readonly_only', 'get_only', 'no_post', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    blockingConditions: ['Readonly only', 'GET only', 'No POST', 'No DB write', 'No external control', 'Stage C disabled'],
     requiredEvidence: ['validator_summary', 'registry_snapshot'],
-    reason: 'Runtime Readonly Status API Preview is readonly. Displays API contract catalog, schema board, mock responses, gate model, and error model. No backend endpoint, no API call, no DB write, no external control, no Stage C.',
+    reason: 'Runtime Readonly Status API Preview is readonly. Displays API contract catalog, schema board, mock responses, gate model, error model, and backend skeleton status. P1 backend has 4 GET readonly endpoints. No POST, no DB write, no external control, no Stage C.',
     nextAction: 'Keep hidden direct. Do not add to sidebar. Do not implement backend endpoint.',
   },
   {

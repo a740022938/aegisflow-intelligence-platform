@@ -125,7 +125,7 @@
 ## 4. Dependency Chain
 
 ```
-D1 (blueprint — COMPLETED) → D2 (human review pack — APPROVED) → P1 (backend skeleton — IMPLEMENTED) → P2 (contract tests) → P3 (frontend linkage) → P4 (final seal)
+D1 (blueprint — COMPLETED) → D2 (human review pack — APPROVED) → P1 (backend skeleton — IMPLEMENTED) → P2/P3/P4 acceleration pack (CONTRACT TESTS + VIEWER LINKAGE + HARDENING — IMPLEMENTED)
 ```
 
 Each phase requires human project owner approval before proceeding. Phases can be reordered or skipped.
@@ -139,13 +139,24 @@ Each phase requires human project owner approval before proceeding. Phases can b
 
 ## 6. Next Step Recommendation
 
-**Recommended:** v7.31.0-D2 Backend Readonly API Human Review Pack — prepare a human review pack presenting the D1 blueprints for project owner review before any implementation work begins.
+**Recommended:** A. v7.31.0 Final Seal Recheck — all v7.31 phases (D1, D2, P1, P2, P3, P4) are now complete.
 
 ## v7.31-D2 Human Review Pack
 
 - **Status:** APPROVED_AND_IMPLEMENTED
 - **P1 skeleton:** Implemented (v7.31.0-P1)
 - **Backend endpoint:** 4 GET readonly endpoints live at /api/runtime/*
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created
+
+## v7.31-P2/P3/P4 Acceleration Pack
+
+- **Status:** IMPLEMENTED
+- **P2 Contract Tests:** 16 tests (schema, security, headers)
+- **P3 Frontend Linkage:** RuntimeReadonlyStatusApiPreview updated
+- **P4 Hardening:** contractVersion, readonly fields, Cache-Control: no-store
 - **Stage C:** Permanently disabled
 - **DB write:** Not performed
 - **External control:** Not enabled
