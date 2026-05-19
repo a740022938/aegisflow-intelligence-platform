@@ -22,4 +22,4 @@
 - Tag/Release: NONE
 
 ## Next Recommended Step
-**v7.36.0-D1 Stage C Enablement Implementation Blueprint** (still not enablement)
+**v7.36.0-D1/D2/P1 Enablement Blueprint Acceleration** — Implementation blueprint, safety harness contract, simulation console. Still not enablement. (COMPLETED)

@@ -1393,6 +1393,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.35.0-P4 added as hidden direct-route. Not in sidebar. Readonly gate seal candidate. Authorization state: PENDING. No authorize/enable, no mutation, no POST. Stage C remains disabled.',
   },
+  {
+    id: 'stage-c-enablement-simulation-console-preview',
+    path: '/stage-c-enablement-simulation-console-preview',
+    label: 'Stage C Enablement Simulation Console Preview',
+    component: 'StageCEnablementSimulationConsolePreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Stage C Enablement Simulation Console Preview page. 14 UI sections: header, authorization state, blueprint baseline, safety harness contract, gate sequence preview, feature flag gate, kill switch gate, audit/evidence gate, rollback/recovery gate, validation/smoke gate, forbidden actions, validator summary, simulation result, next step. Based on D2 safety harness contract registry. 43 harness items, 24 validator checks. Simulation NOT EXECUTED. No backend endpoint, no API call, no DB write, no external control, no Stage C. Authorization PENDING.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.36.0-P1 added as hidden direct-route. Not in sidebar. Readonly simulation preview. Simulation NOT EXECUTED. Authorization PENDING. No enablement, no mutation, no POST. Stage C remains disabled.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {

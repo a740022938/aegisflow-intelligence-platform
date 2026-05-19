@@ -35,3 +35,6 @@
 - Stage C: **DISABLED**
 
 **This gate seal does NOT authorize or enable Stage C.**
+
+## Next Layer
+**v7.36 D1/D2/P1** — Enablement blueprint, safety harness contract, simulation console preview. Completed. Stage C remains disabled.
