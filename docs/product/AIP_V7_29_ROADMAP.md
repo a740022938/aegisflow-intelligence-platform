@@ -133,3 +133,16 @@ After v7.29 Final Seal:
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0-P2/P3/P4 Acceleration Pack (completed)
+
+All 3 phases completed in commit `600a029`. See `AIP_V7_29_ACCELERATION_PACK.md` for details.
+
+## v7.29.0 Final Seal (completed)
+
+- **Status:** V7_29_FINAL_SEAL_READY
+- See `AIP_V7_29_FINAL_SEAL_RECHECK.md`
+
+## v7.30 Roadmap
+
+See `AIP_V7_30_ROADMAP.md` for the full v7.30 roadmap including D1-D3 and P1-P4 phases.

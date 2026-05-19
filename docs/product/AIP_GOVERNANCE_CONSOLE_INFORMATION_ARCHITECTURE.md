@@ -98,10 +98,25 @@ Displays:
 
 ## v7.29.0-P1 Governance Console Aggregator Preview
 
-- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Status:** Established — v7.29.0-P1 complete, commit \`600a029\`
 - **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
 - **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
 - **Validator:** `governance-console-validator.ts` — blocking checks enforced
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0-P2/P3/P4 Acceleration Pack (completed)
+
+- P2 Risk Dashboard Preview — \`/governance-console-risk-dashboard-preview\` (hidden direct)
+- P3 Decision Panel Preview — \`/governance-console-decision-panel-preview\` (hidden direct)
+- P4 Report Pack Preview — \`/governance-console-report-pack-preview\` (hidden direct)
+- All 3 validators: blocking=0, all pass ✓
+- Stage C: Remains disabled
+- Total hidden preview routes: 15
+
+## v7.29 Final Seal
+
+- **Status:** V7_29_FINAL_SEAL_READY
+- All v7.29 validators pass (0 blocking)
+- No Stage C, no DB write, no external control, no executor

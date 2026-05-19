@@ -100,10 +100,20 @@ When new registries are added:
 
 ## v7.29.0-P1 Governance Console Aggregator Preview
 
-- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Status:** Established — v7.29.0-P1 complete, commit \`600a029\`
 - **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
 - **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
 - **Validator:** `governance-console-validator.ts` — blocking checks enforced
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0-P2/P3/P4 Acceleration Pack Registries
+
+| Phase | Registry | Validator | Items | Blocking |
+|-------|----------|-----------|-------|----------|
+| P2 | governance-console-risk-registry.ts | governance-console-risk-validator.ts | 20 | 0 |
+| P3 | governance-console-decision-registry.ts | governance-console-decision-validator.ts | 14 | 0 |
+| P4 | governance-console-report-pack-registry.ts | governance-console-report-pack-validator.ts | 14 | 0 |
+
+All 3 registries synced with permission-evaluator-registry, navigation-exposure-registry, center-access-registry.

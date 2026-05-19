@@ -84,3 +84,10 @@ P4 Rollback Preview does **not** enable Stage C. It is a readonly preview at /ro
 - **v7.29.0-D1 Governance Console:** See `AIP_GOVERNANCE_CONSOLE_MASTER_BLUEPRINT.md` — design-only, not implemented
 - **Stage C:** Remains disabled. No DB write. No external control. No executor implementation.
 - **Sidebar:** Governance Console will not enter sidebar until human decision after v7.29 Final Seal.
+
+## v7.29.0 Final Seal — Stage C Status
+
+- **Stage C:** Permanently disabled
+- **Gates passed:** 12 of 12 validators pass (0 blocking)
+- **Final gate policy:** See `AIP_STAGE_C_FINAL_GATE_POLICY.md`
+- **Next:** No Stage C activation planned. Only human project owner can authorize.

@@ -72,10 +72,18 @@ When human approval is required:
 
 ## v7.29.0-P1 Governance Console Aggregator Preview
 
-- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Status:** Established — v7.29.0-P1 complete, commit \`600a029\`
 - **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
 - **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
 - **Validator:** `governance-console-validator.ts` — blocking checks enforced
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0-P3 Decision Panel Preview (completed)
+
+- 14 decision items, 8 decision types
+- Route: \`/governance-console-decision-panel-preview\` (hidden direct, not in sidebar)
+- Validator: blocking=0, pass ✓
+- No approve/reject/execute
+- Stage C disabled

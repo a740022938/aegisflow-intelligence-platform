@@ -143,3 +143,11 @@ v7.28.0-P4 rollback preview adds 1 new hidden direct target:
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0 Final Seal — Permission Matrix Status
+
+- Permission evaluator: PASS (0 blocking)
+- All 4 governance console validators: PASS (0 blocking)
+- Total PE rules: Updated with 3 new entries (risk dashboard, decision panel, report pack)
+- Stage C: Permanently disabled
+- No execution permission granted for any capability

@@ -110,3 +110,13 @@ All v7.28 work remains **design-only**. No implementation, no external tool cont
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0 Governance Console
+
+- **Status:** V7_29_FINAL_SEAL_READY (commit 600a029)
+- P1 Aggregator Preview — `/governance-console-preview`
+- P2 Risk Dashboard Preview — `/governance-console-risk-dashboard-preview`
+- P3 Decision Panel Preview — `/governance-console-decision-panel-preview`
+- P4 Report Pack Preview — `/governance-console-report-pack-preview`
+- All 4: readonly, hidden direct, not in sidebar, validators pass (0 blocking)
+- Stage C permanently disabled

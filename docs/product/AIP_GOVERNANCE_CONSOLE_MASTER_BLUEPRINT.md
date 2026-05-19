@@ -108,10 +108,28 @@ No phase implements real execution, DB write, external control, or Stage C.
 
 ## v7.29.0-P1 Governance Console Aggregator Preview
 
-- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Status:** Established — v7.29.0-P1 complete, commit `600a029`
 - **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
 - **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
 - **Validator:** `governance-console-validator.ts` — blocking checks enforced
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0-P2/P3/P4 Acceleration Pack (completed)
+
+- **Status:** COMPLETED — commit `600a029`, pushed to origin/main
+- **P2 Risk Dashboard:** 20 risk items, 10 categories, 13 sources — route `/governance-console-risk-dashboard-preview`
+- **P3 Decision Panel:** 14 decision items, 8 decision types — route `/governance-console-decision-panel-preview`
+- **P4 Report Pack:** 14 report items, 11 sections — route `/governance-console-report-pack-preview`
+- **All 3 validators:** blocking=0, pass=✓
+- **All 3 routes:** hidden direct, NOT in sidebar
+- **Stage C:** Remains disabled
+- **Total hidden preview routes:** 15
+
+## v7.29.0 Final Seal
+
+- **Status:** V7_29_FINAL_SEAL_READY
+- **All validators pass** — 0 blocking across all 4 v7.29 validators
+- **No Stage C, no DB write, no external control, no executor
+- **Next:** v7.30.0-D1 Runtime Implementation Readiness Final Audit

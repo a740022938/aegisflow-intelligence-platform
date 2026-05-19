@@ -84,3 +84,16 @@ v7.28.0-P1 governance state machine preview adds one new center entry:
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0 Final Seal — Center Boundaries
+
+- Governance Console Aggregator: hidden direct, not in sidebar
+- Risk Dashboard: hidden direct, not in sidebar
+- Decision Panel: hidden direct, not in sidebar
+- Report Pack: hidden direct, not in sidebar
+- Rollback / Evidence / Human Approval / State Machine: hidden direct, not in sidebar
+- Audit / Dry-run / Runtime / Permission: hidden direct, not in sidebar
+- Lab / Governance / Navigation Preview: hidden direct, not in sidebar
+- **Only sidebar entries:** Advanced Mode Preview, Connector Center
+- Stage C: Permanently disabled
+- No centers have write/execute/control capabilities enabled

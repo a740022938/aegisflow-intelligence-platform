@@ -72,3 +72,13 @@ This document audits the readiness of each major runtime capability for potentia
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.30.0-D1 Runtime Implementation Readiness Final Audit
+
+See `AIP_RUNTIME_IMPLEMENTATION_READINESS_FINAL_AUDIT.md` for the final readiness matrix.
+
+Key conclusions:
+- 9 readonly capabilities can continue as preview
+- 12 write/execute/control capabilities are BLOCKED
+- All 12 blocked capabilities require Stage C + human approval
+- Stage C remains permanently disabled

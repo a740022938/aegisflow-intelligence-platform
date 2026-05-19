@@ -81,10 +81,18 @@ Rollback          │ 22    │ 13         │ 9       │ 9             │ 3  
 
 ## v7.29.0-P1 Governance Console Aggregator Preview
 
-- **Status:** Established — v7.29.0-P1 complete, commit `pending`
+- **Status:** Established — v7.29.0-P1 complete, commit \`600a029\`
 - **Route:** `/governance-console-preview` (hidden direct, not in sidebar)
 - **Registry:** `governance-console-registry.ts` — 18 items across 10 domains
 - **Validator:** `governance-console-validator.ts` — blocking checks enforced
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.29.0-P2 Risk Dashboard Preview (completed)
+
+- 20 risk items, 10 categories, 13 sources
+- Route: \`/governance-console-risk-dashboard-preview\` (hidden direct, not in sidebar)
+- Validator: blocking=0, pass ✓
+- No gate execution, no DB write, no external control
+- Stage C disabled
