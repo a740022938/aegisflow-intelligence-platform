@@ -71,6 +71,7 @@ const StageCEnablementPlanningPreview = lazy(() => import('./pages/StageCEnablem
 const StageCAuthorizationGateSealPreview = lazy(() => import('./pages/StageCAuthorizationGateSealPreview'));
 const StageCEnablementSimulationConsolePreview = lazy(() => import('./pages/StageCEnablementSimulationConsolePreview'));
 const StageCFirstSliceImplementationPreview = lazy(() => import('./pages/StageCFirstSliceImplementationPreview'));
+const StageCFeatureFlagControlPreview = lazy(() => import('./pages/StageCFeatureFlagControlPreview'));
 
 function RouteFallback() {
   return (
@@ -206,6 +207,7 @@ const App: React.FC = () => {
             <Route path="stage-c-authorization-gate-seal-preview" element={<StageCAuthorizationGateSealPreview />} />
             <Route path="stage-c-enablement-simulation-console-preview" element={<StageCEnablementSimulationConsolePreview />} />
             <Route path="stage-c-minimal-first-slice-v7-39-preview" element={<StageCFirstSliceImplementationPreview />} />
+            <Route path="stage-c-feature-flag-control-preview" element={<StageCFeatureFlagControlPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
