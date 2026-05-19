@@ -24,6 +24,10 @@ The following actions are FORBIDDEN during the Stage C readiness process:
 | 13 | Bypass human owner review | Governance boundary | Automatic denial |
 | 14 | Self-approve Stage C enablement | Role boundary | Automatic denial |
 | 15 | Modify forbidden actions contract | Contract integrity | Requires re-freeze |
+| 16 | Implement approve/deny in preview | Role boundary | Contract violation |
+| 17 | Collect evidence from preview page | Evidence integrity | Contract violation |
+| 18 | Upload files from preview page | Evidence integrity | Contract violation |
+| 19 | Treat seal candidate as final enablement | Governance boundary | Contract violation |
 
 ## Contract Enforcement
 
@@ -31,6 +35,7 @@ The following actions are FORBIDDEN during the Stage C readiness process:
 - Validators check for forbidden action words in interpretations
 - Safety searches scan for forbidden patterns
 - No enforcement code executes forbidden actions
+- P2/P3/P4 expanded forbidden actions cover: approve/deny, evidence collect, upload, seal candidate misuse
 
 ## Invariant
 

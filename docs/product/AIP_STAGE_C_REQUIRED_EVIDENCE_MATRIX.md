@@ -17,11 +17,15 @@
 | 8 | v7.34 D1 human review blueprint report | Report | v7.34-D1 | Yes |
 | 9 | v7.34 D2 contract freeze report | Report | v7.34-D2 | Yes |
 | 10 | v7.34 P1 dashboard preview report | Report | v7.34-P1 | Yes |
-| 11 | Smoke test results | Smoke | Current | Yes |
-| 12 | Validator output (all 4) | JSON | Current | Yes |
-| 13 | Safety boundary confirmation | JSON | Current | Yes |
-| 14 | Operator decision record | Doc | Current | Yes |
-| 15 | Human owner approval record | Doc | Current | Yes |
+| 11 | v7.34 P2 human approval review report | Report | v7.34-P2 | Yes |
+| 12 | v7.34 P3 evidence readiness drill report | Report | v7.34-P3 | Yes |
+| 13 | v7.34 P4 seal candidate report | Report | v7.34-P4 | Yes |
+| 14 | v7.34 final seal recheck | Report | v7.34-Final | Yes |
+| 15 | Smoke test results | Smoke | Current | Yes |
+| 16 | Validator output (all 7) | JSON | Current | Yes |
+| 17 | Safety boundary confirmation | JSON | Current | Yes |
+| 18 | Operator decision record | Doc | Current | Yes |
+| 19 | Human owner approval record | Doc | Current | Yes |
 
 ## Evidence Freshness
 

@@ -11,6 +11,9 @@
 | operator-checklist-evidence-validator | 19 | Yes | 0 |
 | operator-console-seal-candidate-validator | 18 | Yes | 0 |
 | stage-c-readiness-contract-validator | 18 | Yes | 0 |
+| stage-c-human-approval-review-validator | 18 | Yes | 0 |
+| stage-c-evidence-readiness-drill-validator | 20 | Yes | 0 |
+| stage-c-preenable-seal-candidate-validator | 18 | Yes | 0 |
 
 ## Pass Conditions
 

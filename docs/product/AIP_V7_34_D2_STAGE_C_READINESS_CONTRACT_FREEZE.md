@@ -31,6 +31,20 @@ blocking=0, warning=0, pass=true
 - 10 UI sections showing contract terms, validators, smoke, safety
 - Stage C explicitly disabled
 
+## P2/P3/P4 Registries
+
+| Phase | Registry | Items | Validator Checks |
+|---|---|---|---|
+| P2 | stage-c-human-approval-review-registry | 22 | 18 |
+| P3 | stage-c-evidence-readiness-drill-registry | 24 | 20 |
+| P4 | stage-c-preenable-seal-candidate-registry | 29 | 18 |
+
+## Final Seal
+
+- v7.34 Final Seal: V7_34_FINAL_SEAL_READY_WITH_ROUTE_SMOKE_DEFERRED
+- All 6 registries (D2 + P2 + P3 + P4 + 3 v7.33) pass with blocking=0
+- Stage C remains disabled across all registries
+
 ## D2 Verdict
 
 ```

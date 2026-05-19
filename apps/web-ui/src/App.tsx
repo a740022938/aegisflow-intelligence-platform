@@ -62,6 +62,9 @@ const OperatorConsoleReadonlyPreview = lazy(() => import('./pages/OperatorConsol
 const StageCReadinessDashboardPreview = lazy(() => import('./pages/StageCReadinessDashboardPreview'));
 const OperatorConsoleSealCandidatePreview = lazy(() => import('./pages/OperatorConsoleSealCandidatePreview'));
 const OperatorChecklistEvidencePreview = lazy(() => import('./pages/OperatorChecklistEvidencePreview'));
+const StageCHumanApprovalReviewPreview = lazy(() => import('./pages/StageCHumanApprovalReviewPreview'));
+const StageCEvidenceReadinessDrillPreview = lazy(() => import('./pages/StageCEvidenceReadinessDrillPreview'));
+const StageCPreenableSealCandidatePreview = lazy(() => import('./pages/StageCPreenableSealCandidatePreview'));
 
 function RouteFallback() {
   return (
@@ -188,6 +191,9 @@ const App: React.FC = () => {
             <Route path="operator-checklist-evidence-preview" element={<OperatorChecklistEvidencePreview />} />
             <Route path="operator-console-seal-candidate-preview" element={<OperatorConsoleSealCandidatePreview />} />
             <Route path="stage-c-readiness-dashboard-preview" element={<StageCReadinessDashboardPreview />} />
+            <Route path="stage-c-human-approval-review-preview" element={<StageCHumanApprovalReviewPreview />} />
+            <Route path="stage-c-evidence-readiness-drill-preview" element={<StageCEvidenceReadinessDrillPreview />} />
+            <Route path="stage-c-preenable-seal-candidate-preview" element={<StageCPreenableSealCandidatePreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

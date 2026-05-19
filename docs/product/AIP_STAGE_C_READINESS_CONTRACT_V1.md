@@ -39,6 +39,20 @@
 - All 24 terms shown with status (frozen), condition (must/should/info), and area grouping
 - Validator output shown in section 8 (Readiness Contract Result)
 
+## P2/P3/P4 Validator Integration
+
+| Validator | Source | Checks | Blocking Target |
+|---|---|---|---|
+| stage-c-human-approval-review-validator | P2 registry | 18 | 0 |
+| stage-c-evidence-readiness-drill-validator | P3 registry | 20 | 0 |
+| stage-c-preenable-seal-candidate-validator | P4 registry | 18 | 0 |
+
+## Final Seal
+
+- V7_34_FINAL_SEAL_READY_WITH_ROUTE_SMOKE_DEFERRED
+- 7 validators total (3 from v7.33 + 4 from v7.34)
+- All pass with blocking=0
+
 ## Contract Invariants
 
 ```
