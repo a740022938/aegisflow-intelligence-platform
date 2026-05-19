@@ -1273,6 +1273,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.33.0-P4 added as hidden direct-route. Not in sidebar. Readonly seal candidate preview. No action, no mutation, no POST, no tag/release. Not a final seal.',
   },
+  {
+    id: 'stage-c-readiness-dashboard-preview',
+    path: '/stage-c-readiness-dashboard-preview',
+    label: 'Stage C Readiness Dashboard Preview',
+    component: 'StageCReadinessDashboardPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Stage C Readiness Dashboard Preview page. 10 UI sections: seal baseline, human review, evidence, validators, smoke, safety boundary, forbidden actions, contract result, terms by area, next step. Based on D2 readiness contract registry. 24 contract terms, 4 validators. No backend endpoint, no API call, no DB write, no external control, no Stage C. No enable button. Not added to left menu.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.34.0-P1 added as hidden direct-route. Not in sidebar. Readonly Stage C readiness dashboard. No enable action, no mutation, no POST. Stage C remains disabled.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {
