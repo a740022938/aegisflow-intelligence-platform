@@ -72,6 +72,7 @@ const StageCAuthorizationGateSealPreview = lazy(() => import('./pages/StageCAuth
 const StageCEnablementSimulationConsolePreview = lazy(() => import('./pages/StageCEnablementSimulationConsolePreview'));
 const StageCFirstSliceImplementationPreview = lazy(() => import('./pages/StageCFirstSliceImplementationPreview'));
 const StageCFeatureFlagControlPreview = lazy(() => import('./pages/StageCFeatureFlagControlPreview'));
+const StageCFeatureFlagToggleTrialPreview = lazy(() => import('./pages/StageCFeatureFlagToggleTrialPreview'));
 
 function RouteFallback() {
   return (
@@ -208,6 +209,7 @@ const App: React.FC = () => {
             <Route path="stage-c-enablement-simulation-console-preview" element={<StageCEnablementSimulationConsolePreview />} />
             <Route path="stage-c-minimal-first-slice-v7-39-preview" element={<StageCFirstSliceImplementationPreview />} />
             <Route path="stage-c-feature-flag-control-preview" element={<StageCFeatureFlagControlPreview />} />
+            <Route path="stage-c-feature-flag-toggle-trial-preview" element={<StageCFeatureFlagToggleTrialPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

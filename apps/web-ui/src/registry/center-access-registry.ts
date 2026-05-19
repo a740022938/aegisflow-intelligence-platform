@@ -13,7 +13,8 @@ export type CenterAccessKind =
   | 'human_approval'
   | 'evidence_schema'
   | 'rollback'
-  | 'feature_flag_control';
+  | 'feature_flag_control'
+  | 'feature_flag_toggle_trial';
 
 export type CenterAccessStatus =
   | 'available_route'
@@ -1460,6 +1461,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     targetContainer: 'launchpad',
     rollbackPlan: 'No sidebar entry to revert. Remove route from App.tsx if needed.',
     userImpact: 'Low — readonly disabled control preview page. No toggle, no mutation, no POST.',
+    maturity: 'preview',
+    owner: 'governance',
+  },
+  {
+    id: 'stage-c-feature-flag-toggle-trial-preview',
+    name: 'Stage C Feature Flag Toggle Trial Preview',
+    kind: 'governance',
+    route: '/stage-c-feature-flag-toggle-trial-preview',
+    status: 'hidden_direct',
+    risk: 'medium',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_toggle', 'no_mutation', 'no_db_write', 'no_external_control', 'no_stage_c'],
+    allowedActions: ['view_trial_preview', 'view_trial_plan', 'view_requirements'],
+    blockedActions: ['enable_stage_c', 'toggle_feature_flag', 'write_database', 'modify_sidebar', 'control_external_tools', 'call_external_api', 'release', 'approve', 'reject'],
+    requiredBeforeExposure: ['readonly_only', 'no_toggle', 'no_db_write', 'validator_pass'],
+    releaseGate: [],
+    displayOrder: 999,
+    group: 'governance',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 90,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '试切换计划只读预览', 'toggle_not_executed'],
+    description: 'Stage C Feature Flag Toggle Trial Preview — 21 项试切换注册表条目。toggleExecuted=false。未入左侧菜单。hidden direct route。',
+    notes: 'v7.40-P2 Feature Flag Toggle Trial Preview。21 items。全部 readonly/trialPlanOnly/toggleExecuted=false。不入 sidebar。不启用 Stage C。不写 DB。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'v7.40-P2 Feature Flag Toggle Trial Preview — readonly trial plan preview. Keep hidden direct. Not in sidebar. Toggle not executed.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove route from App.tsx if needed.',
+    userImpact: 'Low — readonly trial plan preview page. No toggle, no mutation, no POST.',
     maturity: 'preview',
     owner: 'governance',
   },

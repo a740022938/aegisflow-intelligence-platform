@@ -1438,6 +1438,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.40-P1 added as hidden direct-route. Not in sidebar. Readonly control preview. No toggle, no mutation, no POST.',
   },
+  {
+    id: 'stage-c-feature-flag-toggle-trial-preview',
+    path: '/stage-c-feature-flag-toggle-trial-preview',
+    label: 'Stage C Feature Flag Toggle Trial Preview',
+    component: 'StageCFeatureFlagToggleTrialPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Feature Flag Toggle Trial Preview page. Shows 21 registry items with validator. All items readonly, trialPlanOnly=true, toggleExecuted=false, actionAllowed=false, mutationAllowed=false, canEnableStageC=false. No backend endpoint, no API call, no DB write, no external control, no Stage C. Not added to left menu.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.40-P2 added as hidden direct-route. Not in sidebar. Readonly trial plan preview. No toggle, no mutation, no POST.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {

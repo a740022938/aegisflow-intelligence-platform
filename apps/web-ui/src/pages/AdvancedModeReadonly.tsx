@@ -245,11 +245,12 @@ const CENTER_KIND_LABELS: Record<CenterAccessKind, string> = {
   evidence_schema: 'Evidence Schema',
   rollback: 'Rollback',
   feature_flag_control: 'Feature Flag Control',
+  feature_flag_toggle_trial: 'Toggle Trial',
 };
 
 const CENTER_KIND_COLORS: Record<CenterAccessKind, string> = {
   advanced: '#F97316', connector: '#22C55E', lab: '#3B82F6', governance: '#22C55E', navigation_preview: '#8B5CF6',
-  runtime_registry: '#8B5CF6', governance_state_machine: '#8B5CF6', human_approval: '#EC4899',   evidence_schema: '#22C55E', rollback: '#F97316', feature_flag_control: '#8B5CF6',
+  runtime_registry: '#8B5CF6', governance_state_machine: '#8B5CF6', human_approval: '#EC4899',   evidence_schema: '#22C55E', rollback: '#F97316', feature_flag_control: '#8B5CF6', feature_flag_toggle_trial: '#8B5CF6',
 };
 
 const READINESS_COLORS: Record<string, string> = {

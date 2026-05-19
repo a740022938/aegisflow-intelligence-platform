@@ -19,15 +19,16 @@
 4. **External Control Gate** — External control remains disabled
 5. **Connector Action Gate** — Connector action remains disabled
 
-## Gate States
+## Gate States (Updated for v7.40-P2)
 
 | Gate | Current | Post-Toggle |
 |------|---------|-------------|
 | Authorization | PENDING | PENDING (new auth) |
-| Rollback | DESIGN | DESIGN |
+| Rollback | READY (plan exists) | READY (plan exists) |
 | Kill Switch | TESTED | TESTED |
-| Smoke | DESIGN | DESIGN |
+| Smoke | READY (plan exists) | READY (plan exists) |
 | Safety | PASS | MUST RE-PASS |
+| Toggle Trial | PLAN READY (not executed) | TBD (if P3 authorized) |
 | Execution | BLOCKED | BLOCKED |
 | POST | BLOCKED | BLOCKED |
 | DB Write | BLOCKED | BLOCKED |

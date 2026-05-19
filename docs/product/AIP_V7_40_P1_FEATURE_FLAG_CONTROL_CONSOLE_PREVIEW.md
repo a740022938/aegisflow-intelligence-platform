@@ -32,3 +32,7 @@
 ```
 V7_40_P1_FEATURE_FLAG_CONTROL_CONSOLE_PREVIEW_READY_WITH_TOGGLE_DISABLED
 ```
+
+## Updates in v7.40-P2
+
+The P2 toggle trial preview extends the P1 control console with toggle trial planning capabilities. Both remain readonly/disabled. No toggle is executed.

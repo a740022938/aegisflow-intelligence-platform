@@ -42,3 +42,7 @@ Before flag can be toggled:
 ```
 V7_40_D1_CONTROLLED_FEATURE_FLAG_ENABLEMENT_BLUEPRINT_READY
 ```
+
+## Updates in v7.40-P2
+
+The P2 toggle trial plan, approval template, rollback plan, smoke plan, and failure stop policy are consistent with this D1 blueprint. No design changes needed.

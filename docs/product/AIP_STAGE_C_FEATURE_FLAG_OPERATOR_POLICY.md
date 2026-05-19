@@ -29,3 +29,13 @@ Every flag change must record:
 - What the previous state was
 - What the new state is
 - Whether rollback was needed
+
+## v7.40-P2 Addendum
+
+P2 adds the following trial-specific policies:
+
+1. Toggle trial requires human approval (template must be used)
+2. Toggle trial must have rollback plan, smoke plan, and failure stop policy
+3. Toggle trial does NOT enable Stage C
+4. Toggle trial does NOT allow POST, DB write, executor, external control, or connector action
+5. Toggle trial must produce a report with results and next steps
