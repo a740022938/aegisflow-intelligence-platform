@@ -54,6 +54,13 @@
 - **Forbidden action:** Enable or implement
 - **Evidence source:** Phase scope doc
 
+## P3 Usage Notes
+- P3 adds checklist-only status tracking: pass, ready, deferred, blocked, not_applicable, unknown
+- Checklist item statuses are static — no status transition mechanism exists
+- P3 evidence linkage uses a separate static type system (OperatorEvidenceType)
+- P3 verdict: V7_33_P3_OPERATOR_CHECKLIST_EVIDENCE_LINKAGE_PREVIEW_READY
+- Next phase: P4 Operator Console Seal Candidate
+
 ## P2 Usage Notes
 - P2 Operator Console Readonly UI Preview uses static status data from P1 registry
 - No runtime status API calls from the P2 preview page

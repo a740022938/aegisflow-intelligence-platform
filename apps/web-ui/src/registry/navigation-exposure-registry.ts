@@ -1243,6 +1243,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.33.0-P2 added as hidden direct-route. Not in sidebar. Readonly UI preview. No action, no mutation, no POST.',
   },
+  {
+    id: 'operator-checklist-evidence-preview',
+    path: '/operator-checklist-evidence-preview',
+    label: 'Operator Checklist + Evidence Linkage Preview',
+    component: 'OperatorChecklistEvidencePreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Operator Checklist + Evidence Linkage Preview page. 10 UI sections: seal chain, checklist summary, required matrix, evidence linkage, source-of-truth, safety boundaries, forbidden actions, validator summary, evidence type distribution, operator next step. Based on P3 registries. 24 checklist items, 15 evidence links. No backend endpoint, no API call, no DB write, no evidence write, no external control, no Stage C. Not added to left menu.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.33.0-P3 added as hidden direct-route. Not in sidebar. Readonly checklist + evidence preview. No action, no evidence capture, no mutation, no POST.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {

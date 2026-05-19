@@ -87,9 +87,15 @@ v7.33.0-P2 upgrades the P1 registry preview into a more polished operator consol
 V7_33_P2_OPERATOR_CONSOLE_READONLY_UI_PREVIEW_READY
 ```
 
+## P3 Sync Note
+
+- P2 page section 7 (Operator Next Step) updated to link to P3 preview at `/operator-checklist-evidence-preview`
+- P3 adds 24-item checklist registry, 15-item evidence linkage registry, combined validator, and 10-section preview page
+
 ## Next Step Recommendation
 
 ```
-v7.33.0-P3: Operator Checklist + Evidence Linkage Preview (readonly)
+v7.33.0-P3: Operator Checklist + Evidence Linkage Preview (COMPLETED)
+v7.33.0-P4: Operator Console Seal Candidate
 Do not enter Stage C.
 ```

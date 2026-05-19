@@ -54,6 +54,29 @@ Receipts: E:\_AIP_RECEIPTS\...
 - No upload to external services
 - No audit log entry for panel view
 
+## P3 Evidence Linkage Registry
+
+v7.33.0-P3 adds a static evidence linkage registry (`operator-evidence-linkage-registry.ts`) with 15 items:
+
+- 5 phase reports (v7.32 P2, v7.33 D1, P1, P2, P3)
+- 5 phase receipts (v7.32 P2, P1, v7.33 D1, P1, P2)
+- 1 JSON report (v7.33 P2)
+- 1 roadmap doc
+- 1 rollback guide
+- 1 restart checklist
+- 1 readonly workflow doc
+- 1 status model doc
+
+All evidence items are `readonly: true`. The registry provides paths for reference only. No evidence is read, written, or captured from the P3 preview page.
+
+## P3 Validator Evidence Checks
+
+The P3 combined validator (`operator-checklist-evidence-validator.ts`) checks:
+- All evidence items have non-empty paths
+- Source-of-truth items cover both report and receipt types
+- All forbiddenAction fields are non-empty
+- No evidence item has actionAllowed or mutationAllowed
+
 ## Prohibited Capabilities
 
 | Capability | Status |
@@ -63,3 +86,4 @@ Receipts: E:\_AIP_RECEIPTS\...
 | Upload evidence | Prohibited |
 | Generate evidence API | Prohibited |
 | Evidence mutation | Prohibited |
+| Read evidence from panel | Prohibited (paths displayed for reference only) |

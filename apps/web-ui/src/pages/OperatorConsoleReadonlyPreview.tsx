@@ -285,6 +285,7 @@ const OperatorConsoleReadonlyPreview: React.FC = () => {
             <li>Check smoke evidence panel for latest historical smoke results</li>
             <li>Review risk / blocker matrix — acknowledge all high/critical risks are permanent</li>
             <li>Browse P1 Registry Preview for detailed registry item breakdown</li>
+            <li>Open <a href="/operator-checklist-evidence-preview" style={{ color: '#42a5f5' }}>Operator Checklist + Evidence Linkage Preview (P3)</a> for checklist and evidence review</li>
             <li>Do not enter Stage C — no enablement button exists on any Operator Console page</li>
           </ol>
         </div>

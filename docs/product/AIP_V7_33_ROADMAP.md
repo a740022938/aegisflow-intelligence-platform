@@ -33,10 +33,16 @@ v7.33 focuses on productizing the Operator Console — a read-only unified entry
 - No POST interactions, no sidebar exposure, no backend changes, no Stage C
 - **Verdict:** V7_33_P2_OPERATOR_CONSOLE_READONLY_UI_PREVIEW_READY
 
-### P3 — Operator Checklist + Evidence Linkage Preview
-- Add operator checklist preview panel
-- Link evidence panel to existing reports
-- Add rollback/recovery panel preview
+### P3 — Operator Checklist + Evidence Linkage Preview (COMPLETED)
+- New operator-checklist-registry.ts (24 items, 8 categories, all readonly)
+- New operator-evidence-linkage-registry.ts (15 items, 7 types, 12 source-of-truth)
+- New operator-checklist-evidence-validator.ts (19 checks, blocking=0, pass=true)
+- New preview page: OperatorChecklistEvidencePreview (10 sections)
+- Hidden direct route: `/operator-checklist-evidence-preview`
+- Center-access-registry.ts + navigation-exposure-registry.ts entries added
+- P2 UI preview synced with P3 link
+- No POST, no DB write, no evidence write, no sidebar, no Stage C
+- **Verdict:** V7_33_P3_OPERATOR_CHECKLIST_EVIDENCE_LINKAGE_PREVIEW_READY
 
 ### P4 — Operator Console Seal Candidate
 - Complete all Operator Console preview routes
