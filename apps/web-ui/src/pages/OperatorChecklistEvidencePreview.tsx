@@ -366,13 +366,14 @@ const OperatorChecklistEvidencePreview: React.FC = () => {
             <li>Verify source-of-truth evidence covers all sealed phases</li>
             <li>Confirm safety boundaries are all disabled/blocked/absent</li>
             <li>Review validator summary — confirm blocking=0, pass=true</li>
+            <li>Open <a href="/operator-console-seal-candidate-preview" style={{ color: '#ffa726' }}>Operator Console Seal Candidate Preview (P4)</a> for seal readiness review</li>
             <li>Do not enter Stage C — no enablement button exists on any Operator Console page</li>
           </ol>
         </div>
         <div style={{ marginTop: 12, padding: 12, background: '#1a1a2e', borderRadius: 4, border: '1px solid #2a2a4a' }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#ffa726' }}>Next Phase Recommendation</div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary, #8892b0)', marginTop: 4 }}>
-            v7.33.0-P4: Operator Console Seal Candidate
+            <a href="/operator-console-seal-candidate-preview" style={{ color: '#ffa726' }}>v7.33.0-P4: Operator Console Seal Candidate</a>
           </div>
           <div style={{ fontSize: 12, color: '#ef5350', marginTop: 4, fontWeight: 600 }}>
             Do not enter Stage C.

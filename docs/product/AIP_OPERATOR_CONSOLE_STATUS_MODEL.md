@@ -54,12 +54,20 @@
 - **Forbidden action:** Enable or implement
 - **Evidence source:** Phase scope doc
 
+## P4 Usage Notes
+- P4 adds seal candidate status tracking: ready, sealed, blocked, deferred, not_applicable, unknown
+- Seal candidate items are static — no status transition mechanism exists
+- 23 requiredForSeal items must be sealed or ready; 1 deferred item (tag/release) is expected
+- P4 verdict: V7_33_P4_OPERATOR_CONSOLE_SEAL_CANDIDATE_READY
+- Next phase: v7.33 Final Seal Recheck
+- P4 is NOT a final seal — no tag, no release, no Stage C
+
 ## P3 Usage Notes
 - P3 adds checklist-only status tracking: pass, ready, deferred, blocked, not_applicable, unknown
 - Checklist item statuses are static — no status transition mechanism exists
 - P3 evidence linkage uses a separate static type system (OperatorEvidenceType)
 - P3 verdict: V7_33_P3_OPERATOR_CHECKLIST_EVIDENCE_LINKAGE_PREVIEW_READY
-- Next phase: P4 Operator Console Seal Candidate
+- Next phase: P4 Operator Console Seal Candidate (COMPLETED)
 
 ## P2 Usage Notes
 - P2 Operator Console Readonly UI Preview uses static status data from P1 registry

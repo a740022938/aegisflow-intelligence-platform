@@ -1,0 +1,330 @@
+// Operator Console Seal Candidate Registry — static readonly seal readiness checklist
+// Does not execute API calls, modify state, write to databases, or control external tools.
+// P4: seal candidate only — not a final seal, not Stage C, not a release.
+
+export type OperatorConsoleSealCandidateArea =
+  | 'baseline'
+  | 'operator_console'
+  | 'registry'
+  | 'ui'
+  | 'checklist'
+  | 'evidence'
+  | 'safety'
+  | 'validation'
+  | 'release_boundary'
+  | 'next_step';
+
+export type OperatorConsoleSealCandidateStatus =
+  | 'ready'
+  | 'sealed'
+  | 'blocked'
+  | 'deferred'
+  | 'not_applicable'
+  | 'unknown';
+
+export interface OperatorConsoleSealCandidateItem {
+  id: string;
+  title: string;
+  area: OperatorConsoleSealCandidateArea;
+  status: OperatorConsoleSealCandidateStatus;
+  readonly: true;
+  requiredForSeal: boolean;
+  evidenceRef: string;
+  linkedDoc?: string;
+  linkedPreviewRoute?: string;
+  sealInterpretation: string;
+  forbiddenAction: string;
+}
+
+export const OPERATOR_CONSOLE_SEAL_CANDIDATE_REGISTRY: OperatorConsoleSealCandidateItem[] = [
+  {
+    id: 'v7-32-baseline',
+    title: 'v7.32 Productization Seal Baseline',
+    area: 'baseline',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'V7_32_PRODUCTIZATION_SEAL_READY — 38 tests, 4 GET endpoints, POST blocked',
+    linkedDoc: 'docs/product/AIP_V7_32_PRODUCTIZATION_SEAL_BASELINE.md',
+    sealInterpretation: 'v7.32 baseline sealed at V7_32_PRODUCTIZATION_SEAL_READY. No regression.',
+    forbiddenAction: 'Do not bypass v7.32 seal baseline. Do not re-seal without recheck.',
+  },
+  {
+    id: 'v7-33-d1-blueprint',
+    title: 'v7.33 D1 Operator Console Productization Blueprint',
+    area: 'baseline',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'V7_33_D1_OPERATOR_CONSOLE_PRODUCTIZATION_BLUEPRINT_READY — 8 docs',
+    linkedDoc: 'docs/product/AIP_V7_33_D1_OPERATOR_CONSOLE_PRODUCTIZATION_BLUEPRINT.md',
+    sealInterpretation: 'D1 design blueprint completed. 8 design docs (Blueprint, IA, Workflow, Status Model, Risk Model, Evidence Panel, Rollback Panel, Roadmap).',
+    forbiddenAction: 'Do not skip D1 design review. Do not implement from memory without blueprint reference.',
+  },
+  {
+    id: 'v7-33-p1-registry',
+    title: 'v7.33 P1 Operator Console Registry Preview',
+    area: 'registry',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'V7_33_P1_OPERATOR_CONSOLE_REGISTRY_PREVIEW_READY — 20 items, 12 domains, validator pass',
+    linkedDoc: 'docs/product/AIP_V7_33_P1_OPERATOR_CONSOLE_REGISTRY_PREVIEW.md',
+    linkedPreviewRoute: '/operator-console-registry-preview',
+    sealInterpretation: 'P1 registry preview completed. 20 registry items, 12 domains, validator blocking=0.',
+    forbiddenAction: 'Do not mutate P1 registry without re-validation. Do not add action items to P1 registry.',
+  },
+  {
+    id: 'v7-33-p2-readonly-ui',
+    title: 'v7.33 P2 Operator Console Readonly UI Preview',
+    area: 'ui',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'V7_33_P2_OPERATOR_CONSOLE_READONLY_UI_PREVIEW_READY — typecheck PASS, 38 tests PASS, build PASS',
+    linkedDoc: 'docs/product/AIP_V7_33_P2_OPERATOR_CONSOLE_READONLY_UI_PREVIEW.md',
+    linkedPreviewRoute: '/operator-console-readonly-preview',
+    sealInterpretation: 'P2 readonly UI preview completed. 8 sections, hidden direct route. No execute, no POST, no DB write.',
+    forbiddenAction: 'Do not add action buttons, POST forms, or mutation UI to P2 preview.',
+  },
+  {
+    id: 'v7-33-p3-checklist-evidence',
+    title: 'v7.33 P3 Operator Checklist + Evidence Linkage Preview',
+    area: 'checklist',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'V7_33_P3_OPERATOR_CHECKLIST_EVIDENCE_LINKAGE_PREVIEW_READY — 24 checklist items, 15 evidence links, validator pass',
+    linkedDoc: 'docs/product/AIP_V7_33_P3_OPERATOR_CHECKLIST_EVIDENCE_LINKAGE_PREVIEW.md',
+    linkedPreviewRoute: '/operator-checklist-evidence-preview',
+    sealInterpretation: 'P3 checklist + evidence preview completed. 24 checklist items (8 categories), 15 evidence links (7 types). Validator blocking=0.',
+    forbiddenAction: 'Do not enable evidence capture from P3 preview. Do not write evidence from preview page.',
+  },
+  {
+    id: 'route-coverage',
+    title: 'Operator Console Route Coverage (P1+P2+P3)',
+    area: 'operator_console',
+    status: 'ready',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: '3 hidden direct routes registered in App.tsx, center-access-registry.ts, navigation-exposure-registry.ts',
+    linkedPreviewRoute: null,
+    sealInterpretation: 'All 3 operator console preview routes registered: /operator-console-registry-preview, /operator-console-readonly-preview, /operator-checklist-evidence-preview. All hidden direct, not in sidebar.',
+    forbiddenAction: 'Do not expose operator console routes to sidebar without governance review. Do not remove routes without migration plan.',
+  },
+  {
+    id: 'hidden-direct-boundary',
+    title: 'Hidden-Direct Exposure Boundary',
+    area: 'operator_console',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'center-access-registry entries all use hidden_direct with visibleInSidebar=false. navigation-exposure-registry entries recommend keep_direct_route.',
+    sealInterpretation: 'All 3 preview routes are hidden-direct only. No sidebar exposure. Center-access and navigation-exposure registries enforce this boundary.',
+    forbiddenAction: 'Do not add any operator console route to sidebar without new governance phase.',
+  },
+  {
+    id: 'sidebar-non-exposure',
+    title: 'Sidebar Non-Exposure Confirmation',
+    area: 'operator_console',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'menu-registry.ts unchanged — no operator console entries added to sidebar. Layout unchanged.',
+    sealInterpretation: 'Operator console preview pages are NOT in sidebar. No sidebar entry, no primary nav item. Built and verified clean.',
+    forbiddenAction: 'Do not add operator console to sidebar without Phase C approval.',
+  },
+  {
+    id: 'registry-validator-ready',
+    title: 'Operator Console Registry Validator Readiness',
+    area: 'registry',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'operator-console-validator.ts — 18 checks, blocking=0, info<=6, pass=true',
+    linkedPreviewRoute: '/operator-console-registry-preview',
+    sealInterpretation: 'P1 registry validator: blocking=0, all checks pass or info. Validator enforces readonly, forbidden actions, and domain coverage.',
+    forbiddenAction: 'Do not add items to registry without updating validator. Do not bypass validator checks.',
+  },
+  {
+    id: 'checklist-validator-ready',
+    title: 'Checklist Validator Readiness',
+    area: 'checklist',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'operator-checklist-evidence-validator.ts — 19 checks, blocking=0, pass=true',
+    linkedPreviewRoute: '/operator-checklist-evidence-preview',
+    sealInterpretation: 'P3 checklist+evidence validator: 19 checks, blocking=0. All items readonly, forbidden actions enforced, evidence refs present.',
+    forbiddenAction: 'Do not add mutable items to checklist registry. Do not reduce validator coverage.',
+  },
+  {
+    id: 'evidence-linkage-ready',
+    title: 'Evidence Linkage Readiness',
+    area: 'evidence',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: '15 evidence links across 7 types. 12 source-of-truth items. All readonly.',
+    linkedPreviewRoute: '/operator-checklist-evidence-preview',
+    sealInterpretation: 'P3 evidence linkage: 15 items, 7 types (report, receipt, json, doc, roadmap, rollback, smoke). 12 source-of-truth items validated.',
+    forbiddenAction: 'Do not write evidence from preview page. Do not collect new evidence from operator console.',
+  },
+  {
+    id: 'smoke-evidence-availability',
+    title: 'Smoke Evidence Availability',
+    area: 'evidence',
+    status: 'ready',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'v7.32 smoke passed: GET 4/4 PASS, POST 4/4 blocked 401. Stale server 401 resolved in P1.',
+    linkedDoc: 'docs/smoke/v7.32.0_P2_smoke_results.md',
+    sealInterpretation: 'Smoke evidence from v7.32: GET endpoints return 200, POST blocked 401. Stale server 401 resolved in v7.32.0-P1.',
+    forbiddenAction: 'Do not rely on stale smoke data. Re-run smoke before final seal if server state changed.',
+  },
+  {
+    id: 'report-receipt-availability',
+    title: 'Report/Receipt Evidence Availability',
+    area: 'evidence',
+    status: 'ready',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'Reports and receipts exist for D1, P1, P2, P3 at E:\\_AIP_REPORTS\\ and E:\\_AIP_RECEIPTS\\',
+    sealInterpretation: 'All 4 phases (D1, P1, P2, P3) have reports and receipts generated. Evidence chain complete from blueprint through preview.',
+    forbiddenAction: 'Do not delete or overwrite phase reports/receipts without seal recheck.',
+  },
+  {
+    id: 'rollback-recovery-docs',
+    title: 'Rollback/Recovery Documentation',
+    area: 'baseline',
+    status: 'ready',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'Rollback Panel spec in D1 blueprint. Restart checklist doc exists.',
+    linkedDoc: 'docs/product/AIP_V7_33_D1_OPERATOR_CONSOLE_ROLLBACK_PANEL_SPEC.md',
+    sealInterpretation: 'Rollback/recovery documented in D1 design. Restart checklist available. No rollback execution from operator console.',
+    forbiddenAction: 'Do not execute rollback from operator console. Do not implement rollback button without governance approval.',
+  },
+  {
+    id: 'human-restart-policy',
+    title: 'Human Restart Policy',
+    area: 'baseline',
+    status: 'ready',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'Checklist item ev-restart-checklist confirms: Server restart requires human approval and smoke checklist.',
+    linkedDoc: 'docs/product/AIP_V7_33_D1_HUMAN_RESTART_POLICY.md',
+    sealInterpretation: 'Human restart policy documented. Server restart requires human approval and smoke checklist. No auto-restart.',
+    forbiddenAction: 'Do not implement auto-restart. Do not bypass human restart approval.',
+  },
+  {
+    id: 'stage-c-disabled',
+    title: 'Stage C Disabled Confirmation',
+    area: 'safety',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'Runtime GET /api/runtime/readiness returns stageCEnabled=false. All preview pages confirm Stage C disabled.',
+    sealInterpretation: 'Stage C is disabled across all runtime responses and all operator console preview pages. No Stage C enablement in any phase.',
+    forbiddenAction: 'Do not enable Stage C from any operator console page. Do not implement Stage C executor.',
+  },
+  {
+    id: 'post-runtime-blocked',
+    title: 'POST Runtime Blocked Confirmation',
+    area: 'safety',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'Runtime GET /api/runtime/blockers returns POST blocked. P2/P3 pages confirm POST blocked in safety boundaries.',
+    sealInterpretation: 'POST runtime endpoints are blocked (401). No POST implementation in any operator console phase.',
+    forbiddenAction: 'Do not implement POST execution from operator console. Do not remove POST block.',
+  },
+  {
+    id: 'db-write-not-occurred',
+    title: 'DB Write Not Occurred Confirmation',
+    area: 'safety',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'No DB write in any operator console phase. All registries enforce readonly. Runtime API confirms no DB write capability.',
+    sealInterpretation: 'No database write has occurred during any operator console phase. All registry items enforce readonly=true. No DB mutation capability exists.',
+    forbiddenAction: 'Do not add DB write capability to operator console. Do not connect operator console to writable DB endpoints.',
+  },
+  {
+    id: 'external-control-not-occurred',
+    title: 'External Control Not Occurred Confirmation',
+    area: 'safety',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'No external control implementation in any operator console page. Runtime confirms externalControlEnabled=false.',
+    sealInterpretation: 'No external control has been implemented or used during any operator console phase. All registries and pages are self-contained.',
+    forbiddenAction: 'Do not add external control capability. Do not connect operator console to external APIs or services.',
+  },
+  {
+    id: 'executor-absent',
+    title: 'Executor Absent Confirmation',
+    area: 'safety',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'No executor implementation in any operator console page. No runtime executor registered.',
+    sealInterpretation: 'No runtime executor has been implemented or used. No execute button, no run action, no command execution from operator console.',
+    forbiddenAction: 'Do not implement runtime executor in operator console. Do not add execute buttons.',
+  },
+  {
+    id: 'security-safety-search-clean',
+    title: 'Security/Safety Search Clean',
+    area: 'safety',
+    status: 'sealed',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'Phase safety searches for P1, P2, P3 all returned CLEAN for: Stage C, POST, DB write, external control, executor, connector, secret, sidebar, action button, evidence write, audit write, rollback, restart.',
+    sealInterpretation: 'All 3 phases passed safety search. No dangerous capabilities introduced. All forbidden actions documented.',
+    forbiddenAction: 'Do not introduce capabilities without re-running safety search. Do not skip safety search on any future phase.',
+  },
+  {
+    id: 'typecheck-test-build-ready',
+    title: 'Typecheck/Test/Build Readiness',
+    area: 'validation',
+    status: 'ready',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'P2: typecheck PASS, tests 38/38 PASS, build PASS. P3: typecheck PASS, tests 9/9 PASS, build PASS.',
+    sealInterpretation: 'All phases pass typecheck, tests, and build. No type errors, no test failures, no build errors.',
+    forbiddenAction: 'Do not skip typecheck/tests/build before final seal. Do not merge code that breaks typecheck or tests.',
+  },
+  {
+    id: 'git-origin-sync',
+    title: 'Git/Origin Synchronization',
+    area: 'validation',
+    status: 'ready',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'All commits pushed to origin/main. Branch up to date. No uncommitted changes.',
+    sealInterpretation: 'All phase commits (D1, P1, P2, P3) pushed to origin/main. Working tree clean. Origin synchronized.',
+    forbiddenAction: 'Do not push untested code. Do not force push to main without team review.',
+  },
+  {
+    id: 'tag-release-boundary',
+    title: 'Tag/Release Boundary',
+    area: 'release_boundary',
+    status: 'deferred',
+    readonly: true,
+    requiredForSeal: false,
+    evidenceRef: 'No tag or GitHub Release created for v7.33.0-P4. Tags and releases deferred to Final Seal Recheck phase.',
+    sealInterpretation: 'P4 is a seal candidate only. No tag, no GitHub Release. Final seal recheck will determine release readiness.',
+    forbiddenAction: 'Do not create tag or release from P4. Do not bypass Final Seal Recheck.',
+  },
+  {
+    id: 'seal-candidate-readiness',
+    title: 'P4 Seal Candidate Readiness',
+    area: 'next_step',
+    status: 'ready',
+    readonly: true,
+    requiredForSeal: true,
+    evidenceRef: 'All P4 phases complete: registry (24 items), validator (18 checks), preview page (10 sections), route, docs, validation, safety search, reports.',
+    sealInterpretation: 'P4 seal candidate ready for review. 24 seal readiness items, validator blocking=0. All safety boundaries confirmed. Next: Final Seal Recheck.',
+    forbiddenAction: 'Do not treat P4 as final seal. Do not enter Stage C. Do not tag or release from P4.',
+  },
+];

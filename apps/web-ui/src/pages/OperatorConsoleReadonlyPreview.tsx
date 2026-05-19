@@ -286,13 +286,14 @@ const OperatorConsoleReadonlyPreview: React.FC = () => {
             <li>Review risk / blocker matrix — acknowledge all high/critical risks are permanent</li>
             <li>Browse P1 Registry Preview for detailed registry item breakdown</li>
             <li>Open <a href="/operator-checklist-evidence-preview" style={{ color: '#42a5f5' }}>Operator Checklist + Evidence Linkage Preview (P3)</a> for checklist and evidence review</li>
+            <li>Open <a href="/operator-console-seal-candidate-preview" style={{ color: '#ffa726' }}>Operator Console Seal Candidate Preview (P4)</a> for seal readiness review</li>
             <li>Do not enter Stage C — no enablement button exists on any Operator Console page</li>
           </ol>
         </div>
         <div style={{ marginTop: 12, padding: 12, background: '#1a1a2e', borderRadius: 4, border: '1px solid #2a2a4a' }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#ffa726' }}>Next Phase Recommendation</div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary, #8892b0)', marginTop: 4 }}>
-            v7.33.0-P3: Operator Checklist + Evidence Linkage Preview (readonly)
+            <a href="/operator-console-seal-candidate-preview" style={{ color: '#ffa726' }}>v7.33.0-P4: Operator Console Seal Candidate</a>
           </div>
           <div style={{ fontSize: 12, color: '#ef5350', marginTop: 4, fontWeight: 600 }}>
             Do not enter Stage C.

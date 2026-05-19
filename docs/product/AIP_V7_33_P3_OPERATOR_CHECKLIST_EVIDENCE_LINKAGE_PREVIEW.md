@@ -61,62 +61,21 @@ v7.33.0-P3 adds a readonly operator checklist registry, evidence linkage registr
 
 ### P2 UI Preview Sync
 
-- P2 page section 7 (Operator Next Step) adds link to P3 checklist + evidence preview
+- P2 page section 7 (Operator Next Step) updated to link to P3 preview at `/operator-checklist-evidence-preview`
+- P3 adds 24-item checklist registry, 15-item evidence linkage registry, combined validator, and 10-section preview page
 
-## Safety
+### P4 UI Preview Sync
 
-| Check | Status |
-|-------|--------|
-| Source code modified | Yes (3 new registries, 1 new page, App.tsx, registries, P2 sync, docs) |
-| Backend modified | No |
-| POST endpoint added | No |
-| DB write enabled | No |
-| External control enabled | No |
-| Stage C enabled | No |
-| Runtime executor added | No |
-| Evidence write/store | No |
-| Audit write/store | No |
-| Sidebar exposure | No (hidden direct only) |
-| Layout/i18n/menu modified | No |
+- P3 page section 10 (Operator Next Step) updated to link to P4 seal candidate preview at `/operator-console-seal-candidate-preview`
+- P4 adds 24-item seal candidate registry, 18-check validator, 10-section preview page
 
-## UI Sections Summary
+## Next Step Recommendation
 
-| Section | Content | Source |
-|---------|---------|--------|
-| 1. Seal Chain | 5 verdict cards | Static |
-| 2. Checklist Summary | Stats + categories | P3 checklist registry |
-| 3. Required Checklist Matrix | 24 items with status | P3 checklist registry |
-| 4. Evidence Linkage Panel | Stats + listing | P3 evidence registry |
-| 5. Source-of-Truth Evidence | 12 items | P3 evidence registry |
-| 6. Safety Boundary Confirmation | 5 boundaries | Checklist |
-| 7. Forbidden Actions | 10 items | Static |
-| 8. Validator Summary | Pass/blocking/warning | P3 validator |
-| 9. Evidence Type Distribution | 7 types | P3 evidence registry |
-| 10. Operator Next Step | Checklist + recommendation | Static |
-
-## Registry Summary
-
-| Metric | Value |
-|--------|-------|
-| Checklist item count | 24 |
-| Evidence link count | 15 |
-| Categories | 8 (git, seal, validation, safety, evidence, operator, rollback, release) |
-| Evidence types | 7 (report, receipt, json, doc, roadmap, rollback, smoke) |
-| Source of truth items | 12 |
-| Required items pass | 23 |
-| Required items ready | 1 |
-
-## Validation
-
-| Check | Result |
-|-------|--------|
-| typecheck | (see Phase 9) |
-| Tests | (see Phase 9) |
-| Build | (see Phase 9) |
-| git diff --check | (see Phase 9) |
-
-## Final Verdict
-
+```
+v7.33.0-P3: Operator Checklist + Evidence Linkage Preview (COMPLETED)
+v7.33.0-P4: Operator Console Seal Candidate (COMPLETED)
+v7.33.0 Final Seal Recheck
+Do not enter Stage C.
 ```
 V7_33_P3_OPERATOR_CHECKLIST_EVIDENCE_LINKAGE_PREVIEW_READY
 ```
