@@ -88,7 +88,7 @@ const OperatorConsoleRegistryPreview: React.FC = () => {
   return (
     <PageShell
       title="Operator Console Registry Preview"
-      subtitle="v7.33.0-P1 · Readonly registry preview for Operator Console modules"
+      subtitle="v7.33.0-P1 · Readonly registry preview for Operator Console modules · P2 Readonly UI Preview available"
       safetyBoundary="readonly"
       safetyText="只读预览 · 不执行动作 · 不写数据库 · 不启用 Stage C · 不入 sidebar"
     >
@@ -251,6 +251,7 @@ const OperatorConsoleRegistryPreview: React.FC = () => {
         <div style={{ fontSize: 13, lineHeight: 2 }}>
           <ol style={{ margin: 0, paddingLeft: 20 }}>
             <li>Open Operator Console Registry Preview to review current module status</li>
+            <li>Open <a href="/operator-console-readonly-preview" style={{ color: '#42a5f5' }}>Operator Console Readonly UI Preview (P2)</a> for operator decision support UI</li>
             <li>Review seal baseline and blocker matrix before phase transitions</li>
             <li>Reference boundary cards to confirm disabled capabilities</li>
             <li>Navigate to linked preview routes for detailed contract/design views</li>

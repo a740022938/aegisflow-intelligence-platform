@@ -24,11 +24,14 @@ v7.33 focuses on productizing the Operator Console — a read-only unified entry
 - No sidebar exposure, no backend changes, no Stage C
 - **Verdict:** V7_33_P1_OPERATOR_CONSOLE_REGISTRY_PREVIEW_READY
 
-### P2 — Operator Console Readonly UI Preview
-- Create readonly preview UI components
-- Display runtime status, blockers, readiness
-- Display smoke evidence summary
-- No POST interactions
+### P2 — Operator Console Readonly UI Preview (COMPLETED)
+- New UI preview page: OperatorConsoleReadonlyPreview
+- 8 readonly sections: seal baseline, system readiness, safety boundary strip, smoke evidence, risk/blocker matrix, registry coverage, operator next step, forbidden actions notice
+- Hidden direct route: `/operator-console-readonly-preview`
+- Center-access-registry.ts + navigation-exposure-registry.ts entries added
+- P1 registry preview synced with P2 link
+- No POST interactions, no sidebar exposure, no backend changes, no Stage C
+- **Verdict:** V7_33_P2_OPERATOR_CONSOLE_READONLY_UI_PREVIEW_READY
 
 ### P3 — Operator Checklist + Evidence Linkage Preview
 - Add operator checklist preview panel

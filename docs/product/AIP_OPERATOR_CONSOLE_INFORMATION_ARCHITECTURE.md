@@ -38,6 +38,7 @@ The Operator Console organizes read-only information into logical modules. Each 
 
 ### Hidden Preview Links (clickable to preview route)
 - Operator Console Registry Preview → `/operator-console-registry-preview` (P1)
+- Operator Console Readonly UI Preview → `/operator-console-readonly-preview` (P2)
 - Evidence Schema Readiness → `/evidence-schema-preview`
 - Audit Readiness → `/audit-store-contract-preview`
 

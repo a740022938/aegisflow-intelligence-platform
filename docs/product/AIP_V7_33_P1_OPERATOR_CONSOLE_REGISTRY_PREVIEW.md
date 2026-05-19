@@ -31,7 +31,7 @@ v7.33.0-P1 adds a readonly Operator Console registry preview. This is a pure fro
   - D. Registry Overview
   - E. Critical Boundaries
   - F. Full Registry Table (grouped by domain)
-  - G. Operator Next Step
+  - G. Operator Next Step (includes link to P2 readonly UI preview)
   - H. Forbidden Actions Notice
 - No action buttons, no POST forms, no execute controls
 

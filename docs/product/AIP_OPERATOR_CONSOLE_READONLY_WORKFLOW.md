@@ -6,7 +6,9 @@
 ## Workflow
 
 ### Step 1: Open Console
-- Operator opens the Operator Console at `/operator-console-registry-preview` (P1 hidden direct route)
+- Operator opens the Operator Console at:
+  - `/operator-console-registry-preview` (P1 hidden direct route — registry view)
+  - `/operator-console-readonly-preview` (P2 hidden direct route — UI preview)
 - Console displays registry summary, validator result, and domain coverage
 - Console loads readonly state from runtime GET endpoints (via linked preview routes)
 - No authentication required for public runtime endpoints

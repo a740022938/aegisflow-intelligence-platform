@@ -54,6 +54,13 @@
 - **Forbidden action:** Enable or implement
 - **Evidence source:** Phase scope doc
 
+## P2 Usage Notes
+- P2 Operator Console Readonly UI Preview uses static status data from P1 registry
+- No runtime status API calls from the P2 preview page
+- All displayed statuses are readonly — no status transitions possible from this page
+- P2 verdict: V7_33_P2_OPERATOR_CONSOLE_READONLY_UI_PREVIEW_READY
+- Next phase: P3 Operator Checklist + Evidence Linkage Preview
+
 ## Status Transition Rules
 
 - sealed → ready: Not allowed (sealed is terminal per phase)

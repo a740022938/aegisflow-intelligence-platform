@@ -1228,6 +1228,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.33.0-P1 added as hidden direct-route. Not in sidebar. Readonly registry preview. No action, no mutation, no POST.',
   },
+  {
+    id: 'operator-console-readonly-preview',
+    path: '/operator-console-readonly-preview',
+    label: 'Operator Console Readonly UI Preview',
+    component: 'OperatorConsoleReadonlyPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Operator Console UI Preview page. 7 UI sections: seal baseline, system readiness, safety boundary strip, smoke evidence, risk/blocker matrix, registry coverage, operator next step. Based on P1 registry and validator. No backend endpoint, no API call, no DB write, no external control, no Stage C. Not added to left menu.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.33.0-P2 added as hidden direct-route. Not in sidebar. Readonly UI preview. No action, no mutation, no POST.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {
