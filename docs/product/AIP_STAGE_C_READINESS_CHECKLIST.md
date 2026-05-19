@@ -1,6 +1,6 @@
 # Stage C Readiness Checklist
 
-**Status:** v7.28.0-D1 Design Only
+**Status:** v7.28.0-P1 Preview Framework Available
 **Current Stage C State:** Disabled
 **Stage C is NOT the goal of this version.**
 
@@ -20,7 +20,7 @@ Stage C is permanently disabled in v7.27 and v7.28. This document exists as a re
 | 6 | Rollback policy designed | This document |
 | 7 | Evidence schema designed | This document |
 | 8 | Governance Center reviewed | Readonly preview |
-| 9 | All validation gates pass (lint/typecheck/build) | N/A (not yet run) |
+| 9 | All validation gates pass (lint/typecheck/build) | P1 pending |
 | 10 | Human project owner approval obtained | Not obtained |
 
 ## 3. Prohibited Actions
@@ -54,7 +54,14 @@ All are set to `allowedNow=false` and will remain so until Stage C is enabled.
 - All Stage C gated items show `blocked` status
 - Future: Stage C readiness dashboard when conditions are met
 
-## 6. What This Version Provides
+## 6. v7.28.0-P1 Impact
+
+- Governance State Machine Preview does NOT change Stage C status
+- `future_stage_c` remains permanently `allowedNow=false`
+- All 11 validator checks enforce `future_stage_c` is not allowedNow
+- Stage C remains disabled across all codebases
+
+## 7. What This Version Provides
 
 - Documentation of all preconditions
 - Registry items correctly gated

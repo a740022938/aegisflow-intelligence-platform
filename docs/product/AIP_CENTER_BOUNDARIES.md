@@ -13,6 +13,7 @@
 | Lab Center | hidden_direct | allow_hidden_direct | medium | No |
 | Governance Center | hidden_direct | hold_review | medium | No |
 | Navigation Preview | hidden_direct | allow_hidden_direct | low | No |
+| Governance State Machine Preview | hidden_direct | keep_direct_route | low | Yes |
 
 ## Boundary Rules
 
@@ -30,6 +31,7 @@
 | Lab Center | Lab experiment overview | No training/inference/label-save | Disabled |
 | Governance Center | 13 governance modules | 12 gates | Deferred |
 | Navigation Preview | Audit-only readout | No menu change | Disabled |
+| Governance State Machine Preview | 7 states, 18 transitions | 11 validator checks | Disabled |
 
 ## Connector Runtime Design Boundaries (v7.27.0-D1)
 
@@ -53,10 +55,11 @@ Connector runtime is in design-only phase. Current boundaries:
 - All preview routes confirmed not in sidebar ✓
 - No new sidebar entries added ✓
 
-## v7.28 Governance Blueprint — Center Boundary Impact
+## v7.28 Governance Preview — Center Boundary Impact
 
-v7.28.0-D1 governance blueprint docs do NOT change any center boundary:
-- No new centers
+v7.28.0-P1 governance state machine preview adds one new center entry:
+- Governance State Machine Preview: hidden direct, not in sidebar, allowed now
 - No sidebar changes
+- No existing center boundary modified
 - No center exposure changes
 - No Governance Center mutation|

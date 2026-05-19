@@ -1,8 +1,8 @@
 # Human Approval Workflow Spec
 
-**Status:** v7.28.0-D1 Design Only
+**Status:** v7.28.0-P1 Preview Framework Available
 **Stage C:** Disabled
-**Implementation:** Not implemented
+**Implementation:** Not implemented (P1 preview shows blocked transitions but no approval execution)
 
 ## 1. Goals
 

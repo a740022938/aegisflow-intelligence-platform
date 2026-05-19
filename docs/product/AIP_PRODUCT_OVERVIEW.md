@@ -36,6 +36,18 @@ AIP is organized around centers, pages, and actions — all operating under read
 | `permission-evaluator-validator.ts` | Pure validation functions (10 checks) |
 | `product-metadata-registry.ts` | Unified product version metadata |
 
+## Governance State Machine Preview (v7.28.0-P1)
+
+v7.28.0-P1 adds a readonly Governance State Machine Preview with:
+
+- **Governance State Registry** — 7 states, 18 transitions, pure utility functions
+- **Governance State Validator** — 11 blocking checks
+- **GovernanceStateMachinePreview page** — `/governance-state-machine-preview` (hidden direct)
+- **6 page syncs** — Advanced Mode, Runtime, Dry-run, Audit, Permission Evaluator, Connector Center
+- **3 registry syncs** — permission-evaluator-registry, navigation-exposure-registry, center-access-registry
+
+All P1 work is **readonly preview**. No state transitions, no approval processing, no DB write, no external control, no Stage C.
+
 ## Connector Runtime Design (v7.27.0-D1)
 
 v7.27 introduces connector runtime boundary design — runtime not implemented. See:

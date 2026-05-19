@@ -1,7 +1,7 @@
 # Runtime API Contract Spec
 
-**Status:** v7.28.0-D1 Design Only
-**Implementation Status:** Not implemented
+**Status:** v7.28.0-P1 Preview Framework Available
+**Implementation Status:** Not implemented (P1 frontend preview only)
 **Backend:** Not deployed
 **Stage C:** Disabled
 
@@ -198,3 +198,4 @@
 - Stage C must be enabled before any real execution endpoint
 - Stage C is disabled in v7.28
 - No endpoint shall execute without passing all required gates
+- v7.28.0-P1 Governance State Machine Preview uses static registry data — no API calls to any endpoint

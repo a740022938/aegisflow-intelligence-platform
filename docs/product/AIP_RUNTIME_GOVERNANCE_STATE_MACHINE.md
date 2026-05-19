@@ -1,14 +1,16 @@
 # Runtime Governance State Machine
 
-**Status:** v7.28.0-D1 Design Only
+**Status:** v7.28.0-P1 Preview Implemented
 **Stage C:** Disabled
-**Current Phase:** Governance Blueprint (not implementation)
+**Current Phase:** Governance State Machine Preview (readonly display)
+**Preview page:** `/governance-state-machine-preview` (hidden direct, not in sidebar)
 
 ## 1. Goals
 
 - Define runtime governance states for connector action lifecycle
 - Map state transitions and required gates
 - Provide blueprint for future governance center integration
+- Implement readonly preview page for state machine visualization
 
 ## 2. Non-Goals
 
@@ -89,9 +91,10 @@ Each state must satisfy the following from `permission-evaluator-registry`:
 
 ## 10. Current Version Constraints
 
-- v7.28.0-D1: State machine is a document blueprint only
+- v7.28.0-P1: State machine is a readonly frontend preview
 - No state persistence
 - No state transition execution
 - No real gate evaluation
 - No Governance Center state mutation
 - Stage C permanently disabled
+- P1 preview page at `/governance-state-machine-preview` shows 7 states and 18 transitions as static model

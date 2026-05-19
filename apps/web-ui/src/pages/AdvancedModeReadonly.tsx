@@ -23,6 +23,12 @@ import {
   getAuditLogPreviewSummary,
 } from '../registry/audit-log-registry';
 import {
+  getGovernanceStateSummary,
+} from '../registry/governance-state-registry';
+import {
+  getGovernanceStateValidationSummary,
+} from '../registry/governance-state-validator';
+import {
   NAVIGATION_EXPOSURE_REGISTRY,
   NAVIGATION_EXPOSURE_LEVELS,
   getNavigationExposureStats,
@@ -234,11 +240,12 @@ const CENTER_KIND_LABELS: Record<CenterAccessKind, string> = {
   advanced: 'Advanced Mode', connector: 'Connector Center', lab: 'Lab Center',
   governance: 'Governance Center', navigation_preview: 'Navigation Preview',
   runtime_registry: 'Runtime Registry',
+  governance_state_machine: 'Governance State Machine',
 };
 
 const CENTER_KIND_COLORS: Record<CenterAccessKind, string> = {
   advanced: '#F97316', connector: '#22C55E', lab: '#3B82F6', governance: '#22C55E', navigation_preview: '#8B5CF6',
-  runtime_registry: '#8B5CF6',
+  runtime_registry: '#8B5CF6', governance_state_machine: '#8B5CF6',
 };
 
 const READINESS_COLORS: Record<string, string> = {
@@ -933,6 +940,53 @@ export default function AdvancedModeReadonly() {
         </div>
         <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
           Audit Log — 只读预览 · 不写审计库 · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
+      {/* Governance State Machine Preview Summary */}
+      <SectionCard title="治理状态机预览" style={{ marginBottom: 20, border: '1px solid #8B5CF6' }}>
+        <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          只读治理状态机预览 — 不迁移状态 · 不处理审批 · 不写数据库 · 不启用 Stage C
+        </div>
+        {(() => {
+          const gs = getGovernanceStateSummary();
+          const vs = getGovernanceStateValidationSummary();
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 8, marginBottom: 12 }}>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#8B5CF6' }}>{gs.totalStates}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>总状态</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#3B82F6' }}>{gs.totalTransitions}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>总迁移</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--success)' }}>{gs.allowedTransitions}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>当前允许</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{gs.blockedTransitions}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>已阻断</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#DC2626' }}>{gs.criticalTransitions}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>严重迁移</div>
+              </div>
+              <div style={{ padding: '6px 10px', borderRadius: 6, background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#10B981' }}>{vs.pass ? 'PASS' : 'FAIL'}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>验证</div>
+              </div>
+            </div>
+          );
+        })()}
+        <div style={{ marginTop: 8, display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/governance-state-machine-preview" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(139,92,246,0.3)' }}>
+            打开治理状态机预览 [只读]
+          </Link>
+        </div>
+        <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 6, background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.15)', fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
+          Governance State Machine — 只读状态机预览 · 不迁移状态 · 不处理审批 · 不写数据库 · 不启用 Stage C
         </div>
       </SectionCard>
 

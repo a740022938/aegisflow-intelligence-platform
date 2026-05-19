@@ -23,13 +23,14 @@
 | Memory Hub Readonly | allow_sidebar_visible | low | info | preview_only | Yes |
 | OpenAxiom Readonly | allow_sidebar_visible | low | info | preview_only | Yes |
 
-## Hidden Direct / Internal Preview (3 targets)
+## Hidden Direct / Internal Preview (4 targets)
 
 | Target | Decision | Risk | Severity | Stage | Allowed Now |
 |--------|----------|------|----------|-------|-------------|
 | Lab Center | allow_hidden_direct | medium | notice | preview_only | No |
 | Navigation Preview | allow_hidden_direct | low | info | preview_only | No |
 | Permission Evaluator Preview | allow_hidden_direct | low | info | preview_only | No |
+| Governance State Machine Preview | allow_hidden_direct | low | info | preview_only | Yes |
 
 ## Hold Review (3 targets)
 
@@ -107,9 +108,9 @@ Gates: readonly_gate, dry_run_gate, human_approval_gate, audit_log_gate, rollbac
 - All high-risk items blocked
 - Permission Evaluator unchanged
 
-## v7.28 Governance Blueprint Reference
+## v7.28 Governance Preview Reference
 
-v7.28.0-D1 governance blueprint docs do NOT change the permission matrix:
-- No new permission decisions
+v7.28.0-P1 governance state machine preview adds 1 new hidden direct target:
+- Governance State Machine Preview added as preview_only hidden direct target (low risk, info, allowed now)
 - No changes to existing allow/deny/hold_review decisions
-- All v7.28 docs design-only|
+- All v7.28 P1 work is readonly preview — no state transitions, no approval processing, no DB write|

@@ -283,6 +283,9 @@ export default function AuditLogPreview() {
           <Link to="/permission-evaluator-preview" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(139,92,246,0.3)' }}>
             打开 Permission Evaluator 预览
           </Link>
+          <Link to="/governance-state-machine-preview" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(139,92,246,0.3)' }}>
+            打开治理状态机预览
+          </Link>
         </div>
       </SectionCard>
     </PageShell>

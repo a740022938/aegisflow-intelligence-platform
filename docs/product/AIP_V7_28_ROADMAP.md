@@ -1,6 +1,6 @@
 # v7.28 Roadmap — Runtime Governance Blueprint
 
-**Status:** Planned (not started)
+**Status:** P1 Completed (P2-P3 planned, Final pending)
 
 ## Overview
 
@@ -15,7 +15,11 @@
 
 ## Phase Details
 
-### D1: Runtime Governance Blueprint (Current)
+### D1: Runtime Governance Blueprint (Completed)
+
+- 7 design docs created for governance state machine, API contract, approval workflow, evidence schema, rollback spec, Stage C checklist
+- No source code changes
+- Committed in `e61fd98`
 
 Files:
 - `docs/product/AIP_RUNTIME_GOVERNANCE_STATE_MACHINE.md`
@@ -39,14 +43,20 @@ Files:
 
 **Commit policy:** `docs(product): refine runtime API contracts`
 
-### P1: Governance State Machine Preview
+### P1: Governance State Machine Preview (Completed)
 
-- New hidden route `/governance-state-machine-preview`
+- New hidden route `/governance-state-machine-preview` in `App.tsx`
+- New registry: `governance-state-registry.ts` (7 states, 18 transitions)
+- New validator: `governance-state-validator.ts` (11 blocking checks)
+- New page: `GovernanceStateMachinePreview.tsx` (9 sections)
+- Synced to 6 existing pages (AdvancedMode, Runtime, Dry-run, Audit, Permission Evaluator, Connector Center)
+- Synced to 3 registries (permission-evaluator, navigation-exposure, center-access)
+- New doc: `AIP_GOVERNANCE_STATE_MACHINE_PREVIEW.md`
+- Updated 10 existing docs with P1 status
 - Readonly display of state machine design
 - No state persistence
 - No real transitions
-
-**Commit policy:** `feat(runtime): add governance state machine preview`
+- No sidebar changes
 
 ### P2: Approval Workflow Preview
 
@@ -77,7 +87,8 @@ Files:
 ## References
 
 - v7.27 baseline: commit `8f8242a`
-- Registry: `runtime-registry.ts`, `dry-run-plan-registry.ts`, `audit-log-registry.ts`
-- Validators: `runtime-registry-validator.ts`, `dry-run-plan-validator.ts`, `audit-log-validator.ts`
+- v7.28.0-P1: commit (pending)
+- Registry: `runtime-registry.ts`, `dry-run-plan-registry.ts`, `audit-log-registry.ts`, `governance-state-registry.ts`
+- Validators: `runtime-registry-validator.ts`, `dry-run-plan-validator.ts`, `audit-log-validator.ts`, `governance-state-validator.ts`
 - Navigation: `navigation-exposure-registry.ts`
 - Permissions: `permission-evaluator-registry.ts`

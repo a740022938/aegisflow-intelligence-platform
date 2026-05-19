@@ -201,6 +201,9 @@ export default function PermissionEvaluatorPreview() {
                     <p>- external-tool-control: deny — 外部工具控制永久禁止</p>
                     <p>- stage-c-transition: deny — Stage C 永久禁用</p>
                     <p>- git-tag-release: deny / hold_review — 标签和发布需要人工批准</p>
+                    <p><strong>治理状态机参考:</strong></p>
+                    <p>- governance-state-machine-preview: hidden direct / readonly — 不迁移状态 · 不处理审批 · 不写数据库 · 不启用 Stage C</p>
+                    <p>- 7 states, 18 transitions, all approval/execution transitions blocked</p>
                   </div>
                 );
               })()}

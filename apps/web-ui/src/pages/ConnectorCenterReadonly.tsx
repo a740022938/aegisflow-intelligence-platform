@@ -269,6 +269,22 @@ export default function ConnectorCenterReadonly() {
         </div>
       </SectionCard>
 
+      {/* Governance Gate Summary */}
+      <SectionCard title="治理门禁摘要" style={{ marginBottom: 16, border: '1px solid #8B5CF6' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+          治理状态机定义了 7 个状态和 18 个迁移，所有需要外部控制、DB 写入或 Stage C 的迁移均被阻断。
+          当前版本为只读预览，不执行任何迁移。
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/governance-state-machine-preview" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(139,92,246,0.3)' }}>
+            打开治理状态机预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.06)', fontSize: 10, color: '#8B5CF6', textAlign: 'center' }}>
+          Governance Gate — 只读门禁预览 · 不迁移状态 · 不处理审批 · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
       {/* Boundary Notice */}
       <div style={{ marginTop: 24, padding: '14px 16px', borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
         <strong>Readonly boundary notice:</strong><br />

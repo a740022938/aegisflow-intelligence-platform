@@ -264,6 +264,21 @@ export default function RuntimeRegistryPreview() {
         </div>
       </SectionCard>
 
+      {/* J. Governance State Machine Snapshot */}
+      <SectionCard title="治理状态机快照" style={{ marginBottom: 16, border: '1px solid #8B5CF6' }}>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+          7 states · 18 transitions · Readonly preview — no state mutation, no approval processing, no DB write, no Stage C.
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/governance-state-machine-preview" style={{ fontSize: 11, color: '#8B5CF6', textDecoration: 'none', padding: '4px 12px', borderRadius: 6, border: '1px solid rgba(139,92,246,0.3)' }}>
+            打开治理状态机预览
+          </Link>
+        </div>
+        <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(139,92,246,0.06)', fontSize: 10, color: '#8B5CF6', textAlign: 'center' }}>
+          Governance State — 只读预览 · 不迁移状态 · 不处理审批 · 不写数据库 · 不启用 Stage C
+        </div>
+      </SectionCard>
+
       {/* G. Forbidden Runtime Notice */}
       <SectionCard title="当前阶段禁止事项" style={{ marginBottom: 16, border: '1px solid var(--danger)' }}>
         <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)' }}>
