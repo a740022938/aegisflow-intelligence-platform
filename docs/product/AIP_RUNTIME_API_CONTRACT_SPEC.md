@@ -1,9 +1,11 @@
 # Runtime API Contract Spec
 
-**Status:** v7.28.0-P1 Preview Framework Available
-**Implementation Status:** Not implemented (P1 frontend preview only)
+**Status:** v7.30.0-D2 Contract Freeze
+**Implementation Status:** Not implemented (contract freeze v1.freeze)
 **Backend:** Not deployed
 **Stage C:** Disabled
+
+> This document is superseded by AIP_RUNTIME_API_CONTRACT_FREEZE.md (v7.30.0-D2). The contract freeze document provides the definitive endpoint catalog, schema definitions, and freeze rules.
 
 ## 1. Goals
 

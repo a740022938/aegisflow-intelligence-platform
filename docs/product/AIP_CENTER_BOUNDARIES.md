@@ -85,6 +85,15 @@ v7.28.0-P1 governance state machine preview adds one new center entry:
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
 
+## v7.30.0-D2 Runtime API Contract Freeze — Center Boundaries Impact
+
+v7.30.0-D2 is docs-only and does not change any center boundaries:
+- No new centers added
+- No sidebar changes
+- No existing center boundary modified
+- Stage C remains permanently disabled
+- All hidden preview routes remain hidden direct, not in sidebar
+
 ## v7.29.0 Final Seal — Center Boundaries
 
 - Governance Console Aggregator: hidden direct, not in sidebar

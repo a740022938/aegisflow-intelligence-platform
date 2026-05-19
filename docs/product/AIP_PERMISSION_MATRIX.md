@@ -144,6 +144,14 @@ v7.28.0-P4 rollback preview adds 1 new hidden direct target:
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
 
+## v7.30.0-D2 Runtime API Contract Freeze — Permission Matrix Impact
+
+v7.30.0-D2 is docs-only and does not change any permission decisions:
+- All allow/deny/hold_review decisions unchanged
+- Stage C remains permanently disabled
+- No execution permission granted
+- All blocked capabilities remain blocked (12 total)
+
 ## v7.29.0 Final Seal — Permission Matrix Status
 
 - Permission evaluator: PASS (0 blocking)

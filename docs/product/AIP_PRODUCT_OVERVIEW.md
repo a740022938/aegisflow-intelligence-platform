@@ -5,9 +5,10 @@
 - **Product Name:** AegisFlow (AIP)
 - **Current Version:** v7.25.2
 - **Build Date:** 2026.05.19
-- **Seal Status:** Final Seal Candidate
+- **Seal Status:** Final Seal Candidate (v7.29 V7_29_FINAL_SEAL_READY)
 - **Safety Mode:** Readonly-first
 - **Stage C:** Disabled (permanently)
+- **Latest Phase:** v7.30.0-D2 Runtime API Contract Freeze
 
 ## Architecture
 
@@ -110,6 +111,19 @@ All v7.28 work remains **design-only**. No implementation, no external tool cont
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
+
+## v7.30.0-D2 Runtime API Contract Freeze
+
+- **Status:** Completed — commit 13785da
+- **Contract version:** v1.freeze
+- **Endpoint catalog:** 12 endpoints (8 GET contract_only + 4 POST not_implemented)
+- **Readonly Status API Design:** Created (design-only)
+- **Schema catalog:** 13 schemas defined
+- **Error model:** 12 error codes
+- **Gate model:** 11 gates defined
+- **Mock examples:** 7 examples (documentation only)
+- **Implementation freeze checklist:** 8 prerequisite categories
+- **No backend implementation, no DB write, no external control, Stage C unchanged**
 
 ## v7.29.0 Governance Console
 

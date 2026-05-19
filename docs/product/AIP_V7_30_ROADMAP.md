@@ -29,7 +29,7 @@
 | Risk | Low |
 | Commit policy | docs-only, push only |
 
-### D2: Runtime API Contract Freeze
+### D2: Runtime API Contract Freeze (COMPLETED — this document set)
 
 | Field | Value |
 |-------|-------|
@@ -43,6 +43,18 @@
 | Commit policy | docs-only, push only |
 
 **Scope:** Freeze the runtime API contract based on existing design docs. Document all endpoints, request/response shapes, error codes, and auth requirements. No implementation.
+
+**New docs created:**
+- AIP_RUNTIME_API_CONTRACT_FREEZE.md — Contract freeze with 12-endpoint catalog
+- AIP_RUNTIME_READONLY_STATUS_API_DESIGN.md — Readonly Status API design
+- AIP_RUNTIME_API_SCHEMA_CATALOG.md — Schema definitions
+- AIP_RUNTIME_API_ERROR_MODEL.md — Error model with 12 error codes
+- AIP_RUNTIME_API_GATE_AND_PERMISSION_MODEL.md — Gate model with 11 gates
+- AIP_RUNTIME_API_MOCK_EXAMPLES.md — Mock request/response examples
+- AIP_RUNTIME_API_IMPLEMENTATION_FREEZE_CHECKLIST.md — Pre-implementation checklist
+- AIP_V7_30_D2_CONTRACT_FREEZE_REPORT.md — D2 report
+
+**Contract freeze:** v1.freeze, 8 GET (contract_only) + 4 POST (not_implemented)
 
 ### D3: Governance Console UI Polish Blueprint
 
@@ -153,7 +165,7 @@
 ## 4. Dependency Chain
 
 ```
-D1 (audit) → D2 (contract freeze) → D3 (UI polish) → P1 (status API design) → P2 (dry-run design) → P3 (audit store design) → P4 (Stage C review pack) → Final Seal
+D1 (audit) → D2 (contract freeze — COMPLETED) → D3 (UI polish) → P1 (status API design) → P2 (dry-run design) → P3 (audit store design) → P4 (Stage C review pack) → Final Seal
 ```
 
 Each phase is independent. Phases can be reordered or skipped based on human project owner decision.
@@ -164,4 +176,4 @@ All blockers documented in `AIP_RUNTIME_IMPLEMENTATION_BLOCKER_MATRIX.md` remain
 
 ## 6. Next Step Recommendation
 
-**Recommended:** v7.30.0-D2 Runtime API Contract Freeze — freeze the runtime API contract based on existing design documents.
+**Recommended:** v7.30.0-P1 Runtime Readonly Status API Preview — implement a readonly status preview page based on the design document created in D2.

@@ -76,7 +76,11 @@ The following actions are prohibited without Stage C activation:
 - Stage C enablement is a hard blocker (blocking=1) in all validators
 - Any attempt to bypass Stage C gating will be rejected by validators
 
-## 7. Exception Process
+## 7. v7.30.0-D2 Contract Freeze Status
+
+The Runtime API v1 contract has been frozen (v1.freeze) in v7.30.0-D2. The contract freeze explicitly marks all write/execute endpoints as requiring Stage C. Stage C remains permanently disabled. The freeze does not change Stage C policy.
+
+## 8. Exception Process
 
 If the human project owner believes Stage C should be reconsidered:
 1. Submit written request documenting the rationale

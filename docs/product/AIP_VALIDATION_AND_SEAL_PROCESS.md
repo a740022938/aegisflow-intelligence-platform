@@ -117,6 +117,21 @@ P4 Rollback Preview is now established at /rollback-preview (hidden direct, read
 - **Build:** Success
 - **Console does not:** mutate registries, execute actions, write DB, control external tools, enable Stage C
 
+## v7.30.0-D2 Runtime API Contract Freeze — Validation
+
+v7.30.0-D2 is docs-only. The following validation gates apply:
+
+| Gate | Command | Status |
+|------|---------|--------|
+| Lint | `npm run lint` | PENDING |
+| Typecheck | `npm run typecheck` | PENDING |
+| Build | `npm run build` | PENDING |
+| DB Doctor | `npm run db:doctor` | SKIP (script not defined) |
+| Secret Scan | `npm run secret:scan` | SKIP (script not defined) |
+| Smoke | `npm run test:smoke` | SKIP (script not defined) |
+
+No source code changes were made. No backend implementation was performed.
+
 ## v7.29.0 Final Seal
 
 - **Status:** V7_29_FINAL_SEAL_READY (commit 600a029)

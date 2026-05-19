@@ -54,7 +54,11 @@ This document provides the final readiness matrix for all governance capabilitie
 4. **Stage C remains permanently disabled** — only human project owner can authorize activation.
 5. **This audit is final for v7.30-D1** — no implementation work is performed or planned in this phase.
 
-## 5. Required Before Any Implementation
+## 5. v7.30.0-D2 Contract Freeze Status
+
+The Runtime API contract has been frozen at v1.freeze as part of v7.30.0-D2. See `AIP_RUNTIME_API_CONTRACT_FREEZE.md` for the definitive endpoint catalog. The freeze does not change any audit conclusions — all 12 capabilities remain blocked.
+
+## 6. Required Before Any Implementation
 
 Before any write/execute/external-control capability can be implemented:
 1. Project owner must authorize Stage C activation
