@@ -46,7 +46,10 @@ export type NavigationExposureGate =
   | 'no_file_modification'
   | 'no_git_mutation'
   | 'no_registry_mutation'
-  | 'no_execution';
+  | 'no_execution'
+  | 'no_risk_execution'
+  | 'no_decision_execution'
+  | 'no_report_export';
 
 export interface NavigationExposureEntry {
   id: string;
@@ -1014,6 +1017,57 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     notes: 'v7.29.0-P1 added as hidden direct-route. Not in sidebar. Readonly aggregation preview only. No registry mutation, no console executor.',
   },
 
+  // Governance Console Risk Dashboard Preview (hidden route, not in sidebar)
+  {
+    id: 'governance-console-risk-dashboard-preview',
+    path: '/governance-console-risk-dashboard-preview',
+    label: 'Governance Console Risk Dashboard Preview',
+    component: 'GovernanceConsoleRiskDashboardPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_risk_execution', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly risk dashboard preview. Aggregates risks from 6 sources (permission, runtime, dry-run, audit, governance, human approval, evidence, rollback). No risk execution, no DB write, no external control, no Stage C.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.29.0-P2 added as hidden direct-route. Not in sidebar. Readonly risk aggregation only. No risk execution, no gate control.',
+  },
+
+  // Governance Console Decision Panel Preview (hidden route, not in sidebar)
+  {
+    id: 'governance-console-decision-panel-preview',
+    path: '/governance-console-decision-panel-preview',
+    label: 'Governance Console Decision Panel Preview',
+    component: 'GovernanceConsoleDecisionPanelPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_decision_execution', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly decision panel preview. Shows 14 decision types (continue_preview, hold_for_human_review, blocked, etc.). No approve/reject/execute, no DB write, no external control, no Stage C.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.29.0-P3 added as hidden direct-route. Not in sidebar. Readonly decision display only. No decision execution.',
+  },
+
+  // Governance Console Report Pack Preview (hidden route, not in sidebar)
+  {
+    id: 'governance-console-report-pack-preview',
+    path: '/governance-console-report-pack-preview',
+    label: 'Governance Console Report Pack Preview',
+    component: 'GovernanceConsoleReportPackPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_report_export', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly report pack preview. Defines 11 sections with fields, source registries, and forbidden fields. No real file export, no report storage, no DB write, no external control, no Stage C.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.29.0-P4 added as hidden direct-route. Not in sidebar. Readonly report definition only. No real export or storage.',
+  },
+
   // 隐 module placeholder routes (not in nav, from App.tsx)
   {
     id: 'workspace',
@@ -1327,6 +1381,21 @@ export function validateNavigationExposure(): ExposureValidationIssue[] {
     if (entry.id === 'governance-console-preview') {
       if (entry.currentExposure !== 'direct_route') {
         issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'governance-console-preview should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'governance-console-risk-dashboard-preview') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'governance-console-risk-dashboard-preview should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'governance-console-decision-panel-preview') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'governance-console-decision-panel-preview should have currentExposure=direct_route (not in sidebar).' });
+      }
+    }
+    if (entry.id === 'governance-console-report-pack-preview') {
+      if (entry.currentExposure !== 'direct_route') {
+        issues.push({ entryId: entry.id, field: 'currentExposure', severity: 'blocking', message: 'governance-console-report-pack-preview should have currentExposure=direct_route (not in sidebar).' });
       }
     }
   }

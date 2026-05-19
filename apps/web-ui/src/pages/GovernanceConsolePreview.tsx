@@ -7,12 +7,36 @@ import {
   getGovernanceConsoleHiddenPreviewItems,
 } from '../registry/governance-console-registry';
 import { getGovernanceConsoleValidationSummary } from '../registry/governance-console-validator';
+import {
+  getGovernanceConsoleRiskItems,
+  getGovernanceConsoleRiskSummary,
+} from '../registry/governance-console-risk-registry';
+import { getGovernanceConsoleRiskValidationSummary } from '../registry/governance-console-risk-validator';
+import {
+  getGovernanceConsoleDecisionItems,
+  getGovernanceConsoleDecisionSummary,
+} from '../registry/governance-console-decision-registry';
+import { getGovernanceConsoleDecisionValidationSummary } from '../registry/governance-console-decision-validator';
+import {
+  getGovernanceConsoleReportPackItems,
+  getGovernanceConsoleReportPackSummary,
+} from '../registry/governance-console-report-pack-registry';
+import { getGovernanceConsoleReportPackValidationSummary } from '../registry/governance-console-report-pack-validator';
 
 const items = getGovernanceConsoleRegistryItems();
 const summary = getGovernanceConsoleRegistrySummary();
 const blockedItems = getGovernanceConsoleBlockedItems();
 const hiddenPreviews = getGovernanceConsoleHiddenPreviewItems();
 const validation = getGovernanceConsoleValidationSummary();
+const riskItems = getGovernanceConsoleRiskItems();
+const riskSummary = getGovernanceConsoleRiskSummary();
+const riskValidation = getGovernanceConsoleRiskValidationSummary();
+const decisionItems = getGovernanceConsoleDecisionItems();
+const decisionSummary = getGovernanceConsoleDecisionSummary();
+const decisionValidation = getGovernanceConsoleDecisionValidationSummary();
+const reportItems = getGovernanceConsoleReportPackItems();
+const reportSummary = getGovernanceConsoleReportPackSummary();
+const reportValidation = getGovernanceConsoleReportPackValidationSummary();
 
 const riskColors: Record<string, string> = {
   low: '#22C55E', medium: '#F97316', high: '#EF4444', critical: '#DC2626',
@@ -282,6 +306,96 @@ const GovernanceConsolePreview: React.FC = () => {
           <div>✗ No approve, reject, apply, execute button exists</div>
           <div>✗ No rollback, restore, recover button exists</div>
           <div>✗ No API key, token, password input exists</div>
+        </div>
+      </div>
+
+      {/* I. Risk Dashboard Entry Point (P2) */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>I. Risk Dashboard Preview (P2)</h3>
+        <div style={{ display: 'grid', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 8 }}>
+            <StatCard label="Total Risks" value={riskSummary.total} color="var(--text-primary)" />
+            <StatCard label="Blocked" value={riskSummary.blocked} color="#EF4444" />
+            <StatCard label="High/Critical" value={riskSummary.highOrCritical} color="#EF4444" />
+            <StatCard label="Stage C Gated" value={riskSummary.requiresStageC} color="#EF4444" />
+            <StatCard label="DB Write Gated" value={riskSummary.requiresDbWrite} color="#EF4444" />
+            <StatCard label="Ext Control Gated" value={riskSummary.requiresExternalControl} color="#EF4444" />
+            <StatCard label="Human Approval" value={riskSummary.requiresHumanApproval} color="#F97316" />
+            <StatCard label="Evidence Required" value={riskSummary.requiresEvidence} color="#F97316" />
+            <StatCard label="Rollback Required" value={riskSummary.requiresRollback} color="#F97316" />
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13, background: riskValidation.pass ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: riskValidation.pass ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)', color: riskValidation.pass ? '#22C55E' : '#EF4444' }}>
+              {riskValidation.pass ? `✓ Risk validator pass (${riskValidation.blocking}b/${riskValidation.warning}w/${riskValidation.info}i)` : `✗ ${riskValidation.blocking} blocking issues`}
+            </div>
+            <a href="/governance-console-risk-dashboard-preview" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }} target="_blank" rel="noreferrer">
+              Open Risk Dashboard Preview →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* J. Decision Panel Entry Point (P3) */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>J. Decision Panel Preview (P3)</h3>
+        <div style={{ display: 'grid', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 8 }}>
+            <StatCard label="Total Decisions" value={decisionSummary.total} color="var(--text-primary)" />
+            <StatCard label="Recommended Now" value={decisionSummary.recommendedNow} color="#22C55E" />
+            <StatCard label="Blocked" value={decisionSummary.blocked} color="#EF4444" />
+            <StatCard label="High/Critical" value={decisionSummary.highOrCritical} color="#EF4444" />
+            <StatCard label="Executes Action" value={decisionSummary.executesAction} color="#DC2626" />
+            <StatCard label="Mutates Registry" value={decisionSummary.mutatesRegistry} color="#DC2626" />
+            <StatCard label="Writes DB" value={decisionSummary.writesDb} color="#DC2626" />
+            <StatCard label="Ext Control" value={decisionSummary.controlsExternalTool} color="#DC2626" />
+            <StatCard label="Stage C Required" value={decisionSummary.requiresStageC} color="#EF4444" />
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13, background: decisionValidation.pass ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: decisionValidation.pass ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)', color: decisionValidation.pass ? '#22C55E' : '#EF4444' }}>
+              {decisionValidation.pass ? `✓ Decision validator pass (${decisionValidation.blocking}b/${decisionValidation.warning}w/${decisionValidation.info}i)` : `✗ ${decisionValidation.blocking} blocking issues`}
+            </div>
+            <a href="/governance-console-decision-panel-preview" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }} target="_blank" rel="noreferrer">
+              Open Decision Panel Preview →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* K. Report Pack Entry Point (P4) */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>K. Report Pack Preview (P4)</h3>
+        <div style={{ display: 'grid', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 8 }}>
+            <StatCard label="Total Sections" value={reportSummary.total} color="var(--text-primary)" />
+            <StatCard label="Preview Ready" value={reportSummary.previewReady} color="#22C55E" />
+            <StatCard label="Blocked" value={reportSummary.blocked} color="#EF4444" />
+            <StatCard label="Generates File" value={reportSummary.generatesFile} color="#DC2626" />
+            <StatCard label="Writes DB" value={reportSummary.writesDb} color="#DC2626" />
+            <StatCard label="Includes Secrets" value={reportSummary.includesSecrets} color="#DC2626" />
+            <StatCard label="Requires Redaction" value={reportSummary.requiresRedaction} color="#F97316" />
+            <StatCard label="Human Review" value={reportSummary.requiresHumanReview} color="#F97316" />
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ padding: '8px 16px', borderRadius: 8, fontSize: 13, background: reportValidation.pass ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: reportValidation.pass ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)', color: reportValidation.pass ? '#22C55E' : '#EF4444' }}>
+              {reportValidation.pass ? `✓ Report validator pass (${reportValidation.blocking}b/${reportValidation.warning}w/${reportValidation.info}i)` : `✗ ${reportValidation.blocking} blocking issues`}
+            </div>
+            <a href="/governance-console-report-pack-preview" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }} target="_blank" rel="noreferrer">
+              Open Report Pack Preview →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* L. Acceleration Pack Summary */}
+      <div style={{ marginBottom: 24, padding: 16, background: 'rgba(59, 130, 246, 0.05)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+        <h3 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: '#3B82F6' }}>L. v7.29.0-P2/P3/P4 Acceleration Pack</h3>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+          <div>P2 Risk Dashboard: {riskSummary.total} items, {riskSummary.blocked} blocked, {riskSummary.highOrCritical} high/critical — <a href="/governance-console-risk-dashboard-preview" style={{ color: 'var(--accent)', textDecoration: 'none' }} target="_blank" rel="noreferrer">open</a></div>
+          <div>P3 Decision Panel: {decisionSummary.total} items, {decisionSummary.blocked} blocked, {decisionSummary.highOrCritical} high/critical — <a href="/governance-console-decision-panel-preview" style={{ color: 'var(--accent)', textDecoration: 'none' }} target="_blank" rel="noreferrer">open</a></div>
+          <div>P4 Report Pack: {reportSummary.total} items, {reportSummary.blocked} blocked, {reportSummary.previewReady} preview ready — <a href="/governance-console-report-pack-preview" style={{ color: 'var(--accent)', textDecoration: 'none' }} target="_blank" rel="noreferrer">open</a></div>
+          <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(34, 197, 94, 0.1)', borderRadius: 4, border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+            ✓ All 3 validators pass. All previews are readonly, hidden direct, not in sidebar. Stage C permanently disabled.
+          </div>
         </div>
       </div>
     </PageShell>

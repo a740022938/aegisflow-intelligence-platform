@@ -50,6 +50,9 @@ const HumanApprovalWorkflowPreview = lazy(() => import('./pages/HumanApprovalWor
 const EvidenceSchemaPreview = lazy(() => import('./pages/EvidenceSchemaPreview'));
 const RollbackPreview = lazy(() => import('./pages/RollbackPreview'));
 const GovernanceConsolePreview = lazy(() => import('./pages/GovernanceConsolePreview'));
+const GovernanceConsoleRiskDashboardPreview = lazy(() => import('./pages/GovernanceConsoleRiskDashboardPreview'));
+const GovernanceConsoleDecisionPanelPreview = lazy(() => import('./pages/GovernanceConsoleDecisionPanelPreview'));
+const GovernanceConsoleReportPackPreview = lazy(() => import('./pages/GovernanceConsoleReportPackPreview'));
 
 function RouteFallback() {
   return (
@@ -164,6 +167,9 @@ const App: React.FC = () => {
             <Route path="evidence-schema-preview" element={<EvidenceSchemaPreview />} />
             <Route path="rollback-preview" element={<RollbackPreview />} />
             <Route path="governance-console-preview" element={<GovernanceConsolePreview />} />
+            <Route path="governance-console-risk-dashboard-preview" element={<GovernanceConsoleRiskDashboardPreview />} />
+            <Route path="governance-console-decision-panel-preview" element={<GovernanceConsoleDecisionPanelPreview />} />
+            <Route path="governance-console-report-pack-preview" element={<GovernanceConsoleReportPackPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
