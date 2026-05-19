@@ -340,7 +340,13 @@ export default function RuntimeRegistryPreview() {
       <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
         - Governance Console: Runtime registry is included in Governance Console registry chain at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
         <br />
-        - Runtime Readonly Status API Preview: Contract catalog and schema board at <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>/runtime-readonly-status-api-preview</a> (hidden direct, readonly, not in sidebar)
+        - P1 Runtime Readonly Status API Preview: Contract catalog and schema board at <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>/runtime-readonly-status-api-preview</a> (hidden direct, readonly, not in sidebar)
+        <br />
+        - P2 Runtime Dry-run Contract Preview: 18-item dry-run contract at <a href="/runtime-dry-run-contract-preview" style={{ color: '#22C55E' }}>/runtime-dry-run-contract-preview</a> (hidden direct, readonly, not in sidebar, contract only)
+        <br />
+        - P3 Runtime Audit Store Contract Preview: 16-item audit store contract at <a href="/runtime-audit-store-contract-preview" style={{ color: '#22C55E' }}>/runtime-audit-store-contract-preview</a> (hidden direct, readonly, not in sidebar, contract only)
+        <br />
+        - P4 Stage C Pre-Enable Human Review Pack: 18-area review pack at <a href="/stage-c-preenable-review-preview" style={{ color: '#22C55E' }}>/stage-c-preenable-review-preview</a> (hidden direct, readonly, not in sidebar, does NOT enable Stage C)
       </div>
     </PageShell>
   );

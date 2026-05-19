@@ -15,6 +15,9 @@
 | Navigation Preview | hidden_direct | allow_hidden_direct | low | No |
 | Governance State Machine Preview | hidden_direct | keep_direct_route | low | Yes |
 | Runtime Readonly Status API Preview | hidden_direct | keep_hidden_direct | medium | Yes |
+| Runtime Dry-run Contract Preview | hidden_direct | keep_hidden_direct | medium | Yes |
+| Runtime Audit Store Contract Preview | hidden_direct | keep_hidden_direct | medium | Yes |
+| Stage C Pre-Enable Human Review Pack | hidden_direct | keep_hidden_direct | medium | Yes |
 
 ## Boundary Rules
 
@@ -34,6 +37,9 @@
 | Navigation Preview | Audit-only readout | No menu change | Disabled |
 | Governance State Machine Preview | 7 states, 18 transitions | 11 validator checks | Disabled |
 | Runtime Readonly Status API Preview | 12 endpoints, 9-section UI | 7 validator groups | Disabled |
+| Runtime Dry-run Contract Preview | 18 items, 6 contract kinds | 7 validator checks | Disabled |
+| Runtime Audit Store Contract Preview | 16 items, 7 contract kinds | 5 validator checks | Disabled |
+| Stage C Pre-Enable Human Review Pack | 18 items, 11 review areas | 8 validator checks | Disabled |
 
 ## Connector Runtime Design Boundaries (v7.27.0-D1)
 
@@ -87,14 +93,16 @@ v7.28.0-P1 governance state machine preview adds one new center entry:
 - **Stage C:** Remains disabled
 - **Sidebar:** Governance Console Preview not in sidebar
 
-## v7.30.0-D2 Runtime API Contract Freeze — Center Boundaries Impact
+## v7.30.0-P2/P3/P4 Runtime Contract Acceleration Pack — Center Boundaries Impact
 
-v7.30.0-D2 is docs-only and does not change any center boundaries:
-- No new centers added
+v7.30.0-P2/P3/P4 adds 3 new hidden direct centers:
+- Runtime Dry-run Contract Preview: hidden direct, not in sidebar
+- Runtime Audit Store Contract Preview: hidden direct, not in sidebar
+- Stage C Pre-Enable Human Review Pack: hidden direct, not in sidebar
 - No sidebar changes
 - No existing center boundary modified
 - Stage C remains permanently disabled
-- All hidden preview routes remain hidden direct, not in sidebar
+- All new preview routes are hidden direct, not in sidebar
 
 ## v7.29.0 Final Seal — Center Boundaries
 

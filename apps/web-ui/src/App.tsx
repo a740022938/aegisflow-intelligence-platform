@@ -54,6 +54,9 @@ const GovernanceConsoleRiskDashboardPreview = lazy(() => import('./pages/Governa
 const GovernanceConsoleDecisionPanelPreview = lazy(() => import('./pages/GovernanceConsoleDecisionPanelPreview'));
 const GovernanceConsoleReportPackPreview = lazy(() => import('./pages/GovernanceConsoleReportPackPreview'));
 const RuntimeReadonlyStatusApiPreview = lazy(() => import('./pages/RuntimeReadonlyStatusApiPreview'));
+const RuntimeDryRunContractPreview = lazy(() => import('./pages/RuntimeDryRunContractPreview'));
+const RuntimeAuditStoreContractPreview = lazy(() => import('./pages/RuntimeAuditStoreContractPreview'));
+const StageCPreEnableReviewPreview = lazy(() => import('./pages/StageCPreEnableReviewPreview'));
 
 function RouteFallback() {
   return (
@@ -172,6 +175,9 @@ const App: React.FC = () => {
             <Route path="governance-console-decision-panel-preview" element={<GovernanceConsoleDecisionPanelPreview />} />
             <Route path="governance-console-report-pack-preview" element={<GovernanceConsoleReportPackPreview />} />
             <Route path="runtime-readonly-status-api-preview" element={<RuntimeReadonlyStatusApiPreview />} />
+            <Route path="runtime-dry-run-contract-preview" element={<RuntimeDryRunContractPreview />} />
+            <Route path="runtime-audit-store-contract-preview" element={<RuntimeAuditStoreContractPreview />} />
+            <Route path="stage-c-preenable-review-preview" element={<StageCPreEnableReviewPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

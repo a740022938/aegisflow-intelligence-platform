@@ -343,7 +343,13 @@ export default function ConnectorCenterReadonly() {
       <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
         - Governance Console: Aggregated registry chain available at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
         <br />
-        - Runtime Readonly Status API Readiness: API contract v1.freeze with 12 endpoints defined — <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>view contract</a> (hidden direct, readonly, not in sidebar)
+        - P1 Runtime Readonly Status API: API contract v1.freeze with 12 endpoints defined — <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>view contract</a> (hidden direct, readonly, not in sidebar)
+        <br />
+        - P2 Runtime Dry-run Contract: 18-item dry-run contract (request/response/gate/evidence/audit/rollback) — <a href="/runtime-dry-run-contract-preview" style={{ color: '#22C55E' }}>view contract</a> (hidden direct, readonly, not in sidebar)
+        <br />
+        - P3 Runtime Audit Store Contract: 16-item audit store contract (schema/retention/redaction/write policy) — <a href="/runtime-audit-store-contract-preview" style={{ color: '#22C55E' }}>view contract</a> (hidden direct, readonly, not in sidebar)
+        <br />
+        - P4 Stage C Pre-Enable Human Review Pack: 18-area pre-enable review checklist — <a href="/stage-c-preenable-review-preview" style={{ color: '#22C55E' }}>view pack</a> (hidden direct, readonly, not in sidebar, does NOT enable Stage C)
       </div>
     </PageShell>
   );

@@ -1721,7 +1721,13 @@ export default function AdvancedModeReadonly() {
       <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
         - Governance Console: Aggregated readiness view available at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
         <br />
-        - Runtime Readonly Status API Preview: View contract catalog, schema board, and mock responses at <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>/runtime-readonly-status-api-preview</a> (hidden direct, readonly, not in sidebar)
+        - P1 Runtime Readonly Status API Preview: View contract catalog, schema board, and mock responses at <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>/runtime-readonly-status-api-preview</a> (hidden direct, readonly, not in sidebar)
+        <br />
+        - P2 Runtime Dry-run Contract Preview: Dry-run contract with request/response/gate/evidence/audit/rollback specs at <a href="/runtime-dry-run-contract-preview" style={{ color: '#22C55E' }}>/runtime-dry-run-contract-preview</a> (hidden direct, readonly, not in sidebar)
+        <br />
+        - P3 Runtime Audit Store Contract Preview: Audit event schema/retention/redaction/write policy at <a href="/runtime-audit-store-contract-preview" style={{ color: '#22C55E' }}>/runtime-audit-store-contract-preview</a> (hidden direct, readonly, not in sidebar)
+        <br />
+        - P4 Stage C Pre-Enable Human Review Pack: 18-item pre-enable checklist across 11 review areas at <a href="/stage-c-preenable-review-preview" style={{ color: '#22C55E' }}>/stage-c-preenable-review-preview</a> (hidden direct, readonly, not in sidebar, does NOT enable Stage C)
       </div>
     </PageShell>
   );

@@ -122,13 +122,7 @@
 
 ## 10. Next Recommended Step
 
-Options (in recommended order):
-
-1. **v7.30.0-P1 Runtime Readonly Status API Preview** — Implement a readonly status preview page based on the design document
-2. **v7.30.0-D3 Runtime Contract Human Review Pack** — Prepare a human review pack for the contract freeze
-3. **v7.30.0-P1 Governance Console API Contract Viewer Preview** — Add API contract viewer to Governance Console
-4. **v7.30.0 Documentation Polish** — Clean up all documentation
-5. **Stop and wait for human review** — Pause for project owner decision
+All P1-P4 phases are complete. Proceed to v7.30 Final Seal Recheck.
 
 ## 11. P1 Completion
 
@@ -147,6 +141,24 @@ AIP v7.30.0-P1 (Runtime Readonly Status API Preview) has been completed followin
 | API call | NOT made |
 | DB write | NOT performed |
 | Stage C | NOT enabled |
+
+## 12. P2/P3/P4 Runtime Contract Acceleration Pack
+
+Following P1, the acceleration pack (P2/P3/P4) has been completed:
+
+| Aspect | P2 (Dry-run) | P3 (Audit Store) | P4 (Stage C Review) |
+|--------|-------------|-----------------|--------------------|
+| Preview page | RuntimeDryRunContractPreview | RuntimeAuditStoreContractPreview | StageCPreEnableReviewPreview |
+| Route | /runtime-dry-run-contract-preview | /runtime-audit-store-contract-preview | /stage-c-preenable-review-preview |
+| Registry | runtime-dry-run-contract-registry.ts (18 items) | runtime-audit-store-contract-registry.ts (16 items) | stage-c-preenable-review-registry.ts (18 items) |
+| Validator | runtime-dry-run-contract-validator.ts (7 checks) | runtime-audit-store-contract-validator.ts (5 checks) | stage-c-preenable-review-validator.ts (8 checks) |
+| Doc | AIP_RUNTIME_DRY_RUN_CONTRACT_PREVIEW.md | AIP_RUNTIME_AUDIT_STORE_CONTRACT_PREVIEW.md | AIP_STAGE_C_PRE_ENABLE_HUMAN_REVIEW_PACK.md |
+| Cross-page sync | 9 pages | 9 pages | 9 pages |
+| Registry syncs | 3 registries | 3 registries | 3 registries |
+| Backend endpoint | NOT implemented | NOT implemented | NOT implemented |
+| DB write | NOT performed | NOT performed | NOT performed |
+| Stage C | NOT enabled | NOT enabled | NOT enabled (all items canEnableStageC=false) |
+| Note | Contract only, does not execute dry-run | Contract only, does not create store | Review only, does NOT enable Stage C |
 | Sidebar entry | NOT added |
 | Route type | Hidden direct (not in sidebar) |
 

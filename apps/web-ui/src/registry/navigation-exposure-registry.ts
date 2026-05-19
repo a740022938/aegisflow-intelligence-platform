@@ -1158,6 +1158,57 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.30.0-P1 added as hidden direct-route. Not in sidebar. Readonly contract preview only. No real API endpoint implementation.',
   },
+
+  // Runtime Dry-run Contract Preview (hidden route, not in sidebar)
+  {
+    id: 'runtime-dry-run-contract-preview',
+    path: '/runtime-dry-run-contract-preview',
+    label: 'Runtime Dry-run Contract Preview',
+    component: 'RuntimeDryRunContractPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly runtime dry-run contract preview page. Shows dry-run request/response/gate/evidence/audit/rollback contract specs and validator summary. Not added to left menu. No backend endpoint, no API call, no DB write, no external control, no Stage C. Contract only — does not execute dry-run.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.30.0-P2 added as hidden direct-route. Not in sidebar. Readonly dry-run contract preview only. Does not execute dry-run.',
+  },
+
+  // Runtime Audit Store Contract Preview (hidden route, not in sidebar)
+  {
+    id: 'runtime-audit-store-contract-preview',
+    path: '/runtime-audit-store-contract-preview',
+    label: 'Runtime Audit Store Contract Preview',
+    component: 'RuntimeAuditStoreContractPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly runtime audit store contract preview page. Shows audit event schema/retention/redaction/write policy contract specs and validator summary. Not added to left menu. No backend endpoint, no API call, no DB write, no external control, no Stage C. Contract only — does not create store.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.30.0-P3 added as hidden direct-route. Not in sidebar. Readonly audit store contract preview only. Does not create store.',
+  },
+
+  // Stage C Pre-Enable Human Review Pack (hidden route, not in sidebar)
+  {
+    id: 'stage-c-preenable-review-preview',
+    path: '/stage-c-preenable-review-preview',
+    label: 'Stage C Pre-Enable Human Review Pack',
+    component: 'StageCPreEnableReviewPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Stage C pre-enable human review pack page. Shows pre-enable requirements checklist across 11 review areas and validator summary. Not added to left menu. No backend endpoint, no API call, no DB write, no external control, no Stage C. Does NOT enable Stage C.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.30.0-P4 added as hidden direct-route. Not in sidebar. Readonly Stage C pre-enable review pack only. Does NOT enable Stage C.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {

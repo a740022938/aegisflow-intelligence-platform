@@ -315,6 +315,37 @@ const RuntimeReadonlyStatusApiPreview: React.FC = () => {
         ))}
       </div>
 
+      {/* J. Related Contract Previews */}
+      <div style={{ ...sectionStyle, border: '1px solid #42a5f5' }}>
+        <div style={{ ...headerStyle, color: '#42a5f5' }}>J. Related Runtime Contract Previews</div>
+        <div style={{ fontSize: 13, lineHeight: 2 }}>
+          <div>
+            <a href="/runtime-dry-run-contract-preview" style={{ color: '#42a5f5', textDecoration: 'underline' }}>
+              /runtime-dry-run-contract-preview
+            </a>
+            <span style={{ color: 'var(--text-secondary, #8892b0)', marginLeft: 8 }}>
+              — Dry-run request/response/gate/evidence/audit/rollback contract (hidden direct)
+            </span>
+          </div>
+          <div>
+            <a href="/runtime-audit-store-contract-preview" style={{ color: '#42a5f5', textDecoration: 'underline' }}>
+              /runtime-audit-store-contract-preview
+            </a>
+            <span style={{ color: 'var(--text-secondary, #8892b0)', marginLeft: 8 }}>
+              — Audit event schema/retention/redaction/write policy contract (hidden direct)
+            </span>
+          </div>
+          <div>
+            <a href="/stage-c-preenable-review-preview" style={{ color: '#42a5f5', textDecoration: 'underline' }}>
+              /stage-c-preenable-review-preview
+            </a>
+            <span style={{ color: 'var(--text-secondary, #8892b0)', marginLeft: 8 }}>
+              — Stage C pre-enable human review pack (hidden direct, does NOT enable Stage C)
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* I. Forbidden API Notice */}
       <div style={{ ...sectionStyle, border: '2px solid #ef5350' }}>
         <div style={{ ...headerStyle, color: '#ef5350' }}>I. Forbidden API Notice</div>

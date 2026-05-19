@@ -8,7 +8,7 @@
 - **Seal Status:** Final Seal Candidate (v7.29 V7_29_FINAL_SEAL_READY)
 - **Safety Mode:** Readonly-first
 - **Stage C:** Disabled (permanently)
-- **Latest Phase:** v7.30.0-P1 Runtime Readonly Status API Preview
+- **Latest Phase:** v7.30.0-P2/P3/P4 Runtime Contract Acceleration Pack
 
 ## Architecture
 
@@ -61,6 +61,18 @@ v7.30.0-P1 adds a readonly Runtime Status API contract preview page:
 - **3 registry syncs** — permission-evaluator, navigation-exposure, center-access
 
 All P1 work is **readonly static frontend**. No backend endpoint, no API call, no DB write, no external control, no Stage C.
+
+## Runtime Contract Acceleration Pack (v7.30.0-P2/P3/P4)
+
+v7.30.0-P2/P3/P4 adds three more readonly contract preview pages:
+
+- **P2 Runtime Dry-run Contract Preview** — 18 items across 6 contract kinds at `/runtime-dry-run-contract-preview` (hidden direct)
+- **P3 Runtime Audit Store Contract Preview** — 16 items across 7 contract kinds at `/runtime-audit-store-contract-preview` (hidden direct)
+- **P4 Stage C Pre-Enable Human Review Pack** — 18 items across 11 review areas at `/stage-c-preenable-review-preview` (hidden direct, does NOT enable Stage C)
+- **Cross-page sync** — All 3 linked from P1, Governance Console, and 4 traceability pages
+- **Metadata sync** — All 3 registered in permission-evaluator, navigation-exposure, center-access registries
+
+All P2/P3/P4 work is **readonly static frontend**. No backend endpoint, no API call, no DB write, no external control, no Stage C. P4 does NOT enable Stage C.
 
 ## Connector Runtime Design (v7.27.0-D1)
 

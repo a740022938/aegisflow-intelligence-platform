@@ -23,7 +23,7 @@
 | Memory Hub Readonly | allow_sidebar_visible | low | info | preview_only | Yes |
 | OpenAxiom Readonly | allow_sidebar_visible | low | info | preview_only | Yes |
 
-## Hidden Direct / Internal Preview (5 targets)
+## Hidden Direct / Internal Preview (8 targets)
 
 | Target | Decision | Risk | Severity | Stage | Allowed Now |
 |--------|----------|------|----------|-------|-------------|
@@ -34,6 +34,9 @@
 | Evidence Schema Preview | allow_hidden_direct | low | info | preview_only | Yes |
 | Rollback Preview | allow_hidden_direct | low | info | preview_only | Yes |
 | Runtime Readonly Status API Preview | allow_hidden_direct | medium | info | preview_only | Yes |
+| Runtime Dry-run Contract Preview | allow_hidden_direct | medium | info | preview_only | Yes |
+| Runtime Audit Store Contract Preview | allow_hidden_direct | medium | info | preview_only | Yes |
+| Stage C Pre-Enable Human Review Pack | allow_hidden_direct | medium | info | preview_only | Yes |
 
 ## Hold Review (3 targets)
 

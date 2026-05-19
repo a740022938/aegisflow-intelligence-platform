@@ -101,7 +101,7 @@
 - 3 registries — Added permission evaluator, navigation exposure, center access entries
 - 6 contract docs — Updated with P1 status references
 
-### P2: Runtime Dry-run Contract Design
+### P2: Runtime Dry-run Contract Preview (COMPLETED)
 
 | Field | Value |
 |-------|-------|
@@ -114,9 +114,15 @@
 | Risk | Low |
 | Commit policy | code-only (registry + page) |
 
-**Scope:** Design the runtime dry-run contract registry and preview page. Document the dry-run request/response contract. No real dry-run execution.
+**Scope:** Implemented a readonly runtime dry-run contract preview page at `/runtime-dry-run-contract-preview` with 18 items across 6 contract kinds. Contract only — does not execute dry-run.
 
-### P3: Runtime Audit Store Design
+**New files created:**
+- `src/pages/RuntimeDryRunContractPreview.tsx` — 9-section readonly preview page
+- `src/registry/runtime-dry-run-contract-registry.ts` — Static registry (18 items)
+- `src/registry/runtime-dry-run-contract-validator.ts` — Validation checks (7 checks)
+- `docs/product/AIP_RUNTIME_DRY_RUN_CONTRACT_PREVIEW.md` — Preview doc
+
+### P3: Runtime Audit Store Contract Preview (COMPLETED)
 
 | Field | Value |
 |-------|-------|
@@ -129,9 +135,15 @@
 | Risk | Medium |
 | Commit policy | code-only (registry + page) |
 
-**Scope:** Design the runtime audit store schema registry and preview page. Document the audit event model, retention policy, and storage requirements. No real audit storage.
+**Scope:** Implemented a readonly runtime audit store contract preview page at `/runtime-audit-store-contract-preview` with 16 items across 7 contract kinds. Contract only — does not create store.
 
-### P4: Stage C Pre-Enable Human Review Pack
+**New files created:**
+- `src/pages/RuntimeAuditStoreContractPreview.tsx` — 9-section readonly preview page
+- `src/registry/runtime-audit-store-contract-registry.ts` — Static registry (16 items)
+- `src/registry/runtime-audit-store-contract-validator.ts` — Validation checks (5 checks)
+- `docs/product/AIP_RUNTIME_AUDIT_STORE_CONTRACT_PREVIEW.md` — Preview doc
+
+### P4: Stage C Pre-Enable Human Review Pack (COMPLETED)
 
 | Field | Value |
 |-------|-------|
@@ -139,12 +151,18 @@
 | Backend changes | NO |
 | DB writes | NO |
 | External control | NO |
-| Stage C enable | NO |
+| Stage C enable | NO (all items have canEnableStageC=false) |
 | Human review | REQUIRED |
 | Risk | High |
 | Commit policy | code-only, requires human approval |
 
-**Scope:** Prepare the Stage C pre-enable review pack for human project owner. Document all 14 gates, their current status, and what enabling Stage C would mean. Do NOT actually enable Stage C.
+**Scope:** Implemented a readonly Stage C pre-enable human review pack page at `/stage-c-preenable-review-preview` with 18 items across 11 review areas. Does NOT enable Stage C. All items have canEnableStageC=false.
+
+**New files created:**
+- `src/pages/StageCPreEnableReviewPreview.tsx` — 10-section readonly preview page
+- `src/registry/stage-c-preenable-review-registry.ts` — Static registry (18 items)
+- `src/registry/stage-c-preenable-review-validator.ts` — Validation checks (8 checks)
+- `docs/product/AIP_STAGE_C_PRE_ENABLE_HUMAN_REVIEW_PACK.md` — Preview doc
 
 ### Final: v7.30 Final Seal Recheck
 
@@ -180,7 +198,7 @@
 ## 4. Dependency Chain
 
 ```
-D1 (audit) → D2 (contract freeze — COMPLETED) → D3 (UI polish) → P1 (status API design) → P2 (dry-run design) → P3 (audit store design) → P4 (Stage C review pack) → Final Seal
+D1 (audit) → D2 (contract freeze — COMPLETED) → D3 (UI polish) → P1 (status API preview — COMPLETED) → P2 (dry-run preview — COMPLETED) → P3 (audit store preview — COMPLETED) → P4 (Stage C review pack — COMPLETED) → Final Seal
 ```
 
 Each phase is independent. Phases can be reordered or skipped based on human project owner decision.
@@ -191,4 +209,4 @@ All blockers documented in `AIP_RUNTIME_IMPLEMENTATION_BLOCKER_MATRIX.md` remain
 
 ## 6. Next Step Recommendation
 
-**Recommended:** v7.30.0-P1 Runtime Readonly Status API Preview — implement a readonly status preview page based on the design document created in D2.
+**Recommended:** Proceed to v7.30 Final Seal Recheck. All P1-P4 phases are complete.

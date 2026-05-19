@@ -233,7 +233,13 @@ export default function PermissionEvaluatorPreview() {
             <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
               - Governance Console: Permission evaluator is aggregated in Governance Console at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
               <br />
-              - Runtime Readonly Status API Preview: Runtime Status API contract viewer with gateway and error model at <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>/runtime-readonly-status-api-preview</a> (hidden direct, readonly, not in sidebar)
+              - P1 Runtime Readonly Status API Preview: Runtime Status API contract viewer with gateway and error model at <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>/runtime-readonly-status-api-preview</a> (hidden direct, readonly, not in sidebar)
+              <br />
+              - P2 Runtime Dry-run Contract Preview: Dry-run request/response/gate/evidence/audit/rollback contract at <a href="/runtime-dry-run-contract-preview" style={{ color: '#22C55E' }}>/runtime-dry-run-contract-preview</a> (hidden direct, readonly, not in sidebar)
+              <br />
+              - P3 Runtime Audit Store Contract Preview: Audit event schema/retention/redaction/write policy contract at <a href="/runtime-audit-store-contract-preview" style={{ color: '#22C55E' }}>/runtime-audit-store-contract-preview</a> (hidden direct, readonly, not in sidebar)
+              <br />
+              - P4 Stage C Pre-Enable Human Review Pack: Pre-enable requirements checklist across 11 areas at <a href="/stage-c-preenable-review-preview" style={{ color: '#22C55E' }}>/stage-c-preenable-review-preview</a> (hidden direct, readonly, not in sidebar, does NOT enable Stage C)
             </div>
           </>
         );

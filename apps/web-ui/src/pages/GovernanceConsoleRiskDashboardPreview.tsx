@@ -168,11 +168,22 @@ const GovernanceConsoleRiskDashboardPreview: React.FC = () => {
       </div>
       <div style={{ marginTop: 16, padding: 12, background: 'rgba(59, 130, 246, 0.05)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>API Contract Risk Reference</div>
-        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-          v7.30.0-D2 contract freeze v1.freeze — 12 endpoints defined.
-          <a href="/runtime-readonly-status-api-preview" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 4 }} target="_blank" rel="noreferrer">
-            Open Runtime Readonly Status API Preview →
-          </a>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+          <div>P1 — Runtime Readonly Status API (v1.freeze, 12 endpoints):
+            <a href="/runtime-readonly-status-api-preview" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 4 }} target="_blank" rel="noreferrer">Open →</a>
+          </div>
+          <div>P2 — Runtime Dry-run Contract (18 items, 6 kinds):
+            <a href="/runtime-dry-run-contract-preview" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 4 }} target="_blank" rel="noreferrer">Open →</a>
+            <span style={{ color: 'var(--text-muted)', marginLeft: 4, fontSize: 11 }}>(contract only, does not execute dry-run)</span>
+          </div>
+          <div>P3 — Runtime Audit Store Contract (16 items, 7 kinds):
+            <a href="/runtime-audit-store-contract-preview" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 4 }} target="_blank" rel="noreferrer">Open →</a>
+            <span style={{ color: 'var(--text-muted)', marginLeft: 4, fontSize: 11 }}>(contract only, does not create store)</span>
+          </div>
+          <div>P4 — Stage C Pre-Enable Human Review Pack (18 items, 11 areas):
+            <a href="/stage-c-preenable-review-preview" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 4 }} target="_blank" rel="noreferrer">Open →</a>
+            <span style={{ color: 'var(--text-muted)', marginLeft: 4, fontSize: 11 }}>(review only, does NOT enable Stage C)</span>
+          </div>
         </div>
       </div>
     </PageShell>

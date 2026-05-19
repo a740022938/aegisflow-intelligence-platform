@@ -77,6 +77,51 @@ P1 validated with:
 | Readonly-first | pure static registry + validator |
 | Hidden direct route | confirmed not in sidebar |
 
+## v7.30.0-P2/P3/P4 Runtime Contract Acceleration Pack
+
+P2 validated with:
+
+| Check | Result |
+|-------|--------|
+| Registry completeness | 18 items (6 kinds) |
+| No sidebar mutation | hidden direct route, not in sidebar |
+| No backend endpoint | no apps/local-api modified |
+| No API call | static registry only |
+| No DB write | no database mutation |
+| No external control | all external control blocked |
+| Stage C gated | all items have stageCEnabled=false |
+| Readonly-first | pure static registry + validator |
+| Hidden direct route | confirmed not in sidebar |
+
+P3 validated with:
+
+| Check | Result |
+|-------|--------|
+| Registry completeness | 16 items (7 kinds) |
+| No sidebar mutation | hidden direct route, not in sidebar |
+| No backend endpoint | no apps/local-api modified |
+| No API call | static registry only |
+| No DB write | no database mutation |
+| No external control | all external control blocked |
+| Stage C gated | all items have stageCEnabled=false |
+| Readonly-first | pure static registry + validator |
+| Hidden direct route | confirmed not in sidebar |
+
+P4 validated with:
+
+| Check | Result |
+|-------|--------|
+| Registry completeness | 18 items (11 areas) |
+| No sidebar mutation | hidden direct route, not in sidebar |
+| No backend endpoint | no apps/local-api modified |
+| No API call | static registry only |
+| No DB write | no database mutation |
+| No external control | all external control blocked |
+| Stage C gated | all items have canEnableStageC=false |
+| Readonly-first | pure static registry + validator |
+| Hidden direct route | confirmed not in sidebar |
+| Stage C NOT enabled | all 18 items have canEnableStageC=false |
+
 ## v7.27.0 Final Seal Decision
 
 **Verdict: READY** (commit `8f8242a`, 2026-05-19)

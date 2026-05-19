@@ -337,11 +337,25 @@ A frontend-only readonly preview page has been implemented:
 | Safety | No backend endpoint, no API call, no DB write, no external control, no Stage C |
 
 The preview page displays:
+
+## 11. Acceleration Pack Extensions (P2/P3/P4)
+
+Following P1, the v7.30.0-P2/P3/P4 acceleration pack adds three related readonly preview pages:
+
+| Phase | Route | Items | Safety |
+|-------|-------|-------|--------|
+| P2 | `/runtime-dry-run-contract-preview` | 18 (6 kinds) | Contract only, no dry-run execution |
+| P3 | `/runtime-audit-store-contract-preview` | 16 (7 kinds) | Contract only, no store creation |
+| P4 | `/stage-c-preenable-review-preview` | 18 (11 areas) | Review only, does NOT enable Stage C |
+
+All pages are hidden direct routes, not in sidebar, readonly only.
+
+The preview page displays:
 - Endpoint catalog with status badges (GET contract_only / POST not_implemented)
 - Schema board, mock responses, gate model, error model
 - Permissions model, implementation freeze checklist, validator summary
 
-## 11. Contract Boundary Enforcement
+## 12. Contract Boundary Enforcement
 
 - This document is a contract freeze — it does not implement any endpoint
 - No backend code shall be written against this contract without a dedicated implementation task

@@ -219,3 +219,15 @@ The v7.30.0-P1 frontend preview implements:
 | Traceability sync | 4 pages updated with readonly links |
 
 All P1 work is **readonly static frontend**. No backend endpoint, no API call, no DB write, no external control, no Stage C.
+
+## 11. Acceleration Pack (P2/P3/P4)
+
+The v7.30.0-P2/P3/P4 Runtime Contract Acceleration Pack extends P1 with three more readonly preview pages:
+
+| Phase | Route | Content |
+|-------|-------|---------|
+| P2 | `/runtime-dry-run-contract-preview` | 18 dry-run contract items (6 kinds) |
+| P3 | `/runtime-audit-store-contract-preview` | 16 audit store contract items (7 kinds) |
+| P4 | `/stage-c-preenable-review-preview` | 18 Stage C pre-enable review items (11 areas) |
+
+All follow the same pattern as P1: hidden direct route, static registry + validator, cross-page and metadata sync.

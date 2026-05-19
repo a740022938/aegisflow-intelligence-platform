@@ -88,6 +88,18 @@ Links to this preview page have been added to:
 | Navigation Exposure | `runtime-readonly-status-api-preview` | keep_direct_route |
 | Center Access | `runtime-readonly-status-api-preview` | keep_hidden_direct |
 
+## 8. Related Acceleration Pack (P2/P3/P4)
+
+The v7.30.0-P2/P3/P4 Runtime Contract Acceleration Pack adds three more readonly preview pages:
+
+| Phase | Route | Description |
+|-------|-------|-------------|
+| P2 | `/runtime-dry-run-contract-preview` | 18-item dry-run contract (request/response/gate/evidence/audit/rollback) |
+| P3 | `/runtime-audit-store-contract-preview` | 16-item audit store contract (schema/retention/redaction/write policy) |
+| P4 | `/stage-c-preenable-review-preview` | 18-item Stage C pre-enable human review pack (does NOT enable Stage C) |
+
+All P2/P3/P4 pages follow the same pattern: hidden direct route, static registry+validator, readonly only.
+
 ## 7. Validation
 
 The validator (`runtime-readonly-status-api-validator.ts`) checks:
