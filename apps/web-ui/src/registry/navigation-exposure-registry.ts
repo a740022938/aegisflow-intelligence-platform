@@ -848,6 +848,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     notes: 'P3 added as hidden direct-route. Not in sidebar. Readonly preview only.',
   },
 
+  // Permission Evaluator Preview (hidden route, not in sidebar)
+  {
+    id: 'permission-evaluator-preview',
+    path: '/permission-evaluator-preview',
+    label: 'Permission Evaluator Preview',
+    component: 'PermissionEvaluatorPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only'],
+    reason: 'Readonly permission evaluator preview page. Shows all permission evaluation rules, risk/severity matrix, enforcement stages, and validator summary. Not added to left menu. No real permission execution.',
+    allowedNow: false,
+    source: 'route',
+    notes: 'v7.26.0-M2 added as hidden direct-route. Not in sidebar. Readonly preview only. No real permission execution.',
+  },
+
   // 隐 module placeholder routes (not in nav, from App.tsx)
   {
     id: 'workspace',

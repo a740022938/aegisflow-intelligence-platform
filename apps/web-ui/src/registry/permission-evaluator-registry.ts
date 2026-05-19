@@ -21,6 +21,23 @@ export type PermissionDecision =
 
 export type PermissionRisk = 'low' | 'medium' | 'high';
 
+export type PermissionSeverity = 'info' | 'notice' | 'warning' | 'blocking';
+
+export type PermissionEnforcementStage = 'preview_only' | 'manual_review' | 'blocked' | 'future';
+
+export type PermissionTargetCenter =
+  | 'primary_nav'
+  | 'advanced_hub'
+  | 'connector_center'
+  | 'lab_center'
+  | 'governance_center'
+  | 'navigation_preview'
+  | 'internal';
+
+export type PermissionEvidenceSource = 'registry' | 'route' | 'docs' | 'manual_policy' | 'derived';
+
+export type PermissionUiSurface = 'sidebar' | 'advanced_hub' | 'hidden_route' | 'docs_only' | 'none';
+
 export interface PermissionEvaluationRule {
   id: string;
   targetKind: PermissionTargetKind;
@@ -29,6 +46,11 @@ export interface PermissionEvaluationRule {
   currentExposure: string;
   recommendedDecision: PermissionDecision;
   risk: PermissionRisk;
+  severity: PermissionSeverity;
+  enforcementStage: PermissionEnforcementStage;
+  targetCenter: PermissionTargetCenter;
+  evidenceSource: PermissionEvidenceSource;
+  uiSurface: PermissionUiSurface;
   allowedNow: boolean;
   gates: string[];
   blockingConditions: string[];
@@ -46,6 +68,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav',
     recommendedDecision: 'allow_primary_nav',
     risk: 'low',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'primary_nav',
+    evidenceSource: 'registry',
+    uiSurface: 'sidebar',
     allowedNow: true,
     gates: ['readonly_only', 'no_stage_c'],
     blockingConditions: [],
@@ -61,6 +88,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav',
     recommendedDecision: 'allow_primary_nav',
     risk: 'low',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'connector_center',
+    evidenceSource: 'registry',
+    uiSurface: 'sidebar',
     allowedNow: true,
     gates: ['readonly_only', 'no_stage_c', 'no_external_control'],
     blockingConditions: [],
@@ -76,6 +108,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'hidden_direct_route',
     recommendedDecision: 'allow_hidden_direct',
     risk: 'medium',
+    severity: 'notice',
+    enforcementStage: 'preview_only',
+    targetCenter: 'lab_center',
+    evidenceSource: 'registry',
+    uiSurface: 'hidden_route',
     allowedNow: false,
     gates: ['readonly_only', 'no_stage_c', 'no_training', 'no_inference', 'no_label_save'],
     blockingConditions: ['No training/inference/label-save runtime verification'],
@@ -91,6 +128,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'hidden_direct_route',
     recommendedDecision: 'hold_review',
     risk: 'medium',
+    severity: 'warning',
+    enforcementStage: 'manual_review',
+    targetCenter: 'governance_center',
+    evidenceSource: 'route',
+    uiSurface: 'hidden_route',
     allowedNow: false,
     gates: ['readonly_only', 'governance_center_enabled', 'stage_c_disabled'],
     blockingConditions: ['No governance_center_enabled gate clearance', 'Stage C deferred'],
@@ -106,6 +148,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'hidden_direct_route',
     recommendedDecision: 'allow_hidden_direct',
     risk: 'low',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'navigation_preview',
+    evidenceSource: 'registry',
+    uiSurface: 'hidden_route',
     allowedNow: false,
     gates: ['readonly_only', 'no_menu_change'],
     blockingConditions: ['Navigation Preview is audit-only, not a real center.'],
@@ -121,6 +168,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav',
     recommendedDecision: 'allow_primary_nav',
     risk: 'low',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'primary_nav',
+    evidenceSource: 'registry',
+    uiSurface: 'sidebar',
     allowedNow: true,
     gates: ['readonly_only', 'preview_only', 'no_db_write'],
     blockingConditions: [],
@@ -136,6 +188,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav',
     recommendedDecision: 'allow_primary_nav',
     risk: 'low',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'primary_nav',
+    evidenceSource: 'registry',
+    uiSurface: 'sidebar',
     allowedNow: true,
     gates: ['readonly_only', 'preview_only'],
     blockingConditions: [],
@@ -151,6 +208,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav',
     recommendedDecision: 'allow_sidebar_visible',
     risk: 'low',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'primary_nav',
+    evidenceSource: 'registry',
+    uiSurface: 'sidebar',
     allowedNow: true,
     gates: ['readonly_only', 'no_stage_c', 'no_db_write'],
     blockingConditions: [],
@@ -166,12 +228,37 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav',
     recommendedDecision: 'allow_sidebar_visible',
     risk: 'low',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'primary_nav',
+    evidenceSource: 'registry',
+    uiSurface: 'sidebar',
     allowedNow: true,
     gates: ['readonly_only', 'no_label_save'],
     blockingConditions: [],
     requiredEvidence: ['readonly_ui_verified', 'no_label_mutation'],
     reason: 'OpenAxiom Readonly is a readonly diagnostic overview. No label save, no model file changes.',
     nextAction: 'Maintain current sidebar exposure.',
+  },
+  {
+    id: 'pe-permission-evaluator',
+    targetKind: 'center',
+    targetId: 'permission-evaluator',
+    label: 'Permission Evaluator Preview',
+    currentExposure: 'internal_preview',
+    recommendedDecision: 'allow_hidden_direct',
+    risk: 'low',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'internal',
+    evidenceSource: 'registry',
+    uiSurface: 'hidden_route',
+    allowedNow: false,
+    gates: ['readonly_only'],
+    blockingConditions: [],
+    requiredEvidence: ['readonly_ui_verified'],
+    reason: 'Permission Evaluator Preview is a readonly assessment of all permission evaluation rules. Hidden direct route. Not in sidebar. No real permission execution.',
+    nextAction: 'Keep hidden direct. No sidebar exposure planned.',
   },
   {
     id: 'pe-inference',
@@ -181,6 +268,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav_blocked',
     recommendedDecision: 'hold_review',
     risk: 'high',
+    severity: 'blocking',
+    enforcementStage: 'blocked',
+    targetCenter: 'advanced_hub',
+    evidenceSource: 'derived',
+    uiSurface: 'none',
     allowedNow: false,
     gates: ['stage_c_disabled', 'runtime_not_ready'],
     blockingConditions: ['Stage C not enabled', 'No runtime evaluator', 'No permission function'],
@@ -196,6 +288,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav_blocked',
     recommendedDecision: 'hold_review',
     risk: 'high',
+    severity: 'blocking',
+    enforcementStage: 'blocked',
+    targetCenter: 'advanced_hub',
+    evidenceSource: 'derived',
+    uiSurface: 'none',
     allowedNow: false,
     gates: ['stage_c_disabled', 'runtime_not_ready'],
     blockingConditions: ['Stage C not enabled', 'No runtime evaluator'],
@@ -211,6 +308,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'primary_nav_blocked',
     recommendedDecision: 'hold_review',
     risk: 'high',
+    severity: 'blocking',
+    enforcementStage: 'blocked',
+    targetCenter: 'advanced_hub',
+    evidenceSource: 'derived',
+    uiSurface: 'none',
     allowedNow: false,
     gates: ['stage_c_disabled', 'runtime_not_ready'],
     blockingConditions: ['Stage C not enabled', 'Deployment Gate design-only'],
@@ -226,6 +328,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'not_exposed',
     recommendedDecision: 'deny',
     risk: 'high',
+    severity: 'blocking',
+    enforcementStage: 'blocked',
+    targetCenter: 'internal',
+    evidenceSource: 'manual_policy',
+    uiSurface: 'none',
     allowedNow: false,
     gates: ['stage_c_denied', 'permanently_disabled'],
     blockingConditions: ['Stage C permanently disabled by policy', 'No activation package created'],
@@ -241,6 +348,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'not_exposed',
     recommendedDecision: 'deny',
     risk: 'high',
+    severity: 'blocking',
+    enforcementStage: 'blocked',
+    targetCenter: 'primary_nav',
+    evidenceSource: 'derived',
+    uiSurface: 'none',
     allowedNow: false,
     gates: ['stage_c_disabled', 'no_db_write'],
     blockingConditions: ['Memory Hub candidate processing requires DB write', 'Stage C not enabled'],
@@ -256,6 +368,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'not_exposed',
     recommendedDecision: 'deny',
     risk: 'high',
+    severity: 'blocking',
+    enforcementStage: 'blocked',
+    targetCenter: 'connector_center',
+    evidenceSource: 'manual_policy',
+    uiSurface: 'none',
     allowedNow: false,
     gates: ['stage_c_disabled', 'no_external_control'],
     blockingConditions: ['External tool control requires Stage C', 'No runtime authorization'],
@@ -271,6 +388,11 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     currentExposure: 'not_exposed',
     recommendedDecision: 'deny',
     risk: 'high',
+    severity: 'blocking',
+    enforcementStage: 'blocked',
+    targetCenter: 'internal',
+    evidenceSource: 'manual_policy',
+    uiSurface: 'none',
     allowedNow: false,
     gates: ['stage_c_disabled', 'no_db_write'],
     blockingConditions: ['DB write requires Stage C', 'No DB write authorization'],
@@ -298,6 +420,38 @@ export function getPermissionEvaluationDeniedRules(): PermissionEvaluationRule[]
 
 export function getPermissionEvaluationHoldReviewRules(): PermissionEvaluationRule[] {
   return PERMISSION_EVALUATION_RULES.filter(r => r.recommendedDecision === 'hold_review');
+}
+
+export function getPermissionEvaluationRulesBySeverity(severity: PermissionSeverity): PermissionEvaluationRule[] {
+  return PERMISSION_EVALUATION_RULES.filter(r => r.severity === severity);
+}
+
+export function getPermissionEvaluationRulesByEnforcementStage(stage: PermissionEnforcementStage): PermissionEvaluationRule[] {
+  return PERMISSION_EVALUATION_RULES.filter(r => r.enforcementStage === stage);
+}
+
+export function getPermissionEvaluationRulesByTargetCenter(center: PermissionTargetCenter): PermissionEvaluationRule[] {
+  return PERMISSION_EVALUATION_RULES.filter(r => r.targetCenter === center);
+}
+
+export function getPermissionEvaluationMatrixSummary(): {
+  total: number;
+  allowedPrimaryNav: number;
+  holdReview: number;
+  denied: number;
+  blocking: number;
+  warning: number;
+  highRiskAllowedNow: number;
+} {
+  return {
+    total: PERMISSION_EVALUATION_RULES.length,
+    allowedPrimaryNav: PERMISSION_EVALUATION_RULES.filter(r => r.recommendedDecision === 'allow_primary_nav').length,
+    holdReview: PERMISSION_EVALUATION_RULES.filter(r => r.recommendedDecision === 'hold_review').length,
+    denied: PERMISSION_EVALUATION_RULES.filter(r => r.recommendedDecision === 'deny').length,
+    blocking: PERMISSION_EVALUATION_RULES.filter(r => r.severity === 'blocking').length,
+    warning: PERMISSION_EVALUATION_RULES.filter(r => r.severity === 'warning').length,
+    highRiskAllowedNow: PERMISSION_EVALUATION_RULES.filter(r => r.risk === 'high' && r.allowedNow).length,
+  };
 }
 
 export function getPermissionEvaluationSummary(): {

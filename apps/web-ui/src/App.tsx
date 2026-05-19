@@ -41,6 +41,7 @@ const AdvancedModeReadonly = lazy(() => import('./pages/AdvancedModeReadonly'));
 const NavigationPreviewReadonly = lazy(() => import('./pages/NavigationPreviewReadonly'));
 const ConnectorCenterReadonly = lazy(() => import('./pages/ConnectorCenterReadonly'));
 const LabCenterReadonly = lazy(() => import('./pages/LabCenterReadonly'));
+const PermissionEvaluatorPreview = lazy(() => import('./pages/PermissionEvaluatorPreview'));
 
 function RouteFallback() {
   return (
@@ -146,6 +147,7 @@ const App: React.FC = () => {
             <Route path="navigation-preview-readonly" element={<NavigationPreviewReadonly />} />
             <Route path="connector-center-readonly" element={<ConnectorCenterReadonly />} />
             <Route path="lab-center-readonly" element={<LabCenterReadonly />} />
+            <Route path="permission-evaluator-preview" element={<PermissionEvaluatorPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
