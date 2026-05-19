@@ -28,6 +28,10 @@ The following actions are FORBIDDEN during the Stage C readiness process:
 | 17 | Collect evidence from preview page | Evidence integrity | Contract violation |
 | 18 | Upload files from preview page | Evidence integrity | Contract violation |
 | 19 | Treat seal candidate as final enablement | Governance boundary | Contract violation |
+| 20 | AI-generated fake authorization | Role boundary | Reject authorization |
+| 21 | Auto-approve authorization | Governance boundary | Contract violation |
+| 22 | Auto-enable Stage C after authorization | Safety boundary | Contract violation |
+| 23 | Skip cooldown period | Governance boundary | Contract violation |
 
 ## Contract Enforcement
 

@@ -53,6 +53,12 @@
 - 7 validators total (3 from v7.33 + 4 from v7.34)
 - All pass with blocking=0
 
+## v7.35 Authorization Contract
+
+- Authorization Contract v1 (28 terms) frozen as V7_35_D2_STAGE_C_AUTHORIZATION_CONTRACT_FROZEN
+- Authorization Contract Validator (19 checks, blocking=0)
+- See AIP_STAGE_C_AUTHORIZATION_CONTRACT_V1.md
+
 ## Contract Invariants
 
 ```

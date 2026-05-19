@@ -69,6 +69,12 @@ Since route smoke was not re-run (server not restarted):
 > Final Seal does not authorize Stage C enablement.  
 > v7.35 will require a separate human authorization package.
 
+## v7.35 Follow-up
+
+- v7.35.0-D1 Stage C Human Authorization Package: V7_35_D1_STAGE_C_HUMAN_AUTHORIZATION_PACKAGE_READY
+- v7.35.0-D2 Stage C Authorization Contract Freeze: V7_35_D2_STAGE_C_AUTHORIZATION_CONTRACT_FROZEN
+- v7.35.0-P1 Stage C Authorization Review Console Preview: V7_35_P1_STAGE_C_AUTHORIZATION_REVIEW_CONSOLE_PREVIEW_READY
+
 ## Next Step
 
-- v7.35.0-D1 Stage C Human Authorization Package (human approval only, no automatic enablement)
+- v7.35.0-P2 Stage C Authorization Artifact Review Pack (human approval only, no automatic enablement)

@@ -1333,6 +1333,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.34.0-P4 added as hidden direct-route. Not in sidebar. Readonly pre-enable seal candidate. No enable action, no mutation, no POST. Stage C remains disabled. Not a final enablement.',
   },
+  {
+    id: 'stage-c-authorization-review-console-preview',
+    path: '/stage-c-authorization-review-console-preview',
+    label: 'Stage C Authorization Review Console Preview',
+    component: 'StageCAuthorizationReviewConsolePreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'low',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Stage C Authorization Review Console Preview page. 12 UI sections: header, seal baseline, human authorization requirement, auth text, required fields matrix, blocker checklist, evidence requirements, forbidden automation, safety boundary, validator summary, items by category, human owner next step. Based on D2 authorization contract registry. 28 contract items, 19 validator checks. No authorize/enable capability. No backend endpoint, no API call, no DB write, no external control, no Stage C. No authorize/approve/deny button. Not added to left menu.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.35.0-P1 added as hidden direct-route. Not in sidebar. Readonly authorization review console. No authorize/enable, no approve/deny, no mutation, no POST. Stage C remains disabled.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {

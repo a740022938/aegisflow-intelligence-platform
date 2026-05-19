@@ -40,6 +40,12 @@ All docs listed in `AIP_V7_34_FINAL_SEAL_RECHECK.md`.
 
 Stage C Readiness Contract v1 — 24 terms frozen.
 
+## v7.35 Authorization Layer
+
+- D1 Human Authorization Package: V7_35_D1_STAGE_C_HUMAN_AUTHORIZATION_PACKAGE_READY
+- D2 Authorization Contract: V7_35_D2_STAGE_C_AUTHORIZATION_CONTRACT_FROZEN (28 terms)
+- P1 Authorization Review Console: V7_35_P1_STAGE_C_AUTHORIZATION_REVIEW_CONSOLE_PREVIEW_READY
+
 ## Verdict
 
 **V7_34_FINAL_SEAL_READY_WITH_ROUTE_SMOKE_DEFERRED**
