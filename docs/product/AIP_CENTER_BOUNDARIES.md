@@ -45,3 +45,18 @@ Connector runtime is in design-only phase. Current boundaries:
 | External tool control | Denied | Requires Stage C + runtime | Yes |
 
 **Key rule:** Connector runtime design does not enable real execution, external tool control, or DB write in v7.27.
+
+## v7.27 Final Seal Status
+
+**v7.27.0 Final Seal: READY** (commit `8f8242a`)
+- Runtime/Dry-run/Audit Preview all hidden direct ✓
+- All preview routes confirmed not in sidebar ✓
+- No new sidebar entries added ✓
+
+## v7.28 Governance Blueprint — Center Boundary Impact
+
+v7.28.0-D1 governance blueprint docs do NOT change any center boundary:
+- No new centers
+- No sidebar changes
+- No center exposure changes
+- No Governance Center mutation|

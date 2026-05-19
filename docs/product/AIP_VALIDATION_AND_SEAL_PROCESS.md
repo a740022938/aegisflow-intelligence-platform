@@ -60,3 +60,29 @@ feat(product): <feature description>
 Seal: vX.Y.Z build YYYY.MM.DD
 Blocking: 0  Warning: 0  Info: 0
 ```
+
+## v7.27.0 Final Seal Decision
+
+**Verdict: READY** (commit `8f8242a`, 2026-05-19)
+
+| Check | Result |
+|-------|--------|
+| Registry completeness | Runtime (25), Dry-run (16), Audit (18) |
+| No sidebar mutation | Confirmed — only advanced-mode + connector in sidebar |
+| No tag/release | No tag created |
+| Stage C gated | All Stage C items blocked |
+| Readonly-first | No real execution in any preview |
+| No DB write | No database mutation |
+| No external control | No external tool control |
+| Risk classification | All items classified |
+| Blocking conditions | All blocked items have reasons |
+| Validators pass | Runtime=0/0/3, Dry-run=0/0/3, Audit=0/0/3 |
+| Hidden direct routes | All 3 preview routes confirmed hidden |
+| Stage C disabled | Confirmed disabled across all registries |
+| Route audit PASS | No sidebar leakage |
+| Working tree clean | Confirmed |
+| origin/main up to date | Confirmed |
+
+## v7.28 Governance Blueprint — Validation Process
+
+v7.28.0-D1 docs-only phase follows the same validation process. All gates must pass before commit. The `db:doctor`, `secret:scan`, `smoke` scripts remain undefined in `apps/web-ui/package.json` and will be recorded as SKIP in all v7.28 reports.|

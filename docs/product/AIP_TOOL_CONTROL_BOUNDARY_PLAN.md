@@ -75,3 +75,19 @@
 | Hermes | 未接入 | 设计阶段 | 中 | 消息系统 |
 | CC Switch | 只读配置 | read + controlled | 高 | 基础设施 |
 | Claude Proxy | 只读配置 | read + controlled | 高 | AI 代理 |
+
+## 8. v7.27 Final Seal Status
+
+**v7.27.0 Final Seal: READY** (commit `8f8242a`)
+- All tool control boundaries remain enforced
+- Runtime Preview Trilogy (Registry/Dry-run/Audit) completed
+- No tool control capability added — readonly only
+
+## 9. v7.28 Governance Blueprint References
+
+v7.28.0-D1 adds design-only governance docs that do not change any tool control boundary:
+- `AIP_RUNTIME_API_CONTRACT_SPEC.md` — defines endpoint contracts (not implemented)
+- `AIP_RUNTIME_GOVERNANCE_STATE_MACHINE.md` — defines state transitions (not executed)
+- `AIP_HUMAN_APPROVAL_WORKFLOW_SPEC.md` — defines approval flow (not processed)
+
+No new tool control capability, no external API calls, no token/API key handling.|

@@ -98,3 +98,18 @@ Gates: readonly_gate, dry_run_gate, human_approval_gate, audit_log_gate, rollbac
 5. **All denied and hold_review rules have documented blocking conditions.**
 6. **All rules have a reason and nextAction.**
 7. **Connector runtime is design-only in v7.27.** No real execution, no external tool control, no DB write.
+
+## v7.27 Final Seal Status
+
+**v7.27.0 Final Seal: READY** (commit `8f8242a`)
+- Runtime Preview Trilogy complete
+- All routes hidden direct, not in sidebar
+- All high-risk items blocked
+- Permission Evaluator unchanged
+
+## v7.28 Governance Blueprint Reference
+
+v7.28.0-D1 governance blueprint docs do NOT change the permission matrix:
+- No new permission decisions
+- No changes to existing allow/deny/hold_review decisions
+- All v7.28 docs design-only|

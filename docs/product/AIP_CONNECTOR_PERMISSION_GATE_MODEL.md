@@ -103,3 +103,14 @@ Gate Model (设计阶段)
 | audit_log_gate | 是 (持久化需要 DB) | 设计阶段 |
 | rollback_gate | 是 | 设计阶段 |
 | stage_c_gate | 自身 | 始终 deny |
+
+## 6. v7.27 Final Seal Status
+
+**v7.27.0 Final Seal: READY** (commit `8f8242a`)
+- Gate model validated against Permission Evaluator Registry
+- All gates correctly reflect design-only status
+- No gate implementation added
+
+## 7. v7.28 Governance Blueprint Reference
+
+v7.28.0-D1 defines new gate relationships in `AIP_RUNTIME_GOVERNANCE_STATE_MACHINE.md` and `AIP_RUNTIME_API_CONTRACT_SPEC.md`. These remain design-only. No gate is implemented, executed, or enforced in v7.28.|

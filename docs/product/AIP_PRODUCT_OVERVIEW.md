@@ -49,6 +49,28 @@ v7.27 introduces connector runtime boundary design — runtime not implemented. 
 
 All v7.27 work is **design-only**. No runtime implementation, no external tool control, no DB write, no Stage C.
 
+## v7.27 Final Seal
+
+v7.27.0 is sealed at commit `8f8242a` with Runtime Preview Trilogy complete:
+- Runtime Registry Preview: 25 targets, hidden direct ✓
+- Dry-run Plan Preview: 16 plans, hidden direct ✓
+- Audit Log Preview: 18 events, hidden direct ✓
+- All validators: blocking=0 ✓
+- All routes: hidden direct, not in sidebar ✓
+
+## v7.28 Runtime Governance Blueprint
+
+v7.28.0-D1 adds 7 design-only governance docs:
+- `AIP_RUNTIME_GOVERNANCE_STATE_MACHINE.md` — State machine design
+- `AIP_RUNTIME_API_CONTRACT_SPEC.md` — API contract (no implementation)
+- `AIP_HUMAN_APPROVAL_WORKFLOW_SPEC.md` — Approval workflow design
+- `AIP_RUNTIME_EVIDENCE_SCHEMA_SPEC.md` — Evidence schema design
+- `AIP_RUNTIME_ROLLBACK_IDEMPOTENCY_SPEC.md` — Rollback/idempotency design
+- `AIP_STAGE_C_READINESS_CHECKLIST.md` — Stage C preconditions
+- `AIP_V7_28_ROADMAP.md` — v7.28 roadmap
+
+All v7.28 work remains **design-only**. No implementation, no external tool control, no DB write, no Stage C.
+
 ## Target Consumers
 
 - Internal audits and seal reviews

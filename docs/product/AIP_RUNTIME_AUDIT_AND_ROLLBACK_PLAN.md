@@ -126,3 +126,25 @@ DB 写入操作必须：
 | Rollback 引擎 | 未实现 | v7.27-D1 | 待定 |
 | DB 事务日志 | 未实现 | 待定 | Stage C 后 |
 | 外部工具审计 | 未实现 | 待定 | Stage C 后 |
+| Governance State Machine | 未实现 | v7.28-D1 设计 | 否 |
+| API Contract Spec | 未实现 | v7.28-D1 设计 | 否 |
+| Human Approval Workflow | 未实现 | v7.28-D1 设计 | 否 |
+| Evidence Schema | 未实现 | v7.28-D1 设计 | 否 |
+
+## 10. v7.27 Final Seal Status
+
+**v7.27.0 Final Seal: READY** (commit `8f8242a`)
+- Audit Log UI Preview (P3): 18 items, writeNow=0 ✓
+- All audit/rollback items correctly gated ✓
+- No audit logger, no rollback executor, no DB write
+
+## 11. v7.28 Governance Blueprint References
+
+v7.28.0-D1 adds 5 audit/rollback-related design docs:
+- `AIP_RUNTIME_ROLLBACK_IDEMPOTENCY_SPEC.md` — rollback/idempotency design
+- `AIP_RUNTIME_EVIDENCE_SCHEMA_SPEC.md` — evidence schema design
+- `AIP_HUMAN_APPROVAL_WORKFLOW_SPEC.md` — approval workflow design
+- `AIP_RUNTIME_API_CONTRACT_SPEC.md` — API contracts including audit endpoints
+- `AIP_RUNTIME_GOVERNANCE_STATE_MACHINE.md` — state machine for audit transitions
+
+All are design-only. No audit log write, no rollback execution, no DB write.|
