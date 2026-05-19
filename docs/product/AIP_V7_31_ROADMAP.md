@@ -140,3 +140,13 @@ Each phase requires human project owner approval before proceeding. Phases can b
 ## 6. Next Step Recommendation
 
 **Recommended:** v7.31.0-D2 Backend Readonly API Human Review Pack — prepare a human review pack presenting the D1 blueprints for project owner review before any implementation work begins.
+
+## v7.31-D2 Human Review Pack
+
+- **Status:** PENDING_HUMAN_OWNER_REVIEW
+- **P1 skeleton:** Not yet approved
+- **Backend endpoint:** NOT implemented (human review pack only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created

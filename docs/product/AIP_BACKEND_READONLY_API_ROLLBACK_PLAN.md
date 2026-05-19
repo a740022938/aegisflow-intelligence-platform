@@ -68,3 +68,13 @@ After rollback, the following must be confirmed:
 ## Note
 
 This document **defines the rollback plan only**. No rollback is performed in this phase. No git mutation is executed. This plan is for future implementation use.
+
+## v7.31-D2 Human Review Pack
+
+- **Status:** PENDING_HUMAN_OWNER_REVIEW
+- **P1 skeleton:** Not yet approved
+- **Backend endpoint:** NOT implemented (human review pack only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created

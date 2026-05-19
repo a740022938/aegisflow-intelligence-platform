@@ -181,3 +181,13 @@ The Runtime API v1 contract has been frozen (v1.freeze) in v7.30.0-D2. The contr
 - **DB write:** Not performed
 - **External control:** Not enabled
 - **Tag/Release:** Not created
+
+## v7.31-D2 Human Review Pack
+
+- **Status:** PENDING_HUMAN_OWNER_REVIEW
+- **P1 skeleton:** Not yet approved
+- **Backend endpoint:** NOT implemented (human review pack only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created

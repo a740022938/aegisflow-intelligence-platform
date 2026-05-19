@@ -78,3 +78,13 @@ This document is an **implementation blueprint only**. It defines what *could* b
 - Does NOT create API server instances
 - Does NOT start any service
 - Does NOT modify package.json or lock files
+
+## v7.31-D2 Human Review Pack
+
+- **Status:** PENDING_HUMAN_OWNER_REVIEW
+- **P1 skeleton:** Not yet approved
+- **Backend endpoint:** NOT implemented (human review pack only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created

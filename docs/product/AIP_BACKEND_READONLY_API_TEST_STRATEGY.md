@@ -80,3 +80,13 @@
 ## Note
 
 This document **defines the test strategy only**. No test code is created in this phase. Tests will be implemented as part of the future backend implementation task.
+
+## v7.31-D2 Human Review Pack
+
+- **Status:** PENDING_HUMAN_OWNER_REVIEW
+- **P1 skeleton:** Not yet approved
+- **Backend endpoint:** NOT implemented (human review pack only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created

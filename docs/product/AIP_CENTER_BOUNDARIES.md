@@ -127,3 +127,13 @@ v7.30.0-P2/P3/P4 adds 3 new hidden direct centers:
 - **DB write:** Not performed
 - **External control:** Not enabled
 - **Tag/Release:** Not created
+
+## v7.31-D2 Human Review Pack
+
+- **Status:** PENDING_HUMAN_OWNER_REVIEW
+- **P1 skeleton:** Not yet approved
+- **Backend endpoint:** NOT implemented (human review pack only)
+- **Stage C:** Permanently disabled
+- **DB write:** Not performed
+- **External control:** Not enabled
+- **Tag/Release:** Not created
