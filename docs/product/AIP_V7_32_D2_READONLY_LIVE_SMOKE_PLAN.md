@@ -1,8 +1,8 @@
 # AIP v7.32.0-D2 Readonly Live Smoke Plan
 
 > **Date:** 2026-05-20
-> **Status:** Plan only — no smoke executed
-> **Prerequisite:** Human-approved restart completed
+> **Status:** SMOKE EXECUTED AND PASSED (P1).
+> See `docs/product/AIP_V7_32_P1_CONTROLLED_LIVE_SMOKE_REPORT.md` for full results.
 
 ## 1. Smoke Scope (Allowed)
 

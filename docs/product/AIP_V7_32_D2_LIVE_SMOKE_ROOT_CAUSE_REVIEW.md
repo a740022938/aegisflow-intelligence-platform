@@ -1,7 +1,8 @@
 # AIP v7.32.0-D2 Live Smoke Root Cause Review
 
 > **Date:** 2026-05-20
-> **Status:** Root cause identified — stale server, human restart required
+> **Status:** ROOT CAUSE CONFIRMED AND RESOLVED by human-approved restart (P1).
+> See `docs/product/AIP_V7_32_P1_CONTROLLED_LIVE_SMOKE_REPORT.md` for smoke results.
 
 ## 1. Current State
 
