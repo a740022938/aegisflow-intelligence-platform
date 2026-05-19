@@ -1,5 +1,13 @@
 # AIP Validation and Seal Process
 
+## Current Seal Status
+
+| Seal | Status |
+|------|--------|
+| v7.29 Final Seal | V7_29_FINAL_SEAL_READY |
+| v7.30 Final Seal | V7_30_FINAL_SEAL_READY |
+| **v7.31 Final Seal** | **V7_31_FINAL_SEAL_READY_WITH_LIVE_SMOKE_DEFERRED** |
+
 ## Pre-Commit Validation Gates
 
 Before any commit, all gates must pass:

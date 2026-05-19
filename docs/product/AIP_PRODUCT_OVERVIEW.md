@@ -3,12 +3,12 @@
 ## Identity
 
 - **Product Name:** AegisFlow (AIP)
-- **Current Version:** v7.25.2
-- **Build Date:** 2026.05.19
-- **Seal Status:** Final Seal Candidate (v7.29 V7_29_FINAL_SEAL_READY)
+- **Current Version:** v7.31.0
+- **Build Date:** 2026.05.20
+- **Seal Status:** V7_31_FINAL_SEAL_READY_WITH_LIVE_SMOKE_DEFERRED
 - **Safety Mode:** Readonly-first
 - **Stage C:** Disabled (permanently)
-- **Latest Phase:** v7.30.0-P2/P3/P4 Runtime Contract Acceleration Pack
+- **Latest Phase:** v7.31.0 Final Seal Recheck + v7.32.0-D1 Productization Blueprint
 
 ## Architecture
 

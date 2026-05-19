@@ -1,8 +1,10 @@
 # AIP v7.31 Roadmap
 
-> **Roadmap Version:** v7.31.0-P1 (updated)
+> **Roadmap Version:** v7.31.0-final (updated)
 > **Date:** 2026-05-20
+> **Status:** V7_31_FINAL_SEAL_READY_WITH_LIVE_SMOKE_DEFERRED
 > **Previous:** v7.30.0 Final Seal (V7_30_FINAL_SEAL_READY)
+> **Next:** v7.32.0-D1 Readonly Runtime API Productization Blueprint
 > **Scope:** Backend Readonly API Implementation Blueprint
 
 ## 1. Roadmap Principles

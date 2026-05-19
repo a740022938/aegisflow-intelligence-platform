@@ -33,6 +33,8 @@ export type NavigationExposureGate =
   | 'stage_c_disabled'
   | 'human_approval_required'
   | 'readonly_only'
+  | 'get_only'
+  | 'no_post'
   | 'feature_flag_required'
   | 'no_external_control'
   | 'no_db_write'
