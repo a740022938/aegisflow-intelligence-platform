@@ -153,6 +153,15 @@ const GovernanceConsoleDecisionPanelPreview: React.FC = () => {
         <a href="/governance-console-risk-dashboard-preview" style={{ padding: '8px 16px', background: 'var(--bg-secondary)', borderRadius: 6, border: '1px solid var(--border-color)', color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }}>← Risk Dashboard</a>
         <a href="/governance-console-report-pack-preview" style={{ padding: '8px 16px', background: 'var(--bg-secondary)', borderRadius: 6, border: '1px solid var(--border-color)', color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }}>Report Pack →</a>
       </div>
+      <div style={{ marginTop: 16, padding: 12, background: 'rgba(59, 130, 246, 0.05)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>P1 Readonly Status API Preview Next Step</div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          The P1 Runtime Readonly Status API Preview is now available as a hidden direct contract viewer.
+          <a href="/runtime-readonly-status-api-preview" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 4 }} target="_blank" rel="noreferrer">
+            Open Preview →
+          </a>
+        </div>
+      </div>
     </PageShell>
   );
 };

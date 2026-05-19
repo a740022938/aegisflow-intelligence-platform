@@ -49,7 +49,9 @@ export type NavigationExposureGate =
   | 'no_execution'
   | 'no_risk_execution'
   | 'no_decision_execution'
-  | 'no_report_export';
+  | 'no_report_export'
+  | 'no_backend_endpoint'
+  | 'no_api_call';
 
 export interface NavigationExposureEntry {
   id: string;
@@ -1138,6 +1140,23 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     reason: 'Placeholder page not in navigation. External reference.',
     allowedNow: false,
     source: 'route',
+  },
+
+  // Runtime Readonly Status API Preview (hidden route, not in sidebar)
+  {
+    id: 'runtime-readonly-status-api-preview',
+    path: '/runtime-readonly-status-api-preview',
+    label: 'Runtime Readonly Status API Preview',
+    component: 'RuntimeReadonlyStatusApiPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly runtime status API contract preview page. Shows endpoint catalog, schema board, mock responses, gate model, error model, and validator summary. Not added to left menu. No backend endpoint, no API call, no DB write, no external control, no Stage C.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.30.0-P1 added as hidden direct-route. Not in sidebar. Readonly contract preview only. No real API endpoint implementation.',
   },
 ];
 

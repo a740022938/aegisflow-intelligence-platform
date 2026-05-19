@@ -1,18 +1,19 @@
 # AIP Runtime Readonly Status API Design
 
-> **Design Version:** v0.1-draft
-> **AIP Baseline:** v7.30.0-D2
+> **Design Version:** v0.2-preview
+> **AIP Baseline:** v7.30.0-P1
 > **Date:** 2026-05-19
-> **Status:** design-only — no backend implementation
+> **Status:** frontend preview implemented — no backend implementation
 
 ## 1. Design Purpose
 
-This document provides a design sketch for a future P1 Readonly Status API. The purpose is to:
+This document provides a design sketch for the P1 Runtime Readonly Status API Preview. The purpose is to:
 
 - Define the readonly boundary for runtime status queries
 - Establish response shapes for status, readiness, gates, and blockers
 - Provide a reference for frontend preview development
 - Document what is explicitly disallowed in readonly mode
+- P1 frontend preview implemented at `/runtime-readonly-status-api-preview`
 
 ## 2. Readonly Boundary
 
@@ -200,3 +201,21 @@ See AIP_RUNTIME_API_GATE_AND_PERMISSION_MODEL.md for complete gate definitions.
 - No database connection is established
 - No external API is called
 - No authentication/authorization implementation is included
+
+## 10. P1 Frontend Preview Implementation
+
+The v7.30.0-P1 frontend preview implements:
+
+| Aspect | Value |
+|--------|-------|
+| Route | `/runtime-readonly-status-api-preview` |
+| Component | `RuntimeReadonlyStatusApiPreview` (9-section UI) |
+| Registry | `runtime-readonly-status-api-registry.ts` (12 endpoints) |
+| Validator | `runtime-readonly-status-api-validator.ts` (7 validation groups) |
+| Permission evaluator entry | `pe-runtime-readonly-status-api-preview` |
+| Center access entry | `runtime-readonly-status-api-preview` |
+| Navigation exposure entry | `runtime-readonly-status-api-preview` |
+| Governance console sync | 4 pages updated with links/snapshots |
+| Traceability sync | 4 pages updated with readonly links |
+
+All P1 work is **readonly static frontend**. No backend endpoint, no API call, no DB write, no external control, no Stage C.

@@ -23,7 +23,7 @@
 | Memory Hub Readonly | allow_sidebar_visible | low | info | preview_only | Yes |
 | OpenAxiom Readonly | allow_sidebar_visible | low | info | preview_only | Yes |
 
-## Hidden Direct / Internal Preview (4 targets)
+## Hidden Direct / Internal Preview (5 targets)
 
 | Target | Decision | Risk | Severity | Stage | Allowed Now |
 |--------|----------|------|----------|-------|-------------|
@@ -33,6 +33,7 @@
 | Governance State Machine Preview | allow_hidden_direct | low | info | preview_only | Yes |
 | Evidence Schema Preview | allow_hidden_direct | low | info | preview_only | Yes |
 | Rollback Preview | allow_hidden_direct | low | info | preview_only | Yes |
+| Runtime Readonly Status API Preview | allow_hidden_direct | medium | info | preview_only | Yes |
 
 ## Hold Review (3 targets)
 

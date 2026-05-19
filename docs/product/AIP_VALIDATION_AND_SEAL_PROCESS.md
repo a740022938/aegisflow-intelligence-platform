@@ -61,6 +61,22 @@ Seal: vX.Y.Z build YYYY.MM.DD
 Blocking: 0  Warning: 0  Info: 0
 ```
 
+## v7.30.0-P1 Runtime Readonly Status API Preview
+
+P1 validated with:
+
+| Check | Result |
+|-------|--------|
+| Registry completeness | 12 endpoints (8 GET + 4 POST) |
+| No sidebar mutation | hidden direct route, not in sidebar |
+| No backend endpoint | no apps/local-api modified |
+| No API call | static registry only |
+| No DB write | no database mutation |
+| No external control | all external control blocked |
+| Stage C gated | all endpoints report stageCRequired accurately |
+| Readonly-first | pure static registry + validator |
+| Hidden direct route | confirmed not in sidebar |
+
 ## v7.27.0 Final Seal Decision
 
 **Verdict: READY** (commit `8f8242a`, 2026-05-19)

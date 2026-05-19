@@ -232,6 +232,8 @@ export default function PermissionEvaluatorPreview() {
             {/* Governance Console Traceability */}
             <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
               - Governance Console: Permission evaluator is aggregated in Governance Console at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
+              <br />
+              - Runtime Readonly Status API Preview: Runtime Status API contract viewer with gateway and error model at <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>/runtime-readonly-status-api-preview</a> (hidden direct, readonly, not in sidebar)
             </div>
           </>
         );

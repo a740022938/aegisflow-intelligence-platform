@@ -171,6 +171,15 @@ const GovernanceConsoleReportPackPreview: React.FC = () => {
         <a href="/governance-console-risk-dashboard-preview" style={{ padding: '8px 16px', background: 'var(--bg-secondary)', borderRadius: 6, border: '1px solid var(--border-color)', color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }}>← Risk Dashboard</a>
         <a href="/governance-console-decision-panel-preview" style={{ padding: '8px 16px', background: 'var(--bg-secondary)', borderRadius: 6, border: '1px solid var(--border-color)', color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }}>← Decision Panel</a>
       </div>
+      <div style={{ marginTop: 16, padding: 12, background: 'rgba(59, 130, 246, 0.05)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>API Contract Section — Report Preview</div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          Runtime API Contract v1.freeze: 12 endpoints (8 GET contract_only, 4 POST not_implemented).
+          <a href="/runtime-readonly-status-api-preview" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 4 }} target="_blank" rel="noreferrer">
+            View Full Contract →
+          </a>
+        </div>
+      </div>
     </PageShell>
   );
 };

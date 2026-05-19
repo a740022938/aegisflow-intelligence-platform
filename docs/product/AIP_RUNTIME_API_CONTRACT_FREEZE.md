@@ -42,7 +42,7 @@ The following are explicitly out of scope for this contract freeze:
 | Stage C | disabled |
 | External control | blocked |
 | Mock server | not implemented |
-| Frontend preview | readonly UI pages exist (hidden direct) |
+| Frontend preview | P1 readonly preview page created (hidden direct, no backend) |
 
 ## 4. Contract Version
 
@@ -323,10 +323,29 @@ Before any endpoint in this contract can be implemented:
 9. Rollback executor implementation — required for any endpoint with rollbackRequired=true
 10. Human approval queue implementation — required for any endpoint with humanApprovalRequired=true
 
-## 10. Contract Boundary Enforcement
+## 10. Frontend Preview (v7.30.0-P1)
+
+A frontend-only readonly preview page has been implemented:
+
+| Aspect | Value |
+|--------|-------|
+| Route | `/runtime-readonly-status-api-preview` |
+| Component | `RuntimeReadonlyStatusApiPreview` |
+| Registry | `runtime-readonly-status-api-registry.ts` (12 endpoints) |
+| Validator | `runtime-readonly-status-api-validator.ts` |
+| Type | Hidden direct route (not in sidebar) |
+| Safety | No backend endpoint, no API call, no DB write, no external control, no Stage C |
+
+The preview page displays:
+- Endpoint catalog with status badges (GET contract_only / POST not_implemented)
+- Schema board, mock responses, gate model, error model
+- Permissions model, implementation freeze checklist, validator summary
+
+## 11. Contract Boundary Enforcement
 
 - This document is a contract freeze — it does not implement any endpoint
 - No backend code shall be written against this contract without a dedicated implementation task
 - No mock server shall be deployed based on this contract without human approval
 - This contract freeze does not modify apps/local-api, package.json, or any lock files
 - This contract freeze does not enable Stage C, DB write, or external control
+- The v7.30.0-P1 frontend preview is a readonly static page, not a backend endpoint

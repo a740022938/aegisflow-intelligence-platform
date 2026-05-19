@@ -8,7 +8,7 @@
 - **Seal Status:** Final Seal Candidate (v7.29 V7_29_FINAL_SEAL_READY)
 - **Safety Mode:** Readonly-first
 - **Stage C:** Disabled (permanently)
-- **Latest Phase:** v7.30.0-D2 Runtime API Contract Freeze
+- **Latest Phase:** v7.30.0-P1 Runtime Readonly Status API Preview
 
 ## Architecture
 
@@ -48,6 +48,19 @@ v7.28.0-P1 adds a readonly Governance State Machine Preview with:
 - **3 registry syncs** — permission-evaluator-registry, navigation-exposure-registry, center-access-registry
 
 All P1 work is **readonly preview**. No state transitions, no approval processing, no DB write, no external control, no Stage C.
+
+## Runtime Readonly Status API Preview (v7.30.0-P1)
+
+v7.30.0-P1 adds a readonly Runtime Status API contract preview page:
+
+- **Runtime Status API Registry** — 12 endpoints (8 GET contract_only + 4 POST not_implemented)
+- **Runtime Status API Validator** — 7 validation groups (blocking/warning/info)
+- **RuntimeReadonlyStatusApiPreview page** — `/runtime-readonly-status-api-preview` (hidden direct, 9 sections)
+- **4 Governance Console syncs** — Console, Risk Dashboard, Decision Panel, Report Pack
+- **4 traceability syncs** — RuntimeRegistry, PermissionEvaluator, AdvancedMode, ConnectorCenter
+- **3 registry syncs** — permission-evaluator, navigation-exposure, center-access
+
+All P1 work is **readonly static frontend**. No backend endpoint, no API call, no DB write, no external control, no Stage C.
 
 ## Connector Runtime Design (v7.27.0-D1)
 

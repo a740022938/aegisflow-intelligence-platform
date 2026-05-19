@@ -14,6 +14,7 @@
 | Governance Center | hidden_direct | hold_review | medium | No |
 | Navigation Preview | hidden_direct | allow_hidden_direct | low | No |
 | Governance State Machine Preview | hidden_direct | keep_direct_route | low | Yes |
+| Runtime Readonly Status API Preview | hidden_direct | keep_hidden_direct | medium | Yes |
 
 ## Boundary Rules
 
@@ -32,6 +33,7 @@
 | Governance Center | 13 governance modules | 12 gates | Deferred |
 | Navigation Preview | Audit-only readout | No menu change | Disabled |
 | Governance State Machine Preview | 7 states, 18 transitions | 11 validator checks | Disabled |
+| Runtime Readonly Status API Preview | 12 endpoints, 9-section UI | 7 validator groups | Disabled |
 
 ## Connector Runtime Design Boundaries (v7.27.0-D1)
 

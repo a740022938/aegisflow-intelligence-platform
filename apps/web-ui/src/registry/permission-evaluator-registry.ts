@@ -640,6 +640,26 @@ export const PERMISSION_EVALUATION_RULES: PermissionEvaluationRule[] = [
     reason: 'Database write is permanently denied in readonly mode. All current operations are dry-run/synthetic only.',
     nextAction: 'Keep denied. Do not allow DB writes in readonly mode.',
   },
+  {
+    id: 'pe-runtime-readonly-status-api-preview',
+    targetKind: 'page',
+    targetId: 'runtime-readonly-status-api-preview',
+    label: 'Runtime Readonly Status API Preview',
+    currentExposure: 'direct_route',
+    recommendedDecision: 'allow_hidden_direct',
+    risk: 'medium',
+    severity: 'info',
+    enforcementStage: 'preview_only',
+    targetCenter: 'internal',
+    evidenceSource: 'registry',
+    uiSurface: 'hidden_route',
+    allowedNow: true,
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    blockingConditions: ['Readonly only', 'No backend endpoint', 'No API call', 'No DB write', 'No external control', 'Stage C disabled'],
+    requiredEvidence: ['validator_summary', 'registry_snapshot'],
+    reason: 'Runtime Readonly Status API Preview is readonly. Displays API contract catalog, schema board, mock responses, gate model, and error model. No backend endpoint, no API call, no DB write, no external control, no Stage C.',
+    nextAction: 'Keep hidden direct. Do not add to sidebar. Do not implement backend endpoint.',
+  },
 ];
 
 export function getPermissionEvaluationRuleCount(): number {

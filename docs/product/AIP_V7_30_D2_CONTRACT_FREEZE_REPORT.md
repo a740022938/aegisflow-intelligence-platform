@@ -130,11 +130,31 @@ Options (in recommended order):
 4. **v7.30.0 Documentation Polish** — Clean up all documentation
 5. **Stop and wait for human review** — Pause for project owner decision
 
-## 11. Commit
+## 11. P1 Completion
+
+AIP v7.30.0-P1 (Runtime Readonly Status API Preview) has been completed following D2:
+
+| Aspect | Value |
+|--------|-------|
+| Preview page | `RuntimeReadonlyStatusApiPreview` at `/runtime-readonly-status-api-preview` |
+| Registry | `runtime-readonly-status-api-registry.ts` (12 endpoints) |
+| Validator | `runtime-readonly-status-api-validator.ts` |
+| Registry syncs | permission-evaluator, navigation-exposure, center-access |
+| Governance console sync | 4 pages (Console, Risk Dashboard, Decision Panel, Report Pack) |
+| Traceability sync | 4 pages (RuntimeRegistry, PermissionEvaluator, AdvancedMode, ConnectorCenter) |
+| P1 doc | `AIP_RUNTIME_READONLY_STATUS_API_PREVIEW.md` |
+| Backend endpoint | NOT implemented |
+| API call | NOT made |
+| DB write | NOT performed |
+| Stage C | NOT enabled |
+| Sidebar entry | NOT added |
+| Route type | Hidden direct (not in sidebar) |
+
+## 12. Commit
 
 | Field | Value |
 |-------|-------|
-| Commit message | docs(runtime): freeze runtime api contract and readonly status design |
+| Commit message | feat(runtime): add readonly status api preview page with registry and validator |
 | Tag | NO |
 | GitHub Release | NO |
 | Push | origin/main |

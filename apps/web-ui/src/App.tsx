@@ -53,6 +53,7 @@ const GovernanceConsolePreview = lazy(() => import('./pages/GovernanceConsolePre
 const GovernanceConsoleRiskDashboardPreview = lazy(() => import('./pages/GovernanceConsoleRiskDashboardPreview'));
 const GovernanceConsoleDecisionPanelPreview = lazy(() => import('./pages/GovernanceConsoleDecisionPanelPreview'));
 const GovernanceConsoleReportPackPreview = lazy(() => import('./pages/GovernanceConsoleReportPackPreview'));
+const RuntimeReadonlyStatusApiPreview = lazy(() => import('./pages/RuntimeReadonlyStatusApiPreview'));
 
 function RouteFallback() {
   return (
@@ -170,6 +171,7 @@ const App: React.FC = () => {
             <Route path="governance-console-risk-dashboard-preview" element={<GovernanceConsoleRiskDashboardPreview />} />
             <Route path="governance-console-decision-panel-preview" element={<GovernanceConsoleDecisionPanelPreview />} />
             <Route path="governance-console-report-pack-preview" element={<GovernanceConsoleReportPackPreview />} />
+            <Route path="runtime-readonly-status-api-preview" element={<RuntimeReadonlyStatusApiPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

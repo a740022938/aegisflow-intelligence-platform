@@ -166,6 +166,15 @@ const GovernanceConsoleRiskDashboardPreview: React.FC = () => {
         <a href="/governance-console-decision-panel-preview" style={{ padding: '8px 16px', background: 'var(--bg-secondary)', borderRadius: 6, border: '1px solid var(--border-color)', color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }}>Decision Panel →</a>
         <a href="/governance-console-report-pack-preview" style={{ padding: '8px 16px', background: 'var(--bg-secondary)', borderRadius: 6, border: '1px solid var(--border-color)', color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }}>Report Pack →</a>
       </div>
+      <div style={{ marginTop: 16, padding: 12, background: 'rgba(59, 130, 246, 0.05)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>API Contract Risk Reference</div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          v7.30.0-D2 contract freeze v1.freeze — 12 endpoints defined.
+          <a href="/runtime-readonly-status-api-preview" style={{ color: 'var(--accent)', textDecoration: 'none', marginLeft: 4 }} target="_blank" rel="noreferrer">
+            Open Runtime Readonly Status API Preview →
+          </a>
+        </div>
+      </div>
     </PageShell>
   );
 };

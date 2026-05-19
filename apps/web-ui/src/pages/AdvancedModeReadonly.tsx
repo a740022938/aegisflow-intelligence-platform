@@ -1720,6 +1720,8 @@ export default function AdvancedModeReadonly() {
       {/* Governance Console Traceability */}
       <div style={{ marginTop: 16, padding: '10px 14px', borderRadius: 6, background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)', fontSize: 11, color: 'var(--text-secondary)' }}>
         - Governance Console: Aggregated readiness view available at <a href="/governance-console-preview" style={{ color: '#22C55E' }}>/governance-console-preview</a> (hidden direct, readonly, not in sidebar)
+        <br />
+        - Runtime Readonly Status API Preview: View contract catalog, schema board, and mock responses at <a href="/runtime-readonly-status-api-preview" style={{ color: '#22C55E' }}>/runtime-readonly-status-api-preview</a> (hidden direct, readonly, not in sidebar)
       </div>
     </PageShell>
   );

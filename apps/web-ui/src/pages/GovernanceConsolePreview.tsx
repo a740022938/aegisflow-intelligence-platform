@@ -396,6 +396,11 @@ const GovernanceConsolePreview: React.FC = () => {
           <div style={{ marginTop: 8, padding: '8px 12px', background: 'rgba(34, 197, 94, 0.1)', borderRadius: 4, border: '1px solid rgba(34, 197, 94, 0.2)' }}>
             ✓ All 3 validators pass. All previews are readonly, hidden direct, not in sidebar. Stage C permanently disabled.
           </div>
+          <div style={{ marginTop: 8 }}>
+            <a href="/runtime-readonly-status-api-preview" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: 13 }} target="_blank" rel="noreferrer">
+              📋 P1 Runtime Readonly Status API Preview — View contract catalog, schema board, mock responses
+            </a>
+          </div>
         </div>
       </div>
     </PageShell>

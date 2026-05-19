@@ -16,7 +16,9 @@
 
 ## 2. Proposed Phases
 
-### D1: Runtime Implementation Readiness Final Audit (COMPLETED — this document set)
+### D1: Runtime Implementation Readiness Final Audit (COMPLETED)
+
+
 
 | Field | Value |
 |-------|-------|
@@ -71,7 +73,7 @@
 
 **Scope:** Polish Governance Console UI, add missing sections, improve readability, ensure all validators are displayed. No execution, no mutation.
 
-### P1: Runtime Readonly Status API Design
+### P1: Runtime Readonly Status API Preview (COMPLETED)
 
 | Field | Value |
 |-------|-------|
@@ -84,7 +86,20 @@
 | Risk | Low |
 | Commit policy | code-only (new preview page) |
 
-**Scope:** Design a readonly runtime status API preview page showing current runtime status, target availability, and gate status. No real runtime calls.
+**Scope:** Implemented a readonly runtime status API preview page at `/runtime-readonly-status-api-preview` with 12-endpoint catalog, schema board, mock responses, gate model, error model, permissions model, and validator summary. No real runtime calls, no backend endpoint.
+
+**New files created:**
+- `src/pages/RuntimeReadonlyStatusApiPreview.tsx` — 9-section readonly preview page
+- `src/registry/runtime-readonly-status-api-registry.ts` — Static endpoint catalog (12 endpoints)
+- `src/registry/runtime-readonly-status-api-validator.ts` — Validation checks (7 groups)
+- `docs/product/AIP_RUNTIME_READONLY_STATUS_API_PREVIEW.md` — Preview doc
+
+**Files modified:**
+- `src/App.tsx` — Added lazy import + route
+- 4 GovernanceConsole pages — Added links/snapshots
+- 4 traceability pages — Added readonly links
+- 3 registries — Added permission evaluator, navigation exposure, center access entries
+- 6 contract docs — Updated with P1 status references
 
 ### P2: Runtime Dry-run Contract Design
 
