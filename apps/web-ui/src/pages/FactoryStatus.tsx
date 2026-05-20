@@ -346,7 +346,7 @@ export default function FactoryStatus() {
         content: (
           <SectionCard className={`role-card ${roleClass('risk')}`} title={`阻塞 Gate (${timeRange})`} description="点击查看详情">
             {!Array.isArray(blocked_gates) || blocked_gates.length === 0 ? (
-              <div className="factory-empty-ok">✅ 无阻塞</div>
+              <div className="factory-empty-ok">无阻塞</div>
             ) : (
               <div className="factory-list-compact">
                 {blocked_gates.map((g: any) => (
@@ -367,7 +367,7 @@ export default function FactoryStatus() {
         content: (
           <SectionCard className={`role-card ${roleClass('risk')}`} title={`最近失败任务 (${timeRange})`} description="点击行查看根因详情">
             {!Array.isArray(recent_failures) || recent_failures.length === 0 ? (
-              <div className="factory-empty-ok">✅ 无失败</div>
+              <div className="factory-empty-ok">无失败</div>
             ) : (
               <div className="factory-list-compact">
                 {recent_failures.slice(0, 8).map((f: any) => (
@@ -416,7 +416,7 @@ export default function FactoryStatus() {
         content: (
           <SectionCard className={`role-card ${roleClass('risk')}`} title={`失败原因聚合 (${timeRange})`} description="点击查看任务">
             {!Array.isArray(failure_reasons) || failure_reasons.length === 0 ? (
-              <div className="factory-empty-ok">✅ 无失败</div>
+              <div className="factory-empty-ok">无失败</div>
             ) : (
               <div className="factory-list-tight">
                 {failure_reasons.map((f: any) => (
@@ -460,7 +460,7 @@ export default function FactoryStatus() {
         content: (
           <SectionCard className={`role-card ${roleClass('data')}`} title="备份记录" description={`${timeRange} 内`}>
             {!Array.isArray(recent_backups) || recent_backups.length === 0 ? (
-              <div className="factory-empty-warn">⚠️ 无备份记录</div>
+              <div className="factory-empty-warn">无备份记录</div>
             ) : (
               <div className="factory-list-compact">
                 {recent_backups.map((b: any) => (
@@ -568,9 +568,6 @@ export default function FactoryStatus() {
         <div className="factory-status-loading">加载中...</div>
       ) : shouldUseLayoutEditor ? (
         <div>
-          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-            layoutMode: react-grid-edit · contentWidth: {Math.round(contentWidth)}px
-          </div>
           <WorkspaceGrid
             editable={layoutEdit}
             layouts={layouts}
@@ -580,9 +577,6 @@ export default function FactoryStatus() {
         </div>
       ) : (
         <div>
-          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-            layoutMode: css-grid · contentWidth: {Math.round(contentWidth)}px
-          </div>
           <div className="factory-status-responsive-grid">
             {cards.map(c => (
               <div key={c.id} className="factory-status-grid-cell">
