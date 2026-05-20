@@ -1,6 +1,19 @@
 @echo off
 setlocal
 
+echo ╔══════════════════════════════════════════════════════════════╗
+echo ║   WARNING: This script will revert staged/worktree changes  ║
+echo ║   on 13 pre-seal repair files via 'git restore'.            ║
+echo ║   Unsaved changes will be LOST.                             ║
+echo ╚══════════════════════════════════════════════════════════════╝
+echo.
+
+set /p CONFIRM=Type CONFIRM to proceed: 
+if not "%CONFIRM%"=="CONFIRM" (
+  echo [rollback] Cancelled.
+  exit /b 0
+)
+
 set "REPO_ROOT=%~dp0.."
 cd /d "%REPO_ROOT%"
 

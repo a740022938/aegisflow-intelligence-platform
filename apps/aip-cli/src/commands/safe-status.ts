@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 function runGit(args: string): string {
   try {
-    return execSync(`git ${args}`, { encoding: 'utf8', stdio: 'pipe', cwd: 'E:\\AIP' }).trim();
+    return execSync(`git ${args}`, { encoding: 'utf8', stdio: 'pipe', cwd: process.cwd() }).trim();
   } catch {
     return 'unknown';
   }

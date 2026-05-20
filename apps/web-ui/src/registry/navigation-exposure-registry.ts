@@ -386,6 +386,12 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     allowedNow: true,
     source: 'layout',
   },
+  // ── DEFERRED: Sidebar exposure cleanup ──
+  // The 17 entries below have currentExposure: 'primary_nav' but their
+  // recommendedExposure differs (advanced_mode, governance_center, etc.).
+  // Full migration deferred to post-v7.47-RC. See AIP_V7_47_SIDEBAR_MIGRATION_TICKET.
+  // Status: acknowledged, not blocking pre-RC.
+  // ─────────────────────────────────────────
   {
     id: 'cost-routing',
     path: '/cost-routing',

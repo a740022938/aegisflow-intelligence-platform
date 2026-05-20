@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 function runGit(args: string): string {
   try {
-    return execSync(`git ${args}`, { encoding: 'utf8', stdio: 'pipe', cwd: 'E:\\AIP' }).trim();
+    return execSync(`git ${args}`, { encoding: 'utf8', stdio: 'pipe', cwd: process.cwd() }).trim();
   } catch {
     return 'unknown';
   }
@@ -19,7 +19,7 @@ export async function runWhere() {
   console.log('AIP Where');
   console.log('=========');
   console.log('');
-  console.log(`  AIP Home:       E:\\AIP`);
+  console.log(`  AIP Home:       ${process.cwd()}`);
   console.log(`  Branch:         ${branch}`);
   console.log(`  HEAD:           ${head}`);
   console.log(`  Working Tree:   ${workingTree}`);
