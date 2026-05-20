@@ -1513,6 +1513,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.44-P1 added as hidden direct-route. Not in sidebar. Readonly end-to-end operator flow preview. No enablement, no mutation, no POST.',
   },
+  {
+    id: 'operator-usability-drill-preview',
+    path: '/operator-usability-drill-preview',
+    label: 'Operator Usability Drill Preview',
+    component: 'OperatorUsabilityDrillPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled', 'no_post', 'no_execution', 'no_state_transition'],
+    reason: 'Readonly Operator Usability Drill Preview page. Shows 5 drill scenarios covering repair/memory/authorization. All items readonly. Stage C disabled. No sidebar. No POST. No DB write. No execution.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.44-P3 added as hidden direct-route. Not in sidebar. Readonly usability drill preview. No repair execution, no memory mutation, no authorization accepted.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {
