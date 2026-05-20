@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 /**
  * AGI Model Factory — Restore Script v2.6.0
- * Usage: node scripts/restore.mjs <backup.zip> [--dry-run]
+ * ⚠ WARNING: This is a legacy restore script. Use the new restore point system instead.
+ *
+ * Usage: node scripts/restore.mjs <backup.zip> [--dry-run] [--execute]
+ *
+ * Default mode: PLAN-ONLY (shows what would be done, does nothing).
+ * Pass --execute (and human confirmation) to perform real restore.
  */
+
+const PLAN_ONLY = !process.argv.includes('--execute') || process.argv.includes('--dry-run');
+
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
@@ -14,14 +22,39 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
 const REPO_ROOT  = path.resolve(__dirname, '..');
 
+if (!PLAN_ONLY) {
+  console.error('');
+  console.error('╔══════════════════════════════════════════════════════════════╗');
+  console.error('║   ⚠ WARNING: This is a legacy restore script.             ║');
+  console.error('║   Use the new restore point system instead.                ║');
+  console.error('║   Executing this script may overwrite files and write      ║');
+  console.error('║   to the database outside the safety system.               ║');
+  console.error('╚══════════════════════════════════════════════════════════════╝');
+  console.error('');
+
+  const readline = await import('node:readline');
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const answer = await new Promise(resolve => rl.question('Type CONFIRM to proceed with restore: ', resolve));
+  rl.close();
+  if (answer.trim() !== 'CONFIRM') {
+    console.error('Restore cancelled.');
+    process.exit(1);
+  }
+}
+
 const args = process.argv.slice(2);
-if (!args[0]) { console.error('Usage: node scripts/restore.mjs <backup.zip> [--dry-run]'); process.exit(1); }
+if (!args[0]) { console.error('Usage: node scripts/restore.mjs <backup.zip> [--dry-run] [--execute]'); process.exit(1); }
 
 const zipPath = path.resolve(args[0]);
-const dryRun  = args.includes('--dry-run');
+const dryRun  = PLAN_ONLY || args.includes('--dry-run');
 if (!fs.existsSync(zipPath)) { console.error('File not found: ' + zipPath); process.exit(1); }
 
-console.log('Restore: ' + zipPath + ' [' + (dryRun ? 'DRY RUN' : 'LIVE') + ']');
+console.log('Restore: ' + zipPath + ' [' + (dryRun ? 'PLAN-ONLY' : 'LIVE') + ']');
+
+if (PLAN_ONLY) {
+  console.log('\n⚠ Default mode is PLAN-ONLY. No files will be modified.');
+  console.log('  Pass --execute to perform a real restore (requires CONFIRM).');
+}
 
 const DB_DIR    = path.join(REPO_ROOT, 'packages', 'db');
 const SRC_DIR   = path.join(REPO_ROOT, 'apps', 'local-api', 'src');

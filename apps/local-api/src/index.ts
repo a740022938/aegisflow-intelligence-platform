@@ -282,16 +282,27 @@ app.register(swagger, {
 });
 app.register(swaggerUi, { routePrefix: '/docs', uiConfig: { docExpansion: 'list' } });
 
-// JWT 认证
-const JWT_SECRET = process.env.JWT_SECRET || 'aip-dev-jwt-secret-change-in-production';
+// JWT 认证 — fail closed if JWT_SECRET not configured (unless AIP_ALLOW_DEV_JWT=1)
+const JWT_SECRET = (() => {
+  const env = process.env.JWT_SECRET;
+  if (env && env.length >= 16) return env;
+  if (process.env.AIP_ALLOW_DEV_JWT === '1') {
+    console.warn('[WARN] JWT_SECRET not configured. Using dev fallback. Set JWT_SECRET in production.');
+    return 'aip-dev-jwt-secret-change-in-production';
+  }
+  console.error('[FATAL] JWT_SECRET environment variable not set. The API will not start without a JWT signing secret.');
+  console.error('[FATAL] Set JWT_SECRET to a secure random string (min 16 chars).');
+  console.error('[FATAL] For development only, set AIP_ALLOW_DEV_JWT=1 to bypass this check.');
+  process.exit(1);
+})();
 app.register(jwt, { secret: JWT_SECRET });
 authMiddleware(app);
 
 // 全局认证守卫: /api/* 路由除白名单外均需 JWT
 const PUBLIC_PATHS = new Set([
   '/api/health', '/api/comfy/health', '/api/db/ping', '/api/metrics', '/api/auth/login',
-  '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2', '/api/openclaw/master-switch',
-  '/api/openclaw/circuit/recover', '/api/openclaw/token', '/api/system/status', '/api/dashboard/summary',
+  '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2',
+  '/api/system/status', '/api/dashboard/summary',
   '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
   '/api/runtime/status', '/api/runtime/readiness', '/api/runtime/gates', '/api/runtime/blockers',
   '/api/stage-c/status',
@@ -618,46 +629,13 @@ app.get('/api/openclaw/master-switch', async (request: any, reply: any) => {
   };
 });
 
-app.post('/api/openclaw/master-switch', async (request: any, reply: any) => {
-  const body = request.body || {};
-  const enabled = !!body.enabled;
-  const actor = String(body.actor || 'system');
-  const reason = String(body.reason || '');
-  const autoCancel = !!body.auto_cancel_queued_on_disable;
-  const queuedCancelScope = body.queued_cancel_scope && typeof body.queued_cancel_scope === 'object'
-    ? body.queued_cancel_scope
-    : {};
-
-  const beforeRow = getOpenClawControlRow();
-  const beforeState = serializeOpenClawState(beforeRow);
-  const dbInstance = db.getDatabase();
-  dbInstance.prepare(`
-    UPDATE openclaw_control
-    SET enabled = ?, updated_at = ?, updated_by = ?, auto_cancel_queued_on_disable = ?, queued_cancel_scope_json = ?
-    WHERE id = 1
-  `).run(enabled ? 1 : 0, nowIso(), actor, autoCancel ? 1 : 0, JSON.stringify(queuedCancelScope || {}));
-  const afterRow = getOpenClawControlRow();
-  const afterState = serializeOpenClawState(afterRow);
-  writeOpenClawEvent(enabled ? 'master_switch_enable' : 'master_switch_disable', actor, reason, beforeState, afterState);
-  writeOpenClawAudit(enabled ? 'master_switch_enable' : 'master_switch_disable', 'openclaw_master_switch', 'success', {
-    actor,
-    reason,
-    before: beforeState,
-    after: afterState,
+// master-switch is blocked under Stage C disabled. Only GET status is allowed.
+app.post('/api/openclaw/master-switch', async (_request: any, reply: any) => {
+  return reply.code(403).send({
+    ok: false,
+    error: 'master-switch POST is disabled. Stage C is not enabled.',
+    stageCEnabled: false,
   });
-  const status = buildOpenClawStatus(afterRow);
-  return {
-    ok: true,
-    enabled: afterState.enabled,
-    message: afterState.enabled ? 'OpenClaw 执行层已开启' : 'OpenClaw 执行层已关闭',
-    switch: {
-      enabled: afterState.enabled,
-      status_text: afterState.enabled ? 'enabled' : 'disabled',
-      updated_at: afterState.updated_at,
-      updated_by: afterState.updated_by,
-    },
-    status,
-  };
 });
 
 app.post('/api/openclaw/heartbeat', async (request: any, reply: any) => {
@@ -691,7 +669,8 @@ app.post('/api/openclaw/heartbeat', async (request: any, reply: any) => {
   };
 });
 
-// P0-C: Set and persist heartbeat token (survives restart)
+// P0-C: Set and persist heartbeat token (survives restart).
+// Bootstrap bypass is removed — requires configured admin token or fails closed.
 app.post('/api/openclaw/token', async (request: any, reply: any) => {
   const body = request.body || {};
   const token = String(body.heartbeat_token || '').trim();
@@ -701,14 +680,9 @@ app.post('/api/openclaw/token', async (request: any, reply: any) => {
   if (!token && !adminToken) {
     return reply.code(400).send({ ok: false, error: 'heartbeat_token or admin_token required' });
   }
-  // Security:
-  // - Bootstrap: allow initializing admin token only when OPENCLAW_ADMIN_TOKEN is absent
-  // - Normal: require x-openclaw-admin-token to match configured admin token
-  const bootstrapInit = !expectedAdminToken && !!adminToken;
-  if (!bootstrapInit) {
-    if (!expectedAdminToken || providedAdminToken !== expectedAdminToken) {
-      return reply.code(403).send({ ok: false, error: 'unauthorized token update' });
-    }
+  // Require configured admin token for any token operation. No bootstrap bypass.
+  if (!expectedAdminToken || providedAdminToken !== expectedAdminToken) {
+    return reply.code(403).send({ ok: false, error: 'unauthorized token update' });
   }
   try {
     ensureOpenClawTables();
@@ -734,7 +708,7 @@ app.post('/api/openclaw/token', async (request: any, reply: any) => {
     return {
       ok: true,
       token_configured: true,
-      message: bootstrapInit ? 'Admin token bootstrapped and tokens saved' : 'Token saved and activated',
+      message: 'Token saved and activated',
     };
   } catch (err: any) {
     return reply.code(500).send({ ok: false, error: String(err?.message || err) });
