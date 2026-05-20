@@ -1498,6 +1498,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.43-P3 added as hidden direct-route. Not in sidebar. Readonly authorization review pack preview. No authorization granted or implied.',
   },
+  {
+    id: 'operator-end-to-end-flow-preview',
+    path: '/operator-end-to-end-flow-preview',
+    label: 'Operator End-to-End Flow Preview',
+    component: 'OperatorEndToEndFlowPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled', 'no_post', 'no_execution', 'no_state_transition'],
+    reason: 'Readonly Operator End-to-End Flow Preview page. Shows 10 flow steps connecting CLI to Web Console. All items readonly. Stage C disabled. No sidebar. No POST. No DB write. No execution.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.44-P1 added as hidden direct-route. Not in sidebar. Readonly end-to-end operator flow preview. No enablement, no mutation, no POST.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {
