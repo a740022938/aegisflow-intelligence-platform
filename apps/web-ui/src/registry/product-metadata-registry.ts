@@ -1,4 +1,4 @@
-export const AIP_PRODUCT_NAME = 'AegisFlow';
+export const AIP_PRODUCT_NAME = 'OpenAIP';
 export const AIP_PRODUCT_VERSION = 'v7.25.2';
 export const AIP_SEAL_STATUS = 'Final Seal Candidate';
 export const AIP_BUILD_DATE = '2026.05.19';
@@ -6,7 +6,7 @@ export const AIP_SAFETY_MODE = 'readonly-first';
 export const AIP_STAGE_C = 'disabled';
 
 export const AIP_PRODUCT_METADATA = {
-  productName: 'AegisFlow',
+  productName: 'OpenAIP',
   productVersion: 'v7.25.2',
   sealStatus: 'Final Seal Candidate',
   buildDate: '2026.05.19',

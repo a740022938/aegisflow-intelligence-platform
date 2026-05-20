@@ -114,7 +114,7 @@ export const translations = {
     // Dashboard
     dashboard: {
       title: '天枢驾驶舱',
-      subtitle: '天枢智治平台（AIP Community Edition）总览',
+      subtitle: '天枢智治平台（OpenAIP Community Edition）总览',
       factoryStatus: '工厂状态',
       runningTasks: '运行中任务',
       activeWorkflows: '活跃工作流',
@@ -274,8 +274,8 @@ export const translations = {
     },
     // Dashboard
     dashboard: {
-      title: 'AegisFlow Flight Deck',
-      subtitle: 'AegisFlow Intelligence Platform (AIP Community Edition) Overview',
+      title: 'OpenAIP Flight Deck',
+      subtitle: 'OpenAIP (AIP Community Edition) Overview',
       factoryStatus: 'Factory Status',
       runningTasks: 'Running Tasks',
       activeWorkflows: 'Active Workflows',
