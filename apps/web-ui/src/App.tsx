@@ -75,6 +75,7 @@ const StageCFeatureFlagControlPreview = lazy(() => import('./pages/StageCFeature
 const StageCFeatureFlagToggleTrialPreview = lazy(() => import('./pages/StageCFeatureFlagToggleTrialPreview'));
 const StageCFeatureFlagDryTrialPreview = lazy(() => import('./pages/StageCFeatureFlagDryTrialPreview'));
 const AipMemoryKnowledgePreview = lazy(() => import('./pages/AipMemoryKnowledgePreview'));
+const OperatorRuntimeReadinessConsolePreview = lazy(() => import('./pages/OperatorRuntimeReadinessConsolePreview'));
 
 function RouteFallback() {
   return (
@@ -214,6 +215,7 @@ const App: React.FC = () => {
             <Route path="stage-c-feature-flag-toggle-trial-preview" element={<StageCFeatureFlagToggleTrialPreview />} />
             <Route path="stage-c-feature-flag-dry-trial-preview" element={<StageCFeatureFlagDryTrialPreview />} />
             <Route path="aip-memory-knowledge-preview" element={<AipMemoryKnowledgePreview />} />
+            <Route path="operator-runtime-readiness-console-preview" element={<OperatorRuntimeReadinessConsolePreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

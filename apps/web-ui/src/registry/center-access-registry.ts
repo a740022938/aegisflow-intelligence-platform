@@ -15,7 +15,8 @@ export type CenterAccessKind =
   | 'rollback'
   | 'feature_flag_control'
   | 'feature_flag_toggle_trial'
-  | 'feature_flag_dry_trial';
+  | 'feature_flag_dry_trial'
+  | 'operator_readiness';
 
 export type CenterAccessStatus =
   | 'available_route'
@@ -1542,6 +1543,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     userImpact: 'Low — readonly dry trial preview page. No toggle, no mutation, no POST.',
     maturity: 'preview',
     owner: 'governance',
+  },
+  {
+    id: 'operator-runtime-readiness-console-preview',
+    name: 'Operator Runtime Readiness Console Preview',
+    kind: 'operator_readiness',
+    route: '/operator-runtime-readiness-console-preview',
+    status: 'hidden_direct',
+    risk: 'medium',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_stage_c', 'no_db_write', 'no_external_control', 'no_post_runtime', 'no_executor', 'no_connector_action'],
+    allowedActions: ['view_readiness_console'],
+    blockedActions: ['enable_stage_c', 'toggle_feature_flag', 'write_database', 'modify_sidebar', 'control_external_tools', 'execute_runtime', 'connector_action', 'restart_service', 'create_tag', 'create_release'],
+    requiredBeforeExposure: ['readonly_only', 'no_stage_c', 'no_db_write', 'validator_pass'],
+    releaseGate: [],
+    displayOrder: 999,
+    group: 'governance',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 90,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '操作者运行准备只读总控台', 'stage_c_disabled'],
+    description: 'Operator Runtime Readiness Console Preview — v7.42. 30项只读 readiness 条目。未入左侧菜单。hidden direct route。',
+    notes: 'v7.42-P1 Operator Runtime Readiness Console Preview。30 items，全部 readonly。不入 sidebar。不启用 Stage C。不写 DB。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'v7.42-P1 Operator Runtime Readiness Console Preview — readonly operator readiness aggregation. Keep hidden direct. Not in sidebar. Stage C disabled.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove route from App.tsx if needed.',
+    userImpact: 'Low — readonly operator readiness console. No enablement, no mutation, no POST.',
+    maturity: 'preview',
+    owner: 'operator',
   },
 ];
 

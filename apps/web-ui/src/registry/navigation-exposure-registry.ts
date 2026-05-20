@@ -1468,6 +1468,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.40-P3 added as hidden direct-route. Not in sidebar. Readonly dry trial preview. No toggle, no mutation, no POST.',
   },
+  {
+    id: 'operator-runtime-readiness-console-preview',
+    path: '/operator-runtime-readiness-console-preview',
+    label: 'Operator Runtime Readiness Console Preview',
+    component: 'OperatorRuntimeReadinessConsolePreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled', 'no_post', 'no_execution', 'no_state_transition'],
+    reason: 'Readonly Operator Runtime Readiness Console Preview page. Shows 30 registry items with validator across 8 categories. All items readonly, actionAllowed=false, mutationAllowed=false. Stage C disabled. No sidebar. No POST. No DB write. No execution.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.42-P1 added as hidden direct-route. Not in sidebar. Readonly operator readiness aggregation. No enablement, no mutation, no POST.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {
