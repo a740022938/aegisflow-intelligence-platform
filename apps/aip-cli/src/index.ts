@@ -13,6 +13,9 @@ import { runDoctor } from './commands/doctor.js';
 import { runConfig } from './commands/config.js';
 import { runGateway } from './commands/gateway.js';
 import { runRepair } from './commands/repair.js';
+import { runWhere } from './commands/where.js';
+import { runSafeStatus } from './commands/safe-status.js';
+import { runReceiptTemplate } from './commands/receipt.js';
 import { getCliVersion } from './version.js';
 import os from 'node:os';
 
@@ -83,6 +86,7 @@ function printCommandCenter() {
   console.log(helpCmd('aip logs api', '查看 API 日志'));
   console.log(helpCmd('aip logs web', '查看 Web UI 日志'));
   console.log(helpCmd('aip logs gateway', '查看 Gateway 日志'));
+  console.log(helpCmd('aip where', '查看项目位置与 Git 状态', 'safe'));
   console.log('');
 
   console.log(sectionDivider('[02] 项目检查 / Diagnostics'));
@@ -92,6 +96,7 @@ function printCommandCenter() {
   console.log(helpCmd('aip doctor encoding', '检查 Windows 中文编码与颜色支持'));
   console.log(helpCmd('aip doctor ports', '检查 8787 等端口占用'));
   console.log(helpCmd('aip doctor stage-c', '检查 Stage C 安全边界'));
+  console.log(helpCmd('aip safe-status', '查看安全状态摘要', 'safe'));
   console.log('');
 
   console.log(sectionDivider('[03] 配置管理 / Config'));
@@ -107,18 +112,9 @@ function printCommandCenter() {
   console.log(helpCmd('aip gateway stop', '停止 Gateway'));
   console.log(helpCmd('aip gateway restart', '重启 Gateway，需要人工确认', 'warn'));
   console.log(helpCmd('aip ml', '本机模型命令大全'));
-  console.log(helpCmd('aip ml status', '查看本机模型状态'));
   console.log('');
 
-  console.log(sectionDivider('[05] 开发验证 / Validation'));
-  console.log(helpCmd('aip check', '执行基础检查', 'safe'));
-  console.log(helpCmd('aip check full', 'typecheck + tests + build + diff check', 'safe'));
-  console.log(helpCmd('aip smoke', '执行 smoke tests', 'safe'));
-  console.log(helpCmd('aip smoke stage-c', '检查 Stage C readonly 状态', 'safe'));
-  console.log(helpCmd('aip seal status', '查看当前封板状态', 'safe'));
-  console.log('');
-
-  console.log(sectionDivider('[06] 修复系统 / Repair'));
+  console.log(sectionDivider('[05] 修复系统 / Repair'));
   console.log(helpCmd('aip repair', '只生成修复计划，不修改文件', 'safe'));
   console.log(helpCmd('aip repair check', '检查可修复项', 'safe'));
   console.log(helpCmd('aip repair plan', '生成修复计划', 'safe'));
@@ -127,11 +123,8 @@ function printCommandCenter() {
   console.log(helpCmd('aip repair source', '源码恢复，高风险，需要人工确认', 'warn'));
   console.log('');
 
-  console.log(sectionDivider('[07] Stage C 安全门 / Stage C Gate'));
-  console.log(helpCmd('aip stage-c status', '查看 Stage C 状态', 'safe'));
-  console.log(helpCmd('aip stage-c gate', '查看授权门状态', 'safe'));
-  console.log(helpCmd('aip stage-c auth-template', '生成授权文本模板', 'safe'));
-  console.log(helpCmd('aip stage-c smoke', '执行只读安全检查', 'safe'));
+  console.log(sectionDivider('[06] 系统工具 / Utilities'));
+  console.log(helpCmd('aip receipt template', '生成回执模板', 'safe'));
   console.log('');
 
   console.log(tipLine('Tips:'));
@@ -152,12 +145,14 @@ function printHelpFor(cmd: string) {
     health: 'aip health\n  检查 API 健康',
     open: 'aip open\n  打开 Web UI',
     version: 'aip version\n  查看版本信息',
+    where: 'aip where\n  查看项目位置与 Git 状态',
+    'safe-status': 'aip safe-status\n  查看安全状态（Stage C / 运行时 / 边界）',
     doctor: 'aip doctor [sub]\n  sub: env, encoding, ports, stage-c\n  一键诊断',
     config: 'aip config <init|get|set>\n  管理配置',
     gateway: 'aip gateway <start|stop|restart|status>\n  网关管理',
     ml: 'aip ml\n  本机模型命令大全',
     repair: 'aip repair [check|plan|command-pack|restore-point|source]\n  修复系统（plan-only）',
-    'stage-c': 'aip stage-c <status|gate|auth-template|smoke>\n  Stage C 安全门',
+    receipt: 'aip receipt template\n  生成回执模板',
   };
   const text = tips[cmd] || `未知命令: ${cmd}`;
   console.log(text);
@@ -200,6 +195,9 @@ async function main() {
     case 'config': await runConfig(sub, allArgs.filter(a => !a.startsWith('--')).slice(2)); break;
     case 'repair': await runRepair(sub, rest); break;
     case 'gateway': await runGateway(sub); break;
+    case 'where': await runWhere(); break;
+    case 'safe-status': await runSafeStatus(); break;
+    case 'receipt': await runReceiptTemplate(); break;
     case 'ml':
     case 'manual':
     case 'commands':
