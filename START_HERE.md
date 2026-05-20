@@ -21,7 +21,7 @@ AIP is a local-first AI governance and operations platform. It provides:
 | Field | Value |
 |-------|-------|
 | Current baseline | **AIP v7.47 P1** (based on v7.46 Final Seal) |
-| Git HEAD | (see `git log -1 --oneline`) |
+| Git HEAD | `3d5c9cf` (main) |
 | Stage C | **DISABLED** |
 | Feature flag | **OFF** |
 | Release status | **Pre-RC — not yet released or tagged** |
