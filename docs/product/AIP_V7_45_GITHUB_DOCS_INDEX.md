@@ -28,6 +28,10 @@
 | `AIP_V7_45_STAGE_C_SAFETY_NOTICE.md` | Stage C safety notice |
 | `AIP_V7_45_STAGE_C_DISABLED_RELEASE_POLICY.md` | Release policy with Stage C disabled |
 | `AIP_V7_45_ROADMAP.md` | v7.45 roadmap |
+| `AIP_V7_45_RESTORE_POINT_PACK_BLUEPRINT.md` | Restore point pack top-level design blueprint |
+| `AIP_V7_45_REINSTALL_RECOVERY_BLUEPRINT.md` | Reinstall/recovery guide blueprint |
+| `AIP_V7_45_OPERATOR_HANDOFF_BLUEPRINT.md` | Operator handoff pack blueprint |
+| `AIP_V7_45_GITHUB_DOCS_SYNCHRONIZATION_BLUEPRINT.md` | GitHub docs sync blueprint |
 
 ### Earlier Versions
 
