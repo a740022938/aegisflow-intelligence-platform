@@ -17,7 +17,7 @@ import { runWhere } from './commands/where.js';
 import { runSafeStatus } from './commands/safe-status.js';
 import { runReceiptTemplate } from './commands/receipt.js';
 import { getCliVersion } from './version.js';
-import os from 'node:os';
+import { renderBanner, renderStatusLines } from './banner.js';
 
 export interface AipConfig {
   home: string;
@@ -41,6 +41,7 @@ const RESET = '\x1b[0m';
 let noColor = false;
 let plainMode = false;
 let asciiMode = false;
+let noBanner = false;
 
 function c(color: string, text: string): string {
   if (noColor || plainMode) return text;
@@ -70,10 +71,17 @@ function tipLine(text: string): string {
 
 function printCommandCenter() {
   const ver = getCliVersion();
-  console.log(c(BOLD + CYAN, `AIP CLI v${ver}`));
-  console.log(c(CYAN, 'AGI Production Command Center'));
-  console.log(tipLine(`Project: E:\\AIP`));
-  console.log(c(GREEN, 'Mode: SAFE / Stage C DISABLED / Feature Flag OFF'));
+  const bannerOpts = { noColor, plainMode, asciiMode, noBanner };
+
+  const bannerLines = renderBanner(bannerOpts);
+  for (const line of bannerLines) {
+    console.log(line);
+  }
+
+  const statusLines = renderStatusLines(ver);
+  for (const line of statusLines) {
+    console.log(c(GREEN, line));
+  }
   console.log('');
 
   console.log(sectionDivider('[01] 常用控制 / Daily Control'));
@@ -110,7 +118,7 @@ function printCommandCenter() {
   console.log(helpCmd('aip gateway status', '查看 Gateway 状态'));
   console.log(helpCmd('aip gateway start', '启动 Gateway'));
   console.log(helpCmd('aip gateway stop', '停止 Gateway'));
-  console.log(helpCmd('aip gateway restart', '重启 Gateway，需要人工确认', 'warn'));
+  console.log(helpCmd('aip gateway restart', '重启 Gateway，需要人工确认，不自动 taskkill', 'warn'));
   console.log(helpCmd('aip ml', '本机模型命令大全'));
   console.log('');
 
@@ -120,7 +128,7 @@ function printCommandCenter() {
   console.log(helpCmd('aip repair plan', '生成修复计划', 'safe'));
   console.log(helpCmd('aip repair command-pack', '修复命令包，不动源码', 'safe'));
   console.log(helpCmd('aip repair restore-point', '查看可用恢复点'));
-  console.log(helpCmd('aip repair source', '源码恢复，高风险，需要人工确认', 'warn'));
+  console.log(helpCmd('aip repair source', 'BLOCKED by default，需人工确认', 'danger'));
   console.log('');
 
   console.log(sectionDivider('[06] 系统工具 / Utilities'));
@@ -132,6 +140,7 @@ function printCommandCenter() {
   console.log(tipLine('  aip --plain                纯文本模式，适合乱码环境'));
   console.log(tipLine('  aip --no-color             禁用颜色'));
   console.log(tipLine('  aip --ascii                ASCII 兼容模式'));
+  console.log(tipLine('  aip --no-banner            隐藏 OPENAIP 横幅'));
   console.log(tipLine('  aip --lang zh              中文'));
   console.log(tipLine('  aip --lang en              English'));
 }
@@ -161,9 +170,10 @@ function printHelpFor(cmd: string) {
 async function main() {
   const allArgs = process.argv.slice(2);
 
-  noColor = allArgs.includes('--no-color');
+  noColor = process.env.NO_COLOR === '1' || allArgs.includes('--no-color');
   plainMode = allArgs.includes('--plain') || allArgs.includes('--no-color');
   asciiMode = allArgs.includes('--ascii');
+  noBanner = process.env.AIP_NO_BANNER === '1' || allArgs.includes('--no-banner');
   const langZh = allArgs.includes('--lang') && allArgs[allArgs.indexOf('--lang') + 1] === 'zh';
   const langEn = allArgs.includes('--lang') && allArgs[allArgs.indexOf('--lang') + 1] === 'en';
   const helpIndex = allArgs.indexOf('help');
