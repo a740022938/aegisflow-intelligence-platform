@@ -42,7 +42,7 @@ const statCardStyle: React.CSSProperties = {
 const statLabelStyle: React.CSSProperties = {
   fontSize: 11,
   color: 'var(--text-secondary, #8892b0)',
-  textTransform: 'uppercase' as const,
+  textTransform: 'uppercase',
 };
 
 const statValueStyle: React.CSSProperties = {
@@ -102,17 +102,17 @@ const OperatorRuntimeReadinessConsolePreview: React.FC = () => {
   return (
     <PageShell
       title="Operator Runtime Readiness Console"
-      subtitle="v7.42-P1 · Readonly operator readiness aggregation · Stage C disabled"
+      subtitle="v7.43-P1 · Console UI polish · Readonly readiness aggregation · Stage C disabled"
       safetyBoundary="readonly"
       safetyText="只读总控台 · 不执行动作 · 不写数据库 · 不启用 Stage C · 不入 sidebar"
     >
-      {/* 1. Baseline */}
+      {/* 1. Current Seal Baseline */}
       <div style={{ ...sectionStyle, border: '1px solid #66bb6a' }}>
-        <div style={{ ...headerStyle, color: '#66bb6a' }}>1. Baseline</div>
+        <div style={{ ...headerStyle, color: '#66bb6a' }}>1. Current Seal Baseline</div>
         <div style={gridStyle}>
           <div style={statCardStyle}>
             <div style={statLabelStyle}>Current Head</div>
-            <div style={{ ...statValueStyle, fontSize: 14 }}>557e4c6 (v7.42 D1)</div>
+            <div style={{ ...statValueStyle, fontSize: 14 }}>816f376 (v7.43 D1)</div>
           </div>
           <div style={statCardStyle}>
             <div style={statLabelStyle}>Branch</div>
@@ -123,31 +123,54 @@ const OperatorRuntimeReadinessConsolePreview: React.FC = () => {
             <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>Clean</div>
           </div>
           <div style={statCardStyle}>
-            <div style={statLabelStyle}>Stage C</div>
-            <div style={{ ...statValueStyle, fontSize: 14, color: '#ef5350' }}>Disabled</div>
+            <div style={statLabelStyle}>Last Seal</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>v7.42</div>
           </div>
         </div>
       </div>
 
-      {/* 2. Safe Status */}
-      <div style={sectionStyle}>
-        <div style={headerStyle}>2. Safe Status</div>
+      {/* 2. Safety Snapshot */}
+      <div style={{ ...sectionStyle, border: '1px solid #42a5f5' }}>
+        <div style={{ ...headerStyle, color: '#42a5f5' }}>2. Safety Snapshot</div>
         <div style={gridStyle}>
-          {items.filter(i => i.id === 'safe-status' || i.id === 'cli-command-center').map(item => (
-            <div key={item.id} style={statCardStyle}>
-              <div style={statLabelStyle}>{item.title}</div>
-              <div style={{ ...statValueStyle, fontSize: 14, color: item.allowedNow ? '#66bb6a' : '#ef5350' }}>
-                {item.status}
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>{item.summary}</div>
-            </div>
-          ))}
+          <div style={{ ...statCardStyle, border: '1px solid #ef5350' }}>
+            <div style={statLabelStyle}>Stage C</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#ef5350' }}>Disabled</div>
+          </div>
+          <div style={{ ...statCardStyle, border: '1px solid #ef5350' }}>
+            <div style={statLabelStyle}>Feature Flag</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#ef5350' }}>OFF</div>
+          </div>
+          <div style={{ ...statCardStyle, border: '1px solid #66bb6a' }}>
+            <div style={statLabelStyle}>POST Runtime</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>Blocked</div>
+          </div>
+          <div style={{ ...statCardStyle, border: '1px solid #66bb6a' }}>
+            <div style={statLabelStyle}>DB Write</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>Blocked</div>
+          </div>
+          <div style={{ ...statCardStyle, border: '1px solid #66bb6a' }}>
+            <div style={statLabelStyle}>Executor</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>Absent</div>
+          </div>
+          <div style={{ ...statCardStyle, border: '1px solid #66bb6a' }}>
+            <div style={statLabelStyle}>External Control</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>Blocked</div>
+          </div>
+          <div style={{ ...statCardStyle, border: '1px solid #66bb6a' }}>
+            <div style={statLabelStyle}>Connector Action</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>Blocked</div>
+          </div>
+          <div style={{ ...statCardStyle, border: '1px solid #66bb6a' }}>
+            <div style={statLabelStyle}>Sidebar Exposure</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>None</div>
+          </div>
         </div>
       </div>
 
-      {/* 3. Stage C Gate */}
+      {/* 3. Stage C Gate Status */}
       <div style={{ ...sectionStyle, border: '2px solid #880e4f' }}>
-        <div style={{ ...headerStyle, color: '#ef5350' }}>3. Stage C Gate</div>
+        <div style={{ ...headerStyle, color: '#ef5350' }}>3. Stage C Gate Status</div>
         <div style={gridStyle}>
           {items.filter(i =>
             i.category === 'governance' && (i.id.includes('stage-c') || i.id.includes('feature-flag') || i.id.includes('authorization') || i.id.includes('kill-switch'))
@@ -166,32 +189,49 @@ const OperatorRuntimeReadinessConsolePreview: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Feature Flag State */}
-      <div style={sectionStyle}>
-        <div style={headerStyle}>4. Feature Flag State</div>
+      {/* 4. Command Center Links */}
+      <div style={{ ...sectionStyle, border: '1px solid #4fc3f7' }}>
+        <div style={{ ...headerStyle, color: '#4fc3f7' }}>4. Command Center Links</div>
         <div style={gridStyle}>
           <div style={statCardStyle}>
-            <div style={statLabelStyle}>Current State</div>
-            <div style={{ ...statValueStyle, fontSize: 14, color: '#ef5350' }}>OFF</div>
+            <div style={statLabelStyle}>aip</div>
+            <div style={{ ...statValueStyle, fontSize: 13, color: '#66bb6a' }}>Sealed</div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Main CLI entry point</div>
           </div>
           <div style={statCardStyle}>
-            <div style={statLabelStyle}>Mutable from UI</div>
-            <div style={{ ...statValueStyle, fontSize: 14, color: '#ef5350' }}>False</div>
+            <div style={statLabelStyle}>aip where</div>
+            <div style={{ ...statValueStyle, fontSize: 13, color: '#66bb6a' }}>Sealed</div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Phase + context awareness</div>
           </div>
           <div style={statCardStyle}>
-            <div style={statLabelStyle}>Default State</div>
-            <div style={{ ...statValueStyle, fontSize: 14, color: '#f57c00' }}>off</div>
+            <div style={statLabelStyle}>aip safe-status</div>
+            <div style={{ ...statValueStyle, fontSize: 13, color: '#66bb6a' }}>Ready</div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Safety state summary</div>
           </div>
           <div style={statCardStyle}>
-            <div style={statLabelStyle}>Feature Name</div>
-            <div style={{ ...statValueStyle, fontSize: 14 }}>stage_c_enablement</div>
+            <div style={statLabelStyle}>aip receipt template</div>
+            <div style={{ ...statValueStyle, fontSize: 13, color: '#1976d2' }}>Ready</div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Generate phase receipt</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>aip doctor encoding</div>
+            <div style={{ ...statValueStyle, fontSize: 13, color: '#66bb6a' }}>Sealed</div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Windows encoding diagnostics</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>aip check full</div>
+            <div style={{ ...statValueStyle, fontSize: 13, color: '#1976d2' }}>Ready</div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>Full validation check</div>
           </div>
         </div>
       </div>
 
-      {/* 5. Repair Plan-only */}
+      {/* 5. Repair Plan-only Status */}
       <div style={sectionStyle}>
-        <div style={headerStyle}>5. Repair Plan-only</div>
+        <div style={headerStyle}>5. Repair Plan-only Status</div>
+        <div style={{ fontSize: 12, color: '#f57c00', marginBottom: 8 }}>
+          ⚠ All repair commands are plan-only by default. Source restore = blocked. Full restore = forbidden.
+        </div>
         {items.filter(i =>
           i.category === 'operator' && (i.id.includes('repair') || i.id.includes('restore'))
         ).map(item => (
@@ -205,9 +245,9 @@ const OperatorRuntimeReadinessConsolePreview: React.FC = () => {
         ))}
       </div>
 
-      {/* 6. Memory Knowledge */}
+      {/* 6. Memory Baseline Status */}
       <div style={sectionStyle}>
-        <div style={headerStyle}>6. Memory Knowledge</div>
+        <div style={headerStyle}>6. Memory Baseline Status</div>
         <div style={gridStyle}>
           {items.filter(i => i.category === 'memory').map(item => (
             <div key={item.id} style={statCardStyle}>
@@ -226,25 +266,9 @@ const OperatorRuntimeReadinessConsolePreview: React.FC = () => {
         </div>
       </div>
 
-      {/* 7. Encoding / Windows Console */}
+      {/* 7. Smoke Evidence Summary */}
       <div style={sectionStyle}>
-        <div style={headerStyle}>7. Encoding / Windows Console</div>
-        <div style={gridStyle}>
-          {items.filter(i =>
-            i.id === 'encoding-doctor' || i.id === 'cli-doctor-env' || i.id === 'cli-doctor-ports'
-          ).map(item => (
-            <div key={item.id} style={statCardStyle}>
-              <div style={statLabelStyle}>{item.title}</div>
-              <div style={{ ...statValueStyle, fontSize: 13, color: '#66bb6a' }}>{item.status}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>{item.summary}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 8. Validation Evidence */}
-      <div style={sectionStyle}>
-        <div style={headerStyle}>8. Validation Evidence</div>
+        <div style={headerStyle}>7. Smoke Evidence Summary</div>
         <div style={gridStyle}>
           <div style={statCardStyle}>
             <div style={statLabelStyle}>Typecheck</div>
@@ -262,39 +286,61 @@ const OperatorRuntimeReadinessConsolePreview: React.FC = () => {
             <div style={statLabelStyle}>Git Diff Check</div>
             <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>Clean</div>
           </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>API Health</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>OK</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statLabelStyle}>POST Blocked</div>
+            <div style={{ ...statValueStyle, fontSize: 14, color: '#66bb6a' }}>404</div>
+          </div>
         </div>
       </div>
 
-      {/* 9. Safety Boundary Matrix */}
-      <div style={{ ...sectionStyle, border: '2px solid #b71c1c' }}>
-        <div style={{ ...headerStyle, color: '#ef5350' }}>9. Safety Boundary Matrix</div>
-        <div style={gridStyle}>
-          {items.filter(i => i.category === 'boundary').map(item => (
-            <div key={item.id} style={statCardStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={statLabelStyle}>{item.title}</div>
-                <span style={badgeStyle(riskColor(item.riskLevel))}>{item.riskLevel}</span>
-              </div>
-              <div style={{ ...statValueStyle, fontSize: 14, color: '#ef5350' }}>Blocked</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>{item.evidence}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 10. Operator Next Step */}
-      <div style={{ ...sectionStyle, border: '1px solid #42a5f5' }}>
-        <div style={{ ...headerStyle, color: '#42a5f5' }}>10. Operator Next Step</div>
+      {/* 8. No-go Matrix Summary */}
+      <div style={{ ...sectionStyle, border: '1px solid #ffa726' }}>
+        <div style={{ ...headerStyle, color: '#ffa726' }}>8. No-go Matrix Summary</div>
         <div style={{ fontSize: 13, lineHeight: 2 }}>
           <ol style={{ margin: 0, paddingLeft: 20 }}>
-            <li>Continue readonly productization (P2 aggregation docs)</li>
-            <li>Improve CLI ergonomics and repair plan-only docs</li>
-            <li>Improve memory preview and normalization handling</li>
-            <li>Prepare Stage C authorization review (docs only, no enablement)</li>
+            <li><strong>Dirty worktree</strong> — must be clean before any phase transition</li>
+            <li><strong>Validation failure</strong> — typecheck/test/build must all pass</li>
+            <li><strong>Missing authorization</strong> — Stage C requires explicit human authorization</li>
+            <li><strong>Safety boundary violation</strong> — any enabled boundary blocks progression</li>
+            <li><strong>Sidebar exposure</strong> — hidden pages must not appear in sidebar</li>
+            <li><strong>Unverified smoke</strong> — smoke tests must pass (or deferred status recorded)</li>
+          </ol>
+        </div>
+      </div>
+
+      {/* 9. Operator Next Step */}
+      <div style={{ ...sectionStyle, border: '1px solid #42a5f5' }}>
+        <div style={{ ...headerStyle, color: '#42a5f5' }}>9. Operator Next Step</div>
+        <div style={{ fontSize: 13, lineHeight: 2 }}>
+          <ol style={{ margin: 0, paddingLeft: 20 }}>
+            <li>Continue bridge polish (P2 — command/repair/memory registries)</li>
+            <li>Proceed to Stage C authorization review pack preview (P3)</li>
+            <li>Harden operator decision workflow (P4)</li>
+            <li>Run final seal recheck (P5)</li>
             <li>Do NOT enable Stage C, toggle feature flag, write DB, or execute actions</li>
             <li>Do NOT expose hidden preview in sidebar</li>
           </ol>
         </div>
+      </div>
+
+      {/* 10. Forbidden Actions Strip */}
+      <div style={{ ...sectionStyle, border: '2px solid #ef5350' }}>
+        <div style={{ ...headerStyle, color: '#ef5350' }}>10. Forbidden Actions Strip</div>
+        <ul style={{ fontSize: 13, lineHeight: 1.8, margin: 0, paddingLeft: 20 }}>
+          <li>Stage C is DISABLED — no enablement button or API</li>
+          <li>Feature flag is OFF — not mutable from UI</li>
+          <li>POST runtime is BLOCKED — no POST endpoints</li>
+          <li>DB write is BLOCKED — no write path</li>
+          <li>Executor is BLOCKED — no runtime execution</li>
+          <li>External control is BLOCKED — no external API calls</li>
+          <li>Connector action is BLOCKED — no connector control</li>
+          <li>This console is NOT in sidebar — hidden direct route only</li>
+          <li>No tag, no release, no restart without human owner authorization</li>
+        </ul>
       </div>
 
       {/* Validator Summary */}
@@ -384,21 +430,6 @@ const OperatorRuntimeReadinessConsolePreview: React.FC = () => {
             </div>
           );
         })}
-      </div>
-
-      {/* Forbidden Actions */}
-      <div style={{ ...sectionStyle, border: '2px solid #ef5350' }}>
-        <div style={{ ...headerStyle, color: '#ef5350' }}>Forbidden Actions Notice</div>
-        <ul style={{ fontSize: 13, lineHeight: 1.8, margin: 0, paddingLeft: 20 }}>
-          <li>Stage C is DISABLED — no enablement button or API</li>
-          <li>Feature flag is OFF — not mutable from UI</li>
-          <li>POST runtime is BLOCKED — no POST endpoints</li>
-          <li>DB write is BLOCKED — no write path</li>
-          <li>Executor is BLOCKED — no runtime execution</li>
-          <li>External control is BLOCKED — no external API calls</li>
-          <li>Connector action is BLOCKED — no connector control</li>
-          <li>This console is NOT in sidebar — hidden direct route only</li>
-        </ul>
       </div>
     </PageShell>
   );
