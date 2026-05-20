@@ -2,11 +2,11 @@
 
 天枢智治平台 — 面向数据-训练-评估-发布全流程的本地化智能治理平台。
 
-**Current baseline: AIP v7.46 Pre-RC (based on v7.45 Final Seal)** | Stage C DISABLED | Feature Flag OFF
+**Current baseline: AIP v7.46 Pre-RC (product version 7.46.0)** | Stage C DISABLED | Feature Flag OFF
 
-> Historical note: `v7.3.0` is the last tagged release. v7.41-v7.46 are post-release readiness phases. No tag or GitHub Release exists beyond v7.3.0.
+> Historical note: `v7.3.0` is the last tagged release. v7.41-v7.47 are post-release readiness phases. No tag or GitHub Release exists beyond v7.3.0.
 
-AIP v7.46 is the Pre-RC polish phase. It closes 4 release blockers identified in the v7.46-D0 review: missing CLI commands, ghost commands in help, critical API security gaps, and documentation gaps. Stage C remains disabled throughout.
+AIP v7.47 is the missing-risk closure phase. It closes 15 findings from the v7.47-D0 Missing-Risk Sweep: fresh install flow (pnpm, db:init, CLI build), version consistency (code/docs/CLI/UI alignment), restore readiness, and safety cleanup. Stage C remains disabled throughout.
 
 **Start here:** [`START_HERE.md`](START_HERE.md)
 
