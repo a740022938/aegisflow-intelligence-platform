@@ -47,6 +47,7 @@ function NavItem({ to, icon, label }: { to: string; icon: string; label: string 
   return (
     <NavLink
       to={to}
+      end={to === '/'}
       className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
     >
       <span className="nav-icon"><Icon name={icon} /></span>
@@ -298,37 +299,20 @@ function AppShell() {
               </>)}
             </div>
 
-            {/* ── 智能增强 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('intelligence')}>
+            {/* ── 智能增强 ── (stub — all items hidden until implemented) */}
+            <div className="nav-section nav-section-stub">
+              <div className="nav-section-label nav-section-label-stub" onClick={() => toggleSection('intelligence')}>
                 {t.nav.intelligence}
                 <span className="nav-section-arrow">{collapsed.has('intelligence') ? '▸' : '▾'}</span>
               </div>
-              {!collapsed.has('intelligence') && (<>
-                <NavItem to="/digital-employee" icon="brain" label={t.nav.digitalEmployee} />
-                <NavItem to="/training-v2" icon="training" label={t.nav.trainingV2} />
-                <NavItem to="/hpo" icon="run" label={t.nav.hpo} />
-                <NavItem to="/distill" icon="eval" label={t.nav.distill} />
-                <NavItem to="/model-merge" icon="merge" label={t.nav.modelMerge} />
-                <NavItem to="/inference" icon="run" label={t.nav.inference} />
-                <NavItem to="/annotation" icon="label" label={t.nav.annotation} />
-                <NavItem to="/huggingface" icon="api" label={t.nav.huggingface} />
-              </>)}
             </div>
 
-            {/* ── 自动化 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('automation')}>
+            {/* ── 自动化 ── (stub — all items hidden until implemented) */}
+            <div className="nav-section nav-section-stub">
+              <div className="nav-section-label nav-section-label-stub" onClick={() => toggleSection('automation')}>
                 {t.nav.automation}
                 <span className="nav-section-arrow">{collapsed.has('automation') ? '▸' : '▾'}</span>
               </div>
-              {!collapsed.has('automation') && (<>
-                <NavItem to="/backflow-v2" icon="feedback" label={t.nav.backflowV2} />
-                <NavItem to="/scheduler" icon="clock" label={t.nav.scheduler} />
-                <NavItem to="/alerting" icon="bell" label={t.nav.alerting} />
-                <NavItem to="/model-monitor" icon="eval" label={t.nav.modelMonitor} />
-                <NavItem to="/deploy-v2" icon="deploy" label={t.nav.deployV2} />
-              </>)}
             </div>
 
             {/* ── 视觉实验室 ── */}
