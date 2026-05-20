@@ -20,8 +20,8 @@ AIP is a local-first AI governance and operations platform. It provides:
 
 | Field | Value |
 |-------|-------|
-| Current baseline | **AIP v7.46 Pre-RC** (based on v7.45 Final Seal) |
-| Git HEAD | `ecb4a60` (main) |
+| Current baseline | **AIP v7.47 P1** (based on v7.46 Final Seal) |
+| Git HEAD | (see `git log -1 --oneline`) |
 | Stage C | **DISABLED** |
 | Feature flag | **OFF** |
 | Release status | **Pre-RC — not yet released or tagged** |
@@ -33,23 +33,44 @@ AIP is a local-first AI governance and operations platform. It provides:
 Set-Location E:\AIP
 
 # 2. Install dependencies
-npm install
+pnpm install
 
-# 3. Verify everything works
-npm run typecheck
-npm test
-npm run build
+# 3. Initialize the database
+pnpm run db:init
 
-# 4. Start the project
-npm run dev
+# 4. Start the project (starts API + Web UI)
+pnpm run dev
 
-# 5. Open the CLI
+# 5. Open the CLI (build from source first)
+pnpm run aip:cli:build
 node apps/aip-cli/dist/index.js
+
+# Dev mode alternative (no build needed):
+# pnpm --dir apps/aip-cli dev
 ```
 
 See [docs/product/AIP_V7_45_INSTALL_AND_RUN_GUIDE.md](docs/product/AIP_V7_45_INSTALL_AND_RUN_GUIDE.md) for detailed setup.
 
-## 4. First Commands
+## 4. Verify Setup
+
+After the project is running, verify everything works:
+
+```powershell
+# TypeScript type checking
+pnpm run typecheck
+
+# Production build (Web UI)
+pnpm run build
+
+# Smoke tests (requires API running at http://127.0.0.1:8787)
+# Run 'pnpm run dev' first, then in a new terminal:
+pnpm test
+
+# Check security posture
+aip safe-status
+```
+
+## 5. First Commands
 
 After setup, run these in order:
 
@@ -64,7 +85,7 @@ aip safe-status
 aip
 ```
 
-## 5. What NOT To Do (Safety Rules)
+## 6. What NOT To Do (Safety Rules)
 
 - **Do NOT enable Stage C**
 - **Do NOT toggle the feature flag**
@@ -76,7 +97,7 @@ aip
 - **Do NOT add hidden preview pages to the sidebar**
 - **Do NOT treat "continue" as authorization for Stage C**
 
-## 6. Recommended Reading Order
+## 7. Recommended Reading Order
 
 | Step | Document | Time |
 |------|----------|------|
@@ -91,7 +112,7 @@ aip
 | 9 | [docs/product/AIP_V7_45_RECOVERY_AND_RESTORE_GUIDE.md](docs/product/AIP_V7_45_RECOVERY_AND_RESTORE_GUIDE.md) | 10 min |
 | 10 | [docs/product/AIP_V7_46_DOCS_INDEX.md](docs/product/AIP_V7_46_DOCS_INDEX.md) | 5 min |
 
-## 7. Key Paths
+## 8. Key Paths
 
 | Path | Purpose |
 |------|---------|
@@ -101,7 +122,7 @@ aip
 | `E:\_AIP_RECEIPTS\` | Phase completion receipts |
 | `E:\_AIP_RESTORE_POINTS\` | Restore points (not yet created) |
 
-## 8. How to Verify Stage C Is Disabled
+## 9. How to Verify Stage C Is Disabled
 
 ```powershell
 aip safe-status
@@ -115,7 +136,7 @@ Invoke-RestMethod http://127.0.0.1:8787/api/stage-c/status
 
 Expected: `stageCEnabled: false`.
 
-## 9. How to Continue Development
+## 10. How to Continue Development
 
 Each version follows a D1→P5 phase plan:
 
@@ -125,10 +146,11 @@ Each version follows a D1→P5 phase plan:
 
 Before starting a new phase, read the relevant plan docs in `docs/product/`.
 
-## 10. Avoiding Version Confusion
+## 11. Avoiding Version Confusion
 
 - Pre-v7.25 docs are **legacy** (AGI Model Factory era)
 - v7.25-v7.40 docs exist but are **historical**
 - v7.41-v7.45 are the current modern series
-- v7.46 is the current **pre-RC polish** phase
+- v7.46 was the **pre-RC polish** phase
+- v7.47 is the current **missing-risk closure** phase
 - **No release/tag exists beyond v7.3.0** — do not treat any later version as released
