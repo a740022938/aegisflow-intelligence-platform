@@ -1483,6 +1483,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.42-P1 added as hidden direct-route. Not in sidebar. Readonly operator readiness aggregation. No enablement, no mutation, no POST.',
   },
+  {
+    id: 'stage-c-authorization-review-pack-preview',
+    path: '/stage-c-authorization-review-pack-preview',
+    label: 'Stage C Authorization Review Pack Preview',
+    component: 'StageCAuthorizationReviewPackPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'high',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled', 'no_post', 'no_execution', 'no_state_transition'],
+    reason: 'Readonly Stage C Authorization Review Pack Preview page. Shows 12 authorization requirements. All items readonly, satisfied=false. No authorization accepted. Stage C disabled. No sidebar. No POST. No DB write. No execution.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.43-P3 added as hidden direct-route. Not in sidebar. Readonly authorization review pack preview. No authorization granted or implied.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {

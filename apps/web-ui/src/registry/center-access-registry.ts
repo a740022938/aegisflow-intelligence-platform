@@ -16,7 +16,8 @@ export type CenterAccessKind =
   | 'feature_flag_control'
   | 'feature_flag_toggle_trial'
   | 'feature_flag_dry_trial'
-  | 'operator_readiness';
+  | 'operator_readiness'
+  | 'authorization_review_pack';
 
 export type CenterAccessStatus =
   | 'available_route'
@@ -1582,6 +1583,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     userImpact: 'Low — readonly operator readiness console. No enablement, no mutation, no POST.',
     maturity: 'preview',
     owner: 'operator',
+  },
+  {
+    id: 'stage-c-authorization-review-pack-preview',
+    name: 'Stage C Authorization Review Pack Preview',
+    kind: 'authorization_review_pack',
+    route: '/stage-c-authorization-review-pack-preview',
+    status: 'hidden_direct',
+    risk: 'high',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'no_stage_c', 'no_db_write', 'no_external_control', 'no_post_runtime', 'no_executor', 'no_connector_action'],
+    allowedActions: ['view_authorization_review_pack'],
+    blockedActions: ['enable_stage_c', 'toggle_feature_flag', 'write_database', 'modify_sidebar', 'control_external_tools', 'execute_runtime', 'connector_action', 'restart_service', 'create_tag', 'create_release', 'accept_authorization'],
+    requiredBeforeExposure: ['readonly_only', 'no_stage_c', 'no_db_write', 'validator_pass'],
+    releaseGate: [],
+    displayOrder: 999,
+    group: 'governance',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 85,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', '授权审查包只读预览', 'stage_c_disabled'],
+    description: 'Stage C Authorization Review Pack Preview — v7.43. 12项授权审查要求。未入左侧菜单。hidden direct route。',
+    notes: 'v7.43-P3 Stage C Authorization Review Pack Preview。12 items，全部 readonly。不接受授权。不入 sidebar。不启用 Stage C。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'v7.43-P3 Stage C Authorization Review Pack Preview — readonly authorization review. Keep hidden direct. Not in sidebar. Stage C disabled.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove route from App.tsx if needed.',
+    userImpact: 'Low — readonly authorization review pack. No authorization accepted. No enablement, no mutation, no POST.',
+    maturity: 'preview',
+    owner: 'governance',
   },
 ];
 
