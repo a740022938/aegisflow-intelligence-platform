@@ -4,6 +4,7 @@ import './Layout.css';
 import { type Lang, translations, getStoredLang, setStoredLang, syncTranslationsFromServer } from '../i18n';
 import { APP_VERSION, BUILD_DATE } from '../constants/appVersion';
 import { APP_META } from '../constants/appMeta';
+import { getAipTrackLabel, getAipStageCStatusLabel, getAipFeatureFlagLabel } from '../registry/product-metadata-registry';
 import { loadSidebarWidth, saveSidebarWidth } from '../layout/layoutStorage';
 
 // ── SVG Icons ────────────────────────────────────────────────────────────────
@@ -381,6 +382,7 @@ function AppShell() {
           <div className="sidebar-footer">
             <div className="sidebar-footer-text">AIP {APP_VERSION}</div>
             <div className="sidebar-footer-build">Build {BUILD_DATE}</div>
+            <div className="sidebar-footer-status">{getAipTrackLabel()} · {getAipStageCStatusLabel()} · {getAipFeatureFlagLabel()}</div>
           </div>
         </nav>
         <div className={`sidebar-backdrop${sidebarOpen ? ' visible' : ''}`} onClick={() => setSidebarOpen(false)} />

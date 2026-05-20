@@ -347,6 +347,12 @@ body.layout-resizing * {
   color: var(--text-dim);
   margin-top: 2px;
 }
+.sidebar-footer-status {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 2px;
+  opacity: 0.75;
+}
 
 .sidebar-backdrop {
   display: none;
