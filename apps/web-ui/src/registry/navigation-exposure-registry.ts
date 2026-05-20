@@ -1528,6 +1528,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.44-P3 added as hidden direct-route. Not in sidebar. Readonly usability drill preview. No repair execution, no memory mutation, no authorization accepted.',
   },
+  {
+    id: 'restore-point-pack-preview',
+    path: '/restore-point-pack-preview',
+    label: 'Restore Point Pack Preview',
+    component: 'RestorePointPackPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled', 'no_post', 'no_execution', 'no_state_transition'],
+    reason: 'Readonly Restore Point Pack Preview page. Shows 10 restore point design/policy/safety items. Plan-only. No file restore. No secret capture. Stage C disabled. No sidebar. No POST. No DB write. No execution.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.45-P2 added as hidden direct-route. Not in sidebar. Plan-only restore point pack preview. No file restore. No secret capture.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {

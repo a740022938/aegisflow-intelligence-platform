@@ -79,6 +79,7 @@ const OperatorRuntimeReadinessConsolePreview = lazy(() => import('./pages/Operat
 const StageCAuthorizationReviewPackPreview = lazy(() => import('./pages/StageCAuthorizationReviewPackPreview'));
 const OperatorEndToEndFlowPreview = lazy(() => import('./pages/OperatorEndToEndFlowPreview'));
 const OperatorUsabilityDrillPreview = lazy(() => import('./pages/OperatorUsabilityDrillPreview'));
+const RestorePointPackPreview = lazy(() => import('./pages/RestorePointPackPreview'));
 
 function RouteFallback() {
   return (
@@ -222,6 +223,7 @@ const App: React.FC = () => {
             <Route path="stage-c-authorization-review-pack-preview" element={<StageCAuthorizationReviewPackPreview />} />
             <Route path="operator-end-to-end-flow-preview" element={<OperatorEndToEndFlowPreview />} />
             <Route path="operator-usability-drill-preview" element={<OperatorUsabilityDrillPreview />} />
+            <Route path="restore-point-pack-preview" element={<RestorePointPackPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
