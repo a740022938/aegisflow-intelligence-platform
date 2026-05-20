@@ -1,6 +1,6 @@
-# AIP v7.42 — Operator Receipt Template
+# AIP v7.42 — Operator Receipt Template (v7.43 Updated)
 
-**生成日期**: 2026-05-20
+**生成日期**: 2026-05-20 (v7.43 P4 updated)
 **Stage C**: DISABLED
 
 ---
@@ -31,11 +31,20 @@
 - POST/PUT/PATCH/DELETE: BLOCKED (404)
 - Runtime execution: NOT PERMITTED
 - DB writes: NOT PERMITTED
+- Bridge validation: REQUIRED (v7.43+)
+- Authorization review pack: PREVIEW ONLY (v7.43+)
 
 ## Verdict
 
 <V7_42_VERDICT>
 ```
+
+## v7.43 Addition
+
+For v7.43 receipts, use:
+- Verdict prefix: `V7_43_` instead of `V7_42_`
+- Add bridge validation and authorization review pack to Phases Delivered
+- Add Bridge and Decision Workflow check results
 
 ## 使用方式
 

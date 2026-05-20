@@ -1,6 +1,6 @@
-# AIP v7.42 — Stage C No-Go Matrix
+# AIP v7.42 — Stage C No-Go Matrix (v7.43 Updated)
 
-**生成日期**: 2026-05-20
+**生成日期**: 2026-05-20 (v7.43 P4 updated)
 **Stage C**: DISABLED
 
 ---
@@ -28,7 +28,11 @@
 
 ## 结论
 
-当前 11/14 条件为 No-Go。v7.42 不可启用 Stage C。
+当前 11/14 条件为 No-Go。v7.42/v7.43 不可启用 Stage C。
+
+## v7.43 Changes
+
+No-go conditions unchanged from v7.42. v7.43 adds the Authorization Review Pack (P3) and Decision Workflow (P4) as formal readiness gates before any future Stage C consideration.
 
 ## 安全约束
 
