@@ -42,3 +42,7 @@
 | Data loss risk | None |
 | User impact | Low (readonly page) |
 | Rollback time | < 5 minutes |
+
+## v7.40-P3 Addendum
+
+P3 dry trial did not require rollback. Rollback plan remains available for future use.

@@ -43,3 +43,7 @@ The toggle trial must stop immediately when ANY of the following occurs:
 - Do NOT continue trial without fix
 - Do NOT bypass smoke
 - Do NOT modify rollback plan on the fly
+
+## v7.40-P3 Addendum
+
+P3 dry trial did not trigger any failure condition. Failure stop policy remains available for future use.

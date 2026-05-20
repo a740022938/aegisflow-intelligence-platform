@@ -1453,6 +1453,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.40-P2 added as hidden direct-route. Not in sidebar. Readonly trial plan preview. No toggle, no mutation, no POST.',
   },
+  {
+    id: 'stage-c-feature-flag-dry-trial-preview',
+    path: '/stage-c-feature-flag-dry-trial-preview',
+    label: 'Stage C Feature Flag Dry Trial Preview',
+    component: 'StageCFeatureFlagDryTrialPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled'],
+    reason: 'Readonly Feature Flag Dry Trial Preview page. Shows 20 registry items with validator. All items readonly, dryTrialOnly=true, featureFlagOfficiallyEnabled=false, stageCEnabled=false, actionAllowed=false, mutationAllowed=false, canEnableStageC=false. No backend endpoint, no API call, no DB write, no external control, no Stage C. Not added to left menu.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.40-P3 added as hidden direct-route. Not in sidebar. Readonly dry trial preview. No toggle, no mutation, no POST.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {

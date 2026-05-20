@@ -42,3 +42,10 @@ Define the controlled process, boundaries, and requirements for a future human-a
 ```
 V7_40_P2_FEATURE_FLAG_TOGGLE_TRIAL_PLAN_READY_WITH_TOGGLE_NOT_EXECUTED
 ```
+
+## P3 Execution
+
+P3 dry trial was authorized and executed successfully. See:
+- AIP_V7_40_P3_HUMAN_APPROVED_LOCAL_FEATURE_FLAG_TOGGLE_DRY_TRIAL.md
+- AIP_STAGE_C_FEATURE_FLAG_DRY_TRIAL_RESULT.md
+- AIP_STAGE_C_FEATURE_FLAG_DRY_TRIAL_SAFETY_RECHECK.md

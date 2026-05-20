@@ -45,3 +45,7 @@ Must pass after toggle (if executed in future task):
 17. [ ] Tests PASS
 18. [ ] Build PASS
 19. [ ] Safety search 0 issues
+
+## v7.40-P3 Addendum
+
+P3 dry trial smoke was completed successfully. GET /api/stage-c/status returned 200. POST blocked. All fields verified.

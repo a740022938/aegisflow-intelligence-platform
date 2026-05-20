@@ -14,7 +14,8 @@ export type CenterAccessKind =
   | 'evidence_schema'
   | 'rollback'
   | 'feature_flag_control'
-  | 'feature_flag_toggle_trial';
+  | 'feature_flag_toggle_trial'
+  | 'feature_flag_dry_trial';
 
 export type CenterAccessStatus =
   | 'available_route'
@@ -1500,6 +1501,45 @@ export const CENTER_ACCESS_REGISTRY: CenterAccessItem[] = [
     targetContainer: 'launchpad',
     rollbackPlan: 'No sidebar entry to revert. Remove route from App.tsx if needed.',
     userImpact: 'Low — readonly trial plan preview page. No toggle, no mutation, no POST.',
+    maturity: 'preview',
+    owner: 'governance',
+  },
+  {
+    id: 'stage-c-feature-flag-dry-trial-preview',
+    name: 'Stage C Feature Flag Dry Trial Preview',
+    kind: 'governance',
+    route: '/stage-c-feature-flag-dry-trial-preview',
+    status: 'hidden_direct',
+    risk: 'medium',
+    readiness: 'preview_ready',
+    exposureRecommendation: 'keep_hidden_direct',
+    visibleInSidebar: false,
+    allowedNow: true,
+    safetyBoundary: ['readonly', 'dry_trial_only', 'no_toggle', 'no_mutation', 'no_db_write', 'no_external_control', 'no_stage_c'],
+    allowedActions: ['view_dry_trial_preview', 'view_dry_trial_state', 'view_requirements'],
+    blockedActions: ['enable_stage_c', 'toggle_feature_flag', 'write_database', 'modify_sidebar', 'control_external_tools', 'call_external_api', 'release', 'approve', 'reject', 'execute_rollback'],
+    requiredBeforeExposure: ['readonly_only', 'dry_trial_only', 'no_toggle', 'no_db_write', 'validator_pass'],
+    releaseGate: [],
+    displayOrder: 999,
+    group: 'governance',
+    sidebarState: 'hidden_direct',
+    operationalMode: 'readonly',
+    readinessScore: 90,
+    qualityGate: { readonly: true, noDbWrite: true, noExternalControl: true, noStageC: true, noDangerousActions: true },
+    statusBadges: ['未入菜单', 'dry trial 只读预览', 'stage_c_disabled'],
+    description: 'Stage C Feature Flag Dry Trial Preview — 20 项 dry trial 注册表条目。dry trial completed, feature flag remains off, Stage C disabled。未入左侧菜单。hidden direct route。',
+    notes: 'v7.40-P3 Feature Flag Dry Trial Preview。20 items。全部 readonly/dryTrialOnly/featureFlagOfficiallyEnabled=false/stageCEnabled=false。不入 sidebar。不启用 Stage C。不写 DB。',
+    accessLevel: 'direct_url_only',
+    recommendedAccessLevel: 'direct_url_only',
+    launchpadVisible: true,
+    advancedHubVisible: true,
+    directUrlAllowed: true,
+    exposureStage: 'design',
+    exposureDecision: 'hold',
+    exposureReason: 'v7.40-P3 Feature Flag Dry Trial Preview — readonly dry trial preview. Keep hidden direct. Not in sidebar. Stage C disabled.',
+    targetContainer: 'launchpad',
+    rollbackPlan: 'No sidebar entry to revert. Remove route from App.tsx if needed.',
+    userImpact: 'Low — readonly dry trial preview page. No toggle, no mutation, no POST.',
     maturity: 'preview',
     owner: 'governance',
   },
