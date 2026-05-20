@@ -1,4 +1,4 @@
-// ui/index.ts — shared component barrel export
+// ui/index.ts — shared component barrel export (v7.51-P2 Foundation)
 export { default as StatusBadge, STATUS_COLORS } from './StatusBadge';
 export type { StatusBadgeProps } from './StatusBadge';
 
@@ -65,3 +65,13 @@ export { default as RiskSignalBadge } from './RiskSignalBadge';
 
 export { default as StepStatusIndicator } from './StepStatusIndicator';
 export type { StepStatusIndicatorProps } from './StepStatusIndicator';
+
+export { default as PageShell } from './PageShell';
+export { default as SafetyBoundaryBar } from './SafetyBoundaryBar';
+export type { SafetyBoundaryMode, SafetyBoundaryBarProps } from './SafetyBoundaryBar';
+
+export { default as PageSubtitle } from './PageSubtitle';
+export type { PageSubtitleProps } from './PageSubtitle';
+
+export { default as StatusStrip } from './StatusStrip';
+export type { StatusStripItem, StatusStripProps } from './StatusStrip';
