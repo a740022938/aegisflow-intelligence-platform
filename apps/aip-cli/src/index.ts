@@ -16,6 +16,8 @@ import { runRepair } from './commands/repair.js';
 import { runWhere } from './commands/where.js';
 import { runSafeStatus } from './commands/safe-status.js';
 import { runReceiptTemplate } from './commands/receipt.js';
+import { runNext } from './commands/next.js';
+import { runReleaseStatus } from './commands/release-status.js';
 import { getCliVersion } from './version.js';
 import { renderBanner, renderStatusLines } from './banner.js';
 
@@ -104,6 +106,8 @@ function printCommandCenter() {
   console.log(helpCmd('aip doctor encoding', '检查 Windows 中文编码与颜色支持'));
   console.log(helpCmd('aip doctor ports', '检查 8787 等端口占用'));
   console.log(helpCmd('aip doctor stage-c', '检查 Stage C 安全边界'));
+  console.log(helpCmd('aip next', '查看建议的下一步', 'safe'));
+  console.log(helpCmd('aip release-status', '查看发布状态', 'safe'));
   console.log(helpCmd('aip safe-status', '查看安全状态摘要', 'safe'));
   console.log('');
 
@@ -155,6 +159,8 @@ function printHelpFor(cmd: string) {
     open: 'aip open\n  打开 Web UI',
     version: 'aip version\n  查看版本信息',
     where: 'aip where\n  查看项目位置与 Git 状态',
+    'next': 'aip next\n  查看建议的下一步（只读）',
+    'release-status': 'aip release-status\n  查看发布状态（只读）',
     'safe-status': 'aip safe-status\n  查看安全状态（Stage C / 运行时 / 边界）',
     doctor: 'aip doctor [sub]\n  sub: env, encoding, ports, stage-c\n  一键诊断',
     config: 'aip config <init|get|set>\n  管理配置',
@@ -206,6 +212,8 @@ async function main() {
     case 'repair': await runRepair(sub, rest); break;
     case 'gateway': await runGateway(sub); break;
     case 'where': await runWhere(); break;
+    case 'next': await runNext(); break;
+    case 'release-status': await runReleaseStatus(); break;
     case 'safe-status': await runSafeStatus(); break;
     case 'receipt': await runReceiptTemplate(); break;
     case 'ml':
