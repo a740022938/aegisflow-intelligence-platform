@@ -12,6 +12,7 @@ import { runVersion } from './commands/version.js';
 import { runDoctor } from './commands/doctor.js';
 import { runConfig } from './commands/config.js';
 import { runGateway } from './commands/gateway.js';
+import { runRepair } from './commands/repair.js';
 import { getCliVersion } from './version.js';
 import os from 'node:os';
 
@@ -197,6 +198,7 @@ async function main() {
     case 'version': await runVersion(); break;
     case 'doctor': await runDoctor(sub); break;
     case 'config': await runConfig(sub, allArgs.filter(a => !a.startsWith('--')).slice(2)); break;
+    case 'repair': await runRepair(sub, rest); break;
     case 'gateway': await runGateway(sub); break;
     case 'ml':
     case 'manual':
