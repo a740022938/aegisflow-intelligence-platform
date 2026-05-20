@@ -46,14 +46,24 @@ const args = process.argv.slice(2);
 if (!args[0]) { console.error('Usage: node scripts/restore.mjs <backup.zip> [--dry-run] [--execute]'); process.exit(1); }
 
 const zipPath = path.resolve(args[0]);
-const dryRun  = PLAN_ONLY || args.includes('--dry-run');
 if (!fs.existsSync(zipPath)) { console.error('File not found: ' + zipPath); process.exit(1); }
 
-console.log('Restore: ' + zipPath + ' [' + (dryRun ? 'PLAN-ONLY' : 'LIVE') + ']');
+console.log('Restore: ' + zipPath + ' [' + (PLAN_ONLY ? 'PLAN-ONLY' : 'LIVE') + ']');
 
 if (PLAN_ONLY) {
-  console.log('\n⚠ Default mode is PLAN-ONLY. No files will be modified.');
+  console.log('\n⚠ Plan-only mode: no files will be modified.');
   console.log('  Pass --execute to perform a real restore (requires CONFIRM).');
+  console.log('');
+  console.log('Files in archive (would restore):');
+  try {
+    execSync('python -c "import zipfile; z=zipfile.ZipFile(r\'' + zipPath.replace(/'/g, "''") + '\'); [print(f\'  {f}\') for f in z.namelist()]"', {
+      stdio: ['pipe', 'pipe', 'pipe'], timeout: 15000,
+    });
+  } catch {
+    console.log('  (could not list archive contents)');
+  }
+  console.log('\nDry run done.');
+  process.exit(0);
 }
 
 const DB_DIR    = path.join(REPO_ROOT, 'packages', 'db');
@@ -77,13 +87,6 @@ for (const e of fs.readdirSync(tempDir, { recursive: true })) {
   try { if (fs.statSync(fp).isFile()) extracted.push(e); } catch {}
 }
 console.log('Extracted ' + extracted.length + ' files');
-
-if (dryRun) {
-  console.log('\nDRY RUN — would restore:');
-  extracted.forEach(f => console.log('  ' + f));
-  fs.rmSync(tempDir, { recursive: true, force: true });
-  console.log('\nDry run done.'); process.exit(0);
-}
 
 let restoredCount = 0, skipped = 0;
 const restoredList = [];

@@ -1,0 +1,52 @@
+# AIP Restore Point Exclusions
+# Files and patterns listed here are excluded from restore point backups.
+# Lines starting with # are comments.
+
+# Sensitive/secret files
+.env
+.env.*
+*.key
+*.token
+*.pem
+
+# Build artifacts
+dist/
+*.tsbuildinfo
+.vite/
+
+# Database files (will be restored separately via DB migration)
+*.db
+*.db-shm
+*.db-wal
+*.db.bak*
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Large model weights
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# Archive/temp files
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+logs/
+_logs/
+
+# Test output
+coverage/
+test-results/
+
+# AIP internal directories
+_AIP_BACKUPS/
+_AIP_TEMP/
+_TEMP/
+_DELETE_CANDIDATES/
