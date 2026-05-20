@@ -45,6 +45,10 @@ E:\_AIP_REPORTS\AIP_repair_plan_YYYYMMDD_HHMMSS.json
 E:\_AIP_REPORTS\AIP_repair_plan_YYYYMMDD_HHMMSS.md
 ```
 
+## v7.42 集成
+
+在 Operator Runtime Readiness Console 中引用 repair 命令状态和输出路径。
+
 ## 禁止事项
 
 1. 禁止真实 restore

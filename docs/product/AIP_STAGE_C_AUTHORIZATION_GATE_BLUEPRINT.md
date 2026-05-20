@@ -41,8 +41,13 @@ aip stage-c smoke         执行只读安全检查
 | 真实 POST 写 DB | 禁止 |
 | 真实 executor 调用 | 禁止 |
 
+## v7.42 集成
+
+在 Operator Runtime Readiness Console 中展示 Stage C 状态、feature flag 状态、safety boundary。
+
 ## 回查点
 
 - v7.41 封板时须确认 Stage C feature flag = OFF
 - v7.41 封板时须确认无新增 Stage C POST endpoint
 - v7.41 封板时须确认无 executor 被引入
+- v7.42 封板时须确认以上状态未变化

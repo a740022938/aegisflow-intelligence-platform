@@ -34,6 +34,10 @@ v7.41 是 AIP 控制台与记忆标准化版本。不是 Stage C 启用版本。
 11. 不打 tag/不 release
 12. 不重启服务（除非 human owner 明确授权）
 
+## 后续版本
+
+v7.42 在此基础上构建 Operator Runtime Readiness Console，汇总 v7.41 所有模块状态。
+
 ## 最终目标
 
 AIP 具备更好的命令中心、更完整的 PowerShell 操作包、更安全的修复系统设计、更明确的 Stage C 授权门、更可靠的项目记忆基线。
