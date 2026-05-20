@@ -195,7 +195,7 @@ async function main() {
     case 'logs': await runLogs(sub); break;
     case 'open': await runOpen(); break;
     case 'version': await runVersion(); break;
-    case 'doctor': await runDoctor(); break;
+    case 'doctor': await runDoctor(sub); break;
     case 'config': await runConfig(sub, allArgs.filter(a => !a.startsWith('--')).slice(2)); break;
     case 'gateway': await runGateway(sub); break;
     case 'ml':
