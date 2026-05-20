@@ -202,6 +202,25 @@ pnpm run db:migrate:new <name> # Create new migration
 
 ---
 
+## Operator Documentation Index (v7.45)
+
+Key operator documents in `docs/product/`:
+
+| Document | Purpose |
+|----------|---------|
+| `AIP_V7_45_OPERATOR_QUICKSTART.md` | Quickstart from PowerShell |
+| `AIP_V7_45_OPERATOR_GUIDE.md` | Full operator guide |
+| `AIP_V7_45_COMMAND_CENTER_REFERENCE.md` | CLI and web route reference |
+| `AIP_V7_45_SAFE_STATUS_REFERENCE.md` | Safe-status field guide |
+| `AIP_V7_45_RELEASE_READINESS_CHECKLIST.md` | Pre-release checklist |
+| `AIP_V7_45_INSTALL_AND_RUN_GUIDE.md` | Install and run instructions |
+| `AIP_V7_45_RECOVERY_AND_RESTORE_GUIDE.md` | Recovery procedures |
+| `AIP_V7_45_STAGE_C_SAFETY_NOTICE.md` | Stage C safety notice |
+
+All operator docs maintain Stage C disabled and feature flag off.
+
+---
+
 ## Release Policy
 
 - Sealed stable releases are tagged as `vX.Y.Z-stable`
