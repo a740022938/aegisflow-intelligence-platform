@@ -1543,6 +1543,21 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     source: 'route',
     notes: 'v7.45-P2 added as hidden direct-route. Not in sidebar. Plan-only restore point pack preview. No file restore. No secret capture.',
   },
+  {
+    id: 'handoff-pack-preview',
+    path: '/handoff-pack-preview',
+    label: 'Handoff Pack Preview',
+    component: 'HandoffPackPreview',
+    currentExposure: 'direct_route',
+    recommendedExposure: 'direct_route',
+    recommendation: 'keep_direct_route',
+    risk: 'medium',
+    gates: ['readonly_only', 'no_backend_endpoint', 'no_api_call', 'no_db_write', 'no_external_control', 'stage_c_disabled', 'no_post', 'no_execution', 'no_state_transition'],
+    reason: 'Readonly Handoff Pack Preview page. Release evidence matrix + handoff pack registry + checker. Plan-only. No file restore. No secret capture. Stage C disabled. No sidebar. No POST. No DB write. No execution.',
+    allowedNow: true,
+    source: 'route',
+    notes: 'v7.45-P4 added as hidden direct-route. Not in sidebar. Plan-only handoff pack preview. No file restore. No secret capture.',
+  },
 ];
 
 export function getNavigationExposureEntryCount(): number {
