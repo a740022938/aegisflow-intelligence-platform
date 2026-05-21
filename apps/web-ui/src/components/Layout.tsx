@@ -74,7 +74,7 @@ function AppShell() {
   const dragState = useRef<{ active: boolean; startX: number; startWidth: number }>({ active: false, startX: 0, startWidth: 288 });
 
   // ── 侧边栏分组折叠 ──
-  const DEFAULT_COLLAPSED = ['governance', 'intelligence', 'automation', 'systemAdmin', 'knowledge', 'output'];
+  const DEFAULT_COLLAPSED = ['governance', 'systemAdmin', 'knowledge', 'output'];
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set(DEFAULT_COLLAPSED));
   const toggleSection = useCallback((key: string) => {
     setCollapsed(prev => {
@@ -273,6 +273,7 @@ function AppShell() {
               </div>
               {!collapsed.has('modelAndRelease') && (<>
                 <NavItem to="/models" icon="artifact" label={t.nav.modelMgmt} />
+                <NavItem to="/model-gateway" icon="route" label="模型网关" />
                 <NavItem to="/artifacts" icon="artifact" label={t.nav.artifacts} />
                 <NavItem to="/evaluations" icon="eval" label={t.nav.evalCenter} />
                 <NavItem to="/deployments" icon="deploy" label={t.nav.deployCenter} />
@@ -307,22 +308,6 @@ function AppShell() {
                 <NavItem to="/memory-hub" icon="label" label={t.nav.memoryHubReadonly} />
                 <NavItem to="/connector-center-readonly" icon="route" label={t.nav.connectorCenterReadonly} />
               </>)}
-            </div>
-
-            {/* ── 智能增强 ── (stub — all items hidden until implemented) */}
-            <div className="nav-section nav-section-stub">
-              <div className="nav-section-label nav-section-label-stub" onClick={() => toggleSection('intelligence')}>
-                {t.nav.intelligence}
-                <span className="nav-section-arrow">{collapsed.has('intelligence') ? '▸' : '▾'}</span>
-              </div>
-            </div>
-
-            {/* ── 自动化 ── (stub — all items hidden until implemented) */}
-            <div className="nav-section nav-section-stub">
-              <div className="nav-section-label nav-section-label-stub" onClick={() => toggleSection('automation')}>
-                {t.nav.automation}
-                <span className="nav-section-arrow">{collapsed.has('automation') ? '▸' : '▾'}</span>
-              </div>
             </div>
 
             {/* ── 视觉实验室 ── */}

@@ -250,18 +250,6 @@ body.layout-resizing * {
   margin-left: 8px;
 }
 
-.nav-section-stub .nav-section-label-stub {
-  opacity: 0.35;
-  cursor: default;
-  color: var(--text-muted);
-  text-transform: none;
-  font-weight: 500;
-  letter-spacing: 0;
-  font-size: 11px;
-}
-.nav-section-stub .nav-section-label-stub:hover {
-  background: transparent;
-}
 
 .nav-item {
   display: flex;
