@@ -152,15 +152,25 @@ function AppShell() {
       const next = Math.max(220, Math.min(460, dragState.current.startWidth + delta));
       setSidebarWidth(next);
     };
+    const onPointerMove = (event: PointerEvent) => {
+      if (!dragState.current.active) return;
+      const delta = event.clientX - dragState.current.startX;
+      const next = Math.max(220, Math.min(460, dragState.current.startWidth + delta));
+      setSidebarWidth(next);
+    };
     const onUp = () => {
       dragState.current.active = false;
       document.body.classList.remove('layout-resizing');
     };
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onUp);
     return () => {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onUp);
     };
   }, []);
 
@@ -374,6 +384,11 @@ function AppShell() {
           className="sidebar-resizer"
           title="拖拽调整侧栏宽度"
           onMouseDown={(event) => {
+            dragState.current = { active: true, startX: event.clientX, startWidth: sidebarWidth };
+            document.body.classList.add('layout-resizing');
+            event.preventDefault();
+          }}
+          onPointerDown={(event) => {
             dragState.current = { active: true, startX: event.clientX, startWidth: sidebarWidth };
             document.body.classList.add('layout-resizing');
             event.preventDefault();
