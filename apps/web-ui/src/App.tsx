@@ -81,6 +81,7 @@ const OperatorEndToEndFlowPreview = lazy(() => import('./pages/OperatorEndToEndF
 const OperatorUsabilityDrillPreview = lazy(() => import('./pages/OperatorUsabilityDrillPreview'));
 const RestorePointPackPreview = lazy(() => import('./pages/RestorePointPackPreview'));
 const HandoffPackPreview = lazy(() => import('./pages/HandoffPackPreview'));
+const ModelGateway = lazy(() => import('./pages/ModelGateway'));
 
 function RouteFallback() {
   return (
@@ -140,6 +141,7 @@ const App: React.FC = () => {
             <Route path="deployments" element={<Deployments />} />
             <Route path="runs" element={<Runs />} />
             <Route path="models" element={<Models />} />
+            <Route path="model-gateway" element={<ModelGateway />} />
             <Route path="workflow-jobs" element={<WorkflowJobs />} />
             <Route path="workflow-canvas" element={<WorkflowCanvas />} />
             <Route path="approvals" element={<Approvals />} />

@@ -45,6 +45,7 @@ _*.ts
 _*.py
 temp_*.py
 tmp_*.spec.ts
+taskpack_*.txt
 __pycache__/
 *.pyc
 

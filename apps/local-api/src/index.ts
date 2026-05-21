@@ -305,7 +305,6 @@ const PUBLIC_PATHS = new Set([
   '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2',
   '/api/system/status', '/api/dashboard/summary',
   '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
-  '/api/model-gateway/status',
   '/api/runtime/status', '/api/runtime/readiness', '/api/runtime/gates', '/api/runtime/blockers',
   '/api/stage-c/status',
 ]);

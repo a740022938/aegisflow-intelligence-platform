@@ -28,7 +28,7 @@ The GovernanceCenter Registry+Validator lazy-load blueprint is complete. The tar
 | Check | Result |
 |---|---|
 | `pnpm run typecheck` | ✅ PASS |
-| `pnpm run build` | ✅ PASS |
+| `pnpm run build` | ✅ PASS (740 modules, 22.64s, exit 0) |
 | `pnpm run lint` | ✅ PASS (0 warnings) |
 | `git diff --check` | ✅ PASS |
 

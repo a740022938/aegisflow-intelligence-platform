@@ -37,6 +37,9 @@ const GREEN = '\x1b[32m';
 const YELLOW = '\x1b[33m';
 const RED = '\x1b[31m';
 const GRAY = '\x1b[90m';
+const BLUE = '\x1b[34m';
+const MAGENTA = '\x1b[35m';
+const WHITE = '\x1b[97m';
 const BOLD = '\x1b[1m';
 const RESET = '\x1b[0m';
 
@@ -46,29 +49,93 @@ let asciiMode = false;
 let noBanner = false;
 
 function c(color: string, text: string): string {
-  if (noColor || plainMode) return text;
+  if (noColor || plainMode || asciiMode) return text;
   return `${color}${text}${RESET}`;
 }
 
-function sectionDivider(label: string): string {
-  const line = '='.repeat(64);
-  if (plainMode || asciiMode) {
-    return `${line}\n${label}\n${line}`;
-  }
-  return `${c(BOLD + CYAN, line)}\n${c(BOLD + CYAN, label)}\n${c(BOLD + CYAN, line)}`;
+function faint(text: string): string {
+  return c(GRAY, text);
 }
 
-function helpCmd(cmd: string, desc: string, style: 'normal' | 'safe' | 'warn' | 'danger' | 'dim' = 'normal'): string {
-  const padded = cmd.padEnd(30);
-  if (style === 'safe') return `  ${c(GREEN, padded)}${c(GREEN, desc)}`;
-  if (style === 'warn') return `  ${c(YELLOW, padded)}${c(YELLOW, desc)}`;
-  if (style === 'danger') return `  ${c(RED, padded)}${c(RED, desc)}`;
-  if (style === 'dim') return `  ${c(GRAY, padded)}${c(GRAY, desc)}`;
-  return `  ${padded}${desc}`;
+function accent(text: string): string {
+  return c(BOLD + CYAN, text);
+}
+
+function sectionDivider(label: string, subtitle?: string): string {
+  const width = 76;
+  const line = '─'.repeat(width);
+  if (plainMode || asciiMode) {
+    const asciiLine = '-'.repeat(width);
+    return `${asciiLine}\n${label}${subtitle ? `  ${subtitle}` : ''}\n${asciiLine}`;
+  }
+  const title = `${c(BOLD + CYAN, label)}${subtitle ? `  ${c(GRAY, subtitle)}` : ''}`;
+  return `${c(GRAY, line)}\n${title}\n${c(GRAY, line)}`;
+}
+
+function badge(text: string, color: string): string {
+  const label = `[${text}]`.padEnd(8);
+  if (plainMode || asciiMode || noColor) return label.padEnd(11);
+  return `${color}${BOLD}${label}${RESET}`;
+}
+
+function helpCmd(cmd: string, desc: string, style: 'normal' | 'safe' | 'warn' | 'danger' | 'dim' | 'process' = 'normal'): string {
+  const padded = cmd.padEnd(32);
+  const styleMeta = {
+    normal: { tag: 'READ', color: BLUE, text: WHITE },
+    safe: { tag: 'SAFE', color: GREEN, text: GREEN },
+    warn: { tag: 'ASK', color: YELLOW, text: YELLOW },
+    danger: { tag: 'BLOCK', color: RED, text: RED },
+    dim: { tag: 'INFO', color: GRAY, text: GRAY },
+    process: { tag: 'PROC', color: MAGENTA, text: MAGENTA },
+  }[style];
+  return `  ${badge(styleMeta.tag, styleMeta.color)} ${c(BOLD + styleMeta.text, padded)} ${c(styleMeta.text, desc)}`;
 }
 
 function tipLine(text: string): string {
-  return c(GRAY, `  ${text}`);
+  return faint(`  ${text}`);
+}
+
+function statusValue(label: string, value: string, color: string): string {
+  return `${faint(label.padEnd(10))}${c(BOLD + color, value)}`;
+}
+
+function statusLine(label: string, value: string, color: string): string {
+  return `  ${statusValue(label, value, color)}`;
+}
+
+function printStatusPanel(version: string) {
+  const statusLines = renderStatusLines(version);
+  const values = Object.fromEntries(statusLines.map((line) => {
+    const idx = line.indexOf(':');
+    return idx > -1 ? [line.slice(0, idx), line.slice(idx + 1).trim()] : ['AIP CLI', line.replace(/^AIP CLI\s+/, '')];
+  }));
+
+  if (plainMode || asciiMode) {
+    console.log('Runtime Summary');
+    console.log(`  Version   ${values['AIP CLI'] || `v${version}`}`);
+    console.log(`  Track     ${values.Track || 'unknown'}`);
+    console.log(`  Mode      ${values.Mode || 'unknown'}`);
+    console.log(`  Release   ${values.Release || 'unknown'}`);
+    console.log(`  Project   ${values.Project || process.cwd()}`);
+    console.log(`  Git       ${values.Git || 'unknown'}`);
+    return;
+  }
+
+  console.log(accent('Runtime Summary'));
+  console.log(statusLine('Version', values['AIP CLI'] || `v${version}`, CYAN));
+  console.log(statusLine('Track', values.Track || 'unknown', MAGENTA));
+  console.log(statusLine('Mode', values.Mode || 'unknown', GREEN));
+  console.log(statusLine('Release', values.Release || 'unknown', YELLOW));
+  console.log(statusLine('Project', values.Project || process.cwd(), WHITE));
+  console.log(statusLine('Git', values.Git || 'unknown', values.Git?.includes('DIRTY') ? YELLOW : GREEN));
+}
+
+function printQuickStart() {
+  console.log(sectionDivider('[00] 推荐入口 / Quick Start', '先看状态，再做动作'));
+  console.log(helpCmd('aip status', '运行态总览：API / Web / PID / 端口', 'safe'));
+  console.log(helpCmd('aip health', 'API 健康检查，适合确认服务是否可用', 'safe'));
+  console.log(helpCmd('aip open', '打开 Web UI 控制台', 'safe'));
+  console.log(helpCmd('aip next', '只读给出下一步建议', 'safe'));
 }
 
 function printCommandCenter() {
@@ -80,53 +147,49 @@ function printCommandCenter() {
     console.log(line);
   }
 
-  const statusLines = renderStatusLines(ver);
-  for (const line of statusLines) {
-    console.log(c(GREEN, line));
-  }
+  printStatusPanel(ver);
   console.log('');
 
-  console.log(sectionDivider('[01] 常用控制 / Daily Control'));
-  console.log(helpCmd('aip start', '启动 AIP 服务', 'safe'));
-  console.log(helpCmd('aip stop', '停止 AIP 服务', 'safe'));
+  printQuickStart();
+  console.log('');
+
+  console.log(sectionDivider('[01] 服务控制 / Service Control', '会影响 AIP 进程'));
+  console.log(helpCmd('aip start', '启动 AIP 服务', 'process'));
+  console.log(helpCmd('aip stop', '停止 AIP 服务', 'process'));
   console.log(helpCmd('aip restart', '重启 AIP 服务，需要人工确认', 'warn'));
-  console.log(helpCmd('aip status', '查看运行状态'));
-  console.log(helpCmd('aip health', '检查 API 健康'));
-  console.log(helpCmd('aip open', '打开 Web UI'));
   console.log(helpCmd('aip logs api', '查看 API 日志'));
   console.log(helpCmd('aip logs web', '查看 Web UI 日志'));
   console.log(helpCmd('aip logs gateway', '查看 Gateway 日志'));
-  console.log(helpCmd('aip where', '查看项目位置与 Git 状态', 'safe'));
   console.log('');
 
-  console.log(sectionDivider('[02] 项目检查 / Diagnostics'));
+  console.log(sectionDivider('[02] 项目检查 / Diagnostics', '只读优先'));
   console.log(helpCmd('aip version', '查看版本信息'));
   console.log(helpCmd('aip doctor', '一键诊断'));
   console.log(helpCmd('aip doctor env', '检查 Node / npm / Python / Git'));
   console.log(helpCmd('aip doctor encoding', '检查 Windows 中文编码与颜色支持'));
   console.log(helpCmd('aip doctor ports', '检查 8787 等端口占用'));
   console.log(helpCmd('aip doctor stage-c', '检查 Stage C 安全边界'));
-  console.log(helpCmd('aip next', '查看建议的下一步', 'safe'));
   console.log(helpCmd('aip release-status', '查看发布状态', 'safe'));
   console.log(helpCmd('aip safe-status', '查看安全状态摘要', 'safe'));
+  console.log(helpCmd('aip where', '查看项目位置与 Git 状态', 'safe'));
   console.log('');
 
-  console.log(sectionDivider('[03] 配置管理 / Config'));
+  console.log(sectionDivider('[03] 配置管理 / Config', '修改前先 get'));
   console.log(helpCmd('aip config get', '查看当前配置'));
   console.log(helpCmd('aip config init', '初始化配置'));
-  console.log(helpCmd('aip config set home <path>', '设置 AIP 项目路径'));
-  console.log(helpCmd('aip config set <key> <val>', '设置配置项'));
+  console.log(helpCmd('aip config set home <path>', '设置 AIP 项目路径', 'warn'));
+  console.log(helpCmd('aip config set <key> <val>', '设置配置项', 'warn'));
   console.log('');
 
-  console.log(sectionDivider('[04] 网关与模型 / Gateway & ML'));
-  console.log(helpCmd('aip gateway status', '查看 Gateway 状态'));
-  console.log(helpCmd('aip gateway start', '启动 Gateway'));
-  console.log(helpCmd('aip gateway stop', '停止 Gateway'));
+  console.log(sectionDivider('[04] 网关与模型 / Gateway & ML', 'OpenClaw / 本地模型 / Claude 代理相关'));
+  console.log(helpCmd('aip gateway status', '查看 Gateway 状态', 'safe'));
+  console.log(helpCmd('aip gateway start', '启动 Gateway', 'warn'));
+  console.log(helpCmd('aip gateway stop', '停止 Gateway', 'warn'));
   console.log(helpCmd('aip gateway restart', '重启 Gateway，需要人工确认，不自动 taskkill', 'warn'));
-  console.log(helpCmd('aip ml', '本机模型命令大全'));
+  console.log(helpCmd('aip ml', '本机模型命令大全', 'safe'));
   console.log('');
 
-  console.log(sectionDivider('[05] 修复系统 / Repair'));
+  console.log(sectionDivider('[05] 修复系统 / Repair', '默认 plan-only，不直接改源码'));
   console.log(helpCmd('aip repair', '只生成修复计划，不修改文件', 'safe'));
   console.log(helpCmd('aip repair check', '检查可修复项', 'safe'));
   console.log(helpCmd('aip repair plan', '生成修复计划', 'safe'));
@@ -139,7 +202,7 @@ function printCommandCenter() {
   console.log(helpCmd('aip receipt template', '生成回执模板', 'safe'));
   console.log('');
 
-  console.log(tipLine('Tips:'));
+  console.log(c(BOLD + CYAN, '  Tips'));
   console.log(tipLine('  aip help <command>         查看某个命令详情'));
   console.log(tipLine('  aip --plain                纯文本模式，适合乱码环境'));
   console.log(tipLine('  aip --no-color             禁用颜色'));

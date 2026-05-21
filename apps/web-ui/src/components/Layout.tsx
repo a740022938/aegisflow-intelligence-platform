@@ -7,6 +7,8 @@ import { APP_META } from '../constants/appMeta';
 import { getAipTrackLabel, getAipStageCStatusLabel, getAipFeatureFlagLabel } from '../registry/product-metadata-registry';
 import { loadSidebarWidth, saveSidebarWidth } from '../layout/layoutStorage';
 
+const MODEL_GATEWAY_NAV_VISIBLE = import.meta.env.VITE_AIP_MODELGATEWAY_NAV_VISIBLE === '1';
+
 // ── SVG Icons ────────────────────────────────────────────────────────────────
 const Icon = ({ name, size = 16 }: { name: string; size?: number }) => {
   const s = size;
@@ -271,7 +273,7 @@ function AppShell() {
               </div>
               {!collapsed.has('modelAndRelease') && (<>
                 <NavItem to="/models" icon="artifact" label={t.nav.modelMgmt} />
-                <NavItem to="/model-gateway" icon="route" label="模型网关" />
+                {MODEL_GATEWAY_NAV_VISIBLE && <NavItem to="/model-gateway" icon="route" label="模型网关" />}
                 <NavItem to="/artifacts" icon="artifact" label={t.nav.artifacts} />
                 <NavItem to="/evaluations" icon="eval" label={t.nav.evalCenter} />
                 <NavItem to="/deployments" icon="deploy" label={t.nav.deployCenter} />
