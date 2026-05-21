@@ -359,11 +359,6 @@ body.layout-resizing * {
   display: none;
 }
 
-.topbar-wechat {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
 .topbar-status {
   display: inline-flex;
   align-items: center;
@@ -487,9 +482,6 @@ body.layout-resizing * {
     height: 32px;
     white-space: nowrap;
     flex-shrink: 0;
-  }
-  .topbar-wechat {
-    display: none;
   }
   .topbar-right {
     gap: 6px;

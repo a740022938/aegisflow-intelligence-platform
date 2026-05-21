@@ -126,7 +126,6 @@ function AppShell() {
     about: t.common.about,
     systems: t.common.systems,
     help: t.common.help,
-    wechat: t.common.wechat,
     langSwitch: t.common.langSwitch,
     themeSwitch: t.common.themeSwitch,
     apiStatusPending: t.common.apiStatusPending,
@@ -225,7 +224,6 @@ function AppShell() {
         <div className="topbar-right">
           <button className="topbar-action" onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}>{text.langSwitch}</button>
           <button className="topbar-action" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{text.themeSwitch}</button>
-          <span className="topbar-wechat">{text.wechat}: {APP_META.wechatId}</span>
           <div className="topbar-status">
             <span className={`topbar-status-dot ${apiOk === true ? 'ok' : apiOk === false ? 'err' : 'warn'}`} />
             {apiOk === null ? text.apiStatusPending : apiOk ? text.apiStatusOk : text.apiStatusBad}
