@@ -75,3 +75,9 @@ export type { PageSubtitleProps } from './PageSubtitle';
 
 export { default as StatusStrip } from './StatusStrip';
 export type { StatusStripItem, StatusStripProps } from './StatusStrip';
+
+export { default as ErrorState } from './ErrorState';
+export type { ErrorStateProps } from './ErrorState';
+
+export { default as AuthRequiredState } from './AuthRequiredState';
+export type { AuthRequiredStateProps } from './AuthRequiredState';

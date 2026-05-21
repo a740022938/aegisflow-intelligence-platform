@@ -8,22 +8,12 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHeader, SectionCard, EmptyState } from '../components/ui';
+import { PageHeader, SectionCard, EmptyState, AuthRequiredState } from '../components/ui';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
 import { clearLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
 import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
 import '../components/ui/shared.css';
 import '../layout/workspace-grid.css';
-
-function AuthInstructionCard() {
-  return (
-    <div style={{ maxWidth: 480, margin: '16px auto 0', padding: 12, borderRadius: 8, background: 'var(--bg-surface)', border: '1px solid var(--border)', fontSize: 12, color: 'var(--text-secondary)' }}>
-      <div style={{ fontWeight: 600, marginBottom: 4 }}>How to enable:</div>
-      <div>1. Login at POST /api/auth/login</div>
-      <div>2. Or configure OPENCLAW_HEARTBEAT_TOKEN in .env.local</div>
-    </div>
-  );
-}
 
 // Layout key for localStorage
 const LAYOUT_KEY = 'plugin_pool';
@@ -451,7 +441,18 @@ export default function PluginPool() {
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
           <button className="ui-btn ui-btn-primary" onClick={fetchPool}>Retry</button>
         </div>
-        {loadError.includes('authentication') && <AuthInstructionCard />}
+        {loadError.includes('authentication') && (
+          <AuthRequiredState
+            title="需要认证"
+            description="Plugin Pool 当前无法读取插件状态。请确认本地 API token / JWT 配置是否可用，然后重试。"
+            icon="🔒"
+            steps={[
+              'Login at POST /api/auth/login',
+              'Or configure OPENCLAW_HEARTBEAT_TOKEN in .env.local',
+            ]}
+            action={<Link to="/audit" className="ui-btn ui-btn-outline" style={{ fontSize: 13 }}>Check audit logs</Link>}
+          />
+        )}
       </div>
     );
   }
