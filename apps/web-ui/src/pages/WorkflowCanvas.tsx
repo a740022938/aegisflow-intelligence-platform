@@ -13,7 +13,7 @@ import {
   type NodeMouseHandler,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { EmptyState, PageHeader, SectionCard, StatusBadge } from '../components/ui';
+import { EmptyState, PageShell, SectionCard, StatusBadge, StatusStrip } from '../components/ui';
 import '../components/ui/shared.css';
 import './WorkflowCanvas.css';
 
@@ -176,17 +176,19 @@ export default function WorkflowCanvas() {
   }, [selectedNodeId, selectedJob, steps]);
 
   return (
-    <div className="page-root workflow-canvas-page">
-      <PageHeader
-        title="Workflow Canvas V1"
-        subtitle="React Flow"
-        actions={(
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Link className="ui-btn ui-btn-ghost ui-btn-sm" to="/workflow-jobs">列表模式</Link>
-            <button className="ui-btn ui-btn-primary ui-btn-sm" onClick={fetchJobs}>刷新</button>
-          </div>
-        )}
-      />
+    <PageShell
+      title="Workflow Canvas V1"
+      subtitle="React Flow"
+      actions={(
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Link className="ui-btn ui-btn-ghost ui-btn-sm" to="/workflow-jobs">列表模式</Link>
+          <button className="ui-btn ui-btn-primary ui-btn-sm" onClick={fetchJobs}>刷新</button>
+        </div>
+      )}
+    >
+      <StatusStrip items={[
+        { label: 'Workflow Jobs', value: String(jobs.length) },
+      ]} />
 
       <div className="workflow-canvas-layout">
         <SectionCard title={`Workflow Jobs (${jobs.length})`}>
@@ -276,7 +278,7 @@ export default function WorkflowCanvas() {
           )}
         </SectionCard>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

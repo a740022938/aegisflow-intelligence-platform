@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { EmptyState, PageHeader, SectionCard, StatusBadge } from '../components/ui';
+import { EmptyState, PageShell, SectionCard, StatusBadge, StatusStrip } from '../components/ui';
 import '../components/ui/shared.css';
 import './Feedback.css';
 
@@ -187,11 +187,16 @@ export default function FeedbackPage() {
   }, [selectedId]);
 
   return (
-    <div className="feedback-page page-root">
-      <PageHeader
-        title="自动回流 v1（v6.3.0）"
-        subtitle="回流池最小演示：列表、详情、source/trigger 过滤、导出 manifest"
-      />
+    <PageShell
+      title="自动回流 v1（v6.3.0）"
+      subtitle="回流池最小演示：列表、详情、source/trigger 过滤、导出 manifest"
+    >
+      <StatusStrip items={[
+        { label: '总批次数', value: String(summary.total) },
+        { label: '失败案例', value: String(summary.bySource.failed_case) },
+        { label: '低置信度', value: String(summary.bySource.low_confidence) },
+        { label: '手动标志', value: String(summary.bySource.manual_flag) },
+      ]} />
 
       <SectionCard title="回流概览">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 10 }}>
@@ -315,6 +320,6 @@ export default function FeedbackPage() {
       {error ? <div className="feedback-alert-error"><StatusBadge s="failed" /> {error}</div> : null}
       {notice ? <div className="feedback-alert-success"><StatusBadge s="success" /> {notice}</div> : null}
       {lastExportPath ? <div className="feedback-export-path">最近导出: {lastExportPath}</div> : null}
-    </div>
+    </PageShell>
   );
 }
