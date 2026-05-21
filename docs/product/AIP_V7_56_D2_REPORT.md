@@ -2,6 +2,8 @@
 
 **Date:** 2026-05-21
 **Phase:** D2
+**Pre-HEAD:** `d14910a`
+**Post-HEAD:** `434c7c9`
 **Status:** Draft release notes pack created, release not executed
 **Verdict:** `V7_56_D2_RELEASE_NOTES_DRAFT_READY_WITH_RELEASE_NOT_EXECUTED`
 
