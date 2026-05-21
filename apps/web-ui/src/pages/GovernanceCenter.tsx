@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import PageShell from '../components/ui/PageShell';
 import SectionCard from '../components/ui/SectionCard';
 import GovernanceCenterOverview from '../components/governance/GovernanceCenterOverview';
@@ -145,6 +145,7 @@ import MetricsHardeningRuleMatrix from '../components/governance/MetricsHardenin
 import RuntimeFoundationStatusCard from '../components/governance/RuntimeFoundationStatusCard';
 import AuthorizationDryRunStatusCard from '../components/governance/AuthorizationDryRunStatusCard';
 import { GOVERNANCE_REGISTRY } from '../registry/governance-registry';
+import { validateGovernanceRegistry, getGovernanceRegistrySummary } from '../registry/governance-registry-validator';
 import type { GovernanceModuleDefinition } from '../registry/governance-registry';
 
 const VALIDATOR_EXPECTED = { modules: 13, gates: 12, blocking: 0, warning: 0 };
@@ -369,36 +370,8 @@ function ForbiddenActionsMatrix({ modules }: { modules: GovernanceModuleDefiniti
 }
 
 export default function GovernanceCenter() {
-  const [summary, setSummary] = useState({
-    totalModules: 0,
-    byStatus: {} as Record<string, number>,
-    byRiskLevel: {} as Record<string, number>,
-    byMaturity: {} as Record<string, number>,
-    byOwnerCenter: {} as Record<string, number>,
-    dryRunOnlyCount: 0,
-    approvalRequiredCount: 0,
-    externalWriteBlockedCount: 0,
-    dangerousActionBlockedCount: 0,
-    blockedCount: 0,
-    warningCount: 0,
-    relatedRouteCount: 0,
-    missingArtifactWarningCount: 0,
-  });
-  const [validator, setValidator] = useState({
-    pass: false,
-    issues: [] as Array<{ severity: string; moduleId?: string; field?: string; message: string }>,
-    blockingCount: 0,
-    warningCount: 0,
-    infoCount: 0,
-  });
-
-  useEffect(() => {
-    import('../registry/governance-registry-validator').then(mod => {
-      setSummary(mod.getGovernanceRegistrySummary());
-      setValidator(mod.validateGovernanceRegistry());
-    });
-  }, []);
-
+  const summary = useMemo(() => getGovernanceRegistrySummary(), []);
+  const validator = useMemo(() => validateGovernanceRegistry(), []);
   const allGates = useMemo(() => GOVERNANCE_REGISTRY.flatMap(m => m.gates || []), []);
 
   const selfCheck = useMemo(() => {
