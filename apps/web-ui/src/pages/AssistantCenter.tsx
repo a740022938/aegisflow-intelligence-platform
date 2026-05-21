@@ -12,6 +12,12 @@ import type {
 } from '../types/assistant-center';
 import { APP_VERSION } from '../constants/appVersion';
 import PageShell from '../components/ui/PageShell';
+import SectionCard from '../components/ui/SectionCard';
+import StatusBadge from '../components/ui/StatusBadge';
+import StatsGrid from '../components/ui/StatsGrid';
+import StatusStrip from '../components/ui/StatusStrip';
+import EmptyState from '../components/ui/EmptyState';
+import type { StatusStripItem } from '../components/ui/StatusStrip';
 
 const API = '/api/assistant-center';
 
@@ -53,12 +59,18 @@ async function readJson<T>(url: string, init?: RequestInit): Promise<T> {
 
 function RiskBadge({ value }: { value?: string }) {
   const level = value || 'unknown';
-  return <span className={`assistant-risk assistant-risk-${level}`}>{level}</span>;
+  const statusMap: Record<string, string> = {
+    low: 'success', medium: 'warning', high: 'danger', critical: 'danger',
+  };
+  return <StatusBadge s={statusMap[level] || ''} emptyText={level} />;
 }
 
 function StatusPill({ value }: { value?: string }) {
   const status = value || 'unknown';
-  return <span className={`assistant-status assistant-status-${status}`}>{status}</span>;
+  const statusMap: Record<string, string> = {
+    online: 'success', offline: 'danger', unknown: '',
+  };
+  return <StatusBadge s={statusMap[status] || ''} emptyText={status} />;
 }
 
 function CopyButton({ text, label = '复制' }: { text: string; label?: string }) {
@@ -79,17 +91,7 @@ function CopyButton({ text, label = '复制' }: { text: string; label?: string }
   );
 }
 
-function Section({ title, extra, children }: { title: string; extra?: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <section className="assistant-section">
-      <div className="assistant-section-head">
-        <h2>{title}</h2>
-        {extra}
-      </div>
-      {children}
-    </section>
-  );
-}
+
 
 export default function AssistantCenter() {
   const [statusData, setStatusData] = useState<AssistantStatusResponse | null>(null);
@@ -207,42 +209,32 @@ export default function AssistantCenter() {
     >
 
       {error && (
-        <div className="assistant-error">
+        <div className="ui-tag ui-tag-danger" style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 12px', marginBottom: 14, fontSize: 13, lineHeight: 1.5 }}>
           <strong>读取失败</strong>
           <span>{error}</span>
         </div>
       )}
 
-      <section className="assistant-topbar">
-        <div>
-          <span className="assistant-topbar-label">总体状态</span>
-          <strong>{topSummary.state}</strong>
+      <StatusStrip
+        items={[
+          { label: '总体状态', value: topSummary.state, color: topSummary.state === 'healthy' ? 'var(--success)' : topSummary.state === 'warning' ? 'var(--warning)' : 'var(--danger)' },
+          { label: '风险等级', value: topSummary.risk, status: topSummary.risk === 'low' ? 'success' : topSummary.risk === 'medium' ? 'warning' : 'failed' },
+          { label: '在线项', value: `${topSummary.online}/${topSummary.total}` },
+          { label: '最后检查', value: formatDate(statusData?.lastCheckedAt) || '—' },
+          { label: '只读锁定', value: 'readonly', color: 'var(--success)' },
+        ]}
+      />
+      {topSummary.risk !== 'low' && (
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12, padding: '8px 12px', background: 'rgba(245,158,11,0.08)', borderRadius: 6, border: '1px solid rgba(245,158,11,0.2)' }}>
+          {topSummary.offline > 0
+            ? `${topSummary.offline} 个外部组件离线，风险等级升高。AIP 核心仍在线，不影响核心路由与决策能力。`
+            : '部分外部组件存在中高风险项，反映外部助手生态状态，不代表 AIP 核心健康度。'}
         </div>
-        <div>
-          <span className="assistant-topbar-label">风险等级</span>
-          <RiskBadge value={topSummary.risk} />
-          {topSummary.risk !== 'low' && (
-            <div className="cost-routing-policy-meta" style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-              {topSummary.offline > 0
-                ? `${topSummary.offline} 个外部组件离线，风险等级升高。AIP 核心仍在线，不影响核心路由与决策能力。`
-                : '部分外部组件存在中高风险项，反映外部助手生态状态，不代表 AIP 核心健康度。'}
-            </div>
-          )}
-        </div>
-        <div>
-          <span className="assistant-topbar-label">在线项</span>
-          <strong>{topSummary.online}/{topSummary.total}</strong>
-        </div>
-        <div>
-          <span className="assistant-topbar-label">最后检查</span>
-          <strong>{formatDate(statusData?.lastCheckedAt)}</strong>
-        </div>
-        <div className="assistant-readonly-lock">readonly · autoFixAllowed=false</div>
-      </section>
+      )}
 
-      <Section title="助手状态卡片区">
+      <SectionCard title="助手状态卡片区">
         {loading ? (
-          <div className="assistant-empty">正在读取只读状态...</div>
+          <EmptyState title="正在读取只读状态..." icon="⏳" />
         ) : statusData?.items?.length ? (
           <div className="assistant-card-grid">
             {statusData.items.map((item: AssistantStatusItem) => (
@@ -264,22 +256,25 @@ export default function AssistantCenter() {
             ))}
           </div>
         ) : (
-          <div className="assistant-empty">暂无状态数据。</div>
+          <EmptyState title="暂无状态数据" />
         )}
-      </Section>
+      </SectionCard>
 
-      <Section
+      <SectionCard
         title="全链路体检区"
-        extra={<button className="assistant-primary-btn" type="button" onClick={runFullCheck} disabled={checking}>{checking ? '检查中' : '执行只读体检'}</button>}
+        actions={<button className="ui-btn ui-btn-primary" type="button" onClick={runFullCheck} disabled={checking}>{checking ? '检查中' : '执行只读体检'}</button>}
       >
         {fullCheck ? (
           <div className="assistant-check-layout">
-            <div className="assistant-check-summary">
-              <div><span>overallStatus</span><strong>{fullCheck.overallStatus}</strong></div>
-              <div><span>riskLevel</span><RiskBadge value={fullCheck.riskLevel} /></div>
-              <div><span>requiresHumanApproval</span><strong>{String(fullCheck.requiresHumanApproval)}</strong></div>
-              <div><span>autoFixAllowed</span><strong>{String(fullCheck.autoFixAllowed)}</strong></div>
-            </div>
+            <StatsGrid
+              columns={4}
+              items={[
+                { label: 'overallStatus', value: fullCheck.overallStatus, color: fullCheck.overallStatus === 'passed' ? 'var(--success)' : 'var(--danger)' },
+                { label: 'riskLevel', value: fullCheck.riskLevel },
+                { label: 'requiresHumanApproval', value: String(fullCheck.requiresHumanApproval) },
+                { label: 'autoFixAllowed', value: String(fullCheck.autoFixAllowed) },
+              ]}
+            />
             <div className="assistant-check-list">
               {fullCheck.checks.map(item => (
                 <div className={`assistant-check-row assistant-check-${item.status}`} key={item.id}>
@@ -296,11 +291,11 @@ export default function AssistantCenter() {
             )}
           </div>
         ) : (
-          <div className="assistant-empty">点击按钮执行一次只读体检；不会保存审计，也不会触发修复。</div>
+          <EmptyState title="准备就绪" description="点击按钮执行一次只读体检；不会保存审计，也不会触发修复。" />
         )}
-      </Section>
+      </SectionCard>
 
-      <Section title="任务包生成器区">
+      <SectionCard title="任务包生成器区">
         <div className="assistant-task-grid">
           <div className="assistant-task-controls">
             <label>
@@ -309,7 +304,7 @@ export default function AssistantCenter() {
                 {TASK_TYPES.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
               </select>
             </label>
-            <button className="assistant-primary-btn" type="button" onClick={generateTaskPackage} disabled={generating}>
+            <button className="ui-btn ui-btn-primary" type="button" onClick={generateTaskPackage} disabled={generating}>
               {generating ? '生成中' : '生成任务包文本'}
             </button>
           </div>
@@ -321,9 +316,9 @@ export default function AssistantCenter() {
             <textarea readOnly value={taskText} placeholder="生成后将在这里显示任务包文本。" />
           </div>
         </div>
-      </Section>
+      </SectionCard>
 
-      <Section title="报告中心区">
+      <SectionCard title="报告中心区">
         {reports.length ? (
           <div className="assistant-table-wrap">
             <table className="assistant-table">
@@ -343,11 +338,11 @@ export default function AssistantCenter() {
             </table>
           </div>
         ) : (
-          <div className="assistant-empty">暂无报告数据。</div>
+          <EmptyState title="暂无报告数据" />
         )}
-      </Section>
+      </SectionCard>
 
-      <Section title="备份中心简表">
+      <SectionCard title="备份中心简表">
         {backups.length ? (
           <div className="assistant-table-wrap">
             <table className="assistant-table">
@@ -367,11 +362,11 @@ export default function AssistantCenter() {
             </table>
           </div>
         ) : (
-          <div className="assistant-empty">暂无备份数据。</div>
+          <EmptyState title="暂无备份数据" />
         )}
-      </Section>
+      </SectionCard>
 
-      <Section title="风险边界区">
+      <SectionCard title="风险边界区">
         {boundaries.length ? (
           <div className="assistant-boundary-list">
             {boundaries.map(item => (
@@ -389,9 +384,9 @@ export default function AssistantCenter() {
             ))}
           </div>
         ) : (
-          <div className="assistant-empty">暂无风险边界数据。</div>
+          <EmptyState title="暂无风险边界数据" />
         )}
-      </Section>
+      </SectionCard>
     </PageShell>
   );
 }
