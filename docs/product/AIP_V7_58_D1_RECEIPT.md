@@ -12,9 +12,9 @@
 | 是否完成 | ✅ 是 / YES |
 | Final Verdict | `V7_58_D1_PRODUCT_PERFORMANCE_UX_HARDENING_PLAN_READY_WITH_RELEASE_AND_RESTORE_ON_HOLD` |
 | Pre-HEAD | `3f76484` |
-| Post-HEAD | *(after commit)* |
-| Commit hash | *(after commit)* |
-| Push status | *(after push)* |
+| Post-HEAD | `fb7730b` |
+| Commit hash | `fb7730bc7f2db7f7e0e67fa076404e8431c0a6a1` |
+| Push status | ✅ Pushed to `origin/main` |
 | Desktop task pack saved path | `C:\Users\74002\Desktop\AIP_TASK_PACKS\AIP_v7.58_D1_Product_Performance_UX_Hardening_Plan_Task_Pack.txt` |
 
 ---
