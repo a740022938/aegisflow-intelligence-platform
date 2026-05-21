@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { apiService, Dataset, Task } from '../services/api';
 import {
-  StatusBadge, PageHeader, SectionCard, EmptyState,
-  InfoTable, MainlineChainStrip, EntityLinkChips,
+  StatusBadge, PageHeader, PageShell, SectionCard, EmptyState,
+  InfoTable, MainlineChainStrip, EntityLinkChips, StatusStrip,
 } from '../components/ui';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
 import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
@@ -373,16 +373,20 @@ export default function Datasets() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="page-root" ref={contentRef}>
-      <PageHeader
-        title="数据集"
-        subtitle={`${filtered.length} / ${total} 条`}
-        actions={
-          <button className="ui-btn ui-btn-primary" onClick={() => setShowCreate(true)}>+ 新建数据集</button>
-        }
-      />
-
-      <div className="ds-root" style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
+    <PageShell
+      title="数据集"
+      subtitle={`${filtered.length} / ${total} 条`}
+      actions={
+        <button className="ui-btn ui-btn-primary" onClick={() => setShowCreate(true)}>+ 新建数据集</button>
+      }
+    >
+      <StatusStrip items={[
+        { label: '数据集总数', value: String(total) },
+        { label: '布局模式', value: layoutMode },
+        { label: '编辑模式', value: layoutEdit ? '启用' : '关闭' },
+      ]} />
+      <div className="page-root" ref={contentRef} style={{ display: 'block', height: 'auto', overflow: 'visible' }}>
+        <div className="ds-root" style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: 16, alignItems: 'start' }}>
         {/* ── Left panel ── */}
         <div className="ds-left" style={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
@@ -683,5 +687,6 @@ export default function Datasets() {
         </div>
       )}
     </div>
+    </PageShell>
   );
 }
