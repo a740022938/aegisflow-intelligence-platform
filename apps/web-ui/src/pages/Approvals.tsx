@@ -1,7 +1,7 @@
 // v4.4.1 — Approvals 页面（统一控制台风格）
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { StatusBadge, PageHeader, SectionCard, EmptyState, InfoTable, MainlineChainStrip, EntityLinkChips } from '../components/ui';
+import { StatusBadge, PageShell, StatusStrip, SectionCard, EmptyState, InfoTable, MainlineChainStrip, EntityLinkChips } from '../components/ui';
 import '../components/ui/shared.css';
 
 const API = '/api';
@@ -223,42 +223,29 @@ export default function Approvals() {
   const highRiskCount = approvals.filter((a) => (a.step_name || '').toLowerCase().includes('delete') || (a.step_name || '').toLowerCase().includes('rollback')).length;
 
   return (
-    <div className="page-root" style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-      <PageHeader
-        title="Approvals"
-        subtitle={tab === 'pending' ? `${total} pending` : `${total} total`}
-        summaryStrip={
-          <div className="page-summary-strip">
-            <div className="page-summary-item">
-              <div className="page-summary-label">pending</div>
-              <div className="page-summary-value">{pendingCount}</div>
-            </div>
-            <div className="page-summary-item">
-              <div className="page-summary-label">approved</div>
-              <div className="page-summary-value">{approvedCount}</div>
-            </div>
-            <div className="page-summary-item">
-              <div className="page-summary-label">rejected</div>
-              <div className="page-summary-value">{rejectedCount}</div>
-            </div>
-            <div className="page-summary-item">
-              <div className="page-summary-label">high risk</div>
-              <div className="page-summary-value">{highRiskCount}</div>
-            </div>
+    <PageShell
+      title="Approvals"
+      subtitle={tab === 'pending' ? `${total} pending` : `${total} total`}
+      actions={
+        tab === 'pending' && selected.size > 0 ? (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="ui-btn ui-btn-success ui-btn-sm" onClick={batchApprove} disabled={!!pendingAction}>
+              Approve ({selected.size})
+            </button>
+            <button className="ui-btn ui-btn-outline ui-btn-sm" onClick={batchReject} disabled={!!pendingAction} style={{ borderColor: '#EF4444', color: '#EF4444' }}>
+              Reject ({selected.size})
+            </button>
           </div>
-        }
-        actions={
-          tab === 'pending' && selected.size > 0 ? (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="ui-btn ui-btn-success ui-btn-sm" onClick={batchApprove} disabled={!!pendingAction}>
-                Approve ({selected.size})
-              </button>
-              <button className="ui-btn ui-btn-outline ui-btn-sm" onClick={batchReject} disabled={!!pendingAction} style={{ borderColor: '#EF4444', color: '#EF4444' }}>
-                Reject ({selected.size})
-              </button>
-            </div>
-          ) : undefined
-        }
+        ) : undefined
+      }
+    >
+      <StatusStrip
+        items={[
+          { label: 'Pending', value: String(pendingCount), status: pendingCount > 0 ? 'pending' : 'completed' },
+          { label: 'Approved', value: String(approvedCount), status: 'completed' },
+          { label: 'Rejected', value: String(rejectedCount), status: 'failed' },
+          { label: 'High Risk', value: String(highRiskCount), color: highRiskCount > 0 ? '#EF4444' : undefined },
+        ]}
       />
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
@@ -489,7 +476,7 @@ export default function Approvals() {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }
 

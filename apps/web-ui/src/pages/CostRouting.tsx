@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { EmptyState, SectionCard, StatusBadge } from '../components/ui';
+import { EmptyState, SectionCard, StatusBadge, StatusStrip } from '../components/ui';
 import PageShell from '../components/ui/PageShell';
 import '../components/ui/shared.css';
 import './CostRouting.css';
@@ -1124,28 +1124,14 @@ export default function CostRoutingPage() {
       safetyText="预览模式 · 不写入配置 · 需要人工确认"
     >
 
-      <div className={`cr-router-status role-card ${roleClass('exec')}`}>
-        <div>
-          <span>版本</span>
-          <b>AIP v7.25.2 · Cost Routing v7.12.3 (preview_only)</b>
-        </div>
-        <div>
-          <span>当前模式</span>
-          <b>建议 / dry-run / preview only</b>
-        </div>
-        <div>
-          <span>安全状态</span>
-          <b>高风险任务默认人工确认</b>
-        </div>
-        <div>
-          <span>出口路线</span>
-          <b>本地 / 强推理 / 工具链 / 人工确认</b>
-        </div>
-        <div>
-          <span>执行承诺</span>
-          <b>不自动 push、删除、训练或覆盖</b>
-        </div>
-      </div>
+      <StatusStrip
+        items={[
+          { label: '模式', value: '建议 / dry-run / preview only' },
+          { label: '安全状态', value: '高风险任务默认人工确认', color: '#F59E0B' },
+          { label: '出口路线', value: '本地 / 强推理 / 工具链 / 人工确认' },
+          { label: '执行承诺', value: '不自动 push、删除、训练或覆盖', color: '#10B981' },
+        ]}
+      />
 
       <SectionCard className={`role-card ${roleClass('exec')}`} title="控制台摘要 Console Dashboard">
         <div className="cr-dashboard-grid">

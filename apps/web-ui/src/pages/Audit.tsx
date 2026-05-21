@@ -1,7 +1,7 @@
 // v4.9.0 — Audit Log Console
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { StatusBadge, PageHeader, SectionCard, EmptyState, InfoTable, LineagePanel } from '../components/ui';
+import { StatusBadge, PageShell, StatusStrip, SectionCard, EmptyState, InfoTable, LineagePanel } from '../components/ui';
 import '../components/ui/shared.css';
 import './Audit.css';
 
@@ -64,23 +64,31 @@ export default function Audit() {
     return chain;
   };
 
+  const categories = new Set(logs.map(l => l.category));
+
   return (
-    <div className="page-root">
-      <PageHeader
-        title="审计日志"
-        subtitle={`${logs.length} 条记录`}
-        actions={
-          <div className="audit-actions">
-            <select className="ui-select audit-filter-select" value={filter} onChange={e => setFilter(e.target.value)}>
-              <option value="">全部类别</option>
-              <option value="promotion">晋升</option>
-              <option value="release">发布</option>
-              <option value="system">系统</option>
-              <option value="backup">备份</option>
-            </select>
-            <button className="ui-btn ui-btn-ghost ui-btn-sm" onClick={fetchLogs}>↻</button>
-          </div>
-        }
+    <PageShell
+      title="审计日志"
+      subtitle={`${logs.length} 条记录`}
+      actions={
+        <div className="audit-actions">
+          <select className="ui-select audit-filter-select" value={filter} onChange={e => setFilter(e.target.value)}>
+            <option value="">全部类别</option>
+            <option value="promotion">晋升</option>
+            <option value="release">发布</option>
+            <option value="system">系统</option>
+            <option value="backup">备份</option>
+          </select>
+          <button className="ui-btn ui-btn-ghost ui-btn-sm" onClick={fetchLogs}>↻</button>
+        </div>
+      }
+    >
+      <StatusStrip
+        items={[
+          { label: 'Total', value: String(logs.length) },
+          { label: 'Categories', value: String(categories.size) },
+          { label: 'Filter', value: filter || 'all' },
+        ]}
       />
 
       <div className="audit-scroll">
@@ -149,7 +157,7 @@ export default function Audit() {
         </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 
