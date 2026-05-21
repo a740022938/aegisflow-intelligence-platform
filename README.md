@@ -1,12 +1,12 @@
-# AegisFlow Intelligence Platform (AIP)
+# OpenAIP (AIP)
 
 天枢智治平台 — 面向数据-训练-评估-发布全流程的本地化智能治理平台。
 
-**Current baseline: AIP v7.46 Pre-RC (product version 7.46.0)** | Stage C DISABLED | Feature Flag OFF
+**Current baseline: AIP v7.55 Release/Install/Restore Hardening** | Stage C DISABLED | Feature Flag OFF
 
-> Historical note: `v7.3.0` is the last tagged release. v7.41-v7.47 are post-release readiness phases. No tag or GitHub Release exists beyond v7.3.0.
+> Historical note: `v7.3.0` is the last tagged release. v7.41–v7.55 are post-release readiness and hardening phases. No tag or GitHub Release exists beyond v7.3.0. The platform was historically named **AegisFlow Intelligence Platform** and **AGI Model Factory**; these names appear only in legacy context and GitHub URLs.
 
-AIP v7.47 is the missing-risk closure phase. It closes 15 findings from the v7.47-D0 Missing-Risk Sweep: fresh install flow (pnpm, db:init, CLI build), version consistency (code/docs/CLI/UI alignment), restore readiness, and safety cleanup. Stage C remains disabled throughout.
+AIP v7.55 shifts from UI migration to release hardening. The Datasets shell pilot (v7.51–v7.54) is complete and sealed. This phase focuses on fresh install consistency, restore artifact standards, and release gate hardening. Stage C remains disabled throughout.
 
 **Start here:** [`START_HERE.md`](START_HERE.md)
 
@@ -200,9 +200,9 @@ pnpm run db:migrate:new <name> # Create new migration
 
 ---
 
-## Operator Documentation Index (v7.45)
+## Operator Documentation Index
 
-Key operator documents in `docs/product/`:
+Key operator documents in `docs/product/` (v7.45 series, still current):
 
 | Document | Purpose |
 |----------|---------|

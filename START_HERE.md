@@ -1,6 +1,6 @@
 # AIP — Start Here
 
-**Welcome to AegisFlow Intelligence Platform (AIP).**
+**Welcome to OpenAIP (AIP).**
 
 This document tells you where to begin. It is the single entry point for new users and AI assistants.
 
@@ -20,11 +20,11 @@ AIP is a local-first AI governance and operations platform. It provides:
 
 | Field | Value |
 |-------|-------|
-| Current baseline | **AIP v7.47 P1** (based on v7.46 Final Seal) |
-| Git HEAD | `3d5c9cf` (main) |
+| Current baseline | **AIP v7.55 Release/Install/Restore Hardening** |
+| Git HEAD | `0faf4d8` (main) |
 | Stage C | **DISABLED** |
 | Feature flag | **OFF** |
-| Release status | **Pre-RC — not yet released or tagged** |
+| Release status | **Pre-RC — not yet released or tagged beyond v7.3.0** |
 
 ## 3. Quick Start
 
@@ -53,21 +53,29 @@ See [docs/product/AIP_V7_45_INSTALL_AND_RUN_GUIDE.md](docs/product/AIP_V7_45_INS
 
 ## 4. Verify Setup
 
-After the project is running, verify everything works:
+After installing dependencies, run these verification steps:
 
 ```powershell
-# TypeScript type checking
+# 1. TypeScript type checking
 pnpm run typecheck
 
-# Production build (Web UI)
+# 2. Lint (zero warnings required)
+pnpm run lint
+
+# 3. Production build (Web UI)
 pnpm run build
 
-# Smoke tests (requires API running at http://127.0.0.1:8787)
-# Run 'pnpm run dev' first, then in a new terminal:
+# 4. CLI build
+pnpm run aip:cli:build
+node apps/aip-cli/dist/index.js --help
+
+# 5. Start the project first, then smoke tests (requires API running)
+pnpm run dev
+# In a new terminal:
 pnpm test
 
-# Check security posture
-aip safe-status
+# 6. Check security posture
+node apps/aip-cli/dist/index.js safe-status
 ```
 
 ## 5. First Commands
@@ -150,7 +158,10 @@ Before starting a new phase, read the relevant plan docs in `docs/product/`.
 
 - Pre-v7.25 docs are **legacy** (AGI Model Factory era)
 - v7.25-v7.40 docs exist but are **historical**
-- v7.41-v7.45 are the current modern series
+- v7.41-v7.45 are the modern series foundation
 - v7.46 was the **pre-RC polish** phase
-- v7.47 is the current **missing-risk closure** phase
+- v7.47 was the **missing-risk closure** phase
+- v7.48-v7.50 covered RC evidence, brand polish, and sidebar migration
+- v7.51-v7.54 completed the **Datasets shell pilot** and adapter rulebook
+- v7.55 is the **release/install/restore hardening** phase
 - **No release/tag exists beyond v7.3.0** — do not treat any later version as released
