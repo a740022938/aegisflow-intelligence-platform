@@ -11,18 +11,33 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
   const [token, setToken] = useState('');
   const [verifying, setVerifying] = useState(false);
   const mountedRef = useRef(true);
+  const verifyHardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
       abortVerify();
+      if (verifyHardTimeoutRef.current) {
+        clearTimeout(verifyHardTimeoutRef.current);
+        verifyHardTimeoutRef.current = null;
+      }
     };
   }, [abortVerify]);
 
   const handleVerify = async () => {
     if (!token.trim()) return;
     setVerifying(true);
+
+    verifyHardTimeoutRef.current = setTimeout(() => {
+      abortVerify();
+      if (verifyHardTimeoutRef.current) {
+        clearTimeout(verifyHardTimeoutRef.current);
+        verifyHardTimeoutRef.current = null;
+      }
+      if (mountedRef.current) setVerifying(false);
+    }, 9000);
+
     try {
       const ok = await verifyToken(token.trim());
       if (!mountedRef.current) return;
@@ -33,13 +48,22 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
         onVerifiedChange?.(false);
       }
     } finally {
+      if (verifyHardTimeoutRef.current) {
+        clearTimeout(verifyHardTimeoutRef.current);
+        verifyHardTimeoutRef.current = null;
+      }
       if (mountedRef.current) setVerifying(false);
     }
   };
 
   const handleClear = () => {
+    if (verifyHardTimeoutRef.current) {
+      clearTimeout(verifyHardTimeoutRef.current);
+      verifyHardTimeoutRef.current = null;
+    }
     setToken('');
     clearToken();
+    setVerifying(false);
     onVerifiedChange?.(false);
   };
 

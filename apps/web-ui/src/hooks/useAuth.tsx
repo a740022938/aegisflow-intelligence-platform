@@ -124,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (verifyTokenAbortRef.current === controller) {
         verifyTokenAbortRef.current = null;
       }
+      setStatus(prev => prev.state === 'validating' ? { ...prev, state: 'timeout', verifiedToken: false } : prev);
     }
   }, [refreshStatus]);
 

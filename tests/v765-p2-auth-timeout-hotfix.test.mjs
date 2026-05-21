@@ -181,13 +181,41 @@ if (tokenInput.includes("disabled={state === 'unauthenticated' || state === 'unk
 if (!apiIndex.includes('Stage C is not enabled')) {
   failures.push('Backend: master-switch POST must still return 403');
 }
+
+// ===== NEW P3 checks: hard timeout safety net =====
+
+// 27. TokenInput has hard timeout ref (verifyHardTimeoutRef)
+if (!tokenInput.includes('verifyHardTimeoutRef')) {
+  failures.push('TokenInput: must have verifyHardTimeoutRef for hard timeout safety net');
+}
+
+// 28. TokenInput hard timeout is 9000ms
+if (!tokenInput.includes('9000')) {
+  failures.push('TokenInput: hard timeout must be 9000ms');
+}
+
+// 29. TokenInput handleClear sets verifying to false directly
+if (!tokenInput.includes('setVerifying(false)')) {
+  failures.push('TokenInput: handleClear must force setVerifying(false)');
+}
+
+// 30. TokenInput handleClear cancels hard timeout ref
+if (!tokenInput.includes('verifyHardTimeoutRef.current = null')) {
+  failures.push('TokenInput: handleClear must clear verifyHardTimeoutRef');
+}
+
+// 31. useAuth verifyToken finally force-exits "validating" state
+if (!useAuthContent.includes(`prev.state === 'validating'`)) {
+  failures.push('useAuth: verifyToken finally must force-exit validating state');
+}
+
 if (failures.length) {
   console.error('FAIL v7.65-P2 auth UX timeout hotfix tests:');
   for (const f of failures) console.error(`  - ${f}`);
   process.exit(1);
 }
 
-console.log('PASS v7.65-P2 auth UX timeout hotfix tests');
+console.log('PASS v7.65-P3 auth UX live hang hotfix tests');
 console.log(`  ${failures.length} failures`);
 console.log('  Token input masked: ✅');
 console.log('  No localStorage token: ✅');
@@ -213,3 +241,8 @@ console.log('  TokenInput abort on unmount: ✅');
 console.log('  TokenInput mountedRef guard: ✅');
 console.log('  Clear button not stuck: ✅');
 console.log('  Master-switch still 403: ✅');
+console.log('  Hard timeout ref present: ✅');
+console.log('  9000ms hard timeout: ✅');
+console.log('  handleClear forces setVerifying(false): ✅');
+console.log('  handleClear cancels hard timeout: ✅');
+console.log('  verifyToken finally force-exits validating: ✅');

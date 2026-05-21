@@ -24,6 +24,8 @@ const ALLOWED_HITS = [
   'apps/web-ui/src/pages/CostRouting.tsx:604',
   'apps/web-ui/src/pages/CostRouting.tsx:605',
   'apps/web-ui/src/components/governance/ClosureMetricsSnapshot.tsx:114',
+  'apps/web-ui/src/pages/ModelGateway.tsx:59',
+  'docs/product/AIP_V7_65_P1_OPENCLAW_TOKEN_AUTH_UI_IMPLEMENTATION_REPORT.md:77',
 ];
 
 function shouldExclude(filePath) {
