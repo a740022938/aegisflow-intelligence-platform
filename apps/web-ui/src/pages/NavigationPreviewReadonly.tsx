@@ -121,7 +121,7 @@ export default function NavigationPreviewReadonly() {
     <PageShell
       title="导航预览中心"
       subtitle="只读预览未来 Advanced / Connector / Lab / Governance 分组结构；本页面不改变真实左侧菜单。"
-      versionLabel="AIP v7.25.2 · Navigation Preview"
+      versionLabel="AIP v7.62.0 · Navigation Preview"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="只读预览 · 不改变菜单 · 不启用 Stage C · 不执行菜单移动"

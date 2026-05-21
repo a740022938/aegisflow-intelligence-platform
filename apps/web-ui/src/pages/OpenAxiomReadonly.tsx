@@ -328,7 +328,7 @@ function OpenAxiomReadonly() {
     <PageShell
       title="OpenAxiom 只读检查"
       subtitle="只读检查 OpenAxiom 项目、标签健康、YOLO dry-run 与治理建议，不修改 label 或模型文件。"
-      versionLabel="AIP v7.25.2 · OpenAxiom Integration"
+      versionLabel="AIP v7.62.0 · OpenAxiom Integration"
       maturity="external"
       safetyBoundary="readonly"
       safetyText="只读模式 · 不修改 label · 不执行保存/恢复/训练"

@@ -133,7 +133,7 @@ export default function ConnectorCenterReadonly() {
     <PageShell
       title="Connector Center"
       subtitle="Readonly capability overview — external tools, AI assistants, model platforms, and memory system integration status"
-      versionLabel="AIP v7.25.2 · Connector Center Preview"
+      versionLabel="AIP v7.62.0 · Connector Center Preview"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly · No external writes · No connector control · No API calls"

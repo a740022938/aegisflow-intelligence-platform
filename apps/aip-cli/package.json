@@ -1,7 +1,7 @@
 {
   "name": "@aip/cli",
-  "version": "7.55.0",
-  "description": "AIP (AegisFlow Intelligence Platform) official CLI",
+  "version": "7.62.0",
+  "description": "AIP (OpenAIP) official CLI",
   "type": "module",
   "bin": {
     "aip": "./dist/index.js"

@@ -432,7 +432,7 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.25.2 · Final Seal Candidate"
+      versionLabel="AIP v7.62.0 · Release Baseline"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · v7.25.2 controlled dry-run validation · Safe tables · Deny-by-default evaluator · Synthetic dry-run fixtures · API rejection gates · No production side effects"

@@ -1,20 +1,20 @@
 export const AIP_PRODUCT_NAME = 'OpenAIP';
-export const AIP_PRODUCT_VERSION = 'v7.55.0';
-export const AIP_SEAL_STATUS = 'Final Seal Candidate';
-export const AIP_BUILD_DATE = '2026.05.16';
+export const AIP_PRODUCT_VERSION = 'v7.62.0';
+export const AIP_SEAL_STATUS = 'released';
+export const AIP_BUILD_DATE = '2026.05.22';
 export const AIP_SAFETY_MODE = 'readonly-first';
 export const AIP_STAGE_C = 'disabled';
-export const AIP_TRACK = 'rc';
+export const AIP_TRACK = 'stable';
 export const AIP_FEATURE_FLAG = 'off';
 
 export const AIP_PRODUCT_METADATA = {
   productName: 'OpenAIP',
-  productVersion: 'v7.55.0',
-  sealStatus: 'Final Seal Candidate',
-  buildDate: '2026.05.16',
+  productVersion: 'v7.62.0',
+  sealStatus: 'released',
+  buildDate: '2026.05.22',
   safetyMode: 'readonly-first',
   stageC: 'disabled',
-  track: 'rc',
+  track: 'stable',
   featureFlag: 'off',
 } as const;
 
@@ -35,7 +35,8 @@ export function getAipStageCStatusLabel(): string {
 }
 
 export function getAipTrackLabel(): string {
-  return AIP_TRACK === 'rc' ? 'RC' : AIP_TRACK === 'stable' ? 'Stable' : 'Dev';
+  const labels: Record<string, string> = { rc: 'RC', stable: 'Stable', dev: 'Dev' };
+  return labels[AIP_TRACK] || 'Dev';
 }
 
 export function getAipFeatureFlagLabel(): string {

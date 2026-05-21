@@ -1118,7 +1118,7 @@ export default function CostRoutingPage() {
     <PageShell
       title="AI Router Console / 成本路由中心"
       subtitle="AI Router Console — 只读/预览模式，不执行真实路由，不写入数据库，不调用外部系统"
-      versionLabel="AIP v7.25.2 · Cost Routing v7.12.3"
+      versionLabel="AIP v7.62.0 · Cost Routing"
       maturity="preview"
       safetyBoundary="preview"
       safetyText="预览模式 · 不写入配置 · 需要人工确认"

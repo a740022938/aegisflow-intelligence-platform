@@ -25,7 +25,7 @@ export default function RuntimeFoundationStatusCard() {
       borderRadius: 8, padding: 14, fontSize: 11, marginBottom: 12,
     }}>
       <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 8 }}>
-        v7.25 Runtime Foundation
+        v7.62 Runtime Foundation (Release Baseline)
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {[

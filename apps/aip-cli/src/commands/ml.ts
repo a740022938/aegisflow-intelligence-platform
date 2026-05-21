@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 // Fallback manual content in case docs/ml_manual.txt is unavailable
 const FALLBACK_MANUAL = `AIP 本机命令大全（简版）
-稳定基线：Node v22.19.0 / npm 10.9.3 / OpenClaw 2026.3.23 / AIP 7.3.0
+ 稳定基线：Node v22.19.0 / npm 10.9.3 / OpenClaw 2026.3.23 / AIP 7.62.0
 
 AIP 常用命令:
 - aip version

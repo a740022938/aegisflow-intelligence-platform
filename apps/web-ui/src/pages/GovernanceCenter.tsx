@@ -396,7 +396,7 @@ export default function GovernanceCenter() {
     <PageShell
       title="Governance Center"
       subtitle="Readonly Stage C governance preview — policy review only, no real controls"
-      versionLabel="AIP v7.25.2 · Governance Preview"
+      versionLabel="AIP v7.62.0 · Governance Preview"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly governance preview · Stage C deferred · No approval controls · No mutation paths · No external writes · No executable controls · Design-only gates · Schema implemented · Synthetic dry-run only"

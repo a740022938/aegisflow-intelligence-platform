@@ -81,6 +81,7 @@ import { registerMemoryHubRoutes } from './routes/memory-hub/index.js';
 import { registerAuthorizationRoutes } from './routes/authorization/index.js';
 import { registerReadonlyStatusRoutes } from './runtime/readonly-status.js';
 import { registerStageCStatusRoutes } from './stage-c/status.js';
+import { registerModelGatewayRoutes } from './model-gateway/index.js';
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -275,7 +276,7 @@ registerWebSocketHub(app);
 // Swagger/OpenAPI 文档
 app.register(swagger, {
   openapi: {
-    info: { title: 'AegisFlow Intelligence Platform API', version: APP_VERSION, description: '天枢智治平台 — AI ML Pipeline 自动化管理 API' },
+    info: { title: 'OpenAIP (AIP) API', version: APP_VERSION, description: '天枢智治平台 — AI ML Pipeline 自动化管理 API' },
     servers: [{ url: 'http://localhost:8787', description: 'Local dev' }],
     components: { securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' } } },
   },
@@ -304,6 +305,7 @@ const PUBLIC_PATHS = new Set([
   '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2',
   '/api/system/status', '/api/dashboard/summary',
   '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
+  '/api/model-gateway/status',
   '/api/runtime/status', '/api/runtime/readiness', '/api/runtime/gates', '/api/runtime/blockers',
   '/api/stage-c/status',
 ]);
@@ -922,7 +924,7 @@ app.get('/api/db/ping', async (request, reply) => {
 // 根路径
 app.get('/', async (request, reply) => {
   return {
-    message: 'AegisFlow Intelligence Platform Local API (AGI Model Factory legacy compatible)',
+    message: 'OpenAIP (AIP) Local API (AGI Model Factory legacy compatible)',
     endpoints: [
       { method: 'GET', path: '/', description: 'API信息' },
       { method: 'GET', path: '/api/health', description: '健康检查' },
@@ -3534,6 +3536,7 @@ registerReadonlyStatusRoutes(app);
 
 // ── Stage C First Slice Status (v7.39) ──────────────────────────────────────
 registerStageCStatusRoutes(app);
+registerModelGatewayRoutes(app);
 
 // ══ v6.0.0: Plugin System ════════════════════════════════════════════════════
 // M6: 插件系统默认启用，不再依赖环境变量

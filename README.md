@@ -2,11 +2,11 @@
 
 天枢智治平台 — 面向数据-训练-评估-发布全流程的本地化智能治理平台。
 
-**Current baseline: AIP v7.55 Release/Install/Restore Hardening** | Stage C DISABLED | Feature Flag OFF
+**Current baseline: AIP v7.62.0 (Released)** | Stage C DISABLED | Feature Flag OFF | [GitHub Release](https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v7.62.0)
 
-> Historical note: `v7.3.0` is the last tagged release. v7.41–v7.55 are post-release readiness and hardening phases. No tag or GitHub Release exists beyond v7.3.0. The platform was historically named **AegisFlow Intelligence Platform** and **AGI Model Factory**; these names appear only in legacy context and GitHub URLs.
+> OpenAIP v7.62.0 is the latest GitHub Release, tagged at commit `e6be163`. The platform was historically named **AegisFlow Intelligence Platform** and **AGI Model Factory**; these names appear only in legacy context and GitHub URLs. Current maintenance track: v7.63-dev.
 
-AIP v7.55 shifts from UI migration to release hardening. The Datasets shell pilot (v7.51–v7.54) is complete and sealed. This phase focuses on fresh install consistency, restore artifact standards, and release gate hardening. Stage C remains disabled throughout.
+AIP v7.62.0 is the first formal GitHub Release after the v7.5x–v7.6x hardening cycle. Stage C remains disabled throughout. Current track: v7.63-dev maintenance/cleanup.
 
 **Start here:** [`START_HERE.md`](START_HERE.md)
 
