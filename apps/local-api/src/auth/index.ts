@@ -88,6 +88,38 @@ export function registerAuthRoutes(app: FastifyInstance) {
       return { ok: true, users };
     } catch { return reply.code(401).send({ ok: false, error: 'unauthorized' }); }
   });
+
+  app.get('/api/auth/status', async (request: any, reply: any) => {
+    let jwtUser = null;
+    try {
+      await request.jwtVerify();
+      jwtUser = { username: request.user.username, role: request.user.role };
+    } catch { /* not authenticated */ }
+
+    const tokenConfigured = !!String(process.env.OPENCLAW_HEARTBEAT_TOKEN || '').trim();
+
+    let online: boolean | null = null;
+    let masterSwitchEnabled = false;
+    let lastHeartbeatAt: string | null = null;
+    try {
+      const row = db.prepare('SELECT * FROM openclaw_control WHERE id = 1').get() as any;
+      if (row) {
+        masterSwitchEnabled = !!row.enabled;
+        lastHeartbeatAt = row.last_heartbeat_at || null;
+        if (lastHeartbeatAt) {
+          const hbTime = new Date(lastHeartbeatAt).getTime();
+          const timeoutSec = Number(row.heartbeat_timeout_sec || 25);
+          online = (Date.now() - hbTime) <= timeoutSec * 1000;
+        }
+      }
+    } catch { /* openclaw_control table not available */ }
+
+    return {
+      ok: true,
+      jwt: { authenticated: !!jwtUser, username: jwtUser?.username || null, role: jwtUser?.role || null },
+      openclaw: { tokenConfigured, online, masterSwitchEnabled, lastHeartbeatAt },
+    };
+  });
 }
 
 export function authMiddleware(app: FastifyInstance) {

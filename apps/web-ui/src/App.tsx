@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
+import { AuthProvider } from './hooks/useAuth';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Tasks = lazy(() => import('./pages/Tasks'));
@@ -126,6 +127,7 @@ const App: React.FC = () => {
 
   return (
     <Router>
+      <AuthProvider>
       <Suspense fallback={<RouteFallback />}>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -232,6 +234,7 @@ const App: React.FC = () => {
           </Route>
         </Routes>
       </Suspense>
+      </AuthProvider>
     </Router>
   );
 };

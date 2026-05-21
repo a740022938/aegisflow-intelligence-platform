@@ -8,7 +8,8 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PageHeader, SectionCard, EmptyState, AuthRequiredState } from '../components/ui';
+import { PageHeader, SectionCard, EmptyState, AuthRequiredState, TokenInput } from '../components/ui';
+import { useAuth } from '../hooks/useAuth';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
 import { clearLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
 import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
@@ -148,6 +149,8 @@ export default function PluginPool() {
   const [items, setItems] = useState<PluginItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const auth = useAuth();
+  const [tokenVerified, setTokenVerified] = useState(false);
   const [busyId, setBusyId] = useState('');
   const [q, setQ] = useState('');
   const [selected, setSelected] = useState<PluginItem | null>(null);
@@ -442,16 +445,21 @@ export default function PluginPool() {
           <button className="ui-btn ui-btn-primary" onClick={fetchPool}>Retry</button>
         </div>
         {loadError.includes('authentication') && (
-          <AuthRequiredState
-            title="需要认证"
-            description="Plugin Pool 当前无法读取插件状态。请确认本地 API token / JWT 配置是否可用，然后重试。"
-            icon="🔒"
-            steps={[
-              'Login at POST /api/auth/login',
-              'Or configure OPENCLAW_HEARTBEAT_TOKEN in .env.local',
-            ]}
-            action={<Link to="/audit" className="ui-btn ui-btn-outline" style={{ fontSize: 13 }}>Check audit logs</Link>}
-          />
+          <div style={{ maxWidth: 500, margin: '20px auto 0' }}>
+            <SectionCard title="授权验证">
+              <div style={{ marginBottom: 12, fontSize: 13, color: 'var(--text-secondary)' }}>
+                插件池需要授权后查看。请输入 OpenClaw Token 进行当前会话验证。验证不会自动开启执行总闸。
+              </div>
+              <TokenInput onVerifiedChange={setTokenVerified} />
+              {tokenVerified && (
+                <div style={{ marginTop: 12 }}>
+                  <button className="ui-btn ui-btn-primary ui-btn-sm" onClick={fetchPool}>
+                    重新加载插件池
+                  </button>
+                </div>
+              )}
+            </SectionCard>
+          </div>
         )}
       </div>
     );

@@ -302,7 +302,8 @@ authMiddleware(app);
 // 全局认证守卫: /api/* 路由除白名单外均需 JWT
 const PUBLIC_PATHS = new Set([
   '/api/health', '/api/comfy/health', '/api/db/ping', '/api/metrics', '/api/auth/login',
-  '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2',
+  '/api/auth/status',
+  '/api/openclaw/heartbeat', '/api/openclaw/heartbeat-v2', '/api/openclaw/auth/check',
   '/api/system/status', '/api/dashboard/summary',
   '/api/comfy/health', '/api/comfy/generate', '/api/comfy/history',
   '/api/runtime/status', '/api/runtime/readiness', '/api/runtime/gates', '/api/runtime/blockers',
@@ -714,6 +715,23 @@ app.post('/api/openclaw/token', async (request: any, reply: any) => {
   } catch (err: any) {
     return reply.code(500).send({ ok: false, error: String(err?.message || err) });
   }
+});
+
+app.post('/api/openclaw/auth/check', async (request: any, reply: any) => {
+  const body = request.body || {};
+  const token = String(body.heartbeat_token || body.token || '').trim();
+  if (!token) {
+    return reply.code(400).send({ ok: false, error: 'token 不能为空' });
+  }
+  const configuredToken = String(process.env.OPENCLAW_HEARTBEAT_TOKEN || '').trim();
+  if (!configuredToken) {
+    return { ok: true, valid: false, configured: false, error: '服务器未配置 OPENCLAW_HEARTBEAT_TOKEN' };
+  }
+  const valid = token === configuredToken;
+  if (!valid) {
+    return { ok: true, valid: false, configured: true, error: 'Token 验证失败' };
+  }
+  return { ok: true, valid: true, configured: true };
 });
 
 app.post('/api/openclaw/circuit/recover', async (request: any, reply: any) => {

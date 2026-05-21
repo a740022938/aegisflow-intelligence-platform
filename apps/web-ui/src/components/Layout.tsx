@@ -6,6 +6,7 @@ import { APP_VERSION, BUILD_DATE } from '../constants/appVersion';
 import { APP_META } from '../constants/appMeta';
 import { getAipTrackLabel, getAipStageCStatusLabel, getAipFeatureFlagLabel } from '../registry/product-metadata-registry';
 import { loadSidebarWidth, saveSidebarWidth } from '../layout/layoutStorage';
+import { useAuth } from '../hooks/useAuth';
 
 const MODEL_GATEWAY_NAV_VISIBLE = import.meta.env.VITE_AIP_MODELGATEWAY_NAV_VISIBLE === '1';
 
@@ -135,6 +136,8 @@ function AppShell() {
     apiStatusBad: t.common.apiStatusBad,
   };
   const displayVersion = apiVersion && apiVersion !== '…' ? apiVersion : APP_VERSION;
+  const auth = useAuth();
+  const authState = auth.status.state;
   const openclawStatus = systemData?.openclaw?.status || {};
   const openclawOnlineStatus = systemData?.openclaw?.online_status ?? openclawStatus.online_status;
   const openclawCircuitState = systemData?.openclaw?.circuit_state ?? openclawStatus.circuit_status;
@@ -229,6 +232,10 @@ function AppShell() {
           <div className="topbar-status">
             <span className={`topbar-status-dot ${apiOk === true ? 'ok' : apiOk === false ? 'err' : 'warn'}`} />
             {apiOk === null ? text.apiStatusPending : apiOk ? text.apiStatusOk : text.apiStatusBad}
+          </div>
+          <div className="topbar-status" style={{ marginLeft: 8, cursor: 'pointer' }} title="授权状态" onClick={() => { const el = document.getElementById('auth-status-panel'); if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none'; }}>
+            <span className={`topbar-status-dot ${authState === 'authorized' ? 'ok' : authState === 'invalid' || authState === 'unauthenticated' ? 'err' : 'warn'}`} />
+            {authState === 'authorized' ? '已授权' : authState === 'validating' ? '验证中' : authState === 'invalid' ? '无效' : authState === 'openclaw_unreachable' ? '未连接' : '未授权'}
           </div>
         </div>
       </header>

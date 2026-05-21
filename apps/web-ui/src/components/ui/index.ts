@@ -81,3 +81,6 @@ export type { ErrorStateProps } from './ErrorState';
 
 export { default as AuthRequiredState } from './AuthRequiredState';
 export type { AuthRequiredStateProps } from './AuthRequiredState';
+
+export { default as TokenInput } from './TokenInput';
+export type { TokenInputProps } from './TokenInput';

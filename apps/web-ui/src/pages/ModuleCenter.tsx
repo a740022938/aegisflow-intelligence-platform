@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { EmptyState, PageHeader, SectionCard, StatusBadge } from '../components/ui';
+import { EmptyState, PageHeader, SectionCard, StatusBadge, TokenInput } from '../components/ui';
+import { useAuth } from '../hooks/useAuth';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
 import { clearLayout, loadLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
 import { useResponsiveLayoutMode } from '../hooks/useResponsiveLayoutMode';
@@ -136,6 +137,8 @@ export default function ModuleCenter() {
   const [busyKey, setBusyKey] = useState('');
   const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({ health: true, openclaw: true, pool: true, jobs: true, routes: true, audit: true, summary: true });
   const [unauthorized, setUnauthorized] = useState(false);
+  const auth = useAuth();
+  const authState = auth.status.state;
   const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
   const [layouts, setLayouts] = useState<LayoutConfig>(() => loadLayout(LAYOUT_KEY) || DEFAULT_LAYOUTS);
 
@@ -460,7 +463,7 @@ export default function ModuleCenter() {
       content: (
         <SectionCard title="模块操作" description="常用维护动作" bodyClassName="module-section-body module-section-body-actions">
           <div className="module-actions">
-            <button className={`ui-btn ui-btn-sm ${snapshot?.openclawEnabled ? 'ui-btn-outline' : 'ui-btn-success'}`} onClick={toggleOpenClaw} disabled={busyKey === 'openclaw'}>
+            <button className={`ui-btn ui-btn-sm ${snapshot?.openclawEnabled ? 'ui-btn-outline' : 'ui-btn-success'}`} onClick={toggleOpenClaw} disabled={busyKey === 'openclaw' || authState !== 'authorized'} title={authState !== 'authorized' ? '请先完成授权验证' : ''}>
               {busyKey === 'openclaw' ? '处理中...' : snapshot?.openclawEnabled ? '关闭 OpenClaw 总闸' : '开启 OpenClaw 总闸'}
             </button>
             <button className="ui-btn ui-btn-outline ui-btn-sm" onClick={reconcileWorkflow} disabled={busyKey === 'workflow-reconcile'}>
@@ -564,11 +567,23 @@ export default function ModuleCenter() {
 
       {unauthorized && (
         <SectionCard title="身份认证" style={{ marginBottom: 16 }}>
-          <div className="module-issue-item" style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#991b1b', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 18 }}>⚠️</span>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: 13 }}>当前身份信息已过期或不可用</div>
-              <div style={{ fontSize: 11, opacity: 0.8 }}>部分数据未返回，请刷新页面或重新认证。以下显示缓存/默认值。</div>
+          <div style={{ marginBottom: 12, fontSize: 13, color: 'var(--text-secondary)' }}>
+            部分数据未返回，请输入 Token 进行当前会话验证。以下可能显示缓存/默认值。
+          </div>
+          <TokenInput />
+          <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 8, background: '#fefce8', border: '1px solid #fde68a', fontSize: 12 }}>
+            <div style={{ fontWeight: 700, color: '#92400e', marginBottom: 4 }}>OpenClaw 总闸状态</div>
+            <div style={{ color: '#78350f' }}>
+              {!auth.status.openclaw.tokenConfigured
+                ? '未检测到 Token 配置。请先完成 Token 验证。'
+                : authState !== 'authorized'
+                  ? 'Token 未验证，无法开启总闸。请先完成授权验证。'
+                  : !auth.status.openclaw.online
+                    ? 'OpenClaw 未连接，总闸无法开启。'
+                    : '已授权，但总闸仍保持关闭。开启前需要二次确认。'}
+            </div>
+            <div style={{ marginTop: 4, opacity: 0.7 }}>
+              {snapshot?.openclawEnabled ? '总闸状态: 已开启' : '总闸状态: 已关闭'}
             </div>
           </div>
         </SectionCard>
