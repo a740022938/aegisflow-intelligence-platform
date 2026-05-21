@@ -69,32 +69,37 @@ Verify clean install flow still works.
 
 ---
 
-### v7.55-P4 — Release Gate Evidence Pack
+### v7.55-P4 — Release Gate Evidence Pack ✅ Completed
 
 **Objective:** Produce unified evidence pack for eventual release decision.
 
 **Deliverables:**
-- Run full validation suite (typecheck, build, lint, test, secret:scan)
-- Generate evidence pack document
-- Update release notes draft
-- Update release authorization template
+- ✅ Release Gate Evidence Pack — `AIP_V7_55_P4_RELEASE_GATE_EVIDENCE_PACK.md`
+- ✅ Version/Metadata Evidence — `AIP_V7_55_P4_VERSION_METADATA_EVIDENCE.md`
+- ✅ Safety Boundary Evidence — `AIP_V7_55_P4_SAFETY_BOUNDARY_EVIDENCE.md`
+- ✅ Go/No-Go Decision Matrix — `AIP_V7_55_P4_RELEASE_GATE_DECISION_MATRIX.md`
+- ✅ Human Authorization Template — `AIP_V7_55_P4_RELEASE_AUTHORIZATION_TEMPLATE.md`
+- ✅ Final report — `AIP_V7_55_P4_FINAL_REPORT.md`
+- ✅ Full validation (typecheck, build, lint, diff-check)
 
-**No tag/release in P4.**
+**P4 Decision:** `RELEASE_GATE_EVIDENCE_READY_BUT_RELEASE_NOT_AUTHORIZED`
+
+**No tag/release in P4.** ✅
 
 ---
 
-### v7.55-P4 — Local RC Verification Recheck
+### v7.55-P5 — Local RC Verification Recheck
 
 **Objective:** Re-run all verification from scratch on current HEAD.
 
 **Deliverables:**
 - Fresh clone verification
-- Full test suite run
-- Restore dry run
+- Full test suite run (with API start authorization)
+- Restore dry run (requires restore point zip)
 - Evidence pack update
 - Go/No-Go assessment for release
 
-**Still no tag/release in P4.**
+**Still no tag/release in P5.**
 
 ---
 
