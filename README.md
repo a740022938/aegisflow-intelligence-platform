@@ -200,9 +200,31 @@ pnpm run db:migrate:new <name> # Create new migration
 
 ---
 
-## Operator Documentation Index
+## Reading Order
 
-Key operator documents in `docs/product/` (v7.45 series, still current):
+### Current baseline (v7.55)
+
+| Step | Document | Purpose |
+|------|----------|---------|
+| 1 | `START_HERE.md` | **Start here** — install, configure, and run |
+| 2 | `README.md` | Project overview and CLI reference |
+| 3 | `docs/product/AIP_V7_55_D1_ROADMAP.md` | v7.55 phase roadmap |
+| 4 | `docs/product/AIP_V7_55_P1_FRESH_INSTALL_DOCS_CONSISTENCY_RESULT.md` | Fresh install hardening result |
+| 5 | `docs/product/AIP_V7_55_P2_RESTORE_RESULT.md` | Restore artifact dry pack result |
+| 6 | `docs/product/AIP_V7_55_D1_FRESH_INSTALL_HARDENING_PLAN.md` | Install hardening plan |
+| 7 | `docs/product/AIP_V7_55_D1_RESTORE_HARDENING_PLAN.md` | Restore hardening plan |
+| 8 | `docs/product/AIP_V7_55_D1_RELEASE_GATE_HARDENING_PLAN.md` | Release gate hardening plan |
+
+### Design-system reference (v7.51–v7.54, Datasets pilot)
+
+| Document | Purpose |
+|----------|---------|
+| `AIP_V7_54_P3_ROADMAP_UPDATE.md` | Datasets shell pilot closure |
+| `AIP_V7_53_D0_DEFERRED_COMPLEXITY_INVENTORY.md` | Deferred complexity inventory |
+
+### Historical operator guides (v7.45 series)
+
+These remain valid as design-system and operator references but are superseded by v7.55 docs for install/restore/release gate workflows:
 
 | Document | Purpose |
 |----------|---------|
@@ -213,9 +235,7 @@ Key operator documents in `docs/product/` (v7.45 series, still current):
 | `AIP_V7_45_RELEASE_READINESS_CHECKLIST.md` | Pre-release checklist |
 | `AIP_V7_45_INSTALL_AND_RUN_GUIDE.md` | Install and run instructions |
 | `AIP_V7_45_RECOVERY_AND_RESTORE_GUIDE.md` | Recovery procedures |
-| `AIP_V7_45_STAGE_C_SAFETY_NOTICE.md` | Stage C safety notice |
-
-All operator docs maintain Stage C disabled and feature flag off.
+| `AIP_V7_45_STAGE_C_SAFETY_NOTICE.md` | Stage C safety notice
 
 ---
 

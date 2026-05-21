@@ -1,5 +1,5 @@
 export const AIP_PRODUCT_NAME = 'OpenAIP';
-export const AIP_PRODUCT_VERSION = 'v7.46.0';
+export const AIP_PRODUCT_VERSION = 'v7.55.0';
 export const AIP_SEAL_STATUS = 'Final Seal Candidate';
 export const AIP_BUILD_DATE = '2026.05.16';
 export const AIP_SAFETY_MODE = 'readonly-first';
@@ -9,7 +9,7 @@ export const AIP_FEATURE_FLAG = 'off';
 
 export const AIP_PRODUCT_METADATA = {
   productName: 'OpenAIP',
-  productVersion: 'v7.46.0',
+  productVersion: 'v7.55.0',
   sealStatus: 'Final Seal Candidate',
   buildDate: '2026.05.16',
   safetyMode: 'readonly-first',

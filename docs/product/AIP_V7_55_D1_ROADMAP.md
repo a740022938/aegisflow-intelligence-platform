@@ -52,7 +52,24 @@ Verify clean install flow still works.
 
 ---
 
-### v7.55-P3 — Release Gate Evidence Pack
+### v7.55-P3 — Version / Env / Reading Order Consistency Fix ✅ Completed
+
+**Objective:** Close three deferred findings from P1: version metadata (7.46.0 → 7.55.0), .env guidance hardening, and reading order update.
+
+**Deliverables:**
+- ✅ Version consistency review — `AIP_V7_55_P3_VERSION_CONSISTENCY_REVIEW.md`
+- ✅ Version metadata fix — 6 files bumped from 7.46.0 to 7.55.0
+- ✅ .env guidance update — `AIP_V7_55_P3_ENV_GUIDANCE_UPDATE.md`
+- ✅ Reading order update — `AIP_V7_55_P3_READING_ORDER_UPDATE.md`
+- ✅ Full validation (typecheck, build, lint) | git diff --check
+
+**No tag/release in P3.** ✅
+
+**Result:** `V7_55_P3_VERSION_ENV_READING_ORDER_CONSISTENCY_READY_WITH_STAGE_C_DISABLED`
+
+---
+
+### v7.55-P4 — Release Gate Evidence Pack
 
 **Objective:** Produce unified evidence pack for eventual release decision.
 
@@ -62,7 +79,7 @@ Verify clean install flow still works.
 - Update release notes draft
 - Update release authorization template
 
-**No tag/release in P3.**
+**No tag/release in P4.**
 
 ---
 
