@@ -15,8 +15,9 @@ Date: 2026-05-22
 | Service restart / taskkill | No |
 | External connector control | No |
 | Validation | typecheck/build/lint/diff-check/P3 test all PASS |
-| Commit hash | `50ae395` |
-| Pushed to origin/main | `PENDING` |
+| Implementation commit hash | `d81fbfc` |
+| Metadata receipt commit hash | latest `origin/main` HEAD after push |
+| Pushed to origin/main | `YES` |
 
 Validation commands:
 

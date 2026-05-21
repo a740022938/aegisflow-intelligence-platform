@@ -88,5 +88,6 @@ These were not part of the P3 polish scope.
 
 ## 8. Commit / Push
 
-- Commit hash: `50ae395`
-- Pushed to `origin/main`: `PENDING`
+- Implementation commit hash: `d81fbfc`
+- Metadata receipt commit hash: see latest `origin/main` HEAD after push
+- Pushed to `origin/main`: `YES`
