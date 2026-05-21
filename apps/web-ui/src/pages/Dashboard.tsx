@@ -9,7 +9,8 @@ import { APP_META } from '../constants/appMeta';
 import { roleClass } from '../theme/colorRoles';
 import WorkspaceGrid from '../layout/WorkspaceGrid';
 import { clearLayout, saveLayout, type LayoutConfig } from '../layout/layoutStorage';
-import { PageHeader } from '../components/ui';
+import { PageShell, StatusStrip } from '../components/ui';
+import { getAipTrackLabel, getAipStageCStatusLabel, getAipFeatureFlagLabel } from '../registry/product-metadata-registry';
 
 // Plugin Status 类型定义
 interface Plugin {
@@ -626,61 +627,73 @@ export default function Dashboard() {
   }, [s, activities, plugins, lang, t, td, openclaw, openclawEnabled, ocStatus, switchBusy, toggleOpenClawSwitch, navigate, isActive, pluginStats]);
 
   return (
-    <div className="page-root dashboard-page" ref={contentRef}>
-      <PageHeader
-        title={APP_META.appName}
-        subtitle={td.title}
-        actions={(
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span className="dash-version">v{displayVersion}</span>
-            <button className="dash-refresh-btn" onClick={fetchAll} disabled={loading}>
-              {loading ? '⟳' : '↻'}
-            </button>
-              <button
-                className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
-                onClick={toggleEdit}
-                disabled={!canUseLayoutEditor}
-                title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
-              >
-              {layoutEdit ? '退出布局编辑' : '布局编辑'}
-            </button>
-            <button
-              className="ui-btn ui-btn-outline ui-btn-sm"
-              onClick={() => {
-                clearLayout(LAYOUT_KEY);
-                setLayouts(DEFAULT_LAYOUTS);
-              }}
-            >
-              重置布局
-            </button>
-          </div>
-        )}
-      />
-
-      {loading && !summary ? (
-        <div className="dashboard-loading-shimmer">
-          <div className="shimmer-block" style={{ height: 120 }} />
-          <div className="shimmer-grid">
-            <div className="shimmer-block" style={{ height: 180 }} />
-            <div className="shimmer-block" style={{ height: 180 }} />
-            <div className="shimmer-block" style={{ height: 180 }} />
-          </div>
-        </div>
-      ) : shouldUseLayoutEditor ? (
-        <div>
-          <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={cards} onChange={setLayouts} />
-        </div>
-      ) : (
-        <div>
-          <div className="responsive-card-grid">
-            {cards.map((c: any) => (
-              <div key={c.id} className="factory-status-grid-cell" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
-                {c.content}
-              </div>
-            ))}
-          </div>
+    <PageShell
+      title={APP_META.appName}
+      subtitle={td.title}
+      versionLabel={`v${displayVersion}`}
+      maturity="stable"
+      actions={(
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button className="dash-refresh-btn" onClick={fetchAll} disabled={loading}>
+            {loading ? '⟳' : '↻'}
+          </button>
+          <button
+            className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
+            onClick={toggleEdit}
+            disabled={!canUseLayoutEditor}
+            title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
+          >
+            {layoutEdit ? '退出布局编辑' : '布局编辑'}
+          </button>
+          <button
+            className="ui-btn ui-btn-outline ui-btn-sm"
+            onClick={() => {
+              clearLayout(LAYOUT_KEY);
+              setLayouts(DEFAULT_LAYOUTS);
+            }}
+          >
+            重置布局
+          </button>
         </div>
       )}
-    </div>
+    >
+      <StatusStrip
+        items={[
+          { label: 'Track', value: getAipTrackLabel() },
+          { label: 'Stage C', value: getAipStageCStatusLabel() },
+          { label: 'Feature Flag', value: getAipFeatureFlagLabel() },
+          { label: 'Version', value: `v${displayVersion}` },
+          { label: 'Services', value: String(s.running_tasks ?? 0), color: (s.running_tasks ?? 0) > 0 ? '#10B981' : undefined },
+          { label: 'Experiments', value: String(s.running_experiments ?? 0) },
+        ]}
+      />
+
+      <div ref={contentRef}>
+        {loading && !summary ? (
+          <div className="dashboard-loading-shimmer">
+            <div className="shimmer-block" style={{ height: 120 }} />
+            <div className="shimmer-grid">
+              <div className="shimmer-block" style={{ height: 180 }} />
+              <div className="shimmer-block" style={{ height: 180 }} />
+              <div className="shimmer-block" style={{ height: 180 }} />
+            </div>
+          </div>
+        ) : shouldUseLayoutEditor ? (
+          <div>
+            <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={cards} onChange={setLayouts} />
+          </div>
+        ) : (
+          <div>
+            <div className="responsive-card-grid">
+              {cards.map((c: any) => (
+                <div key={c.id} className="factory-status-grid-cell" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+                  {c.content}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </PageShell>
   );
 }

@@ -1,7 +1,7 @@
 // v5.2.0 — Factory Status Page with Root Cause Traceability (Workbench Layout 版)
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { StatusBadge, PageHeader, SectionCard, EmptyState, LineagePanel, DrilldownPanel, TimelinePanel, IncidentDetail, ReleaseGovernancePanel, ReleaseComparePanel, RollbackReadinessBadge, HealthPatrolPanel, VerificationSummaryPanel, TrendSummaryPanel, RiskSignalBadge } from '../components/ui';
+import { StatusBadge, PageShell, StatusStrip, SectionCard, EmptyState, LineagePanel, DrilldownPanel, TimelinePanel, IncidentDetail, ReleaseGovernancePanel, ReleaseComparePanel, RollbackReadinessBadge, HealthPatrolPanel, VerificationSummaryPanel, TrendSummaryPanel, RiskSignalBadge } from '../components/ui';
 import '../components/ui/shared.css';
 import './FactoryStatus.css';
 import { roleClass } from '../theme/colorRoles';
@@ -517,75 +517,81 @@ export default function FactoryStatus() {
   if (!status) return <div className="factory-status-loading">加载中...</div>;
 
   return (
-    <div className="page-root factory-status-page" ref={contentRef}>
-      <PageHeader
-        title="工厂运行态"
-        subtitle={`Production Readiness Dashboard · ${timeRange === '24h' ? '24小时' : timeRange === '7d' ? '7天' : '30天'}`}
-        actions={
-          <div className="factory-status-actions">
-            {/* Version Prefix Filter */}
-            <select className="factory-status-select-sm" value={versionPrefix} onChange={e => setVersionPrefix(e.target.value)}>
-              {VERSION_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-            {/* Active Only Toggle */}
-            <button className={`factory-status-toggle-btn ${activeOnly ? 'active' : ''}`} onClick={() => setActiveOnly(!activeOnly)}>
-              {activeOnly ? '仅活跃' : '全部'}
-            </button>
-            {/* Time Range Filter */}
-            <div className="factory-status-time-range">
-              {TIME_RANGES.map(tr => (
-                <button key={tr.value}
-                  onClick={() => setTimeRange(tr.value as any)}
-                  className={`factory-status-time-btn ${timeRange === tr.value ? 'active' : ''}`}
-                >{tr.label}</button>
-              ))}
-            </div>
-            <button className="ui-btn ui-btn-ghost ui-btn-sm" onClick={fetchStatus} disabled={loading}>
-              {loading ? '...' : '↻'}
-            </button>
-            <button
-              className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
-              onClick={() => setLayoutEdit((v) => !v)}
-              disabled={!canUseLayoutEditor}
-              title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
-            >
-              {layoutEdit ? '退出布局编辑' : '布局编辑'}
-            </button>
-            <button
-              className="ui-btn ui-btn-outline ui-btn-sm"
-              onClick={() => {
-                clearAllLayouts();
-                setLayouts(DEFAULT_LAYOUTS);
-              }}
-            >
-              重置布局
-            </button>
-          </div>
-        }
-      />
-
-      {loading && !status ? (
-        <div className="factory-status-loading">加载中...</div>
-      ) : shouldUseLayoutEditor ? (
-        <div>
-          <WorkspaceGrid
-            editable={layoutEdit}
-            layouts={layouts}
-            cards={cards}
-            onChange={setLayouts}
-          />
-        </div>
-      ) : (
-        <div>
-          <div className="factory-status-responsive-grid">
-            {cards.map(c => (
-              <div key={c.id} className="factory-status-grid-cell">
-                {c.content}
-              </div>
+    <PageShell
+      title="工厂运行态"
+      subtitle={`Production Readiness Dashboard · ${timeRange === '24h' ? '24小时' : timeRange === '7d' ? '7天' : '30天'}`}
+      actions={
+        <div className="factory-status-actions">
+          <select className="factory-status-select-sm" value={versionPrefix} onChange={e => setVersionPrefix(e.target.value)}>
+            {VERSION_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          <button className={`factory-status-toggle-btn ${activeOnly ? 'active' : ''}`} onClick={() => setActiveOnly(!activeOnly)}>
+            {activeOnly ? '仅活跃' : '全部'}
+          </button>
+          <div className="factory-status-time-range">
+            {TIME_RANGES.map(tr => (
+              <button key={tr.value}
+                onClick={() => setTimeRange(tr.value as any)}
+                className={`factory-status-time-btn ${timeRange === tr.value ? 'active' : ''}`}
+              >{tr.label}</button>
             ))}
           </div>
+          <button className="ui-btn ui-btn-ghost ui-btn-sm" onClick={fetchStatus} disabled={loading}>
+            {loading ? '...' : '↻'}
+          </button>
+          <button
+            className={`ui-btn ui-btn-sm ${layoutEdit ? 'ui-btn-warning' : 'ui-btn-outline'}`}
+            onClick={() => setLayoutEdit((v) => !v)}
+            disabled={!canUseLayoutEditor}
+            title={!canUseLayoutEditor ? '请在大屏宽度下编辑布局' : ''}
+          >
+            {layoutEdit ? '退出布局编辑' : '布局编辑'}
+          </button>
+          <button
+            className="ui-btn ui-btn-outline ui-btn-sm"
+            onClick={() => {
+              clearAllLayouts();
+              setLayouts(DEFAULT_LAYOUTS);
+            }}
+          >
+            重置布局
+          </button>
         </div>
-      )}
+      }
+    >
+      <StatusStrip
+        items={[
+          { label: 'Time Range', value: timeRange },
+          { label: 'Blocked Gates', value: String(blocked_gates?.length ?? 0), color: (blocked_gates?.length ?? 0) > 0 ? '#EF4444' : '#10B981' },
+          { label: 'Recent Failures', value: String(recent_failures?.length ?? 0), color: (recent_failures?.length ?? 0) > 0 ? '#EF4444' : '#10B981' },
+          { label: 'Recoveries', value: String(recent_recoveries?.length ?? 0) },
+        ]}
+      />
+
+      <div ref={contentRef}>
+        {loading && !status ? (
+          <div className="factory-status-loading">加载中...</div>
+        ) : shouldUseLayoutEditor ? (
+          <div>
+            <WorkspaceGrid
+              editable={layoutEdit}
+              layouts={layouts}
+              cards={cards}
+              onChange={setLayouts}
+            />
+          </div>
+        ) : (
+          <div>
+            <div className="factory-status-responsive-grid">
+              {cards.map(c => (
+                <div key={c.id} className="factory-status-grid-cell">
+                  {c.content}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Drilldown Panels - 浮动覆盖层 */}
       {gateDrilldown !== null && (
@@ -683,6 +689,6 @@ export default function FactoryStatus() {
           <TimelinePanel events={timeline} loading={timelineLoading} maxHeight="300px" />
         </DrilldownPanel>
       )}
-    </div>
+    </PageShell>
   );
 }
