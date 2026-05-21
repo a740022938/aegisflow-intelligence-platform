@@ -31,6 +31,12 @@ interface FeedbackItem {
 
 const FEEDBACK_TYPES = ['failed_case', 'low_confidence', 'manual_flag'] as const;
 
+function productError(v: string | undefined, fallback: string) {
+  return String(v || '').toLowerCase().includes('unauthorized')
+    ? '当前未授权，自动回流写入操作不可用。'
+    : (v || fallback);
+}
+
 function fmtTime(v?: string) {
   if (!v) return '暂无记录';
   try {
@@ -85,7 +91,7 @@ export default function FeedbackPage() {
       q.set('limit', '100');
       const res: any = await api(`/api/feedback-batches?${q.toString()}`);
       if (!res.ok) {
-        setError(res.error || '回流池列表加载失败');
+        setError(productError(res.error, '回流池列表加载失败'));
         setBatches([]);
         return;
       }
@@ -94,7 +100,7 @@ export default function FeedbackPage() {
         setSelectedId(res.batches[0].id);
       }
     } catch (e: any) {
-      setError(e.message || '回流池列表加载异常');
+      setError(productError(e.message, '回流池列表加载异常'));
       setBatches([]);
     } finally {
       setLoading(false);
@@ -109,13 +115,13 @@ export default function FeedbackPage() {
     try {
       const res: any = await api(`/api/feedback-batches/${id}`);
       if (!res.ok) {
-        setError(res.error || '回流池详情加载失败');
+        setError(productError(res.error, '回流池详情加载失败'));
         setSelected(null);
         return;
       }
       setSelected(res.batch || null);
     } catch (e: any) {
-      setError(e.message || '回流池详情加载异常');
+      setError(productError(e.message, '回流池详情加载异常'));
       setSelected(null);
     }
   }
@@ -138,7 +144,7 @@ export default function FeedbackPage() {
         }),
       });
       if (!res.ok) {
-        setError(res.error || '回流登记失败');
+        setError(productError(res.error, '回流登记失败'));
         return;
       }
       setNotice(`回流登记成功: ${res.batch.id}`);
@@ -150,7 +156,7 @@ export default function FeedbackPage() {
         setSelectedId(res.batch.id);
       }
     } catch (e: any) {
-      setError(e.message || '回流登记异常');
+      setError(productError(e.message, '回流登记异常'));
     } finally {
       setSaving(false);
     }
@@ -164,7 +170,7 @@ export default function FeedbackPage() {
     try {
       const res: any = await api(`/api/feedback-batches/${selected.id}/export`, { method: 'POST' });
       if (!res.ok) {
-        setError(res.error || '导出失败');
+        setError(productError(res.error, '导出失败'));
         return;
       }
       setLastExportPath(res.manifest_path || '');
@@ -172,7 +178,7 @@ export default function FeedbackPage() {
       await loadDetail(selected.id);
       await loadList();
     } catch (e: any) {
-      setError(e.message || '导出异常');
+      setError(productError(e.message, '导出异常'));
     } finally {
       setExporting(false);
     }
@@ -188,8 +194,8 @@ export default function FeedbackPage() {
 
   return (
     <PageShell
-      title="自动回流 v1（v6.3.0）"
-      subtitle="回流池最小演示：列表、详情、source/trigger 过滤、导出 manifest"
+      title="自动回流"
+      subtitle="OpenAIP / AIP v7.62.0 回流池：列表、详情、source/trigger 过滤、导出 manifest"
     >
       <StatusStrip items={[
         { label: '总批次数', value: String(summary.total) },

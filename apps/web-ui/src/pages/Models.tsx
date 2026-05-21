@@ -55,6 +55,14 @@ interface ModelDetail extends Model {
 
 type DetailTab = 'overview' | 'artifacts' | 'packages' | 'deployments' | 'evaluations' | 'raw';
 
+function isUnauthorizedMessage(v?: string | null) {
+  return String(v || '').toLowerCase().includes('unauthorized');
+}
+
+function productError(v: string | undefined, fallback: string) {
+  return isUnauthorizedMessage(v) ? '当前未授权，模型写入操作不可用。' : (v || fallback);
+}
+
 // Workspace layout key
 const LAYOUT_KEY = 'models';
 
@@ -232,10 +240,10 @@ export default function Models() {
         setModels(data.models);
         setTotal(data.total);
       } else {
-        setError(data.error || 'Failed to fetch models');
+        setError(productError(data.error, '模型列表加载失败'));
       }
     } catch (e: any) {
-      setError(e.message || 'Network error');
+      setError(productError(e.message, '网络错误'));
     } finally {
       setLoading(false);
     }
@@ -339,10 +347,10 @@ export default function Models() {
         fetchModels();
         setSelectedId(data.model.model_id);
       } else {
-        setFormError(data.error || '创建失败');
+        setFormError(productError(data.error, '创建失败'));
       }
     } catch (e: any) {
-      setFormError(e.message || '网络错误');
+      setFormError(productError(e.message, '网络错误'));
     } finally {
       setCreating(false);
     }
@@ -361,10 +369,10 @@ export default function Models() {
         setSelectedId(null);
         fetchModels();
       } else {
-        setError(data.error || '删除失败');
+        setError(productError(data.error, '删除失败'));
       }
     } catch (e: any) {
-      setError(e.message || '网络错误');
+      setError(productError(e.message, '网络错误'));
     } finally {
       setDeleting(false);
     }
@@ -400,10 +408,10 @@ export default function Models() {
         setPackageForm({ package_name: '', package_version: '1.0.0', artifact_ids: [], release_note: '' });
         fetchModelPackages(selectedId);
       } else {
-        setPackageFormError(data.error || '创建失败');
+        setPackageFormError(productError(data.error, '创建失败'));
       }
     } catch (e: any) {
-      setPackageFormError(e.message || '网络错误');
+      setPackageFormError(productError(e.message, '网络错误'));
     } finally {
       setCreatingPackage(false);
     }
@@ -422,10 +430,10 @@ export default function Models() {
         setSuccess('Package 构建成功');
         if (selectedId) fetchModelPackages(selectedId);
       } else {
-        setError(data.error || '构建失败');
+        setError(productError(data.error, '构建失败'));
       }
     } catch (e: any) {
-      setError(e.message || '网络错误');
+      setError(productError(e.message, '网络错误'));
     }
   };
 
@@ -442,10 +450,10 @@ export default function Models() {
         setSuccess('Package 发布成功');
         if (selectedId) fetchModelPackages(selectedId);
       } else {
-        setError(data.error || '发布失败');
+        setError(productError(data.error, '发布失败'));
       }
     } catch (e: any) {
-      setError(e.message || '网络错误');
+      setError(productError(e.message, '网络错误'));
     }
   };
 
@@ -864,7 +872,12 @@ export default function Models() {
           onChange={(e) => setQ(e.target.value)}
           className="filter-input"
         />
-        <button className="btn-primary" onClick={() => setShowCreate(true)}>
+        <button
+          className="btn-primary"
+          onClick={() => setShowCreate(true)}
+          disabled={isUnauthorizedMessage(error)}
+          title={isUnauthorizedMessage(error) ? '需授权后新建模型' : undefined}
+        >
           + 新建模型
         </button>
       </div>
@@ -974,16 +987,10 @@ export default function Models() {
                           <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
                         ) : shouldUseLayoutEditor ? (
                           <div>
-                            <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-                              layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
-                            </div>
                             <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={workspaceCards} onChange={handleLayoutChange} />
                           </div>
                         ) : (
                           <div>
-                            <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-                              layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
-                            </div>
                             <div className="responsive-card-grid">
                               {workspaceCards.map((c: any) => (
                                 <div key={c.id} style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>

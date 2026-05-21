@@ -120,6 +120,15 @@ function fmtTime(v: string) {
   }
 }
 
+function formatDbStatus(v: any) {
+  if (!v) return 'unknown';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object') {
+    return String(v.status || v.state || v.online_status || v.health || 'unknown');
+  }
+  return String(v);
+}
+
 export default function ModuleCenter() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
@@ -172,7 +181,7 @@ export default function ModuleCenter() {
       setSnapshot({
         healthOk: !!health?.ok,
         apiVersion: String(health?.version || '—'),
-        db: String(health?.database || 'unknown'),
+        db: formatDbStatus(health?.database),
         openclawEnabled: !!oc?.switch?.enabled || !!oc?.enabled,
         openclawOnline: String(oc?.status?.online_status || oc?.online_status || 'offline'),
         openclawCircuit: String(oc?.status?.circuit_status || oc?.circuit_state || 'unknown'),
@@ -575,16 +584,10 @@ export default function ModuleCenter() {
         </SectionCard>
       ) : shouldUseLayoutEditor ? (
         <div>
-          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
-          </div>
           <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={cards} onChange={setLayouts} />
         </div>
       ) : (
         <div>
-          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
-          </div>
           <div className="responsive-card-grid">
             {cards.map((c: any) => (
               <div key={c.id} style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>

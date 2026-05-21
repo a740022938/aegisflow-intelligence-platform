@@ -42,7 +42,7 @@ export default function HealthPatrolPanel({ timeRange }: Props) {
   const { overall_status, verification, trends, risks, links } = data || {};
 
   const statusColor = STATUS_COLORS[overall_status] || 'var(--text-muted)';
-  const statusLabel = STATUS_LABELS[overall_status] || 'UNKNOWN';
+  const statusLabel = STATUS_LABELS[overall_status] || '暂无数据';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

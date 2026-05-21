@@ -31,9 +31,9 @@ export default function RollbackReadinessBadge({ releaseId, showDetail = false }
     status === 'blocked' ? '#EF4444' : 'var(--text-muted)';
 
   const statusLabel = 
-    status === 'ready' ? '✅ READY' :
-    status === 'caution' ? '⚠️ CAUTION' :
-    status === 'blocked' ? '⛔ BLOCKED' : '❓ UNKNOWN';
+    status === 'ready' ? 'READY' :
+    status === 'caution' ? 'CAUTION' :
+    status === 'blocked' ? 'BLOCKED' : '待检测';
 
   return (
     <div style={{ display: 'inline-block' }}>

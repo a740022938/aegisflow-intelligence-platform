@@ -133,7 +133,7 @@ export default function ReleaseGovernancePanel({ timeRange, versionPrefix }: Pro
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: 12, fontWeight: 700 }}>↩️ 回滚就绪状态</span>
           <span style={{ fontSize: 14, fontWeight: 800, color: rollbackStatusColor }}>
-            {rollback_readiness?.status?.toUpperCase() || 'UNKNOWN'}
+            {rollback_readiness?.status?.toUpperCase() || '待检测'}
           </span>
         </div>
         {rollback_readiness?.checks?.map((c: any, i: number) => (

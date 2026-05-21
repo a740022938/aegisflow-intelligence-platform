@@ -1137,7 +1137,7 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-          <b>Cost Routing v7.12.3 UX Sanity</b>
+          <b>OpenAIP / AIP v7.62.0 Release Baseline</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">当前模式</span>

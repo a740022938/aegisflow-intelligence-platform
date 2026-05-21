@@ -437,7 +437,7 @@ export default function PluginPool() {
   if (loadError && items.length === 0) {
     return (
       <div className="page-root" style={{ padding: 40 }}>
-        <EmptyState icon="\u26A0\uFE0F" title="Plugin Pool" description={loadError} />
+        <EmptyState icon="!" title="Plugin Pool" description={loadError} />
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
           <button className="ui-btn ui-btn-primary" onClick={fetchPool}>Retry</button>
         </div>
@@ -503,16 +503,10 @@ export default function PluginPool() {
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
       ) : shouldUseLayoutEditor ? (
         <div>
-          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
-          </div>
           <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={cards} onChange={setLayouts} />
         </div>
       ) : (
         <div>
-          <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-            layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
-          </div>
           <div className="responsive-card-grid">
             {cards.map((c: any) => (
               <div key={c.id} className="factory-status-grid-cell" style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>

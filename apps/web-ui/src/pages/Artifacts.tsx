@@ -631,16 +631,10 @@ export default function Artifacts() {
                       <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading...</div>
                     ) : shouldUseLayoutEditor ? (
                       <div>
-                        <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-                          layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
-                        </div>
                         <WorkspaceGrid editable={layoutEdit} layouts={layouts} cards={workspaceCards} onChange={setLayouts} />
                       </div>
                     ) : (
                       <div>
-                        <div style={{ padding: '4px 8px', fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-surface)', borderRadius: 4, marginBottom: 8, display: 'inline-block' }}>
-                          layoutMode: {layoutMode} · contentWidth: {Math.round(contentWidth)}px
-                        </div>
                         <div className="responsive-card-grid">
                           {workspaceCards.map((c: any) => (
                             <div key={c.id} style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>

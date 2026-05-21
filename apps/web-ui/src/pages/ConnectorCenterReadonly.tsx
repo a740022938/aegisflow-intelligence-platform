@@ -67,7 +67,7 @@ function ConnectorCard({ conn }: { conn: ConnectorRegistryItem }) {
       <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', marginBottom: 2 }}>
         <span style={{ color: 'var(--text-muted)' }}>允许: </span>
         {conn.actionsAllowed.map(a => <Tag key={a} label={a} color="var(--success)" />)}
-        <span style={{ color: 'var(--text-muted)', marginLeft: 4 }}>禁止: </span>
+        <span style={{ color: 'var(--text-muted)', marginLeft: 4 }}>禁止能力（未启用）: </span>
         {conn.actionsBlocked.map(a => <Tag key={a} label={a} color="var(--danger)" />)}
       </div>
       {conn.recommendedNextStep && <div style={{ marginBottom: 2, color: 'var(--text-secondary)' }}>下一步: {conn.recommendedNextStep}</div>}
@@ -316,7 +316,7 @@ export default function ConnectorCenterReadonly() {
       {/* Boundary Notice */}
       <div className="ui-card" style={{ marginTop: 16, padding: '14px 16px', fontSize: 11, lineHeight: 1.7 }}>
         <strong>Readonly boundary notice:</strong><br />
-        This is a <u>Connector Center readonly overview</u>. Connector Registry is readonly metadata. Does not call external APIs, write to external systems, control connectors, process Memory Hub candidates, or enable Stage C. All <code>actionsBlocked</code> are governance display, not a permission system.
+        This is a <u>Connector Center readonly overview</u>. Connector Registry is readonly metadata. Does not call external APIs, write to external systems, control connectors, process Memory Hub candidates, or enable Stage C. All <code>actionsBlocked</code> labels are prohibited capabilities, not enabled permissions.
       </div>
 
       {/* Governance Console Traceability */}

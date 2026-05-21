@@ -79,6 +79,12 @@ function asArray(v: any): any[] {
   return [v];
 }
 
+function productError(v: string | undefined, fallback: string) {
+  return String(v || '').toLowerCase().includes('unauthorized')
+    ? '当前未授权，仅显示只读健康摘要。'
+    : (v || fallback);
+}
+
 function pickTopEvidence(evidence: Record<string, any[]> | undefined, max = 5) {
   if (!evidence || typeof evidence !== 'object') return [] as Array<{ kind: string; data: any }>;
   const order = ['jobs', 'routes', 'rules', 'feedback', 'artifacts', 'logs'];
@@ -221,7 +227,7 @@ export default function GovernanceHub() {
     try {
       await Promise.all([fetchSummary(), fetchIncidents()]);
     } catch (e: any) {
-      setError(e?.message || '加载失败');
+      setError(productError(e?.message, '加载失败'));
     }
     setLoading(false);
   }, [fetchSummary, fetchIncidents]);
@@ -270,7 +276,7 @@ export default function GovernanceHub() {
       if (d?.ok !== true) throw new Error(d?.error || 'sync failed');
       await refreshAll();
     } catch (e: any) {
-      setError(e?.message || 'sync failed');
+      setError(productError(e?.message, '同步失败'));
     }
     setSyncing(false);
   }, [operator, refreshAll]);
@@ -292,7 +298,7 @@ export default function GovernanceHub() {
     });
     const d = await r.json();
     if (!d?.ok) {
-      setError(d?.error || 'action failed');
+      setError(productError(d?.error, '操作失败'));
       return;
     }
     setComment('');
@@ -313,7 +319,7 @@ export default function GovernanceHub() {
     });
     const d = await r.json();
     if (!d?.ok) {
-      setError(d?.error || 'playbook action failed');
+      setError(productError(d?.error, '剧本操作失败'));
       return;
     }
     setPlaybookNote('');
@@ -330,7 +336,7 @@ export default function GovernanceHub() {
     });
     const d = await r.json();
     if (!d?.ok) {
-      setError(d?.error || 'feedback failed');
+      setError(productError(d?.error, '回流失败'));
       return;
     }
     await Promise.all([fetchIncidentDetail(selectedId), fetchPlaybookQuality()]);
@@ -349,7 +355,7 @@ export default function GovernanceHub() {
     });
     const d = await r.json();
     if (!d?.ok) {
-      setError(d?.error || 'assistant diagnostic failed');
+      setError(productError(d?.error, '助手诊断失败'));
       return;
     }
     await fetchIncidentDetail(selectedId);
@@ -366,7 +372,7 @@ export default function GovernanceHub() {
     });
     const d = await r.json();
     if (!d?.ok) {
-      setError(d?.error || 'assistant manual confirmation failed');
+      setError(productError(d?.error, '人工确认失败'));
       return;
     }
     await fetchIncidentDetail(selectedId);
@@ -383,7 +389,7 @@ export default function GovernanceHub() {
     });
     const d = await r.json();
     if (!d?.ok) {
-      setError(d?.error || 'assistant adoption update failed');
+      setError(productError(d?.error, '采纳状态更新失败'));
       return;
     }
     await fetchIncidentDetail(selectedId);

@@ -435,7 +435,7 @@ export default function AdvancedModeReadonly() {
       versionLabel="AIP v7.62.0 · Release Baseline"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · v7.25.2 controlled dry-run validation · Safe tables · Deny-by-default evaluator · Synthetic dry-run fixtures · API rejection gates · No production side effects"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · v7.62.0 release baseline · Safe tables · Deny-by-default evaluator · Synthetic dry-run fixtures · API rejection gates · No production side effects"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>
