@@ -8,35 +8,57 @@ function load(fileName: string): any[] {
   return JSON.parse(fs.readFileSync(target, 'utf8'));
 }
 
-function header(sub?: string) {
-  console.log('');
-  console.log('OpenAIP v8 Foundation Command');
-  console.log(`Command: aip task${sub ? ` ${sub}` : ''}`);
-  console.log('Center: Task Center');
-  console.log('Status: readonly foundation stub');
-  console.log('Safety: no mutation, no runtime action, Gate CLOSED, Stage C disabled');
-  console.log('Source: example/static readonly registry');
-}
-
 export async function runTask(sub?: string) {
   const items = load('tasks.example.json');
+  const total = items.length;
+  const draft = items.filter((i: any) => i.lifecycle === 'draft').length;
+  const pendingReview = items.filter((i: any) => i.lifecycle === 'pending_review').length;
+  const blocked = items.filter((i: any) => i.lifecycle === 'blocked').length;
+  const critical = items.filter((i: any) => i.risk === 'critical').length;
+  const humanAuth = items.filter((i: any) => i.humanAuthorizationRequired).length;
+
+  console.log('');
+  console.log('OpenAIP v8 Task Center');
+  console.log('======================');
+  console.log(`Command: aip task${sub ? ` ${sub}` : ''}`);
+  console.log(`Source: example/static readonly registry`);
+  console.log(`Total task archetypes: ${total}`);
+  console.log(`  Draft:        ${draft}`);
+  console.log(`  Pending review: ${pendingReview}`);
+  console.log(`  Blocked:      ${blocked}`);
+  console.log(`  Critical risk: ${critical}`);
+  console.log(`  Human auth:   ${humanAuth}`);
+  console.log('');
+  console.log('Safety: no mutation, no runtime action, no agent dispatch, Gate CLOSED, Stage C disabled');
+  console.log('');
+
   if (sub === 'list') {
-    header(sub);
-    console.log(`Registry count: ${items.length} tasks (openAipv8CenterData.ts mirrors this data)`);
-    for (const it of items) {
-      console.log(`- ${it.name} | lifecycle=${it.lifecycle} | permission=${it.permissionLevel} | receipt=${it.receiptRequired} | review=${it.reviewRequired}`);
+    console.log('Task Archetype List:');
+    console.log('--------------------');
+    for (const t of items) {
+      const evidence = t.requiredEvidence && t.requiredEvidence.length > 0 ? t.requiredEvidence.slice(0, 2).join(', ') : '—';
+      console.log(`  ${(t.title || t.name || '—').padEnd(38)} lifecycle=${(t.lifecycle || '—').padEnd(16)} risk=${(t.risk || '—').padEnd(8)} review=${(t.reviewState || '—').padEnd(16)} evidence=${evidence}`);
     }
-    return;
+    console.log('');
+    console.log(`Total: ${total} task archetypes`);
+    console.log('');
+    console.log('Execution and agent dispatch is blocked for all tasks. Gate CLOSED. Stage C disabled.');
+    console.log('Use "aip v8 status" for overall v8 foundation status.');
+  } else if (sub === 'status') {
+    console.log('Task Summary:');
+    console.log('-------------');
+    for (const t of items) {
+      console.log(`  ${(t.title || t.name || '—').padEnd(38)} intent=${(t.intent || '—').padEnd(22)} phase=${(t.phase || '—').padEnd(4)} lifecycle=${(t.lifecycle || '—').padEnd(16)} risk=${(t.risk || '—').padEnd(8)} agent=${t.recommendedAgent || '—'}`);
+    }
+    console.log('');
+    console.log(`Total: ${total} task archetypes`);
+    console.log('');
+    console.log('All tasks are readonly. No agent dispatch. No execution.');
+  } else {
+    console.log('Subcommands:');
+    console.log('  list     List all task archetypes with lifecycle, risk, review state, and evidence');
+    console.log('  status   Show per-task details including intent, phase, and recommended agent');
+    console.log('');
+    console.log('All output is readonly/static. No task execution. No agent dispatch.');
   }
-  if (sub === 'status') {
-    header(sub);
-    console.log(`Registry count: ${items.length} tasks`);
-    console.log(`- draft items: ${items.filter((i: any) => i.lifecycle === 'draft').length}`);
-    console.log(`- receipt required: ${items.filter((i: any) => i.receiptRequired).length}`);
-    console.log(`- review required: ${items.filter((i: any) => i.reviewRequired).length}`);
-    return;
-  }
-  header(sub);
-  console.log(`Registry count: ${items.length} tasks`);
-  console.log('- planned subcommands: aip task list, aip task status (implemented readonly)');
 }

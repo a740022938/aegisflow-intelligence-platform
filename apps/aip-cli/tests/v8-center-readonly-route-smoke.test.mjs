@@ -138,8 +138,8 @@ test('integration center shows migration bridge', () => {
   assert.ok(icContent.includes('legacyConnectorName'));
 });
 
-test('all 8 config-based pages have relatedCenters in their config', () => {
-  const V8_CENTER_FILES = V8_PAGE_FILES.filter(f => f !== 'OpenAIPv8CommandCenterPreview.tsx' && f !== 'OpenAIPv8ReadonlyCenterPreview.tsx' && f !== 'OpenAIPv8AgentCenterPreview.tsx');
+test('all 7 config-based pages have relatedCenters in their config', () => {
+  const V8_CENTER_FILES = V8_PAGE_FILES.filter(f => f !== 'OpenAIPv8CommandCenterPreview.tsx' && f !== 'OpenAIPv8ReadonlyCenterPreview.tsx' && f !== 'OpenAIPv8AgentCenterPreview.tsx' && f !== 'OpenAIPv8TaskCenterPreview.tsx');
   for (const file of V8_CENTER_FILES) {
     const content = fs.readFileSync(path.join(PAGES_DIR, file), 'utf8');
     assert.ok(content.includes('relatedCenters'), `${file} missing relatedCenters`);
@@ -308,5 +308,115 @@ test('no risky labels in actionable contexts on agent center', () => {
     const beforeSafety = content.substring(0, safetyBoundaryStart >= 0 ? safetyBoundaryStart : content.length);
     const inActionableContext = beforeSafety.includes(label) && !beforeSafety.includes('blockedActions') && !beforeSafety.includes('No ');
     assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Agent Center`);
+  }
+});
+
+// ── Task Center MVP Tests ──
+
+const TASK_PAGE = path.join(PAGES_DIR, 'OpenAIPv8TaskCenterPreview.tsx');
+const TASKS_EXAMPLE = 'E:\\AIP\\docs\\product\\examples\\tasks.example.json';
+const CLI_TASK_FILE = 'E:\\AIP\\apps\\aip-cli\\src\\commands\\task.ts';
+
+test('task center route exists in App.tsx', () => {
+  const appContent = fs.readFileSync(APP_TSX, 'utf8');
+  assert.ok(appContent.includes('openaip-v8-task-center-preview'), 'Task Center route missing from App.tsx');
+});
+
+test('task center registry has all 5 task archetypes', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  assert.ok(regContent.includes('task.architecture-planning'), 'Registry missing Architecture Planning task');
+  assert.ok(regContent.includes('task.cli-readonly-improvement'), 'Registry missing CLI improvement task');
+  assert.ok(regContent.includes('task.ui-readonly-preview'), 'Registry missing UI preview task');
+  assert.ok(regContent.includes('task.receipt-review'), 'Registry missing Receipt Review task');
+  assert.ok(regContent.includes('task.high-risk-execution'), 'Registry missing High-Risk task');
+});
+
+test('task center includes Task Pack Generator, Receipt Intake, Review Queue', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  assert.ok(content.includes('Task Pack Generator'), 'Missing Task Pack Generator');
+  assert.ok(content.includes('Receipt Intake'), 'Missing Receipt Intake');
+  assert.ok(content.includes('Review Queue'), 'Missing Review Queue');
+  assert.ok(content.includes('fatigue') || content.includes('减少人工'), 'Missing human fatigue reduction mention');
+});
+
+test('task center includes task lifecycle states', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  const states = ['draft', 'pending_review', 'needs_evidence', 'accepted', 'rejected', 'blocked', 'archived'];
+  for (const s of states) assert.ok(content.includes(s), `Task state "${s}" missing`);
+});
+
+test('task center shows safety phrases', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  assert.ok(content.includes('No task execution'), 'Missing No task execution');
+  assert.ok(content.includes('No runtime mutation'), 'Missing No runtime mutation');
+  assert.ok(content.includes('Gate CLOSED'), 'Missing Gate CLOSED');
+  assert.ok(content.includes('Stage C disabled'), 'Missing Stage C disabled');
+});
+
+test('task center includes safe links to related centers', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  assert.ok(content.includes('/openaip-v8-agent-center-preview'), 'Missing link to Agent Center');
+  assert.ok(content.includes('/openaip-v8-audit-center-preview'), 'Missing link to Audit Center');
+  assert.ok(content.includes('/openaip-v8-policy-capability-center-preview'), 'Missing link to Policy/Capability Center');
+  assert.ok(content.includes('/openaip-v8-execution-gateway-preview'), 'Missing link to Execution Gateway');
+  assert.ok(content.includes('/openaip-v8-command-center-preview'), 'Missing link to Command Center');
+});
+
+test('CLI task command shows task list with lifecycle/risk/review', () => {
+  const cliContent = fs.readFileSync(CLI_TASK_FILE, 'utf8');
+  assert.ok(cliContent.includes('lifecycle='), 'CLI task missing lifecycle output');
+  assert.ok(cliContent.includes('risk='), 'CLI task missing risk output');
+  assert.ok(cliContent.includes('reviewState'), 'CLI task missing reviewState output');
+  assert.ok(cliContent.includes('blocked for all tasks'), 'CLI task missing execution blocked note');
+});
+
+test('tasks example JSON has all 5 task entries with full fields', () => {
+  const exampleContent = fs.readFileSync(TASKS_EXAMPLE, 'utf8');
+  assert.ok(exampleContent.includes('task.architecture-planning'), 'Example missing Architecture Planning');
+  assert.ok(exampleContent.includes('task.cli-readonly-improvement'), 'Example missing CLI improvement');
+  assert.ok(exampleContent.includes('task.ui-readonly-preview'), 'Example missing UI preview');
+  assert.ok(exampleContent.includes('task.receipt-review'), 'Example missing Receipt Review');
+  assert.ok(exampleContent.includes('task.high-risk-execution'), 'Example missing High-Risk task');
+  assert.ok(exampleContent.includes('intent'), 'Example missing intent field');
+  assert.ok(exampleContent.includes('requiredEvidence'), 'Example missing requiredEvidence field');
+  assert.ok(exampleContent.includes('humanAuthorizationRequired'), 'Example missing humanAuthorizationRequired field');
+});
+
+test('task center safety boundary lists forbidden actions', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  assert.ok(content.includes('Safety Boundary'), 'Missing Safety Boundary heading');
+  assert.ok(content.includes('No task execution'), 'Missing no task execution');
+  assert.ok(content.includes('No task dispatch'), 'Missing no task dispatch');
+  assert.ok(content.includes('No agent invocation'), 'Missing no agent invocation');
+  assert.ok(content.includes('No DB write'), 'Missing no DB write');
+  assert.ok(content.includes('No Gate opening'), 'Missing no Gate opening');
+  assert.ok(content.includes('No Stage C enablement'), 'Missing no Stage C enablement');
+  assert.ok(content.includes('No release/tag/restore'), 'Missing no release/tag/restore');
+  assert.ok(content.includes('No connector action'), 'Missing no connector action');
+});
+
+test('task center has preview warning on Task Pack Generator', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  assert.ok(content.includes('This preview does not generate, dispatch, or execute tasks'), 'Missing task pack generation warning');
+});
+
+test('task center has preview warning on Receipt Intake', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  assert.ok(content.includes('Receipt intake is readonly in this preview'), 'Missing receipt intake readonly warning');
+});
+
+test('task center has review queue warning', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  assert.ok(content.includes('Human review remains the acceptance gate'), 'Missing human review warning');
+});
+
+test('no risky labels in actionable contexts on task center', () => {
+  const content = fs.readFileSync(TASK_PAGE, 'utf8');
+  const riskyLabels = ['Execute', 'Dispatch', 'Launch', 'Enable Gate', 'Enable Stage C', 'Write config', 'Release', 'Restore'];
+  const safetyBoundaryStart = content.indexOf('Safety Boundary');
+  for (const label of riskyLabels) {
+    const beforeSafety = content.substring(0, safetyBoundaryStart >= 0 ? safetyBoundaryStart : content.length);
+    const inActionableContext = beforeSafety.includes(label) && !beforeSafety.includes('blockedActions') && !beforeSafety.includes('No ') && !beforeSafety.includes('cannot proceed') && !beforeSafety.includes('not available');
+    assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Task Center`);
   }
 });

@@ -2,6 +2,8 @@
 // READONLY METADATA ONLY. Does not call real APIs, write to databases, or execute.
 
 export type V8Lifecycle = 'planned' | 'registered' | 'enabled' | 'paused' | 'disabled' | 'quarantined' | 'draft' | 'running' | 'stopped' | 'error';
+export type V8TaskLifecycle = 'draft' | 'ready_for_agent' | 'running_external' | 'receipt_pending' | 'pending_review' | 'accepted' | 'rejected' | 'blocked' | 'archived';
+export type V8ReviewState = 'pending_review' | 'needs_evidence' | 'accepted' | 'rejected' | 'blocked' | 'archived';
 export type V8PermissionLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
 export type V8RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 export type V8DataSource = 'static_registry' | 'example_json' | 'future_integration';
@@ -80,11 +82,19 @@ export interface V8PolicyEntry extends V8BaseEntry {
 
 export interface V8TaskEntry extends V8BaseEntry {
   id: string;
-  name: string;
-  lifecycle: V8Lifecycle;
-  permissionLevel: V8PermissionLevel;
+  title: string;
+  intent: string;
+  phase: string;
+  lifecycle: V8TaskLifecycle;
+  risk: V8RiskLevel;
+  recommendedAgent: string;
+  permissionRequired: V8PermissionLevel;
+  allowedActions: string[];
+  requiredEvidence: string[];
+  reviewState: V8ReviewState;
   receiptRequired: boolean;
-  reviewRequired: boolean;
+  auditRequired: boolean;
+  humanAuthorizationRequired: boolean;
 }
 
 export interface V8AuditEntry extends V8BaseEntry {
@@ -233,10 +243,73 @@ export const V8_POLICIES: V8PolicyEntry[] = [
 ];
 
 // ── Tasks Registry ──
+// Task Center: human-fatigue reducer — task packs, receipts, review queue
 export const V8_TASKS: V8TaskEntry[] = [
-  { id: 'task.registry', name: 'Task Pack Registry', lifecycle: 'draft', permissionLevel: 'L1', receiptRequired: true, reviewRequired: false, dataSource: 'static_registry', safetyNote: 'Draft registry — no execution.', blockedActions: ['task execution', 'receipt write', 'agent assignment execution'] },
-  { id: 'task.receipt.intake', name: 'Receipt Intake Pipeline', lifecycle: 'draft', permissionLevel: 'L1', receiptRequired: false, reviewRequired: true, dataSource: 'static_registry', safetyNote: 'Pipeline definition only — no intake running.', blockedActions: ['task execution', 'receipt write', 'review queue mutation'] },
-  { id: 'task.review', name: 'Human Review Queue', lifecycle: 'draft', permissionLevel: 'L2', receiptRequired: true, reviewRequired: false, dataSource: 'static_registry', safetyNote: 'Review queue defined — no human review actions available.', blockedActions: ['task execution', 'review execution', 'queue mutation'] },
+  {
+    id: 'task.architecture-planning', title: 'Architecture / Product Planning Task',
+    intent: 'plan/blueprint', phase: 'P1', lifecycle: 'draft', risk: 'low',
+    recommendedAgent: 'Planner / Reviewer Agent', permissionRequired: 'L2',
+    allowedActions: ['readonly review', 'suggestion draft'],
+    requiredEvidence: ['plan document', 'risk assessment', 'safety review'],
+    reviewState: 'pending_review', receiptRequired: true, auditRequired: false,
+    humanAuthorizationRequired: false,
+    dataSource: 'static_registry',
+    safetyNote: 'Planning task — no code changes, no execution. Readonly/suggest only.',
+    blockedActions: ['code changes', 'execution', 'release', 'config mutation'],
+    futurePhase: 'Task pack generation from center state'
+  },
+  {
+    id: 'task.cli-readonly-improvement', title: 'CLI Readonly Improvement Task',
+    intent: 'CLI readonly polish', phase: 'P2', lifecycle: 'draft', risk: 'medium',
+    recommendedAgent: 'Claude Code / Codex', permissionRequired: 'L3',
+    allowedActions: ['draft code changes (safe readonly)', 'test addition', 'doc update'],
+    requiredEvidence: ['test results', 'diff review', 'safety grep result'],
+    reviewState: 'needs_evidence', receiptRequired: true, auditRequired: true,
+    humanAuthorizationRequired: false,
+    dataSource: 'static_registry',
+    safetyNote: 'CLI readonly improvement — no DB writes, no Gate, no Stage C.',
+    blockedActions: ['release', 'DB write', 'Gate operations', 'Stage C enablement'],
+    futurePhase: 'Task-agent binding, automated evidence gathering'
+  },
+  {
+    id: 'task.ui-readonly-preview', title: 'UI Readonly Preview Task',
+    intent: 'hidden readonly UI page', phase: 'P2', lifecycle: 'draft', risk: 'medium',
+    recommendedAgent: 'Claude Code / Codex + Reviewer Agent', permissionRequired: 'L3',
+    allowedActions: ['draft UI code (hidden readonly)', 'test addition', 'visual QA'],
+    requiredEvidence: ['before/after screenshots', 'route inventory', 'sidebar check', 'safety grep'],
+    reviewState: 'pending_review', receiptRequired: true, auditRequired: true,
+    humanAuthorizationRequired: true,
+    dataSource: 'static_registry',
+    safetyNote: 'UI readonly preview — no execution buttons, no sidebar exposure without approval.',
+    blockedActions: ['execution buttons', 'sidebar exposure unless approved', 'config write', 'DB change'],
+    futurePhase: 'UI component library, reusable preview patterns'
+  },
+  {
+    id: 'task.receipt-review', title: 'Receipt Review Task',
+    intent: 'verify receipt evidence', phase: 'P3', lifecycle: 'pending_review', risk: 'low',
+    recommendedAgent: 'Reviewer Agent', permissionRequired: 'L2',
+    allowedActions: ['readonly review', 'evidence validation', 'status suggest'],
+    requiredEvidence: ['receipt document', 'evidence chain', 'commit verification'],
+    reviewState: 'pending_review', receiptRequired: true, auditRequired: true,
+    humanAuthorizationRequired: false,
+    dataSource: 'static_registry',
+    safetyNote: 'Receipt review — no code changes, no execution. Human review required for acceptance.',
+    blockedActions: ['code changes', 'execution', 'auto-acceptance'],
+    futurePhase: 'Automated evidence validation pipeline'
+  },
+  {
+    id: 'task.high-risk-execution', title: 'High-Risk Execution Task Placeholder',
+    intent: 'future gated execution', phase: 'P5', lifecycle: 'blocked', risk: 'critical',
+    recommendedAgent: 'none until policy', permissionRequired: 'L5',
+    allowedActions: [],
+    requiredEvidence: ['human authorization form', 'Gate open confirmation', 'Stage C enablement record', 'audit trail'],
+    reviewState: 'blocked', receiptRequired: true, auditRequired: true,
+    humanAuthorizationRequired: true,
+    dataSource: 'static_registry',
+    safetyNote: 'High-risk execution — blocked in preview. Requires Gate open + Stage C enabled + human authorization.',
+    blockedActions: ['all execution', 'Gate opening in preview', 'Stage C enablement in preview', 'config mutation'],
+    futurePhase: 'Gated execution with human approval workflow'
+  },
 ];
 
 // ── Audit Registry ──
@@ -331,7 +404,24 @@ export function getV8PolicySummary() {
 
 export function getV8TaskSummary() {
   const all = V8_TASKS;
-  return { total: all.length, draft: all.filter(t => t.lifecycle === 'draft').length, receiptRequired: all.filter(t => t.receiptRequired).length, reviewRequired: all.filter(t => t.reviewRequired).length };
+  return {
+    total: all.length,
+    draft: all.filter(t => t.lifecycle === 'draft').length,
+    pendingReview: all.filter(t => t.lifecycle === 'pending_review').length,
+    blocked: all.filter(t => t.lifecycle === 'blocked').length,
+    receiptRequired: all.filter(t => t.receiptRequired).length,
+    auditRequired: all.filter(t => t.auditRequired).length,
+    humanAuthRequired: all.filter(t => t.humanAuthorizationRequired).length,
+    riskLow: all.filter(t => t.risk === 'low').length,
+    riskMedium: all.filter(t => t.risk === 'medium').length,
+    riskHigh: all.filter(t => t.risk === 'high').length,
+    riskCritical: all.filter(t => t.risk === 'critical').length,
+    reviewPending: all.filter(t => t.reviewState === 'pending_review').length,
+    reviewNeedsEvidence: all.filter(t => t.reviewState === 'needs_evidence').length,
+    reviewAccepted: all.filter(t => t.reviewState === 'accepted').length,
+    reviewRejected: all.filter(t => t.reviewState === 'rejected').length,
+    reviewBlocked: all.filter(t => t.reviewState === 'blocked').length,
+  } as const;
 }
 
 export function getV8AuditSummary() {
