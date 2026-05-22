@@ -83,6 +83,7 @@ const OperatorUsabilityDrillPreview = lazy(() => import('./pages/OperatorUsabili
 const RestorePointPackPreview = lazy(() => import('./pages/RestorePointPackPreview'));
 const HandoffPackPreview = lazy(() => import('./pages/HandoffPackPreview'));
 const ModelGateway = lazy(() => import('./pages/ModelGateway'));
+const OpenAIPv8CommandCenterPreview = lazy(() => import('./pages/OpenAIPv8CommandCenterPreview'));
 
 function RouteFallback() {
   return (
@@ -230,6 +231,7 @@ const App: React.FC = () => {
             <Route path="operator-usability-drill-preview" element={<OperatorUsabilityDrillPreview />} />
             <Route path="restore-point-pack-preview" element={<RestorePointPackPreview />} />
             <Route path="handoff-pack-preview" element={<HandoffPackPreview />} />
+            <Route path="openaip-v8-command-center-preview" element={<OpenAIPv8CommandCenterPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
