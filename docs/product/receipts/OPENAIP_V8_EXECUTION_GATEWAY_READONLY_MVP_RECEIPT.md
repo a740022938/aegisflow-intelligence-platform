@@ -4,11 +4,13 @@
 OPENAIP_V8_EXECUTION_GATEWAY_READONLY_MVP_READY_WITH_GATE_CLOSED
 
 ## Commit
-- Hash: (pending)
-- Pushed: pending
-- Working tree: pending
+- Hash: 3f6101c
+- Pushed: yes
+- Working tree: clean
 
 ## Files Changed
+- Total: 9 files changed, 940 insertions, 89 deletions
+
 ### New Files
 - `apps/web-ui/src/pages/OpenAIPv8ExecutionGatewayPreview.tsx` — standalone MVP page (replaced config-based shared component wrapper)
 - `apps/aip-cli/src/commands/execution-gateway.ts` — CLI readonly command
