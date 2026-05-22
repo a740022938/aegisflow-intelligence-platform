@@ -1,11 +1,12 @@
 export async function runProviders() {
   console.log('');
-  console.log('AIP Providers (v8)');
-  console.log('==================');
-  console.log('');
-  console.log('  This command is coming in OpenAIP v8.');
-  console.log('  The Provider Manager will handle model providers,');
-  console.log('  API keys, provider health, and routing policies.');
-  console.log('');
-  console.log('  This is a readonly command. No files were modified.');
+  console.log('OpenAIP v8 Foundation Command');
+  console.log('Command: aip providers');
+  console.log('Center: Provider Manager');
+  console.log('Status: readonly foundation stub');
+  console.log('Safety: no mutation, no runtime action, Gate CLOSED, Stage C disabled');
+  console.log('Next: planned subcommands (not implemented)');
+  console.log('  - aip providers list');
+  console.log('  - aip providers routes');
+  console.log('  - aip providers health');
 }

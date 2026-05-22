@@ -244,6 +244,11 @@ function printHelpFor(cmd: string) {
     ml: 'aip ml\n  本机模型命令大全',
     repair: 'aip repair [check|plan|command-pack|restore-point|source]\n  修复系统（plan-only）',
     receipt: 'aip receipt template\n  生成回执模板',
+    runtime: 'aip runtime\n  OpenAIP v8 Runtime Kernel 只读基础命令（not implemented）',
+    agents: 'aip agents\n  OpenAIP v8 Agent Center 只读基础命令（not implemented）',
+    integrations: 'aip integrations\n  OpenAIP v8 Integration Center 只读基础命令（not implemented）',
+    providers: 'aip providers\n  OpenAIP v8 Provider Manager 只读基础命令（not implemented）',
+    apps: 'aip apps\n  OpenAIP v8 Local Apps Center 只读基础命令（not implemented）',
   };
   const text = tips[cmd] || `未知命令: ${cmd}`;
   console.log(text);
@@ -311,3 +316,4 @@ main().catch((e) => {
   console.error('Fatal:', e.message);
   process.exit(1);
 });
+

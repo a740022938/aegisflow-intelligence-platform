@@ -1,11 +1,12 @@
 export async function runApps() {
   console.log('');
-  console.log('AIP Apps (v8)');
-  console.log('=============');
-  console.log('');
-  console.log('  This command is coming in OpenAIP v8.');
-  console.log('  Local Apps will manage onboard tools, micro-apps,');
-  console.log('  and the local application runtime.');
-  console.log('');
-  console.log('  This is a readonly command. No files were modified.');
+  console.log('OpenAIP v8 Foundation Command');
+  console.log('Command: aip apps');
+  console.log('Center: Local Apps Center');
+  console.log('Status: readonly foundation stub');
+  console.log('Safety: no mutation, no runtime action, Gate CLOSED, Stage C disabled');
+  console.log('Next: planned subcommands (not implemented)');
+  console.log('  - aip apps list');
+  console.log('  - aip apps inspect <id>');
+  console.log('  - aip apps capabilities');
 }

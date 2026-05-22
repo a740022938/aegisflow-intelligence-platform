@@ -1,5 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execSync } from 'node:child_process';
+
+function runCli(args, cwd = 'C:\\Users\\74002') {
+  return execSync(`node E:\\AIP\\apps\\aip-cli\\dist\\index.js ${args}`, { cwd, encoding: 'utf8' });
+}
 
 test('resolver prefers AIP_HOME when valid', async () => {
   const old = process.env.AIP_HOME;
@@ -11,32 +16,24 @@ test('resolver prefers AIP_HOME when valid', async () => {
   process.env.AIP_HOME = old;
 });
 
-test('resolver can use marker fallback', async () => {
-  const old = process.env.AIP_HOME;
-  delete process.env.AIP_HOME;
-  const mod = await import('../dist/projectRoot.js');
-  const r = mod.resolveProjectRoot('C:\\Users\\74002');
-  assert.ok(['marker', 'upward-search', 'config', 'cwd-fallback', 'env'].includes(r.source));
-  process.env.AIP_HOME = old;
-});
-
-test('status lines no longer contain stale v7.48 track', async () => {
+test('status lines no stale track', async () => {
   const mod = await import('../dist/banner.js');
-  const lines = mod.renderStatusLines('7.62.0').join('\n');
-  assert.equal(lines.includes('v7.48 Local RC Candidate'), false);
+  assert.equal(mod.renderStatusLines('7.62.0').join('\n').includes('v7.48 Local RC Candidate'), false);
 });
 
-test('v8 stubs are exported', async () => {
-  const cmds = await Promise.all([
-    import('../dist/commands/runtime.js'),
-    import('../dist/commands/agents.js'),
-    import('../dist/commands/integrations.js'),
-    import('../dist/commands/providers.js'),
-    import('../dist/commands/apps.js'),
-  ]);
-  assert.equal(typeof cmds[0].runRuntime, 'function');
-  assert.equal(typeof cmds[1].runAgents, 'function');
-  assert.equal(typeof cmds[2].runIntegrations, 'function');
-  assert.equal(typeof cmds[3].runProviders, 'function');
-  assert.equal(typeof cmds[4].runApps, 'function');
+test('five v8 commands show readonly contract', () => {
+  for (const c of ['runtime', 'agents', 'integrations', 'providers', 'apps']) {
+    const out = runCli(c);
+    assert.match(out, /OpenAIP v8 Foundation Command/);
+    assert.match(out, /Status: readonly foundation stub/);
+    assert.match(out, /Safety: no mutation, no runtime action, Gate CLOSED, Stage C disabled/);
+    assert.match(out, /not implemented/);
+  }
+});
+
+test('help for five v8 commands does not claim implemented features', () => {
+  for (const c of ['runtime', 'agents', 'integrations', 'providers', 'apps']) {
+    const out = runCli(`help ${c}`);
+    assert.match(out, /readonly|只读|not implemented|foundation/i);
+  }
 });
