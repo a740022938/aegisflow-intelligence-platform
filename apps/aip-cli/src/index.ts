@@ -17,6 +17,11 @@ import { runWhere } from './commands/where.js';
 import { runSafeStatus } from './commands/safe-status.js';
 import { runReceiptTemplate } from './commands/receipt.js';
 import { runNext } from './commands/next.js';
+import { runAgents } from './commands/agents.js';
+import { runIntegrations } from './commands/integrations.js';
+import { runProviders } from './commands/providers.js';
+import { runApps } from './commands/apps.js';
+import { runRuntime } from './commands/runtime.js';
 import { runReleaseStatus } from './commands/release-status.js';
 import { getCliVersion } from './version.js';
 import { renderBanner, renderStatusLines } from './banner.js';
@@ -202,6 +207,14 @@ function printCommandCenter() {
   console.log(helpCmd('aip receipt template', '生成回执模板', 'safe'));
   console.log('');
 
+  console.log(sectionDivider('[07] OpenAIP v8 / 新功能 (预览)', 'Stub commands — 正式实现在 v8'));
+  console.log(helpCmd('aip agents', 'Agent Center — 代理生命周期管理', 'dim'));
+  console.log(helpCmd('aip integrations', 'Integration Center — 外部服务绑定', 'dim'));
+  console.log(helpCmd('aip providers', 'Provider Manager — 模型提供商路由', 'dim'));
+  console.log(helpCmd('aip apps', 'Local Apps — 本地微应用运行时', 'dim'));
+  console.log(helpCmd('aip runtime', 'Runtime Kernel — 服务编排与健康', 'dim'));
+  console.log('');
+
   console.log(c(BOLD + CYAN, '  Tips'));
   console.log(tipLine('  aip help <command>         查看某个命令详情'));
   console.log(tipLine('  aip --plain                纯文本模式，适合乱码环境'));
@@ -279,6 +292,11 @@ async function main() {
     case 'release-status': await runReleaseStatus(); break;
     case 'safe-status': await runSafeStatus(); break;
     case 'receipt': await runReceiptTemplate(); break;
+    case 'agents': await runAgents(); break;
+    case 'integrations': await runIntegrations(); break;
+    case 'providers': await runProviders(); break;
+    case 'apps': await runApps(); break;
+    case 'runtime': await runRuntime(); break;
     case 'ml':
     case 'manual':
     case 'commands':
