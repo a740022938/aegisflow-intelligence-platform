@@ -7,6 +7,7 @@ const config = {
   title: 'Policy Router + Capability Center',
   subtitle: '策略路由与能力管理',
   purpose: '能力不等于权限，政策先于按钮。管理风险等级和权限映射。',
+  role: 'Policy registry, capability catalog with risk levels, and L0-L5 permission mapping',
   sections: [
     {
       title: 'Capability vs Permission',

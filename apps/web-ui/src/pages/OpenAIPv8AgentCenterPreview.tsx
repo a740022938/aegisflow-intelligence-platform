@@ -6,6 +6,7 @@ const config = {
   title: 'Agent Center',
   subtitle: 'AI Agent 生命周期管理',
   purpose: '管理 AI Agent 的注册、生命周期和权限等级，是 OpenAIP v8 的主线中心。',
+  role: 'Agent registry, lifecycle states, and L0-L5 permission levels',
   sections: [
     {
       title: 'Agent Lifecycle',

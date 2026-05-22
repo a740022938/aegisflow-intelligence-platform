@@ -5,6 +5,7 @@ const config = {
   title: 'Execution Gateway',
   subtitle: '执行网关 — 默认为关闭',
   purpose: '控制所有执行操作的网关，默认关闭。需要人工审批和多层安全验证才能开启。',
+  role: 'Gate state, opening requirements, and execution request queue — remains CLOSED in preview',
   sections: [
     {
       title: 'Gateway State',

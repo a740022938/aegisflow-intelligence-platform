@@ -6,6 +6,7 @@ const config = {
   title: 'Audit Center',
   subtitle: '审计链与凭证管理',
   purpose: '记录所有操作的回执、报告和证据，形成不可篡改的审计链。',
+  role: 'Receipts, reports, evidence, commit/push trail, and verification chain',
   sections: [
     {
       title: 'Audit Trail Contents',

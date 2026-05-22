@@ -7,6 +7,7 @@ const config = {
   title: 'Integration Center',
   subtitle: '外部服务绑定与桥接管理',
   purpose: '管理外部工具和服务的集成，包括 OpenClaw、GitHub、Webhook 等。包含 Connector Center 迁移桥接。',
+  role: 'External service registry, integration lifecycle, and legacy connector migration bridge',
   sections: [
     {
       title: 'Managed Integrations',

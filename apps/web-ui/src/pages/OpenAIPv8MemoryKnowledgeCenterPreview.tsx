@@ -6,6 +6,7 @@ const config = {
   title: 'Memory + Knowledge Center',
   subtitle: '长期项目大脑与知识源管理',
   purpose: '管理内存访问策略和知识源注册，是项目的长期记忆和知识中枢。',
+  role: 'Memory access policy, knowledge source registry, and receipt/report indexing',
   sections: [
     {
       title: 'Memory Access Modes',

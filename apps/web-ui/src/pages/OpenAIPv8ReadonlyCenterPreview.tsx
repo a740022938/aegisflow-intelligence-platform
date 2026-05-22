@@ -68,6 +68,7 @@ export interface CenterConfig {
   title: string;
   subtitle: string;
   purpose: string;
+  role?: string;
   sections: CenterSection[];
   registryTables?: RegistryTable[];
   keyRules: string[];
@@ -88,10 +89,12 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
   return (
     <div style={shellStyle}>
       <div style={panelStyle}>
+        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
           <div>
             <h1 style={{ margin: 0, fontSize: 26 }}>{config.title}</h1>
             <p style={{ marginTop: 4, color: '#93c5fd', fontSize: 14 }}>{config.subtitle}</p>
+            {config.role && <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6b7280' }}>{config.role}</p>}
             <p style={{ margin: '6px 0 0', fontSize: 13, color: '#9ca3af' }}>{config.purpose}</p>
           </div>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
@@ -99,8 +102,19 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
             <span style={{ ...badgeStyle, background: '#059669', color: '#fff' }}>No runtime mutation</span>
             <span style={{ ...badgeStyle, background: '#dc2626', color: '#fff' }}>Gate CLOSED</span>
             <span style={{ ...badgeStyle, background: '#7c3aed', color: '#fff' }}>Stage C disabled</span>
-            <span style={{ ...badgeStyle, background: '#6b7280', color: '#fff' }}>Static / registry example</span>
+            <span style={{ ...badgeStyle, background: '#6b7280', color: '#fff' }}>Registry-backed</span>
           </div>
+        </div>
+
+        {/* Global Status Badge Strip */}
+        <div style={{ ...cardStyle, display: 'flex', gap: 4, flexWrap: 'wrap', borderLeft: '3px solid #f59e0b' }}>
+          <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #fbbf24' }}>Preview only</span>
+          <span style={{ ...badgeStyle, background: '#1e293b', color: '#22c55e', border: '1px solid #22c55e' }}>No runtime mutation</span>
+          <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #fbbf24' }}>Gate CLOSED</span>
+          <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #fbbf24' }}>Stage C disabled</span>
+          <span style={{ ...badgeStyle, background: '#1e293b', color: '#93c5fd', border: '1px solid #93c5fd' }}>Registry-backed data</span>
+          <span style={{ ...badgeStyle, background: '#1e293b', color: '#9ca3af', border: '1px solid #374151' }}>No config writes</span>
+          <span style={{ ...badgeStyle, background: '#1e293b', color: '#9ca3af', border: '1px solid #374151' }}>No execution</span>
         </div>
 
         {config.sections.map((section) => (
@@ -174,8 +188,13 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
           </ul>
         </div>
 
+        {/* Footer */}
+        <div style={{ marginTop: 16, padding: 10, border: '1px solid #374151', borderRadius: 8, background: 'rgba(0,0,0,0.3)', fontSize: 11, color: '#6b7280', textAlign: 'center' }}>
+          OpenAIP v8 · {config.title} · Readonly preview · No execution · No config writes · Gate remains CLOSED · Stage C disabled
+        </div>
+
         {config.backLink && (
-          <div style={{ marginTop: 16, textAlign: 'center' }}>
+          <div style={{ marginTop: 12, textAlign: 'center' }}>
             <Link to={config.backLink} style={{ color: '#93c5fd', fontSize: 13, textDecoration: 'underline' }}>
               {config.backLabel || 'Back to Command Center'}
             </Link>

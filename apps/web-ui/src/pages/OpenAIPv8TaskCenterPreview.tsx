@@ -6,6 +6,7 @@ const config = {
   title: 'Task Center',
   subtitle: '任务包生成与回执管理',
   purpose: '生成任务包、管理回执接收、减少人工复制粘贴的重复劳动。',
+  role: 'Task pack generation, receipt intake, review queue, and human-fatigue reduction pipeline',
   sections: [
     {
       title: 'Task Pack Generator',

@@ -6,6 +6,7 @@ const config = {
   title: 'Local Apps Center',
   subtitle: '本地微应用运行时管理',
   purpose: '管理 OpenAxiom、ComfyUI、Ollama、LM Studio、YOLO/SAM、Python Workers 等本地应用。',
+  role: 'Local app registration, lifecycle, and runtime state — no launch without Gate open',
   sections: [
     {
       title: 'Managed Local Apps',

@@ -6,6 +6,7 @@ const config = {
   title: 'Provider Manager',
   subtitle: '模型提供商路由与配置管理',
   purpose: '吸收 CC Switch 的提供商配置/路由优势，统一管理模型提供商。',
+  role: 'Model provider registry, dry-run routing, and cost/usage visibility concepts',
   sections: [
     {
       title: 'CC Switch-like Strengths',
