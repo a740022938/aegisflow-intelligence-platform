@@ -1,5 +1,7 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_TASKS, getV8TaskSummary } from '../registry/openAipv8CenterData';
 
+const s = getV8TaskSummary();
 const config = {
   title: 'Task Center',
   subtitle: '任务包生成与回执管理',
@@ -26,13 +28,26 @@ const config = {
       ]
     },
     {
-      title: 'Human Fatigue Reduction',
+      title: 'Registry Summary',
       items: [
-        '自动生成标准回执模板',
-        '批量任务状态追踪',
-        '证据链自动关联',
-        '减少手动复制粘贴'
+        `Total tasks: ${s.total}`,
+        `Draft: ${s.draft}`,
+        `Receipt required: ${s.receiptRequired}`,
+        `Review required: ${s.reviewRequired}`,
       ]
+    }
+  ],
+  registryTables: [
+    {
+      title: `Task Registry (${V8_TASKS.length} entries)`,
+      columns: [
+        { label: 'Name', key: 'name' },
+        { label: 'Lifecycle', key: 'lifecycle' },
+        { label: 'Permission', key: 'permissionLevel' },
+        { label: 'Receipt', key: 'receiptRequired' },
+        { label: 'Review', key: 'reviewRequired' },
+      ],
+      rows: V8_TASKS.map(t => ({ name: t.name, lifecycle: t.lifecycle, permissionLevel: t.permissionLevel, receiptRequired: t.receiptRequired, reviewRequired: t.reviewRequired }))
     }
   ],
   keyRules: [

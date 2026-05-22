@@ -1,5 +1,7 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_PROVIDERS, getV8ProviderSummary } from '../registry/openAipv8CenterData';
 
+const s = getV8ProviderSummary();
 const config = {
   title: 'Provider Manager',
   subtitle: '模型提供商路由与配置管理',
@@ -24,13 +26,27 @@ const config = {
       ]
     },
     {
-      title: 'What This Center Will Manage',
+      title: 'Registry Summary',
       items: [
-        'Provider 注册与配置',
-        '路由策略与切换',
-        'Dry-run 模式验证',
-        '成本与用量追踪'
+        `Total providers: ${s.total}`,
+        `Enabled: ${s.enabled}`,
+        `Configured: ${s.configured}`,
+        `Online: ${s.online}`,
+        `Authorized: ${s.authorized}`,
       ]
+    }
+  ],
+  registryTables: [
+    {
+      title: `Provider Registry (${V8_PROVIDERS.length} entries)`,
+      columns: [
+        { label: 'Name', key: 'name' },
+        { label: 'Lifecycle', key: 'lifecycle' },
+        { label: 'Permission', key: 'permissionLevel' },
+        { label: 'Online', key: 'online' },
+        { label: 'Authorized', key: 'authorized' },
+      ],
+      rows: V8_PROVIDERS.map(p => ({ name: p.name, lifecycle: p.lifecycle, permissionLevel: p.permissionLevel, online: p.online, authorized: p.authorized }))
     }
   ],
   keyRules: [

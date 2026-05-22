@@ -19,21 +19,24 @@ function header(sub?: string) {
 }
 
 export async function runTask(sub?: string) {
+  const items = load('tasks.example.json');
   if (sub === 'list') {
     header(sub);
-    for (const it of load('tasks.example.json')) {
+    console.log(`Registry count: ${items.length} tasks (openAipv8CenterData.ts mirrors this data)`);
+    for (const it of items) {
       console.log(`- ${it.name} | lifecycle=${it.lifecycle} | permission=${it.permissionLevel} | receipt=${it.receiptRequired} | review=${it.reviewRequired}`);
     }
     return;
   }
   if (sub === 'status') {
     header(sub);
-    const items = load('tasks.example.json');
+    console.log(`Registry count: ${items.length} tasks`);
     console.log(`- draft items: ${items.filter((i: any) => i.lifecycle === 'draft').length}`);
     console.log(`- receipt required: ${items.filter((i: any) => i.receiptRequired).length}`);
     console.log(`- review required: ${items.filter((i: any) => i.reviewRequired).length}`);
     return;
   }
   header(sub);
+  console.log(`Registry count: ${items.length} tasks`);
   console.log('- planned subcommands: aip task list, aip task status (implemented readonly)');
 }

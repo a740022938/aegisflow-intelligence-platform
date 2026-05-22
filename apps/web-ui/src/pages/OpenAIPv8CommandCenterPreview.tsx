@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { getV8RegistryCounts, getV8ConnectorMigrationSummary } from '../registry/openAipv8CenterData';
 
 const shellStyle: React.CSSProperties = {
   minHeight: '100vh',
@@ -54,69 +55,81 @@ const safetyItems = [
   'UI switch != backend truth'
 ];
 
+const counts = getV8RegistryCounts();
+const ms = getV8ConnectorMigrationSummary();
+
 const centers = [
   {
     title: 'Agent Center',
     route: '/openaip-v8-agent-center-preview',
     tag: 'readonly',
     items: ['AI agents lifecycle: enabled / paused / disabled / quarantined', 'Permission levels L0-L5', 'Task/audit linkage'],
-    safetyNote: 'No agent launch, no lifecycle mutation'
+    safetyNote: 'No agent launch, no lifecycle mutation',
+    count: counts.agents
   },
   {
     title: 'Task Center',
     route: '/openaip-v8-task-center-preview',
     tag: 'draft',
     items: ['Task pack generation', 'Receipt intake pipeline', 'Review queue', 'Human-fatigue reduction'],
-    safetyNote: 'No task execution, no write'
+    safetyNote: 'No task execution, no write',
+    count: counts.tasks
   },
   {
     title: 'Provider Manager',
     route: '/openaip-v8-provider-manager-preview',
     tag: 'readonly',
     items: ['CC Switch-like provider/config/router', 'Provider registry', 'Readonly/dry-run first'],
-    safetyNote: 'No provider action, dry-run only'
+    safetyNote: 'No provider action, dry-run only',
+    count: counts.providers
   },
   {
     title: 'Integration Center',
     route: '/openaip-v8-integration-center-preview',
     tag: 'readonly',
-    items: ['OpenClaw', 'GitHub', 'Webhooks/external services'],
-    safetyNote: 'No connector action in preview'
+    items: ['OpenClaw', 'GitHub', 'Webhooks/external services', 'Connector → v8 migration bridge'],
+    safetyNote: 'No connector action in preview',
+    count: counts.integrations
   },
   {
     title: 'Local Apps Center',
     route: '/openaip-v8-local-apps-center-preview',
     tag: 'readonly',
     items: ['OpenAxiom as Local App / UI Lab / Vision Tool', 'ComfyUI', 'Ollama / LM Studio', 'YOLO / SAM tools'],
-    safetyNote: 'No app launch in preview'
+    safetyNote: 'No app launch in preview',
+    count: counts.localApps
   },
   {
     title: 'Memory + Knowledge Center',
     route: '/openaip-v8-memory-knowledge-center-preview',
     tag: 'readonly',
     items: ['Memory access policy', 'Knowledge source registry', 'Receipt/report indexing'],
-    safetyNote: 'No memory write in preview'
+    safetyNote: 'No memory write in preview',
+    count: counts.memoryKnowledge
   },
   {
     title: 'Policy Router + Capability Center',
     route: '/openaip-v8-policy-capability-center-preview',
     tag: 'readonly',
     items: ['Capability != permission', 'Permission levels', 'Policy-before-buttons'],
-    safetyNote: 'No policy mutation'
+    safetyNote: 'No policy mutation',
+    count: `${counts.policies} policies, ${counts.capabilities} caps`
   },
   {
     title: 'Audit Center',
     route: '/openaip-v8-audit-center-preview',
     tag: 'readonly',
     items: ['Receipts', 'Reports', 'Evidence', 'Commit/push/verification trail'],
-    safetyNote: 'Readonly audit trail'
+    safetyNote: 'Readonly audit trail',
+    count: counts.audits
   },
   {
     title: 'Execution Gateway',
     route: '/openaip-v8-execution-gateway-preview',
     tag: 'closed',
     items: ['Default closed', 'Gate CLOSED', 'Stage C disabled', 'Dry-run/approval required before future execution'],
-    safetyNote: 'Gate remains closed'
+    safetyNote: 'Gate remains closed',
+    count: `${counts.policies} gate policies`
   }
 ];
 
@@ -151,6 +164,38 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
           </p>
         </div>
 
+        {/* Registry Counts Strip */}
+        <div style={{ ...cardStyle, marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+          {[
+            { label: 'Agents', value: counts.agents, color: '#3b82f6' },
+            { label: 'Providers', value: counts.providers, color: '#22c55e' },
+            { label: 'Integrations', value: counts.integrations, color: '#f97316' },
+            { label: 'Local Apps', value: counts.localApps, color: '#a855f7' },
+            { label: 'Capabilities', value: counts.capabilities, color: '#ec4899' },
+            { label: 'Policies', value: counts.policies, color: '#eab308' },
+            { label: 'Tasks', value: counts.tasks, color: '#06b6d4' },
+            { label: 'Audits', value: counts.audits, color: '#ef4444' },
+            { label: 'Memory/Knowledge', value: counts.memoryKnowledge, color: '#14b8a6' },
+            { label: 'Connector Migrations', value: counts.connectorMigrations, color: '#8b5cf6' },
+          ].map(item => (
+            <div key={item.label} style={{ textAlign: 'center', minWidth: 90 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: item.color }}>{item.value}</div>
+              <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>{item.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Migration Status Strip */}
+        <div style={{ ...cardStyle, marginTop: 8, borderLeft: '3px solid #8b5cf6' }}>
+          <h3 style={{ margin: 0, fontSize: 12, color: '#8b5cf6', marginBottom: 6 }}>Connector → v8 Migration Status</h3>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 11, color: '#22c55e' }}>Migrated: {ms.migrated}</span>
+            <span style={{ fontSize: 11, color: '#f97316' }}>In Progress: {ms.inProgress}</span>
+            <span style={{ fontSize: 11, color: '#eab308' }}>Planned: {ms.planned}</span>
+            <span style={{ fontSize: 11, color: '#6b7280' }}>Total: {ms.total}</span>
+          </div>
+        </div>
+
         <div style={gridStyle}>
           {centers.map((center) => (
             <Link key={center.title} to={center.route} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -167,6 +212,9 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
                 <p style={{ margin: '10px 0 0', fontSize: 11, color: '#6b7280', fontStyle: 'italic' }}>
                   {center.safetyNote}
                 </p>
+                <div style={{ marginTop: 6, fontSize: 18, fontWeight: 700, color: '#93c5fd', textAlign: 'right' }}>
+                  {center.count}
+                </div>
               </section>
             </Link>
           ))}

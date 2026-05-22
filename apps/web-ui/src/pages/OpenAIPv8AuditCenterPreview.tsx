@@ -1,5 +1,7 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_AUDITS, getV8AuditSummary } from '../registry/openAipv8CenterData';
 
+const s = getV8AuditSummary();
 const config = {
   title: 'Audit Center',
   subtitle: '审计链与凭证管理',
@@ -25,13 +27,25 @@ const config = {
       ]
     },
     {
-      title: 'What This Center Will Manage',
+      title: 'Registry Summary',
       items: [
-        '自动生成操作回执',
-        '证据链收集与验证',
-        '合规审计报告',
-        '安全状态摘要'
+        `Total receipts: ${s.total}`,
+        `Passed: ${s.passed}`,
+        `Latest phase: ${s.latestPhase}`,
       ]
+    }
+  ],
+  registryTables: [
+    {
+      title: `Audit Registry (${V8_AUDITS.length} entries)`,
+      columns: [
+        { label: 'ID', key: 'id' },
+        { label: 'Type', key: 'type' },
+        { label: 'Phase', key: 'phase' },
+        { label: 'Verdict', key: 'verdict' },
+        { label: 'Commit', key: 'commit' },
+      ],
+      rows: V8_AUDITS.map(a => ({ id: a.id, type: a.type, phase: a.phase, verdict: a.verdict, commit: a.commit }))
     }
   ],
   keyRules: [

@@ -1,5 +1,7 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_AGENTS, getV8AgentCenterSummary } from '../registry/openAipv8CenterData';
 
+const s = getV8AgentCenterSummary();
 const config = {
   title: 'Agent Center',
   subtitle: 'AI Agent 生命周期管理',
@@ -26,13 +28,29 @@ const config = {
       ]
     },
     {
-      title: 'What This Center Will Manage',
+      title: 'Registry Summary',
       items: [
-        'Agent 注册与启停生命周期',
-        '权限等级 L0-L5 分配',
-        '任务/审计关联',
-        'Agent 健康监控'
+        `Total agents: ${s.total}`,
+        `Enabled: ${s.enabled}`,
+        `Configured: ${s.configured}`,
+        `Online: ${s.online}`,
+        `Authorized: ${s.authorized}`,
+        `Gate open: ${s.gateOpen}`,
       ]
+    }
+  ],
+  registryTables: [
+    {
+      title: `Agent Registry (${V8_AGENTS.length} entries)`,
+      columns: [
+        { label: 'Name', key: 'name' },
+        { label: 'Kind', key: 'integrationKind' },
+        { label: 'Lifecycle', key: 'lifecycle' },
+        { label: 'Permission', key: 'permissionLevel' },
+        { label: 'Online', key: 'online' },
+        { label: 'Authorized', key: 'authorized' },
+      ],
+      rows: V8_AGENTS.map(a => ({ name: a.name, integrationKind: a.integrationKind, lifecycle: a.lifecycle, permissionLevel: a.permissionLevel, online: a.online, authorized: a.authorized }))
     }
   ],
   keyRules: [

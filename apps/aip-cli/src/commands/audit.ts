@@ -19,21 +19,24 @@ function header(sub?: string) {
 }
 
 export async function runAudit(sub?: string) {
+  const items = load('audit.example.json');
   if (sub === 'list') {
     header(sub);
-    for (const it of load('audit.example.json')) {
+    console.log(`Registry count: ${items.length} audit entries (openAipv8CenterData.ts mirrors this data)`);
+    for (const it of items) {
       console.log(`- ${it.id} | type=${it.type} | phase=${it.phase} | verdict=${it.verdict} | commit=${it.commit}`);
     }
     return;
   }
   if (sub === 'status') {
     header(sub);
-    const items = load('audit.example.json');
+    console.log(`Registry count: ${items.length} audit entries`);
     console.log(`- total receipts: ${items.length}`);
     console.log(`- passed: ${items.filter((i: any) => i.verdict === 'passed').length}`);
     console.log(`- latest phase: ${items[items.length - 1]?.phase || 'none'}`);
     return;
   }
   header(sub);
+  console.log(`Registry count: ${items.length} audit entries`);
   console.log('- planned subcommands: aip audit list, aip audit status (implemented readonly)');
 }

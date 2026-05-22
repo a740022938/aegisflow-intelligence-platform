@@ -1,5 +1,7 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_MEMORY_KNOWLEDGE, getV8MemoryKnowledgeSummary } from '../registry/openAipv8CenterData';
 
+const s = getV8MemoryKnowledgeSummary();
 const config = {
   title: 'Memory + Knowledge Center',
   subtitle: '长期项目大脑与知识源管理',
@@ -26,13 +28,25 @@ const config = {
       ]
     },
     {
-      title: 'What This Center Will Manage',
+      title: 'Registry Summary',
       items: [
-        '内存访问策略配置',
-        '知识源注册与管理',
-        '回执/报告索引',
-        '知识检索与引用'
+        `Total entries: ${s.total}`,
+        `Readonly access: ${s.readonly}`,
+        `Scoped write (disabled): ${s.scopedWrite}`,
+        `Enabled: ${s.enabled}`,
       ]
+    }
+  ],
+  registryTables: [
+    {
+      title: `Memory + Knowledge Registry (${V8_MEMORY_KNOWLEDGE.length} entries)`,
+      columns: [
+        { label: 'Source', key: 'source' },
+        { label: 'Access Mode', key: 'accessMode' },
+        { label: 'Lifecycle', key: 'lifecycle' },
+        { label: 'Permission', key: 'permissionLevel' },
+      ],
+      rows: V8_MEMORY_KNOWLEDGE.map(m => ({ source: m.source, accessMode: m.accessMode, lifecycle: m.lifecycle, permissionLevel: m.permissionLevel }))
     }
   ],
   keyRules: [

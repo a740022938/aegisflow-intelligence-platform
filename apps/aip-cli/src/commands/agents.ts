@@ -8,6 +8,7 @@ function load() {
 }
 
 export async function runAgents(sub?: string) {
+  const entries = load();
   console.log('');
   console.log('OpenAIP v8 Foundation Command');
   console.log(`Command: aip agents${sub ? ` ${sub}` : ''}`);
@@ -15,8 +16,10 @@ export async function runAgents(sub?: string) {
   console.log('Status: readonly foundation stub');
   console.log('Safety: no mutation, no runtime action, Gate CLOSED, Stage C disabled');
   console.log('Source: example/static readonly registry');
+  console.log(`Registry count: ${entries.length} agents (openAipv8CenterData.ts mirrors this data)`);
   if (sub === 'list') {
     for (const it of load()) console.log(`- ${it.name} | kind=${it.kind} | lifecycle=${it.lifecycle} | permission=${it.permissionLevel}`);
+    console.log(`Total: ${entries.length}`);
   } else {
     console.log('- planned subcommand: aip agents list (implemented readonly)');
   }

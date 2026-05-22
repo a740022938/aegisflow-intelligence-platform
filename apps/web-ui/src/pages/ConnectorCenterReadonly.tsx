@@ -140,6 +140,37 @@ export default function ConnectorCenterReadonly() {
     >
       <StatusStrip items={stripItems} />
 
+      {/* Migration Bridge Banner */}
+      <SectionCard title="Connector → v8 Integration Center Migration" style={{ marginTop: 16, border: '1px solid #8B5CF6', background: 'rgba(139,92,246,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: '#8B5CF6', color: '#fff' }}>MIGRATION BRIDGE</span>
+          <span style={{ fontSize: 12, color: '#c4b5fd' }}>Connector Center → v8 Integration Center</span>
+        </div>
+        <div style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 6px' }}>
+            This page is the <strong>legacy Connector Center</strong>. New integration development is on the v8 track.
+          </p>
+          <p style={{ margin: '0 0 6px' }}>
+            The <strong>v8 Integration Center</strong> absorbs connector management with registry-backed data,
+            integration lifecycle management, and a full migration registry from legacy connectors.
+          </p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>
+            <Link
+              to="/openaip-v8-integration-center-preview"
+              style={{ fontSize: 12, color: '#8B5CF6', textDecoration: 'underline', fontWeight: 600 }}
+            >
+              Open v8 Integration Center →
+            </Link>
+            <Link
+              to="/openaip-v8-command-center-preview"
+              style={{ fontSize: 12, color: '#93c5fd', textDecoration: 'underline' }}
+            >
+              v8 Command Center
+            </Link>
+          </div>
+        </div>
+      </SectionCard>
+
       {/* Overview Hero */}
       <SectionCard title="Connector Overview" style={{ marginTop: 16 }}>
         <ConnectorCenterOverview />

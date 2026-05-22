@@ -1,4 +1,5 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_POLICIES } from '../registry/openAipv8CenterData';
 
 const config = {
   title: 'Execution Gateway',
@@ -27,14 +28,20 @@ const config = {
       ]
     },
     {
-      title: 'What This Center Will Monitor',
-      items: [
-        'Gate 开闭状态',
-        'Stage C 启用状态',
-        '执行请求队列',
-        '审批流转状态',
-        '安全边界合规性'
-      ]
+      title: 'Current Gate Policy',
+      items: V8_POLICIES.map(p => `${p.id}: gateOpen=${p.gateOpen}, stageCEnabled=${p.stageCEnabled}`)
+    }
+  ],
+  registryTables: [
+    {
+      title: `Policy Registry — Gate State (${V8_POLICIES.length} entries)`,
+      columns: [
+        { label: 'Policy', key: 'id' },
+        { label: 'Gate Open', key: 'gateOpen' },
+        { label: 'Stage C', key: 'stageCEnabled' },
+        { label: 'Rule', key: 'rule' },
+      ],
+      rows: V8_POLICIES.map(p => ({ id: p.id, gateOpen: p.gateOpen, stageCEnabled: p.stageCEnabled, rule: p.rule }))
     }
   ],
   keyRules: [

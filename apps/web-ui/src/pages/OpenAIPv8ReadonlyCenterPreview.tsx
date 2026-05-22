@@ -35,9 +35,33 @@ const cardStyle: React.CSSProperties = {
   marginTop: 12
 };
 
+const gridItemStyle: React.CSSProperties = {
+  padding: '6px 10px',
+  borderBottom: '1px solid #1e293b',
+  display: 'flex',
+  justifyContent: 'space-between',
+  fontSize: 13,
+};
+
 export interface CenterSection {
   title: string;
   items: string[];
+}
+
+export interface RegistryTableColumn {
+  label: string;
+  key: string;
+  width?: string;
+}
+
+export interface RegistryTableRow {
+  [key: string]: string | number | boolean | undefined;
+}
+
+export interface RegistryTable {
+  title: string;
+  columns: RegistryTableColumn[];
+  rows: RegistryTableRow[];
 }
 
 export interface CenterConfig {
@@ -45,12 +69,19 @@ export interface CenterConfig {
   subtitle: string;
   purpose: string;
   sections: CenterSection[];
+  registryTables?: RegistryTable[];
   keyRules: string[];
   notAllowed: string[];
   futurePhases: string[];
   backLink?: string;
   backLabel?: string;
   sampleData?: { label: string; value: string }[];
+}
+
+function formatCellValue(v: string | number | boolean | undefined): string {
+  if (v === undefined || v === null) return '—';
+  if (typeof v === 'boolean') return v ? 'YES' : 'NO';
+  return String(v);
 }
 
 export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: CenterConfig }): React.JSX.Element {
@@ -80,6 +111,26 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
                 <li key={item}>{item}</li>
               ))}
             </ul>
+          </div>
+        ))}
+
+        {config.registryTables && config.registryTables.map((table) => (
+          <div key={table.title} style={{ ...cardStyle, overflowX: 'auto' }}>
+            <h2 style={{ margin: 0, fontSize: 14, color: '#60a5fa', marginBottom: 8 }}>{table.title}</h2>
+            <div style={{ minWidth: table.columns.length * 120 }}>
+              <div style={{ display: 'flex', fontWeight: 600, color: '#93c5fd', fontSize: 11, borderBottom: '1px solid #374151', paddingBottom: 4, marginBottom: 2 }}>
+                {table.columns.map((col) => (
+                  <div key={col.key} style={{ flex: col.width || 1, padding: '0 4px' }}>{col.label}</div>
+                ))}
+              </div>
+              {table.rows.map((row, idx) => (
+                <div key={idx} style={gridItemStyle}>
+                  {table.columns.map((col) => (
+                    <div key={col.key} style={{ flex: col.width || 1, padding: '0 4px' }}>{formatCellValue(row[col.key])}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         ))}
 

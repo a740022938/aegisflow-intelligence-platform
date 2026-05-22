@@ -19,22 +19,24 @@ function header(sub?: string) {
 }
 
 export async function runPolicy(sub?: string) {
+  const policies = load('policies.example.json');
+  const capabilities = load('capabilities.example.json');
   if (sub === 'list') {
     header(sub);
-    for (const p of load('policies.example.json')) {
+    console.log(`Registry count: ${policies.length} policies, ${capabilities.length} capabilities (openAipv8CenterData.ts mirrors this data)`);
+    for (const p of policies) {
       console.log(`- ${p.id} | gateOpen=${p.gateOpen} | stageCEnabled=${p.stageCEnabled} | rule=${p.rule}`);
     }
-    for (const c of load('capabilities.example.json')) {
+    for (const c of capabilities) {
       console.log(`- cap: ${c.id} | risk=${c.risk} | permission=${c.permissionLevel} | requiresGate=${c.requiresGate || false}`);
     }
     return;
   }
   if (sub === 'status') {
     header(sub);
-    const policies = load('policies.example.json');
-    const capabilities = load('capabilities.example.json');
     const gateClosed = policies.every((p: any) => !p.gateOpen);
     const stageCDisabled = policies.every((p: any) => !p.stageCEnabled);
+    console.log(`Registry count: ${policies.length} policies, ${capabilities.length} capabilities`);
     console.log(`- gateOpen: ${!gateClosed} (expected: false)`);
     console.log(`- stageCEnabled: ${!stageCDisabled} (expected: false)`);
     console.log(`- policies: ${policies.length}`);
@@ -43,5 +45,6 @@ export async function runPolicy(sub?: string) {
     return;
   }
   header(sub);
+  console.log(`Registry count: ${policies.length} policies, ${capabilities.length} capabilities`);
   console.log('- planned subcommands: aip policy list, aip policy status (implemented readonly)');
 }

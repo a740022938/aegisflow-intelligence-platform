@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import PageShell from '../components/ui/PageShell';
 import SectionCard from '../components/ui/SectionCard';
 import { CONNECTOR_REGISTRY, getConnectorStats } from '../registry/connector-registry';
@@ -167,6 +168,26 @@ export default function ConnectorCenter() {
           </div>
         ))}
       </div>
+
+      {/* Migration Bridge Banner */}
+      <SectionCard title="Connector → v8 Migration Bridge" style={{ border: '1px solid #8B5CF6', background: 'rgba(139,92,246,0.06)', marginTop: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: '#8B5CF6', color: '#fff' }}>MIGRATION BRIDGE</span>
+          <span style={{ fontSize: 12, color: '#c4b5fd' }}>Legacy Connector Centers → v8 Integration Center / Provider Manager</span>
+        </div>
+        <div style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 6px' }}>
+            This page (Connector Center) and its readonly variant (ConnectorCenterReadonly) are <strong>legacy pages</strong>.
+            The v8 track provides registry-backed Integration Center, Provider Manager, and Local Apps Center.
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 6 }}>
+            <Link to="/openaip-v8-integration-center-preview" style={{ fontSize: 12, color: '#8B5CF6', textDecoration: 'underline', fontWeight: 600 }}>v8 Integration Center →</Link>
+            <Link to="/openaip-v8-provider-manager-preview" style={{ fontSize: 12, color: '#93c5fd', textDecoration: 'underline' }}>v8 Provider Manager</Link>
+            <Link to="/openaip-v8-local-apps-center-preview" style={{ fontSize: 12, color: '#93c5fd', textDecoration: 'underline' }}>v8 Local Apps Center</Link>
+            <Link to="/openaip-v8-command-center-preview" style={{ fontSize: 12, color: '#93c5fd', textDecoration: 'underline' }}>v8 Command Center</Link>
+          </div>
+        </div>
+      </SectionCard>
 
       {/* Connector Cards Grid */}
       <SectionCard title="连接器列表">

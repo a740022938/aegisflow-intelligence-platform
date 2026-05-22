@@ -40,7 +40,28 @@ test('v8 list/status commands show readonly source and classify entities', () =>
   }
 });
 
-test('v8 centers command lists all hidden readonly routes', () => {
+test('v8 list/status commands show registry counts', () => {
+  const countChecks = [
+    ['agents list', /Registry count/],
+    ['providers list', /Registry count/],
+    ['integrations list', /Registry count/],
+    ['apps list', /Registry count/],
+    ['runtime status', /total runtime entries/],
+    ['runtime list', /Registry count/],
+    ['task list', /Registry count/],
+    ['task status', /Registry count/],
+    ['audit list', /Registry count/],
+    ['audit status', /Registry count/],
+    ['policy list', /Registry count/],
+    ['policy status', /Registry count/],
+  ];
+  for (const [cmd, pattern] of countChecks) {
+    const out = runCli(cmd);
+    assert.match(out, pattern, `${cmd} should show Registry count`);
+  }
+});
+
+test('v8 centers command lists all hidden readonly routes with registry data note', () => {
   const out = runCli('v8 centers');
   assert.match(out, /openaip-v8-command-center-preview/);
   assert.match(out, /openaip-v8-agent-center-preview/);
@@ -53,14 +74,18 @@ test('v8 centers command lists all hidden readonly routes', () => {
   assert.match(out, /openaip-v8-audit-center-preview/);
   assert.match(out, /openaip-v8-execution-gateway-preview/);
   assert.match(out, /hidden\/direct, readonly, Gate CLOSED/);
+  assert.match(out, /registry-backed/);
+  assert.match(out, /Migration bridge banner/);
 });
 
-test('v8 status command shows foundation summary', () => {
+test('v8 status command shows foundation summary with registry data', () => {
   const out = runCli('v8 status');
   assert.match(out, /Gate.*CLOSED/);
   assert.match(out, /Stage C.*DISABLED/);
   assert.match(out, /Runtime Mutation.*NONE/);
   assert.match(out, /DB Write.*NONE/);
+  assert.match(out, /Registry Data Layer.*COMPLETE/);
+  assert.match(out, /Connector.*v8 Migration.*COMPLETE/);
 });
 
 test('validators for examples and index pass', () => {
@@ -135,4 +160,53 @@ test('no risky button labels in v8 center pages', () => {
       }
     }
   }
+});
+
+test('center pages import registry data', () => {
+  const pagesDir = 'E:\\AIP\\apps\\web-ui\\src\\pages';
+  const centerFiles = fs.readdirSync(pagesDir).filter(f => f.startsWith('OpenAIPv8') && f.endsWith('.tsx') && f !== 'OpenAIPv8ReadonlyCenterPreview.tsx');
+  for (const file of centerFiles) {
+    const content = fs.readFileSync(path.join(pagesDir, file), 'utf8');
+    assert.ok(content.includes('openAipv8CenterData'), `${file} should import from openAipv8CenterData`);
+    assert.ok(content.includes('V8_') || content.includes('getV8'), `${file} should use V8 registry data`);
+  }
+});
+
+test('openAipv8CenterData.ts has all required registries', () => {
+  const data = fs.readFileSync('E:\\AIP\\apps\\web-ui\\src\\registry\\openAipv8CenterData.ts', 'utf8');
+  assert.ok(data.includes('V8_AGENTS'));
+  assert.ok(data.includes('V8_PROVIDERS'));
+  assert.ok(data.includes('V8_INTEGRATIONS'));
+  assert.ok(data.includes('V8_LOCAL_APPS'));
+  assert.ok(data.includes('V8_CAPABILITIES'));
+  assert.ok(data.includes('V8_POLICIES'));
+  assert.ok(data.includes('V8_TASKS'));
+  assert.ok(data.includes('V8_AUDITS'));
+  assert.ok(data.includes('V8_MEMORY_KNOWLEDGE'));
+  assert.ok(data.includes('V8_CONNECTOR_MIGRATIONS'));
+  assert.ok(data.includes('getV8RegistryCounts'));
+  assert.ok(data.includes('getV8ConnectorMigrationSummary'));
+});
+
+test('ConnectorCenter pages have migration bridge', () => {
+  const readonlyContent = fs.readFileSync('E:\\AIP\\apps\\web-ui\\src\\pages\\ConnectorCenterReadonly.tsx', 'utf8');
+  const legacyContent = fs.readFileSync('E:\\AIP\\apps\\web-ui\\src\\pages\\ConnectorCenter.tsx', 'utf8');
+  assert.ok(readonlyContent.includes('MIGRATION BRIDGE'), 'ConnectorCenterReadonly missing migration bridge');
+  assert.ok(legacyContent.includes('MIGRATION BRIDGE'), 'ConnectorCenter missing migration bridge');
+  assert.ok(readonlyContent.includes('v8 Integration Center'));
+  assert.ok(legacyContent.includes('v8 Integration Center'));
+});
+
+test('Command Center shows registry-backed counts', () => {
+  const commandCenterContent = fs.readFileSync('E:\\AIP\\apps\\web-ui\\src\\pages\\OpenAIPv8CommandCenterPreview.tsx', 'utf8');
+  assert.ok(commandCenterContent.includes('getV8RegistryCounts'));
+  assert.ok(commandCenterContent.includes('getV8ConnectorMigrationSummary'));
+  assert.ok(commandCenterContent.includes('Connector Migration'));
+});
+
+test('Shared component supports registryTables', () => {
+  const sharedContent = fs.readFileSync('E:\\AIP\\apps\\web-ui\\src\\pages\\OpenAIPv8ReadonlyCenterPreview.tsx', 'utf8');
+  assert.ok(sharedContent.includes('registryTables'));
+  assert.ok(sharedContent.includes('RegistryTableColumn'));
+  assert.ok(sharedContent.includes('RegistryTableRow'));
 });

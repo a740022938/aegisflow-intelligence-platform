@@ -1,5 +1,8 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_POLICIES, V8_CAPABILITIES, getV8PolicySummary, getV8CapabilitySummary } from '../registry/openAipv8CenterData';
 
+const ps = getV8PolicySummary();
+const cs = getV8CapabilitySummary();
 const config = {
   title: 'Policy Router + Capability Center',
   subtitle: '策略路由与能力管理',
@@ -33,6 +36,38 @@ const config = {
         'L4: 授权执行，可执行已授权操作',
         'L5: 完全控制'
       ]
+    },
+    {
+      title: 'Registry Summary',
+      items: [
+        `Policies: ${ps.total} (${ps.gateClosed} gate closed, ${ps.stageCDisabled} Stage C disabled)`,
+        `Capabilities: ${cs.total} (low=${cs.low}, medium=${cs.medium}, high=${cs.high}, critical=${cs.critical})`,
+        `Capabilities requiring Gate: ${cs.requiresGate}`,
+        `Capabilities requiring Stage C: ${cs.requiresStageC}`,
+      ]
+    }
+  ],
+  registryTables: [
+    {
+      title: `Policy Registry (${V8_POLICIES.length} entries)`,
+      columns: [
+        { label: 'ID', key: 'id' },
+        { label: 'Gate Open', key: 'gateOpen' },
+        { label: 'Stage C', key: 'stageCEnabled' },
+        { label: 'Rule', key: 'rule' },
+      ],
+      rows: V8_POLICIES.map(p => ({ id: p.id, gateOpen: p.gateOpen, stageCEnabled: p.stageCEnabled, rule: p.rule }))
+    },
+    {
+      title: `Capability Registry (${V8_CAPABILITIES.length} entries)`,
+      columns: [
+        { label: 'ID', key: 'id' },
+        { label: 'Risk', key: 'risk' },
+        { label: 'Permission', key: 'permissionLevel' },
+        { label: 'Requires Gate', key: 'requiresGate' },
+        { label: 'Requires Stage C', key: 'requiresStageC' },
+      ],
+      rows: V8_CAPABILITIES.map(c => ({ id: c.id, risk: c.risk, permissionLevel: c.permissionLevel, requiresGate: c.requiresGate, requiresStageC: c.requiresStageC }))
     }
   ],
   keyRules: [

@@ -1,0 +1,17 @@
+{
+  "id": "receipt.v8-center-data-upgrade.001",
+  "type": "receipt",
+  "phase": "P2C",
+  "verdict": "passed",
+  "commit": "",
+  "timestamp": "2026-05-23T00:00:00Z",
+  "summary": "OpenAIP v8 Multi-Center Pages upgraded from static skeletons to registry-backed readonly pages with connector migration bridge.",
+  "details": {
+    "filesCreated": 1,
+    "filesModified": 23,
+    "testsPassed": 15,
+    "registriesDefined": 10,
+    "migrationEntries": 7,
+    "centersUpgraded": 9
+  }
+}

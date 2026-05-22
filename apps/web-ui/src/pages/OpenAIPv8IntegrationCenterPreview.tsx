@@ -1,9 +1,12 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_INTEGRATIONS, V8_CONNECTOR_MIGRATIONS, getV8IntegrationSummary, getV8ConnectorMigrationSummary } from '../registry/openAipv8CenterData';
 
+const s = getV8IntegrationSummary();
+const ms = getV8ConnectorMigrationSummary();
 const config = {
   title: 'Integration Center',
   subtitle: '外部服务绑定与桥接管理',
-  purpose: '管理外部工具和服务的集成，包括 OpenClaw、GitHub、Webhook 等。',
+  purpose: '管理外部工具和服务的集成，包括 OpenClaw、GitHub、Webhook 等。包含 Connector Center 迁移桥接。',
   sections: [
     {
       title: 'Managed Integrations',
@@ -24,19 +27,52 @@ const config = {
       ]
     },
     {
-      title: 'What This Center Will Manage',
+      title: 'Registry Summary',
       items: [
-        '外部服务注册与配置',
-        '连接状态监控',
-        '桥接策略管理',
-        'Webhook 端点管理'
+        `Total integrations: ${s.total}`,
+        `Enabled: ${s.enabled}`,
+        `Registered: ${s.registered}`,
       ]
+    },
+    {
+      title: 'Connector → v8 Migration Bridge',
+      items: [
+        `Total migration entries: ${ms.total}`,
+        `Migrated: ${ms.migrated}`,
+        `In progress: ${ms.inProgress}`,
+        `Planned: ${ms.planned}`,
+        'Legacy Connector Center is being absorbed into v8 Integration Center.',
+        'ConnectorCenterReadonly page shows migration banner linking here.',
+      ]
+    }
+  ],
+  registryTables: [
+    {
+      title: `Integration Registry (${V8_INTEGRATIONS.length} entries)`,
+      columns: [
+        { label: 'Name', key: 'name' },
+        { label: 'Kind', key: 'kind' },
+        { label: 'Lifecycle', key: 'lifecycle' },
+        { label: 'Permission', key: 'permissionLevel' },
+      ],
+      rows: V8_INTEGRATIONS.map(i => ({ name: i.name, kind: i.kind, lifecycle: i.lifecycle, permissionLevel: i.permissionLevel }))
+    },
+    {
+      title: `Connector → v8 Migration Registry (${V8_CONNECTOR_MIGRATIONS.length} entries)`,
+      columns: [
+        { label: 'Legacy Connector', key: 'legacyConnectorName' },
+        { label: 'v8 Center', key: 'v8Center' },
+        { label: 'Mapping', key: 'v8Mapping' },
+        { label: 'Status', key: 'migrationStatus' },
+      ],
+      rows: V8_CONNECTOR_MIGRATIONS.map(m => ({ legacyConnectorName: m.legacyConnectorName, v8Center: m.v8Center, v8Mapping: m.v8Mapping, migrationStatus: m.migrationStatus }))
     }
   ],
   keyRules: [
     'Integration online does not mean connector action allowed.',
     'Integration enabled does not mean execution authorized.',
-    'Connector actions require Gate open and Stage C enabled.'
+    'Connector actions require Gate open and Stage C enabled.',
+    'Legacy Connector Center is read-only; use v8 Integration Center for new integrations.'
   ],
   notAllowed: [
     'No connector actions in this preview',

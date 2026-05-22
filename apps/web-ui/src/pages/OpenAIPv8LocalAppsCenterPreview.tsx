@@ -1,5 +1,7 @@
 import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
+import { V8_LOCAL_APPS, getV8LocalAppSummary } from '../registry/openAipv8CenterData';
 
+const s = getV8LocalAppSummary();
 const config = {
   title: 'Local Apps Center',
   subtitle: '本地微应用运行时管理',
@@ -27,13 +29,24 @@ const config = {
       ]
     },
     {
-      title: 'What This Center Will Manage',
+      title: 'Registry Summary',
       items: [
-        '本地应用注册与配置',
-        '应用启停管理（未来阶段）',
-        '资源使用监控',
-        '日志查看'
+        `Total local apps: ${s.total}`,
+        `Registered: ${s.registered}`,
+        `Enabled: ${s.enabled}`,
       ]
+    }
+  ],
+  registryTables: [
+    {
+      title: `Local Apps Registry (${V8_LOCAL_APPS.length} entries)`,
+      columns: [
+        { label: 'Name', key: 'name' },
+        { label: 'Kind', key: 'kind' },
+        { label: 'Lifecycle', key: 'lifecycle' },
+        { label: 'Permission', key: 'permissionLevel' },
+      ],
+      rows: V8_LOCAL_APPS.map(a => ({ name: a.name, kind: a.kind, lifecycle: a.lifecycle, permissionLevel: a.permissionLevel }))
     }
   ],
   keyRules: [
