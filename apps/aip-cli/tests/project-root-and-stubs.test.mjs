@@ -6,6 +6,10 @@ function runCli(args, cwd = 'C:\\Users\\74002') {
   return execSync(`node E:\\AIP\\apps\\aip-cli\\dist\\index.js ${args}`, { cwd, encoding: 'utf8' });
 }
 
+function runNode(script) {
+  return execSync(`node ${script}`, { cwd: 'E:\\AIP', encoding: 'utf8' });
+}
+
 test('status lines no stale track', async () => {
   const mod = await import('../dist/banner.js');
   assert.equal(mod.renderStatusLines('7.62.0').join('\n').includes('v7.48 Local RC Candidate'), false);
@@ -27,7 +31,7 @@ test('v8 list/status commands show readonly source and classify entities', () =>
   }
 });
 
-test('help runtime and agents keep not implemented wording', () => {
-  assert.match(runCli('help runtime'), /not implemented|只读|foundation/i);
-  assert.match(runCli('help agents'), /not implemented|只读|foundation/i);
+test('validators for examples and index pass', () => {
+  assert.match(runNode('scripts/validate-v8-registry-examples.mjs'), /semantic validation passed/);
+  assert.match(runNode('scripts/validate-v8-foundation-index.mjs'), /index validation passed/);
 });
