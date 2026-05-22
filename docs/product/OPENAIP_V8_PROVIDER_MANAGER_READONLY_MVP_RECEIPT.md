@@ -1,9 +1,9 @@
 # OPENAIP v8 Provider Manager Readonly MVP Receipt
 
 - verdict: OPENAIP_V8_PROVIDER_MANAGER_READONLY_MVP_READY_WITH_GATE_CLOSED
-- commit: PENDING
-- pushed: PENDING
-- working tree clean: PENDING
+- commit: ae78251
+- pushed: ae78251
+- working tree clean: ae78251
 - files changed: 7
 - provider entries: 8
 - UI changed: yes
@@ -20,3 +20,4 @@
 - connector action executed: no
 - human authorization needed: no
 - recommended next step: Provider Manager readonly -> Integration/Provider policy handshake dry-run (still readonly)
+
