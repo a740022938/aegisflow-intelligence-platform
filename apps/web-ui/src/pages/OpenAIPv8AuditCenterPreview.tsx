@@ -72,8 +72,11 @@ const config = {
     { label: 'P1B Receipt', value: 'passed | def456' },
     { label: 'P1C Receipt', value: 'passed | 789abc' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Task Center', route: '/openaip-v8-task-center-preview' },
+    { title: 'Memory + Knowledge Center', route: '/openaip-v8-memory-knowledge-center-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8AuditCenterPreview() {

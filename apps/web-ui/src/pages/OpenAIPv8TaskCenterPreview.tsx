@@ -74,8 +74,11 @@ const config = {
     { label: 'Receipt Intake Pipeline', value: 'draft | L1 | review=true' },
     { label: 'Human Review Queue', value: 'draft | L2 | receipt=true' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Audit Center', route: '/openaip-v8-audit-center-preview' },
+    { title: 'Agent Center', route: '/openaip-v8-agent-center-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8TaskCenterPreview() {

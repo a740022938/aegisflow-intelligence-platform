@@ -72,8 +72,11 @@ const config = {
     { label: 'Ollama', value: 'enabled | L1 | online=false' },
     { label: 'LM Studio', value: 'registered | L1 | online=false' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Integration Center', route: '/openaip-v8-integration-center-preview' },
+    { title: 'Local Apps Center', route: '/openaip-v8-local-apps-center-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8ProviderManagerPreview() {

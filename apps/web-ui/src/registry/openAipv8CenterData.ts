@@ -4,6 +4,7 @@
 export type V8Lifecycle = 'registered' | 'enabled' | 'paused' | 'disabled' | 'quarantined' | 'draft' | 'running' | 'stopped' | 'error';
 export type V8PermissionLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
 export type V8RiskLevel = 'low' | 'medium' | 'high' | 'critical';
+export type V8DataSource = 'static_registry' | 'example_json' | 'future_integration';
 
 export interface V8RegistryTruthFields {
   configured?: boolean;
@@ -13,7 +14,14 @@ export interface V8RegistryTruthFields {
   stageCEnabled?: boolean;
 }
 
-export interface V8AgentEntry extends V8RegistryTruthFields {
+export interface V8BaseEntry {
+  dataSource?: V8DataSource;
+  safetyNote?: string;
+  blockedActions?: string[];
+  futurePhase?: string;
+}
+
+export interface V8AgentEntry extends V8RegistryTruthFields, V8BaseEntry {
   id: string;
   name: string;
   kind: 'agent';
@@ -22,7 +30,7 @@ export interface V8AgentEntry extends V8RegistryTruthFields {
   permissionLevel: V8PermissionLevel;
 }
 
-export interface V8ProviderEntry extends V8RegistryTruthFields {
+export interface V8ProviderEntry extends V8RegistryTruthFields, V8BaseEntry {
   id: string;
   name: string;
   kind: 'provider';
@@ -30,7 +38,7 @@ export interface V8ProviderEntry extends V8RegistryTruthFields {
   permissionLevel: V8PermissionLevel;
 }
 
-export interface V8IntegrationEntry extends V8RegistryTruthFields {
+export interface V8IntegrationEntry extends V8RegistryTruthFields, V8BaseEntry {
   id: string;
   name: string;
   kind: string;
@@ -38,7 +46,7 @@ export interface V8IntegrationEntry extends V8RegistryTruthFields {
   permissionLevel: V8PermissionLevel;
 }
 
-export interface V8LocalAppEntry extends V8RegistryTruthFields {
+export interface V8LocalAppEntry extends V8RegistryTruthFields, V8BaseEntry {
   id: string;
   name: string;
   kind: string;
@@ -47,7 +55,7 @@ export interface V8LocalAppEntry extends V8RegistryTruthFields {
   permissionLevel: V8PermissionLevel;
 }
 
-export interface V8CapabilityEntry {
+export interface V8CapabilityEntry extends V8BaseEntry {
   id: string;
   kind: string;
   risk: V8RiskLevel;
@@ -56,14 +64,14 @@ export interface V8CapabilityEntry {
   requiresStageC?: boolean;
 }
 
-export interface V8PolicyEntry {
+export interface V8PolicyEntry extends V8BaseEntry {
   id: string;
   gateOpen: boolean;
   stageCEnabled: boolean;
   rule: string;
 }
 
-export interface V8TaskEntry {
+export interface V8TaskEntry extends V8BaseEntry {
   id: string;
   name: string;
   lifecycle: V8Lifecycle;
@@ -72,7 +80,7 @@ export interface V8TaskEntry {
   reviewRequired: boolean;
 }
 
-export interface V8AuditEntry {
+export interface V8AuditEntry extends V8BaseEntry {
   id: string;
   type: string;
   phase: string;
@@ -81,7 +89,7 @@ export interface V8AuditEntry {
   timestamp: string;
 }
 
-export interface V8MemoryKnowledgeEntry {
+export interface V8MemoryKnowledgeEntry extends V8BaseEntry {
   id: string;
   source: string;
   accessMode: string;
@@ -100,95 +108,103 @@ export interface V8ConnectorMigrationEntry {
 }
 
 // ── Agents Registry ──
+// OpenClaw: agent + runtime gateway integration, optional but first-class
 export const V8_AGENTS: V8AgentEntry[] = [
-  { id: 'agent.openclaw', name: 'OpenClaw', kind: 'agent', integrationKind: 'runtime_service', lifecycle: 'enabled', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'agent.codex', name: 'Codex', kind: 'agent', integrationKind: 'coding_agent', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false },
-  { id: 'agent.future', name: 'Future Agent', kind: 'agent', integrationKind: 'pending', lifecycle: 'disabled', permissionLevel: 'L0', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
+  { id: 'agent.openclaw', name: 'OpenClaw', kind: 'agent', integrationKind: 'runtime_service', lifecycle: 'enabled', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Agent registered does not mean execution allowed.', blockedActions: ['agent execution', 'lifecycle mutation', 'permission level changes', 'agent launch/stop'] },
+  { id: 'agent.codex', name: 'Codex', kind: 'agent', integrationKind: 'coding_agent', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Authorized != gateOpen. Gate remains CLOSED.', blockedActions: ['agent execution', 'lifecycle mutation'] },
+  { id: 'agent.future', name: 'Future Agent', kind: 'agent', integrationKind: 'pending', lifecycle: 'disabled', permissionLevel: 'L0', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Placeholder entry. No operations available.', blockedActions: ['all agent operations'], futurePhase: 'Agent registration and lifecycle UI' },
 ];
 
 // ── Providers Registry ──
+// CC Switch-like: provider/config switcher ecosystem reference, not execution engine
 export const V8_PROVIDERS: V8ProviderEntry[] = [
-  { id: 'provider.cc-switch', name: 'CC Switch-like Provider Router', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L2', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false },
-  { id: 'provider.ollama', name: 'Ollama', kind: 'provider', lifecycle: 'enabled', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'provider.lmstudio', name: 'LM Studio', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'provider.claude', name: 'Claude (OpenAI-compatible)', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'provider.deepseek', name: 'DeepSeek', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
+  { id: 'provider.cc-switch', name: 'CC Switch-like Provider Router', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L2', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Provider configured does not mean provider selected for execution.', blockedActions: ['provider switching', 'config mutation', 'live routing changes', 'provider execution'] },
+  { id: 'provider.ollama', name: 'Ollama', kind: 'provider', lifecycle: 'enabled', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Ollama configured but not online in this environment.', blockedActions: ['provider switching', 'config mutation', 'model execution'], futurePhase: 'Provider profile management UI' },
+  { id: 'provider.lmstudio', name: 'LM Studio', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Registered for future use. Not currently online.', blockedActions: ['provider switching', 'config mutation', 'model execution'], futurePhase: 'Provider profile management UI' },
+  { id: 'provider.claude', name: 'Claude (OpenAI-compatible)', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'example_json', safetyNote: 'Claude proxy / local service reference. Not configured.', blockedActions: ['provider switching', 'config mutation', 'model execution'], futurePhase: 'Multi-provider failover' },
+  { id: 'provider.deepseek', name: 'DeepSeek', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'example_json', safetyNote: 'Future provider adapter. Not configured.', blockedActions: ['provider switching', 'config mutation', 'model execution'], futurePhase: 'Multi-provider failover' },
 ];
 
 // ── Integrations Registry ──
+// GitHub = code_host / integration
+// Memory Hub = memory_provider
+// Knowledge Base = knowledge_provider
 export const V8_INTEGRATIONS: V8IntegrationEntry[] = [
-  { id: 'integration.github', name: 'GitHub', kind: 'code_host', lifecycle: 'enabled', permissionLevel: 'L1', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false },
-  { id: 'integration.memoryhub', name: 'Memory Hub', kind: 'memory_provider', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'integration.knowledgebase', name: 'Knowledge Base', kind: 'knowledge_provider', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'integration.webhook', name: 'Webhook Bridge', kind: 'webhook', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
+  { id: 'integration.github', name: 'GitHub', kind: 'code_host', lifecycle: 'enabled', permissionLevel: 'L1', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Integration online does not mean connector action allowed.', blockedActions: ['connector actions', 'external service calls', 'webhook execution', 'integration mutation'] },
+  { id: 'integration.memoryhub', name: 'Memory Hub', kind: 'memory_provider', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Memory Hub is a memory provider, not a runtime service.', blockedActions: ['connector actions', 'memory writes', 'candidate processing'], futurePhase: 'Integration registry management' },
+  { id: 'integration.knowledgebase', name: 'Knowledge Base', kind: 'knowledge_provider', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Knowledge source registration does not authorize content extraction.', blockedActions: ['connector actions', 'content extraction', 'knowledge source mutation'], futurePhase: 'Knowledge source management' },
+  { id: 'integration.webhook', name: 'Webhook Bridge', kind: 'webhook', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Not configured. Webhook execution requires Gate open and Stage C enabled.', blockedActions: ['webhook execution', 'connector actions', 'external service calls'], futurePhase: 'Webhook configuration UI' },
 ];
 
 // ── Local Apps Registry ──
+// OpenAxiom: local_app / UI Lab / Vision Tool, not primary provider
+// ComfyUI: local_app / workflow_engine
+// YOLO/SAM: local tools / vision pipeline
 export const V8_LOCAL_APPS: V8LocalAppEntry[] = [
-  { id: 'app.openaxiom', name: 'OpenAxiom', kind: 'local_app', subtype: 'ui_lab_vision_tool', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'app.comfyui', name: 'ComfyUI', kind: 'workflow_engine', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'app.ollama', name: 'Ollama (Local LLM)', kind: 'local_app', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'app.lmstudio', name: 'LM Studio (Local LLM)', kind: 'local_app', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'app.yolo', name: 'YOLO / SAM Vision Tools', kind: 'local_app', subtype: 'vision_tool', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
-  { id: 'app.python-workers', name: 'Python Workers', kind: 'local_app', lifecycle: 'disabled', permissionLevel: 'L0', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false },
+  { id: 'app.openaxiom', name: 'OpenAxiom', kind: 'local_app', subtype: 'ui_lab_vision_tool', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'OpenAxiom is a local_app / UI Lab / Vision Tool, not a primary model provider.', blockedActions: ['app launch', 'app stop/restart', 'app configuration write', 'model execution'] },
+  { id: 'app.comfyui', name: 'ComfyUI', kind: 'workflow_engine', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'ComfyUI is a local_app / workflow_engine.', blockedActions: ['app launch', 'workflow execution'], futurePhase: 'App launch/stop controls (gated)' },
+  { id: 'app.ollama', name: 'Ollama (Local LLM)', kind: 'local_app', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Local LLM, not a primary provider for routing.', blockedActions: ['app launch', 'model execution'], futurePhase: 'App launch/stop controls (gated)' },
+  { id: 'app.lmstudio', name: 'LM Studio (Local LLM)', kind: 'local_app', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Local LLM, registered but not currently online.', blockedActions: ['app launch', 'model execution'], futurePhase: 'Local app registry management' },
+  { id: 'app.yolo', name: 'YOLO / SAM Vision Tools', kind: 'local_app', subtype: 'vision_tool', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Local tools / vision pipeline. Not configured.', blockedActions: ['app launch', 'vision processing execution'], futurePhase: 'Local app registry management' },
+  { id: 'app.python-workers', name: 'Python Workers', kind: 'local_app', lifecycle: 'disabled', permissionLevel: 'L0', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Placeholder. Disabled in this preview.', blockedActions: ['all local app operations'], futurePhase: 'Custom work process management' },
 ];
 
 // ── Capabilities Registry ──
 export const V8_CAPABILITIES: V8CapabilityEntry[] = [
-  { id: 'cap.runtime.status', kind: 'runtime_status', risk: 'low', permissionLevel: 'L1', requiresGate: false },
-  { id: 'cap.runtime.execute', kind: 'runtime_execute', risk: 'critical', permissionLevel: 'L5', requiresGate: true, requiresStageC: true },
-  { id: 'cap.agent.list', kind: 'agent_list', risk: 'low', permissionLevel: 'L1', requiresGate: false },
-  { id: 'cap.agent.configure', kind: 'agent_configure', risk: 'high', permissionLevel: 'L3', requiresGate: true },
-  { id: 'cap.memory.read', kind: 'memory_read', risk: 'low', permissionLevel: 'L1', requiresGate: false },
-  { id: 'cap.memory.write', kind: 'memory_write', risk: 'high', permissionLevel: 'L3', requiresGate: true, requiresStageC: true },
-  { id: 'cap.connector.route', kind: 'connector_route', risk: 'medium', permissionLevel: 'L2', requiresGate: false },
-  { id: 'cap.connector.execute', kind: 'connector_execute', risk: 'critical', permissionLevel: 'L5', requiresGate: true, requiresStageC: true },
+  { id: 'cap.runtime.status', kind: 'runtime_status', risk: 'low', permissionLevel: 'L1', requiresGate: false, dataSource: 'static_registry', safetyNote: 'Readonly status observation.' },
+  { id: 'cap.runtime.execute', kind: 'runtime_execute', risk: 'critical', permissionLevel: 'L5', requiresGate: true, requiresStageC: true, dataSource: 'static_registry', safetyNote: 'Execution requires Gate open + Stage C enabled.' },
+  { id: 'cap.agent.list', kind: 'agent_list', risk: 'low', permissionLevel: 'L1', requiresGate: false, dataSource: 'static_registry', safetyNote: 'Readonly agent catalog view.' },
+  { id: 'cap.agent.configure', kind: 'agent_configure', risk: 'high', permissionLevel: 'L3', requiresGate: true, dataSource: 'static_registry', safetyNote: 'Agent configuration requires Gate open.' },
+  { id: 'cap.memory.read', kind: 'memory_read', risk: 'low', permissionLevel: 'L1', requiresGate: false, dataSource: 'static_registry', safetyNote: 'Readonly memory access.' },
+  { id: 'cap.memory.write', kind: 'memory_write', risk: 'high', permissionLevel: 'L3', requiresGate: true, requiresStageC: true, dataSource: 'static_registry', safetyNote: 'Memory write requires Gate open + Stage C enabled.' },
+  { id: 'cap.connector.route', kind: 'connector_route', risk: 'medium', permissionLevel: 'L2', requiresGate: false, dataSource: 'static_registry', safetyNote: 'Readonly route inspection.' },
+  { id: 'cap.connector.execute', kind: 'connector_execute', risk: 'critical', permissionLevel: 'L5', requiresGate: true, requiresStageC: true, dataSource: 'static_registry', safetyNote: 'Connector execution requires Gate open + Stage C enabled.' },
 ];
 
 // ── Policies Registry ──
 export const V8_POLICIES: V8PolicyEntry[] = [
-  { id: 'policy.default', gateOpen: false, stageCEnabled: false, rule: 'configured!=online && authorized!=gateOpen && enabled!=execution' },
-  { id: 'policy.gate', gateOpen: false, stageCEnabled: false, rule: 'gate remains CLOSED in preview; requires human authorization to open' },
-  { id: 'policy.stage-c', gateOpen: false, stageCEnabled: false, rule: 'Stage C remains disabled; requires pre-enable review to enable' },
+  { id: 'policy.default', gateOpen: false, stageCEnabled: false, rule: 'configured!=online && authorized!=gateOpen && enabled!=execution', dataSource: 'static_registry', safetyNote: 'Default policy: all actions requiring Gate are blocked.' },
+  { id: 'policy.gate', gateOpen: false, stageCEnabled: false, rule: 'gate remains CLOSED in preview; requires human authorization to open', dataSource: 'static_registry', safetyNote: 'Gate policy: CLOSED. No execution path available.' },
+  { id: 'policy.stage-c', gateOpen: false, stageCEnabled: false, rule: 'Stage C remains disabled; requires pre-enable review to enable', dataSource: 'static_registry', safetyNote: 'Stage C remains disabled. All Stage C actions blocked.' },
 ];
 
 // ── Tasks Registry ──
 export const V8_TASKS: V8TaskEntry[] = [
-  { id: 'task.registry', name: 'Task Pack Registry', lifecycle: 'draft', permissionLevel: 'L1', receiptRequired: true, reviewRequired: false },
-  { id: 'task.receipt.intake', name: 'Receipt Intake Pipeline', lifecycle: 'draft', permissionLevel: 'L1', receiptRequired: false, reviewRequired: true },
-  { id: 'task.review', name: 'Human Review Queue', lifecycle: 'draft', permissionLevel: 'L2', receiptRequired: true, reviewRequired: false },
+  { id: 'task.registry', name: 'Task Pack Registry', lifecycle: 'draft', permissionLevel: 'L1', receiptRequired: true, reviewRequired: false, dataSource: 'static_registry', safetyNote: 'Draft registry — no execution.', blockedActions: ['task execution', 'receipt write', 'agent assignment execution'] },
+  { id: 'task.receipt.intake', name: 'Receipt Intake Pipeline', lifecycle: 'draft', permissionLevel: 'L1', receiptRequired: false, reviewRequired: true, dataSource: 'static_registry', safetyNote: 'Pipeline definition only — no intake running.', blockedActions: ['task execution', 'receipt write', 'review queue mutation'] },
+  { id: 'task.review', name: 'Human Review Queue', lifecycle: 'draft', permissionLevel: 'L2', receiptRequired: true, reviewRequired: false, dataSource: 'static_registry', safetyNote: 'Review queue defined — no human review actions available.', blockedActions: ['task execution', 'review execution', 'queue mutation'] },
 ];
 
 // ── Audit Registry ──
 export const V8_AUDITS: V8AuditEntry[] = [
-  { id: 'audit.receipt.001', type: 'receipt', phase: 'P1A', verdict: 'passed', commit: 'abc123', timestamp: '2026-05-21T00:00:00Z' },
-  { id: 'audit.receipt.002', type: 'receipt', phase: 'P1B', verdict: 'passed', commit: 'def456', timestamp: '2026-05-21T06:00:00Z' },
-  { id: 'audit.receipt.003', type: 'receipt', phase: 'P1C', verdict: 'passed', commit: '789abc', timestamp: '2026-05-21T12:00:00Z' },
-  { id: 'audit.receipt.004', type: 'receipt', phase: 'P2A', verdict: 'passed', commit: 'ghi012', timestamp: '2026-05-22T00:00:00Z' },
-  { id: 'audit.receipt.005', type: 'receipt', phase: 'P2B', verdict: 'passed', commit: 'jkl345', timestamp: '2026-05-22T06:00:00Z' },
+  { id: 'audit.receipt.001', type: 'receipt', phase: 'P1A', verdict: 'passed', commit: 'abc123', timestamp: '2026-05-21T00:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
+  { id: 'audit.receipt.002', type: 'receipt', phase: 'P1B', verdict: 'passed', commit: 'def456', timestamp: '2026-05-21T06:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
+  { id: 'audit.receipt.003', type: 'receipt', phase: 'P1C', verdict: 'passed', commit: '789abc', timestamp: '2026-05-21T12:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
+  { id: 'audit.receipt.004', type: 'receipt', phase: 'P2A', verdict: 'passed', commit: 'ghi012', timestamp: '2026-05-22T00:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
+  { id: 'audit.receipt.005', type: 'receipt', phase: 'P2B', verdict: 'passed', commit: 'jkl345', timestamp: '2026-05-22T06:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
 ];
 
 // ── Memory + Knowledge Registry ──
 export const V8_MEMORY_KNOWLEDGE: V8MemoryKnowledgeEntry[] = [
-  { id: 'mem.knowledge.docs', source: 'docs', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1' },
-  { id: 'mem.knowledge.reports', source: 'reports', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1' },
-  { id: 'mem.knowledge.receipts', source: 'receipts', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1' },
-  { id: 'mem.knowledge.repo', source: 'repo', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1' },
-  { id: 'mem.knowledge.datasets', source: 'datasets', accessMode: 'readonly', lifecycle: 'registered', permissionLevel: 'L1' },
-  { id: 'mem.knowledge.local-files', source: 'local files', accessMode: 'readonly', lifecycle: 'registered', permissionLevel: 'L1' },
-  { id: 'mem.access.readonly', source: 'memory-access', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1' },
-  { id: 'mem.access.scoped-write', source: 'memory-access', accessMode: 'scoped_write_draft', lifecycle: 'disabled', permissionLevel: 'L2' },
+  { id: 'mem.knowledge.docs', source: 'docs', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly access — no content extraction.' },
+  { id: 'mem.knowledge.reports', source: 'reports', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly access — no content extraction.' },
+  { id: 'mem.knowledge.receipts', source: 'receipts', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly access — no receipt mutation.' },
+  { id: 'mem.knowledge.repo', source: 'repo', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly access — no repo writes.' },
+  { id: 'mem.knowledge.datasets', source: 'datasets', accessMode: 'readonly', lifecycle: 'registered', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Registered but not yet indexed.' },
+  { id: 'mem.knowledge.local-files', source: 'local files', accessMode: 'readonly', lifecycle: 'registered', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Registered but not yet indexed.' },
+  { id: 'mem.access.readonly', source: 'memory-access', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly mode is the default safe mode. Memory write blocked.' },
+  { id: 'mem.access.scoped-write', source: 'memory-access', accessMode: 'scoped_write_draft', lifecycle: 'disabled', permissionLevel: 'L2', dataSource: 'static_registry', safetyNote: 'Scoped write mode defined but DISABLED in this preview.', blockedActions: ['memory write', 'knowledge source mutation', 'content extraction', 'policy changes'] },
 ];
 
 // ── Connector → v8 Migration Registry ──
 export const V8_CONNECTOR_MIGRATIONS: V8ConnectorMigrationEntry[] = [
-  { id: 'migration.openaxiom', legacyConnectorId: 'openaxiom', legacyConnectorName: 'OpenAxiom', v8Center: 'Local Apps Center', v8Mapping: 'app.openaxiom', migrationStatus: 'migrated', notes: 'Legacy connector page exists as OpenAxiomReadonly; v8 Local Apps Center entry registered.' },
-  { id: 'migration.memoryhub', legacyConnectorId: 'memory-hub', legacyConnectorName: 'Memory Hub', v8Center: 'Memory + Knowledge Center', v8Mapping: 'integration.memoryhub', migrationStatus: 'migrated', notes: 'Legacy Memory Hub readonly page exists; v8 Integration Center and Memory Knowledge Center both reference it.' },
-  { id: 'migration.labcenter', legacyConnectorId: 'lab-center', legacyConnectorName: 'Lab Center', v8Center: 'Local Apps Center', v8Mapping: 'app.comfyui', migrationStatus: 'migrated', notes: 'Lab Center components mapped to v8 Local Apps Center.' },
+  { id: 'migration.openaxiom', legacyConnectorId: 'openaxiom', legacyConnectorName: 'OpenAxiom', v8Center: 'Local Apps Center', v8Mapping: 'app.openaxiom', migrationStatus: 'migrated', notes: 'Legacy connector page exists as OpenAxiomReadonly; v8 Local Apps Center entry registered. OpenAxiom classified as local_app / UI Lab / Vision Tool.' },
+  { id: 'migration.memoryhub', legacyConnectorId: 'memory-hub', legacyConnectorName: 'Memory Hub', v8Center: 'Memory + Knowledge Center', v8Mapping: 'integration.memoryhub', migrationStatus: 'migrated', notes: 'Legacy Memory Hub readonly page exists; v8 Integration Center and Memory Knowledge Center both reference it. Classified as memory_provider.' },
+  { id: 'migration.labcenter', legacyConnectorId: 'lab-center', legacyConnectorName: 'Lab Center', v8Center: 'Local Apps Center', v8Mapping: 'app.comfyui', migrationStatus: 'migrated', notes: 'Lab Center components mapped to v8 Local Apps Center. ComfyUI classified as workflow_engine.' },
   { id: 'migration.assistantcenter', legacyConnectorId: 'assistant-center', legacyConnectorName: 'Assistant Center', v8Center: 'Agent Center', v8Mapping: 'agent.*', migrationStatus: 'planned', notes: 'Assistant Center has no direct v8 mapping yet; Agent Center will absorb it.' },
   { id: 'migration.governancehub', legacyConnectorId: 'governance-hub', legacyConnectorName: 'Governance Hub', v8Center: 'Policy Router + Capability Center', v8Mapping: 'cap.*, policy.*', migrationStatus: 'planned', notes: 'Governance Hub legacy page; v8 Policy/Capability Center covers governance rules.' },
   { id: 'migration.connectorcenter', legacyConnectorId: 'connector-center', legacyConnectorName: 'Connector Center', v8Center: 'Integration Center', v8Mapping: 'integration.*, connector.*', migrationStatus: 'in_progress', notes: 'Connector Center is the primary legacy page; Integration Center is the v8 successor. Migration bridge added to Connector Center.' },
-  { id: 'migration.modelgateway', legacyConnectorId: 'model-gateway', legacyConnectorName: 'Model Gateway', v8Center: 'Provider Manager', v8Mapping: 'provider.*', migrationStatus: 'planned', notes: 'Model Gateway legacy page exists; Provider Manager is the v8 successor.' },
+  { id: 'migration.modelgateway', legacyConnectorId: 'model-gateway', legacyConnectorName: 'Model Gateway', v8Center: 'Provider Manager', v8Mapping: 'provider.*', migrationStatus: 'planned', notes: 'Model Gateway legacy page exists; Provider Manager is the v8 successor. Classified as provider/config switcher, not execution engine.' },
 ];
 
 // ── Summary helpers ──

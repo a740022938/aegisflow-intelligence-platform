@@ -92,8 +92,12 @@ const config = {
     { label: 'Memory Hub', value: 'registered | L1 | memory_provider' },
     { label: 'Knowledge Base', value: 'registered | L1 | knowledge_provider' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Provider Manager', route: '/openaip-v8-provider-manager-preview' },
+    { title: 'Local Apps Center', route: '/openaip-v8-local-apps-center-preview' },
+    { title: 'Memory + Knowledge Center', route: '/openaip-v8-memory-knowledge-center-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8IntegrationCenterPreview() {

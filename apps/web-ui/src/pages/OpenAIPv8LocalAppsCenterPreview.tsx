@@ -72,8 +72,11 @@ const config = {
     { label: 'ComfyUI', value: 'registered | L1 | workflow_engine' },
     { label: 'Future: Python Workers', value: 'placeholder | L0 | pending' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Integration Center', route: '/openaip-v8-integration-center-preview' },
+    { title: 'Provider Manager', route: '/openaip-v8-provider-manager-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8LocalAppsCenterPreview() {

@@ -76,6 +76,7 @@ export interface CenterConfig {
   futurePhases: string[];
   backLink?: string;
   backLabel?: string;
+  relatedCenters?: { title: string; route: string }[];
   sampleData?: { label: string; value: string }[];
 }
 
@@ -188,6 +189,18 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
           </ul>
         </div>
 
+        {/* Related Centers */}
+        {config.relatedCenters && config.relatedCenters.length > 0 && (
+          <div style={{ ...cardStyle, borderLeft: '3px solid #93c5fd' }}>
+            <h2 style={{ margin: 0, fontSize: 13, color: '#93c5fd', marginBottom: 6 }}>Related Centers</h2>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {config.relatedCenters.map((rc) => (
+                <Link key={rc.route} to={rc.route} style={{ fontSize: 12, color: '#93c5fd', textDecoration: 'underline', padding: '2px 6px', border: '1px solid #334155', borderRadius: 4 }}>{rc.title}</Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <div style={{ marginTop: 16, padding: 10, border: '1px solid #374151', borderRadius: 8, background: 'rgba(0,0,0,0.3)', fontSize: 11, color: '#6b7280', textAlign: 'center' }}>
           OpenAIP v8 · {config.title} · Readonly preview · No execution · No config writes · Gate remains CLOSED · Stage C disabled
@@ -196,7 +209,7 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
         {config.backLink && (
           <div style={{ marginTop: 12, textAlign: 'center' }}>
             <Link to={config.backLink} style={{ color: '#93c5fd', fontSize: 13, textDecoration: 'underline' }}>
-              {config.backLabel || 'Back to Command Center'}
+              {config.backLabel || '← Back to OpenAIP v8 Command Center'}
             </Link>
           </div>
         )}

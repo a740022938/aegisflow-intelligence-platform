@@ -77,8 +77,11 @@ const config = {
     { label: 'Codex', value: 'registered | L1 | coding_agent' },
     { label: 'Future Agent', value: 'placeholder | L0 | pending' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Task Center', route: '/openaip-v8-task-center-preview' },
+    { title: 'Policy Router + Capability Center', route: '/openaip-v8-policy-capability-center-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8AgentCenterPreview() {

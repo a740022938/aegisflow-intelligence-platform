@@ -95,8 +95,11 @@ const config = {
     { label: 'cap.runtime.status', value: 'risk=low | L1 | requiresGate=false' },
     { label: 'cap.runtime.execute', value: 'risk=critical | L5 | requiresGate=true | requiresStageC=true' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Agent Center', route: '/openaip-v8-agent-center-preview' },
+    { title: 'Execution Gateway', route: '/openaip-v8-execution-gateway-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8PolicyCapabilityCenterPreview() {

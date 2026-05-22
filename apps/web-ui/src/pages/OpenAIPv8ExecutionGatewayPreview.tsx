@@ -71,8 +71,11 @@ const config = {
     { label: 'Stage C State', value: 'disabled' },
     { label: 'Policy Rule', value: 'configured!=online && authorized!=gateOpen && enabled!=execution' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Policy Router + Capability Center', route: '/openaip-v8-policy-capability-center-preview' },
+    { title: 'Agent Center', route: '/openaip-v8-agent-center-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8ExecutionGatewayPreview() {

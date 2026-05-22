@@ -73,8 +73,11 @@ const config = {
     { label: 'Knowledge Sources', value: 'docs, reports, receipts, repo, datasets, local files' },
     { label: 'Indexing State', value: 'append-only, no deletion in preview' }
   ],
-  backLink: '/openaip-v8-command-center-preview',
-  backLabel: 'Back to Command Center'
+  relatedCenters: [
+    { title: 'Integration Center', route: '/openaip-v8-integration-center-preview' },
+    { title: 'Audit Center', route: '/openaip-v8-audit-center-preview' },
+  ],
+  backLink: '/openaip-v8-command-center-preview'
 };
 
 export default function OpenAIPv8MemoryKnowledgeCenterPreview() {
