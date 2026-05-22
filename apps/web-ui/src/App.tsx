@@ -84,6 +84,15 @@ const RestorePointPackPreview = lazy(() => import('./pages/RestorePointPackPrevi
 const HandoffPackPreview = lazy(() => import('./pages/HandoffPackPreview'));
 const ModelGateway = lazy(() => import('./pages/ModelGateway'));
 const OpenAIPv8CommandCenterPreview = lazy(() => import('./pages/OpenAIPv8CommandCenterPreview'));
+const OpenAIPv8AgentCenterPreview = lazy(() => import('./pages/OpenAIPv8AgentCenterPreview'));
+const OpenAIPv8TaskCenterPreview = lazy(() => import('./pages/OpenAIPv8TaskCenterPreview'));
+const OpenAIPv8ProviderManagerPreview = lazy(() => import('./pages/OpenAIPv8ProviderManagerPreview'));
+const OpenAIPv8IntegrationCenterPreview = lazy(() => import('./pages/OpenAIPv8IntegrationCenterPreview'));
+const OpenAIPv8LocalAppsCenterPreview = lazy(() => import('./pages/OpenAIPv8LocalAppsCenterPreview'));
+const OpenAIPv8MemoryKnowledgeCenterPreview = lazy(() => import('./pages/OpenAIPv8MemoryKnowledgeCenterPreview'));
+const OpenAIPv8PolicyCapabilityCenterPreview = lazy(() => import('./pages/OpenAIPv8PolicyCapabilityCenterPreview'));
+const OpenAIPv8AuditCenterPreview = lazy(() => import('./pages/OpenAIPv8AuditCenterPreview'));
+const OpenAIPv8ExecutionGatewayPreview = lazy(() => import('./pages/OpenAIPv8ExecutionGatewayPreview'));
 
 function RouteFallback() {
   return (
@@ -232,6 +241,15 @@ const App: React.FC = () => {
             <Route path="restore-point-pack-preview" element={<RestorePointPackPreview />} />
             <Route path="handoff-pack-preview" element={<HandoffPackPreview />} />
             <Route path="openaip-v8-command-center-preview" element={<OpenAIPv8CommandCenterPreview />} />
+            <Route path="openaip-v8-agent-center-preview" element={<OpenAIPv8AgentCenterPreview />} />
+            <Route path="openaip-v8-task-center-preview" element={<OpenAIPv8TaskCenterPreview />} />
+            <Route path="openaip-v8-provider-manager-preview" element={<OpenAIPv8ProviderManagerPreview />} />
+            <Route path="openaip-v8-integration-center-preview" element={<OpenAIPv8IntegrationCenterPreview />} />
+            <Route path="openaip-v8-local-apps-center-preview" element={<OpenAIPv8LocalAppsCenterPreview />} />
+            <Route path="openaip-v8-memory-knowledge-center-preview" element={<OpenAIPv8MemoryKnowledgeCenterPreview />} />
+            <Route path="openaip-v8-policy-capability-center-preview" element={<OpenAIPv8PolicyCapabilityCenterPreview />} />
+            <Route path="openaip-v8-audit-center-preview" element={<OpenAIPv8AuditCenterPreview />} />
+            <Route path="openaip-v8-execution-gateway-preview" element={<OpenAIPv8ExecutionGatewayPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

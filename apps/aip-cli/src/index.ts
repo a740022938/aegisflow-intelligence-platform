@@ -26,6 +26,7 @@ import { runReleaseStatus } from './commands/release-status.js';
 import { runTask } from './commands/task.js';
 import { runAudit } from './commands/audit.js';
 import { runPolicy } from './commands/policy.js';
+import { runV8 } from './commands/v8.js';
 import { getCliVersion } from './version.js';
 import { renderBanner, renderStatusLines } from './banner.js';
 
@@ -219,6 +220,8 @@ function printCommandCenter() {
   console.log(helpCmd('aip task', 'Task Center — 任务包生成与回执', 'dim'));
   console.log(helpCmd('aip audit', 'Audit Center — 审计链与凭证', 'dim'));
   console.log(helpCmd('aip policy', 'Policy Router — 策略与能力', 'dim'));
+  console.log(helpCmd('aip v8 centers', '列出所有隐藏只读中心预览路由', 'dim'));
+  console.log(helpCmd('aip v8 status', 'v8 基础状态摘要', 'dim'));
   console.log('');
 
   console.log(c(BOLD + CYAN, '  Tips'));
@@ -258,6 +261,7 @@ function printHelpFor(cmd: string) {
     task: 'aip task [list|status]\n  OpenAIP v8 Task Center 只读基础命令',
     audit: 'aip audit [list|status]\n  OpenAIP v8 Audit Center 只读基础命令',
     policy: 'aip policy [list|status]\n  OpenAIP v8 Policy Router + Capability Center 只读基础命令',
+    v8: 'aip v8 <centers|status>\n  OpenAIP v8 foundation 信息',
   };
   const text = tips[cmd] || `未知命令: ${cmd}`;
   console.log(text);
@@ -314,6 +318,7 @@ async function main() {
     case 'task': await runTask(sub); break;
     case 'audit': await runAudit(sub); break;
     case 'policy': await runPolicy(sub); break;
+    case 'v8': await runV8(sub); break;
     case 'ml':
     case 'manual':
     case 'commands':

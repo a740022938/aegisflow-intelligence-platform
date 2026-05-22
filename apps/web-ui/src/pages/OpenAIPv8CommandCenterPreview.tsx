@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const shellStyle: React.CSSProperties = {
   minHeight: '100vh',
@@ -36,7 +37,8 @@ const badgeStyle: React.CSSProperties = {
   borderRadius: 4,
   fontSize: 11,
   fontWeight: 600,
-  marginRight: 6
+  marginRight: 6,
+  marginBottom: 4
 };
 
 const safetyItems = [
@@ -55,54 +57,63 @@ const safetyItems = [
 const centers = [
   {
     title: 'Agent Center',
+    route: '/openaip-v8-agent-center-preview',
     tag: 'readonly',
     items: ['AI agents lifecycle: enabled / paused / disabled / quarantined', 'Permission levels L0-L5', 'Task/audit linkage'],
     safetyNote: 'No agent launch, no lifecycle mutation'
   },
   {
     title: 'Task Center',
+    route: '/openaip-v8-task-center-preview',
     tag: 'draft',
     items: ['Task pack generation', 'Receipt intake pipeline', 'Review queue', 'Human-fatigue reduction'],
     safetyNote: 'No task execution, no write'
   },
   {
     title: 'Provider Manager',
+    route: '/openaip-v8-provider-manager-preview',
     tag: 'readonly',
     items: ['CC Switch-like provider/config/router', 'Provider registry', 'Readonly/dry-run first'],
     safetyNote: 'No provider action, dry-run only'
   },
   {
     title: 'Integration Center',
+    route: '/openaip-v8-integration-center-preview',
     tag: 'readonly',
     items: ['OpenClaw', 'GitHub', 'Webhooks/external services'],
     safetyNote: 'No connector action in preview'
   },
   {
     title: 'Local Apps Center',
+    route: '/openaip-v8-local-apps-center-preview',
     tag: 'readonly',
     items: ['OpenAxiom as Local App / UI Lab / Vision Tool', 'ComfyUI', 'Ollama / LM Studio', 'YOLO / SAM tools'],
     safetyNote: 'No app launch in preview'
   },
   {
     title: 'Memory + Knowledge Center',
+    route: '/openaip-v8-memory-knowledge-center-preview',
     tag: 'readonly',
     items: ['Memory access policy', 'Knowledge source registry', 'Receipt/report indexing'],
     safetyNote: 'No memory write in preview'
   },
   {
     title: 'Policy Router + Capability Center',
+    route: '/openaip-v8-policy-capability-center-preview',
     tag: 'readonly',
     items: ['Capability != permission', 'Permission levels', 'Policy-before-buttons'],
     safetyNote: 'No policy mutation'
   },
   {
     title: 'Audit Center',
+    route: '/openaip-v8-audit-center-preview',
     tag: 'readonly',
     items: ['Receipts', 'Reports', 'Evidence', 'Commit/push/verification trail'],
     safetyNote: 'Readonly audit trail'
   },
   {
     title: 'Execution Gateway',
+    route: '/openaip-v8-execution-gateway-preview',
     tag: 'closed',
     items: ['Default closed', 'Gate CLOSED', 'Stage C disabled', 'Dry-run/approval required before future execution'],
     safetyNote: 'Gate remains closed'
@@ -142,20 +153,22 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
 
         <div style={gridStyle}>
           {centers.map((center) => (
-            <section key={center.title} style={cardStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                <SafetyBadge text={center.tag} />
-                <h2 style={{ margin: 0, fontSize: 15 }}>{center.title}</h2>
-              </div>
-              <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: '#cbd5e1', lineHeight: 1.8 }}>
-                {center.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-              <p style={{ margin: '10px 0 0', fontSize: 11, color: '#6b7280', fontStyle: 'italic' }}>
-                {center.safetyNote}
-              </p>
-            </section>
+            <Link key={center.title} to={center.route} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <section style={cardStyle}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <SafetyBadge text={center.tag} />
+                  <h2 style={{ margin: 0, fontSize: 15 }}>{center.title}</h2>
+                </div>
+                <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: '#cbd5e1', lineHeight: 1.8 }}>
+                  {center.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <p style={{ margin: '10px 0 0', fontSize: 11, color: '#6b7280', fontStyle: 'italic' }}>
+                  {center.safetyNote}
+                </p>
+              </section>
+            </Link>
           ))}
         </div>
 
