@@ -6,7 +6,7 @@ OPENAIP_V8_AGENT_CENTER_READONLY_MVP_READY_WITH_GATE_CLOSED
 
 | Item | Value |
 |------|-------|
-| Commit | set after verification |
+| Commit | 1d8b92d |
 | Pushed | yes |
 | Working tree clean | yes |
 | Baseline commit | ef84811 |
