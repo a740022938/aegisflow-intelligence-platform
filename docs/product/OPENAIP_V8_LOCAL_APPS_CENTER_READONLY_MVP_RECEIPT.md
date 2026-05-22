@@ -1,8 +1,8 @@
 # OPENAIP v8 Local Apps Center Readonly MVP Receipt
 - verdict: OPENAIP_V8_LOCAL_APPS_CENTER_READONLY_MVP_READY_WITH_GATE_CLOSED
-- commit hash: PENDING
-- pushed: PENDING
-- working tree clean: PENDING
+- commit hash: 8e28b4d
+- pushed: yes
+- working tree clean: yes
 - files changed: 7
 - local app entries: 8
 - relationship matrix rows: 7
@@ -21,3 +21,4 @@
 - external/local app calls made: no
 - human authorization needed: no
 - recommended next step: Memory + Knowledge Center readonly MVP deepening
+
