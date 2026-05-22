@@ -7,6 +7,8 @@ export type V8ReviewState = 'pending_review' | 'needs_evidence' | 'accepted' | '
 export type V8PermissionLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
 export type V8RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 export type V8DataSource = 'static_registry' | 'example_json' | 'future_integration';
+export type V8AcceptanceState = 'accepted' | 'needs_evidence' | 'rejected' | 'blocked' | 'archived';
+export type V8EvidenceLevel = 'none' | 'partial' | 'sufficient' | 'seal_grade';
 
 export interface V8RegistryTruthFields {
   configured?: boolean;
@@ -99,10 +101,32 @@ export interface V8TaskEntry extends V8BaseEntry {
 
 export interface V8AuditEntry extends V8BaseEntry {
   id: string;
-  type: string;
+  title: string;
+  taskType: string;
+  relatedCenter: string;
+  relatedTaskId?: string;
+  relatedAgentId?: string;
   phase: string;
   verdict: string;
-  commit: string;
+  commitHash: string;
+  pushed: boolean;
+  workingTreeClean: boolean;
+  filesChangedSummary: string;
+  verificationStatus: string;
+  verificationCommands: string[];
+  safetyStatus: string;
+  safetyFindings: string[];
+  runtimeChanged: boolean;
+  servicesRestarted: boolean;
+  dbWritten: boolean;
+  gateOpened: boolean;
+  stageCEnabled: boolean;
+  releaseTagCreated: boolean;
+  authGateChanged: boolean;
+  connectorActionExecuted: boolean;
+  humanAuthorizationNeeded: boolean;
+  acceptanceState: V8AcceptanceState;
+  evidenceLevel: V8EvidenceLevel;
   timestamp: string;
 }
 
@@ -313,12 +337,163 @@ export const V8_TASKS: V8TaskEntry[] = [
 ];
 
 // ── Audit Registry ──
+// Each entry represents a sealed receipt archetype with full evidence fields.
+// All entries are readonly. No audit DB writes in this preview.
 export const V8_AUDITS: V8AuditEntry[] = [
-  { id: 'audit.receipt.001', type: 'receipt', phase: 'P1A', verdict: 'passed', commit: 'abc123', timestamp: '2026-05-21T00:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
-  { id: 'audit.receipt.002', type: 'receipt', phase: 'P1B', verdict: 'passed', commit: 'def456', timestamp: '2026-05-21T06:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
-  { id: 'audit.receipt.003', type: 'receipt', phase: 'P1C', verdict: 'passed', commit: '789abc', timestamp: '2026-05-21T12:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
-  { id: 'audit.receipt.004', type: 'receipt', phase: 'P2A', verdict: 'passed', commit: 'ghi012', timestamp: '2026-05-22T00:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
-  { id: 'audit.receipt.005', type: 'receipt', phase: 'P2B', verdict: 'passed', commit: 'jkl345', timestamp: '2026-05-22T06:00:00Z', dataSource: 'example_json', safetyNote: 'Historical receipt record. No new receipts generated in preview.' },
+  {
+    id: 'audit.cli-identity-foundation',
+    title: 'CLI Identity Foundation Receipt',
+    taskType: 'CLI identity',
+    relatedCenter: 'Command Center',
+    relatedAgentId: 'agent.claude-code',
+    phase: 'P1',
+    verdict: 'passed',
+    commitHash: '9842495',
+    pushed: true,
+    workingTreeClean: true,
+    filesChangedSummary: '23 files modified, 1 created — registry data, CLI v8 commands, page files',
+    verificationStatus: 'passed',
+    verificationCommands: ['tsc --noEmit', 'npm test', 'npm run build', 'git diff --check'],
+    safetyStatus: 'passed',
+    safetyFindings: ['No Gate/Stage C enabled', 'No DB writes', 'No runtime mutation'],
+    runtimeChanged: false,
+    servicesRestarted: false,
+    dbWritten: false,
+    gateOpened: false,
+    stageCEnabled: false,
+    releaseTagCreated: false,
+    authGateChanged: false,
+    connectorActionExecuted: false,
+    humanAuthorizationNeeded: false,
+    acceptanceState: 'accepted',
+    evidenceLevel: 'seal_grade',
+    dataSource: 'static_registry',
+    safetyNote: 'CLI identity foundation — commit pushed, working tree clean, all verifications passed.',
+    timestamp: '2026-05-22T00:00:00Z',
+  },
+  {
+    id: 'audit.agent-center-mvp',
+    title: 'Agent Center MVP Receipt',
+    taskType: 'UI readonly MVP',
+    relatedCenter: 'Agent Center',
+    relatedAgentId: 'agent.claude-code',
+    phase: 'P2',
+    verdict: 'passed',
+    commitHash: '1d8b92d',
+    pushed: true,
+    workingTreeClean: true,
+    filesChangedSummary: '5 agents in registry, standalone MVP page, CLI agents command, 14 tests added',
+    verificationStatus: 'passed',
+    verificationCommands: ['tsc --noEmit', 'npm test (43/43)', 'npm run build', 'git diff --check', 'safety grep'],
+    safetyStatus: 'passed',
+    safetyFindings: ['No Gate/Stage C enabled', 'No execution buttons', 'Sidebar not exposed'],
+    runtimeChanged: false,
+    servicesRestarted: false,
+    dbWritten: false,
+    gateOpened: false,
+    stageCEnabled: false,
+    releaseTagCreated: false,
+    authGateChanged: false,
+    connectorActionExecuted: false,
+    humanAuthorizationNeeded: false,
+    acceptanceState: 'accepted',
+    evidenceLevel: 'seal_grade',
+    dataSource: 'static_registry',
+    safetyNote: 'Agent Center MVP — commit pushed, working tree clean, all verifications passed.',
+    timestamp: '2026-05-22T06:00:00Z',
+  },
+  {
+    id: 'audit.task-center-mvp',
+    title: 'Task Center MVP Receipt',
+    taskType: 'UI readonly MVP + task/receipt scaffolding',
+    relatedCenter: 'Task Center',
+    relatedAgentId: 'agent.claude-code',
+    phase: 'P3',
+    verdict: 'passed',
+    commitHash: '2f2baa8',
+    pushed: true,
+    workingTreeClean: true,
+    filesChangedSummary: '5 task archetypes, standalone MVP page, CLI task command, 15 tests added, V8TaskLifecycle type',
+    verificationStatus: 'passed',
+    verificationCommands: ['tsc --noEmit', 'npm test (43/43)', 'npm run build', 'git diff --check', 'safety grep'],
+    safetyStatus: 'passed',
+    safetyFindings: ['No Gate/Stage C enabled', 'No task execution', 'No agent dispatch', 'Sidebar not exposed'],
+    runtimeChanged: false,
+    servicesRestarted: false,
+    dbWritten: false,
+    gateOpened: false,
+    stageCEnabled: false,
+    releaseTagCreated: false,
+    authGateChanged: false,
+    connectorActionExecuted: false,
+    humanAuthorizationNeeded: false,
+    acceptanceState: 'accepted',
+    evidenceLevel: 'seal_grade',
+    dataSource: 'static_registry',
+    safetyNote: 'Task Center MVP — commit pushed, working tree clean, all verifications passed.',
+    timestamp: '2026-05-23T00:00:00Z',
+  },
+  {
+    id: 'audit.incomplete-receipt-example',
+    title: 'Incomplete Receipt Example',
+    taskType: 'unknown',
+    relatedCenter: 'Task Center',
+    verdict: 'needs_evidence',
+    commitHash: 'unknown',
+    pushed: false,
+    workingTreeClean: false,
+    filesChangedSummary: 'No file change record provided',
+    verificationStatus: 'unknown',
+    verificationCommands: [],
+    safetyStatus: 'unknown',
+    safetyFindings: [],
+    runtimeChanged: false,
+    servicesRestarted: false,
+    dbWritten: false,
+    gateOpened: false,
+    stageCEnabled: false,
+    releaseTagCreated: false,
+    authGateChanged: false,
+    connectorActionExecuted: false,
+    humanAuthorizationNeeded: false,
+    acceptanceState: 'needs_evidence',
+    evidenceLevel: 'none',
+    dataSource: 'example_json',
+    safetyNote: 'Incomplete receipt — missing commit hash, no verification results, no safety summary. "All done" without evidence is rejected.',
+    phase: 'P0',
+    timestamp: '2026-05-20T00:00:00Z',
+  },
+  {
+    id: 'audit.high-risk-deferred',
+    title: 'High-Risk Execution Deferred',
+    taskType: 'execution/gate/auth/db',
+    relatedCenter: 'Execution Gateway',
+    relatedTaskId: 'task.high-risk-execution',
+    phase: 'P5',
+    verdict: 'blocked',
+    commitHash: 'none',
+    pushed: false,
+    workingTreeClean: true,
+    filesChangedSummary: 'Plan-only — no code changes',
+    verificationStatus: 'not_applicable',
+    verificationCommands: [],
+    safetyStatus: 'blocked',
+    safetyFindings: ['Requires Gate open', 'Requires Stage C enabled', 'Requires human authorization form'],
+    runtimeChanged: false,
+    servicesRestarted: false,
+    dbWritten: false,
+    gateOpened: false,
+    stageCEnabled: false,
+    releaseTagCreated: false,
+    authGateChanged: false,
+    connectorActionExecuted: false,
+    humanAuthorizationNeeded: true,
+    acceptanceState: 'blocked',
+    evidenceLevel: 'none',
+    dataSource: 'static_registry',
+    safetyNote: 'High-risk execution deferred — blocked in preview. Requires Gate open + Stage C enabled + human authorization.',
+    timestamp: '2026-05-23T12:00:00Z',
+  },
 ];
 
 // ── Memory + Knowledge Registry ──
@@ -426,7 +601,28 @@ export function getV8TaskSummary() {
 
 export function getV8AuditSummary() {
   const all = V8_AUDITS;
-  return { total: all.length, passed: all.filter(a => a.verdict === 'passed').length, latestPhase: all[all.length - 1]?.phase || 'none' };
+  return {
+    total: all.length,
+    accepted: all.filter(a => a.acceptanceState === 'accepted').length,
+    needsEvidence: all.filter(a => a.acceptanceState === 'needs_evidence').length,
+    rejected: all.filter(a => a.acceptanceState === 'rejected').length,
+    blocked: all.filter(a => a.acceptanceState === 'blocked').length,
+    archived: all.filter(a => a.acceptanceState === 'archived').length,
+    sealGrade: all.filter(a => a.evidenceLevel === 'seal_grade').length,
+    sufficientEvidence: all.filter(a => a.evidenceLevel === 'sufficient').length,
+    partialEvidence: all.filter(a => a.evidenceLevel === 'partial').length,
+    noEvidence: all.filter(a => a.evidenceLevel === 'none').length,
+    humanAuthNeeded: all.filter(a => a.humanAuthorizationNeeded).length,
+    runtimeChanged: all.filter(a => a.runtimeChanged).length,
+    servicesRestarted: all.filter(a => a.servicesRestarted).length,
+    dbWritten: all.filter(a => a.dbWritten).length,
+    gateOpened: all.filter(a => a.gateOpened).length,
+    stageCEnabled: all.filter(a => a.stageCEnabled).length,
+    releaseTagCreated: all.filter(a => a.releaseTagCreated).length,
+    pushed: all.filter(a => a.pushed).length,
+    workingTreeClean: all.filter(a => a.workingTreeClean).length,
+    passed: all.filter(a => a.verdict === 'passed').length,
+  };
 }
 
 export function getV8MemoryKnowledgeSummary() {

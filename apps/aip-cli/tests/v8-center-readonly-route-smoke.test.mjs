@@ -96,8 +96,9 @@ test('forbidden action labels absent from v8 pages', () => {
 
 test('no Launch/Restart/Restore/Release as action labels outside safety descriptions', () => {
   const riskyLabels = ['Launch', 'Restart', 'Restore', 'Release'];
+  const standalonePages = ['OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx'];
   for (const file of V8_PAGE_FILES) {
-    if (file === 'OpenAIPv8ReadonlyCenterPreview.tsx') continue;
+    if (standalonePages.includes(file)) continue;
     const content = fs.readFileSync(path.join(PAGES_DIR, file), 'utf8');
     for (const label of riskyLabels) {
       const inSafetySection = content.includes(label) && (content.includes('Not allowed') || content.includes('notAllowed'));
@@ -138,8 +139,9 @@ test('integration center shows migration bridge', () => {
   assert.ok(icContent.includes('legacyConnectorName'));
 });
 
-test('all 7 config-based pages have relatedCenters in their config', () => {
-  const V8_CENTER_FILES = V8_PAGE_FILES.filter(f => f !== 'OpenAIPv8CommandCenterPreview.tsx' && f !== 'OpenAIPv8ReadonlyCenterPreview.tsx' && f !== 'OpenAIPv8AgentCenterPreview.tsx' && f !== 'OpenAIPv8TaskCenterPreview.tsx');
+test('all 6 config-based pages have relatedCenters in their config', () => {
+  const standalone = ['OpenAIPv8CommandCenterPreview.tsx', 'OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx'];
+  const V8_CENTER_FILES = V8_PAGE_FILES.filter(f => !standalone.includes(f));
   for (const file of V8_CENTER_FILES) {
     const content = fs.readFileSync(path.join(PAGES_DIR, file), 'utf8');
     assert.ok(content.includes('relatedCenters'), `${file} missing relatedCenters`);
@@ -418,5 +420,129 @@ test('no risky labels in actionable contexts on task center', () => {
     const beforeSafety = content.substring(0, safetyBoundaryStart >= 0 ? safetyBoundaryStart : content.length);
     const inActionableContext = beforeSafety.includes(label) && !beforeSafety.includes('blockedActions') && !beforeSafety.includes('No ') && !beforeSafety.includes('cannot proceed') && !beforeSafety.includes('not available');
     assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Task Center`);
+  }
+});
+
+// ── Audit Center MVP Tests ──
+
+const AUDIT_PAGE = path.join(PAGES_DIR, 'OpenAIPv8AuditCenterPreview.tsx');
+const AUDITS_EXAMPLE = 'E:\\AIP\\docs\\product\\examples\\audit.example.json';
+const CLI_AUDIT_FILE = 'E:\\AIP\\apps\\aip-cli\\src\\commands\\audit.ts';
+
+test('audit center route exists in App.tsx', () => {
+  const appContent = fs.readFileSync(APP_TSX, 'utf8');
+  assert.ok(appContent.includes('openaip-v8-audit-center-preview'), 'Audit Center route missing from App.tsx');
+});
+
+test('audit center registry has all 5 audit archetypes', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  assert.ok(regContent.includes('audit.cli-identity-foundation'), 'Registry missing CLI Identity Foundation audit');
+  assert.ok(regContent.includes('audit.agent-center-mvp'), 'Registry missing Agent Center MVP audit');
+  assert.ok(regContent.includes('audit.task-center-mvp'), 'Registry missing Task Center MVP audit');
+  assert.ok(regContent.includes('audit.incomplete-receipt-example'), 'Registry missing Incomplete Receipt audit');
+  assert.ok(regContent.includes('audit.high-risk-deferred'), 'Registry missing High-Risk Deferred audit');
+});
+
+test('audit center page includes Required Receipt Fields, Rejection Rules, Seal-Grade Evidence', () => {
+  const content = fs.readFileSync(AUDIT_PAGE, 'utf8');
+  assert.ok(content.includes('Required Receipt Fields'), 'Missing Required Receipt Fields');
+  assert.ok(content.includes('Rejection Rules'), 'Missing Rejection Rules');
+  assert.ok(content.includes('Seal-Grade Evidence'), 'Missing Seal-Grade Evidence');
+});
+
+test('audit center includes acceptance states', () => {
+  const content = fs.readFileSync(AUDIT_PAGE, 'utf8');
+  assert.ok(content.includes('accepted'), 'Missing accepted state');
+  assert.ok(content.includes('needs_evidence'), 'Missing needs_evidence state');
+  assert.ok(content.includes('rejected'), 'Missing rejected state');
+  assert.ok(content.includes('blocked'), 'Missing blocked state');
+  assert.ok(content.includes('archived'), 'Missing archived state');
+});
+
+test('audit center shows safety phrases', () => {
+  const content = fs.readFileSync(AUDIT_PAGE, 'utf8');
+  assert.ok(content.includes('No audit DB write'), 'Missing No audit DB write');
+  assert.ok(content.includes('No runtime mutation'), 'Missing No runtime mutation');
+  assert.ok(content.includes('Gate CLOSED'), 'Missing Gate CLOSED');
+  assert.ok(content.includes('Stage C disabled'), 'Missing Stage C disabled');
+});
+
+test('audit center includes safe links to related centers', () => {
+  const content = fs.readFileSync(AUDIT_PAGE, 'utf8');
+  assert.ok(content.includes('/openaip-v8-task-center-preview'), 'Missing link to Task Center');
+  assert.ok(content.includes('/openaip-v8-agent-center-preview'), 'Missing link to Agent Center');
+  assert.ok(content.includes('/openaip-v8-policy-capability-center-preview'), 'Missing link to Policy/Capability Center');
+  assert.ok(content.includes('/openaip-v8-execution-gateway-preview'), 'Missing link to Execution Gateway');
+  assert.ok(content.includes('/openaip-v8-command-center-preview'), 'Missing link to Command Center');
+});
+
+test('audit center includes safety boundary with all forbidden actions', () => {
+  const content = fs.readFileSync(AUDIT_PAGE, 'utf8');
+  assert.ok(content.includes('Safety Boundary'), 'Missing Safety Boundary heading');
+  assert.ok(content.includes('No audit DB write'), 'Missing no audit DB write');
+  assert.ok(content.includes('No approval mutation'), 'Missing no approval mutation');
+  assert.ok(content.includes('No task acceptance mutation'), 'Missing no task acceptance mutation');
+  assert.ok(content.includes('No Gate opening'), 'Missing no Gate opening');
+  assert.ok(content.includes('No Stage C enablement'), 'Missing no Stage C enablement');
+  assert.ok(content.includes('No release/tag/restore'), 'Missing no release/tag/restore');
+  assert.ok(content.includes('No connector action'), 'Missing no connector action');
+});
+
+test('CLI audit list command shows audit count and readonly/static source', () => {
+  const cliContent = fs.readFileSync(CLI_AUDIT_FILE, 'utf8');
+  assert.ok(cliContent.includes('readonly static/example registry'), 'CLI audit missing readonly source note');
+  assert.ok(cliContent.includes('Total audit entries'), 'CLI audit missing total count');
+  assert.ok(cliContent.includes('Accepted:'), 'CLI audit missing accepted count');
+  assert.ok(cliContent.includes('Needs evidence:'), 'CLI audit missing needs evidence count');
+});
+
+test('CLI audit list shows acceptance state, evidence level, commit, push, tree status', () => {
+  const cliContent = fs.readFileSync(CLI_AUDIT_FILE, 'utf8');
+  assert.ok(cliContent.includes('state='), 'CLI audit missing acceptanceState output');
+  assert.ok(cliContent.includes('evidence='), 'CLI audit missing evidenceLevel output');
+  assert.ok(cliContent.includes('commit='), 'CLI audit missing commit output');
+  assert.ok(cliContent.includes('pushed='), 'CLI audit missing pushed output');
+  assert.ok(cliContent.includes('tree='), 'CLI audit missing tree output');
+});
+
+test('CLI audit requirements subcommand shows receipt fields and rejection rules', () => {
+  const cliContent = fs.readFileSync(CLI_AUDIT_FILE, 'utf8');
+  assert.ok(cliContent.includes('requirements'), 'CLI audit missing requirements subcommand');
+  assert.ok(cliContent.includes('Receipt Requirements'), 'CLI audit missing Receipt Requirements');
+  assert.ok(cliContent.includes('Rejection triggers'), 'CLI audit missing Rejection triggers');
+  assert.ok(cliContent.includes('Seal-grade requires'), 'CLI audit missing Seal-grade criteria');
+});
+
+test('audit example JSON has all 5 audit entries with full fields', () => {
+  const exampleContent = fs.readFileSync(AUDITS_EXAMPLE, 'utf8');
+  assert.ok(exampleContent.includes('audit.cli-identity-foundation'), 'Example missing CLI Identity Foundation');
+  assert.ok(exampleContent.includes('audit.agent-center-mvp'), 'Example missing Agent Center MVP');
+  assert.ok(exampleContent.includes('audit.task-center-mvp'), 'Example missing Task Center MVP');
+  assert.ok(exampleContent.includes('audit.incomplete-receipt-example'), 'Example missing Incomplete Receipt');
+  assert.ok(exampleContent.includes('audit.high-risk-deferred'), 'Example missing High-Risk Deferred');
+  assert.ok(exampleContent.includes('commitHash'), 'Example missing commitHash field');
+  assert.ok(exampleContent.includes('verificationCommands'), 'Example missing verificationCommands field');
+  assert.ok(exampleContent.includes('safetyFindings'), 'Example missing safetyFindings field');
+  assert.ok(exampleContent.includes('acceptanceState'), 'Example missing acceptanceState field');
+  assert.ok(exampleContent.includes('evidenceLevel'), 'Example missing evidenceLevel field');
+  assert.ok(exampleContent.includes('humanAuthorizationNeeded'), 'Example missing humanAuthorizationNeeded field');
+});
+
+test('incomplete receipt example exists and is not accepted', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  const incompleteEntry = regContent.split('audit.incomplete-receipt-example')[1]?.split('},')[0] || '';
+  assert.ok(incompleteEntry.includes('acceptanceState: \'needs_evidence\''), 'Incomplete receipt should not be accepted');
+  assert.ok(incompleteEntry.includes('evidenceLevel: \'none\''), 'Incomplete receipt should have no evidence');
+  assert.ok(regContent.includes('"All done" without evidence is rejected'), 'Missing evidence rejection message');
+});
+
+test('no risky labels in actionable contexts on audit center', () => {
+  const content = fs.readFileSync(AUDIT_PAGE, 'utf8');
+  const riskyLabels = ['Accept', 'Approve', 'Execute', 'Launch', 'Enable Gate', 'Enable Stage C', 'Write audit', 'Write config', 'Release', 'Restore'];
+  const safetyBoundaryStart = content.indexOf('Safety Boundary');
+  for (const label of riskyLabels) {
+    const beforeSafety = content.substring(0, safetyBoundaryStart >= 0 ? safetyBoundaryStart : content.length);
+    const inActionableContext = beforeSafety.includes(label) && !beforeSafety.includes('blockedActions') && !beforeSafety.includes('No ') && !beforeSafety.includes('cannot proceed') && !beforeSafety.includes('not available');
+    assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Audit Center`);
   }
 });
