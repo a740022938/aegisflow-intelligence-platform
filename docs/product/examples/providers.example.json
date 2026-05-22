@@ -1,1 +1,5 @@
-{"id":"provider.example","type":"provider","lifecycle":"enabled","permissionLevel":"L1"}
+[
+  {"id":"provider.ollama","name":"Ollama","kind":"provider","lifecycle":"enabled","permissionLevel":"L1","configured":true,"online":false,"authorized":false,"gateOpen":false,"stageCEnabled":false},
+  {"id":"provider.lmstudio","name":"LM Studio","kind":"provider","lifecycle":"registered","permissionLevel":"L1","configured":true,"online":false,"authorized":false,"gateOpen":false,"stageCEnabled":false},
+  {"id":"provider.cc-switch","name":"CC Switch-like Provider Router","kind":"provider","lifecycle":"registered","permissionLevel":"L2","configured":true,"online":true,"authorized":true,"gateOpen":false,"stageCEnabled":false}
+]

@@ -1,1 +1,3 @@
-{"id":"policy.example","gateOpen":false,"stageCEnabled":false}
+[
+  {"id":"policy.default","gateOpen":false,"stageCEnabled":false,"rule":"configured!=online && authorized!=gateOpen && enabled!=execution"}
+]

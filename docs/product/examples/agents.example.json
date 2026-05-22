@@ -1,1 +1,30 @@
-{"id":"agent.example","type":"agent","lifecycle":"registered","permissionLevel":"L1"}
+[
+  {
+    "id": "agent.openclaw",
+    "name": "OpenClaw",
+    "kind": "agent",
+    "integrationKind": "runtime_service",
+    "lifecycle": "enabled",
+    "optional": true,
+    "firstClass": true,
+    "permissionLevel": "L1",
+    "configured": true,
+    "online": false,
+    "authorized": false,
+    "gateOpen": false,
+    "stageCEnabled": false
+  },
+  {
+    "id": "agent.codex",
+    "name": "Codex",
+    "kind": "agent",
+    "integrationKind": "coding_agent",
+    "lifecycle": "registered",
+    "permissionLevel": "L1",
+    "configured": true,
+    "online": true,
+    "authorized": true,
+    "gateOpen": false,
+    "stageCEnabled": false
+  }
+]

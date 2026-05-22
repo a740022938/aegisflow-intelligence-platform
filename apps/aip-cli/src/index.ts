@@ -297,11 +297,11 @@ async function main() {
     case 'release-status': await runReleaseStatus(); break;
     case 'safe-status': await runSafeStatus(); break;
     case 'receipt': await runReceiptTemplate(); break;
-    case 'agents': await runAgents(); break;
-    case 'integrations': await runIntegrations(); break;
-    case 'providers': await runProviders(); break;
-    case 'apps': await runApps(); break;
-    case 'runtime': await runRuntime(); break;
+    case 'agents': await runAgents(sub); break;
+    case 'integrations': await runIntegrations(sub); break;
+    case 'providers': await runProviders(sub); break;
+    case 'apps': await runApps(sub); break;
+    case 'runtime': await runRuntime(sub); break;
     case 'ml':
     case 'manual':
     case 'commands':

@@ -1,1 +1,4 @@
-{"id":"local-app.example","type":"local_app","lifecycle":"paused","permissionLevel":"L1"}
+[
+  {"id":"app.openaxiom","name":"OpenAxiom","kind":"local_app","subtype":"ui_lab_vision_tool","lifecycle":"registered","permissionLevel":"L1"},
+  {"id":"app.comfyui","name":"ComfyUI","kind":"workflow_engine","lifecycle":"registered","permissionLevel":"L1"}
+]

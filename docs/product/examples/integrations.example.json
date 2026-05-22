@@ -1,1 +1,5 @@
-{"id":"integration.example","type":"internal_plugin","lifecycle":"registered","permissionLevel":"L1"}
+[
+  {"id":"integration.github","name":"GitHub","kind":"code_host","lifecycle":"enabled","permissionLevel":"L1"},
+  {"id":"integration.memoryhub","name":"Memory Hub","kind":"memory_provider","lifecycle":"registered","permissionLevel":"L1"},
+  {"id":"integration.knowledgebase","name":"Knowledge Base","kind":"knowledge_provider","lifecycle":"registered","permissionLevel":"L1"}
+]

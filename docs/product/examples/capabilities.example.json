@@ -1,1 +1,4 @@
-{"id":"capability.example","capability":"status.read","permissionRequired":"L1"}
+[
+  {"id":"cap.runtime.status","kind":"runtime_status","risk":"low","permissionLevel":"L1"},
+  {"id":"cap.runtime.execute","kind":"runtime_execute","risk":"critical","permissionLevel":"L5","requiresGate":true,"requiresStageC":true}
+]
