@@ -23,6 +23,9 @@ import { runProviders } from './commands/providers.js';
 import { runApps } from './commands/apps.js';
 import { runRuntime } from './commands/runtime.js';
 import { runReleaseStatus } from './commands/release-status.js';
+import { runTask } from './commands/task.js';
+import { runAudit } from './commands/audit.js';
+import { runPolicy } from './commands/policy.js';
 import { getCliVersion } from './version.js';
 import { renderBanner, renderStatusLines } from './banner.js';
 
@@ -213,6 +216,9 @@ function printCommandCenter() {
   console.log(helpCmd('aip providers', 'Provider Manager — 模型提供商路由', 'dim'));
   console.log(helpCmd('aip apps', 'Local Apps — 本地微应用运行时', 'dim'));
   console.log(helpCmd('aip runtime', 'Runtime Kernel — 服务编排与健康', 'dim'));
+  console.log(helpCmd('aip task', 'Task Center — 任务包生成与回执', 'dim'));
+  console.log(helpCmd('aip audit', 'Audit Center — 审计链与凭证', 'dim'));
+  console.log(helpCmd('aip policy', 'Policy Router — 策略与能力', 'dim'));
   console.log('');
 
   console.log(c(BOLD + CYAN, '  Tips'));
@@ -249,6 +255,9 @@ function printHelpFor(cmd: string) {
     integrations: 'aip integrations\n  OpenAIP v8 Integration Center 只读基础命令（not implemented）',
     providers: 'aip providers\n  OpenAIP v8 Provider Manager 只读基础命令（not implemented）',
     apps: 'aip apps\n  OpenAIP v8 Local Apps Center 只读基础命令（not implemented）',
+    task: 'aip task [list|status]\n  OpenAIP v8 Task Center 只读基础命令',
+    audit: 'aip audit [list|status]\n  OpenAIP v8 Audit Center 只读基础命令',
+    policy: 'aip policy [list|status]\n  OpenAIP v8 Policy Router + Capability Center 只读基础命令',
   };
   const text = tips[cmd] || `未知命令: ${cmd}`;
   console.log(text);
@@ -302,6 +311,9 @@ async function main() {
     case 'providers': await runProviders(sub); break;
     case 'apps': await runApps(sub); break;
     case 'runtime': await runRuntime(sub); break;
+    case 'task': await runTask(sub); break;
+    case 'audit': await runAudit(sub); break;
+    case 'policy': await runPolicy(sub); break;
     case 'ml':
     case 'manual':
     case 'commands':

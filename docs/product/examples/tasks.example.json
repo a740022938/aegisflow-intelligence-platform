@@ -1,0 +1,5 @@
+[
+  {"id":"task.registry","name":"Task Pack Registry","lifecycle":"draft","permissionLevel":"L1","receiptRequired":true,"reviewRequired":false},
+  {"id":"task.receipt.intake","name":"Receipt Intake Pipeline","lifecycle":"draft","permissionLevel":"L1","receiptRequired":false,"reviewRequired":true},
+  {"id":"task.review","name":"Human Review Queue","lifecycle":"draft","permissionLevel":"L2","receiptRequired":true,"reviewRequired":false}
+]

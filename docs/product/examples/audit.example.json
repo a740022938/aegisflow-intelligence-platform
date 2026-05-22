@@ -1,0 +1,5 @@
+[
+  {"id":"audit.receipt.001","type":"receipt","phase":"P1A","verdict":"passed","commit":"abc123","timestamp":"2026-05-21T00:00:00Z"},
+  {"id":"audit.receipt.002","type":"receipt","phase":"P1B","verdict":"passed","commit":"def456","timestamp":"2026-05-21T06:00:00Z"},
+  {"id":"audit.receipt.003","type":"receipt","phase":"P1C","verdict":"passed","commit":"789abc","timestamp":"2026-05-21T12:00:00Z"}
+]

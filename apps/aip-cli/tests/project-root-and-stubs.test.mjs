@@ -22,6 +22,13 @@ test('v8 list/status commands show readonly source and classify entities', () =>
     ['integrations list', /GitHub/, /Source: example\/static readonly registry/],
     ['apps list', /OpenAxiom/, /kind=local_app/],
     ['runtime status', /gateOpen=false/, /stageCEnabled=false/],
+    ['runtime list', /OpenClaw/, /Ollama/],
+    ['task list', /Task Pack Registry/, /lifecycle=draft/],
+    ['task status', /draft items/, /receipt required/],
+    ['audit list', /P1A/, /verdict=passed/],
+    ['audit status', /total receipts/, /latest phase/],
+    ['policy list', /gateOpen=false/, /cap\.runtime\.status/],
+    ['policy status', /gateOpen/, /stageCEnabled/],
   ];
   for (const [cmd, p1, p2] of checks) {
     const out = runCli(cmd);

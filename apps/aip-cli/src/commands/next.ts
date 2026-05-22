@@ -8,35 +8,33 @@ function runGit(args: string): string {
   }
 }
 
-function getTagStatus(): string {
-  const tags = runGit('tag --points-at HEAD');
-  return tags ? tags : 'NOT CREATED';
-}
-
 export async function runNext() {
   console.log('');
   console.log('Recommended Next Step');
   console.log('=====================');
   console.log('');
-  console.log('  v7.48-P3 Local RC Dry Run + Fresh Start Rehearsal');
+  console.log('  OpenAIP v8 Next Phase:');
+  console.log('    P2-P5 Readonly Command Center Expansion');
   console.log('');
-  console.log('  Steps:');
-  console.log('    1. Verify pnpm install from clean state');
-  console.log('    2. Verify pnpm run aip:cli:build');
-  console.log('    3. Verify aip / aip where / aip safe-status');
-  console.log('    4. Verify aip next / aip release-status');
-  console.log('    5. Verify pnpm run typecheck');
-  console.log('    6. Verify pnpm run build');
-  console.log('    7. Verify restore remains plan-only');
-  console.log('    8. Generate dry run evidence');
+  console.log('  Completed:');
+  console.log('    ✓ P1A-P1E CLI Identity + Foundation Docs');
+  console.log('    ✓ Phase E Hidden Command Center Preview UI');
+  console.log('    ✓ P2A-P5B CLI readonly commands (agents/providers/integrations/apps/runtime/task/audit/policy)');
+  console.log('');
+  console.log('  Suggested:');
+  console.log('    1. Run aip task list / aip audit list / aip policy list');
+  console.log('    2. Run pnpm run typecheck && pnpm run build');
+  console.log('    3. Run the CLI tests');
+  console.log('    4. Verify Page: /openaip-v8-command-center-preview');
   console.log('');
   console.log('  Do NOT:');
   console.log('    - enable Stage C');
   console.log('    - toggle feature flag');
-  console.log('    - create tag');
-  console.log('    - create GitHub Release');
+  console.log('    - create tag or release');
   console.log('    - execute restore');
   console.log('    - restart/taskkill services');
+  console.log('    - modify Auth/Gate implementation');
+  console.log('    - write DB or migrate');
   console.log('');
   console.log('  This is a readonly command. No files were modified.');
 }

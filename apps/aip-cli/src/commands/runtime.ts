@@ -1,16 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-function loadJsonArray(fileName: string): any[] {
-  const root = path.resolve(process.cwd(), 'docs', 'product', 'examples', fileName);
-  const fallback = path.resolve('E:\\AIP', 'docs', 'product', 'examples', fileName);
-  const target = fs.existsSync(root) ? root : fallback;
+function load(fileName: string): any[] {
+  const p1 = path.resolve(process.cwd(), 'docs', 'product', 'examples', fileName);
+  const p2 = path.resolve('E:\\AIP', 'docs', 'product', 'examples', fileName);
+  const target = fs.existsSync(p1) ? p1 : p2;
   return JSON.parse(fs.readFileSync(target, 'utf8'));
 }
 
 function printList(title: string, arr: any[]) {
   console.log('');
-  console.log(`OpenAIP v8 Foundation Command`);
+  console.log('OpenAIP v8 Foundation Command');
   console.log(`Command: ${title}`);
   console.log('Status: readonly foundation stub');
   console.log('Safety: no mutation, no runtime action, Gate CLOSED, Stage C disabled');
@@ -22,7 +22,7 @@ function printList(title: string, arr: any[]) {
 
 export async function runRuntime(sub?: string) {
   if (sub === 'status') {
-    const policies = loadJsonArray('policies.example.json');
+    const policies = load('policies.example.json');
     const p = policies[0] || { gateOpen: false, stageCEnabled: false };
     console.log('');
     console.log('OpenAIP v8 Foundation Command');
@@ -34,25 +34,10 @@ export async function runRuntime(sub?: string) {
     console.log(`- runtimeTruth=unknown | gateOpen=${p.gateOpen} | stageCEnabled=${p.stageCEnabled}`);
     return;
   }
+  if (sub === 'list') {
+    const items = load('agents.example.json').concat(load('providers.example.json')).concat(load('integrations.example.json')).concat(load('local-apps.example.json'));
+    printList('aip runtime list', items);
+    return;
+  }
   printList('aip runtime', [{ id: 'runtime.kernel', name: 'Runtime Kernel', kind: 'runtime_service', lifecycle: 'registered', permissionLevel: 'L1' }]);
-}
-
-export async function runAgents(sub?: string) {
-  if (sub === 'list') return printList('aip agents list', loadJsonArray('agents.example.json'));
-  printList('aip agents', [{ id: 'agents.center', name: 'Agent Center', kind: 'agent', lifecycle: 'registered', permissionLevel: 'L1' }]);
-}
-
-export async function runIntegrations(sub?: string) {
-  if (sub === 'list') return printList('aip integrations list', loadJsonArray('integrations.example.json'));
-  printList('aip integrations', [{ id: 'integrations.center', name: 'Integration Center', kind: 'internal_plugin', lifecycle: 'registered', permissionLevel: 'L1' }]);
-}
-
-export async function runProviders(sub?: string) {
-  if (sub === 'list') return printList('aip providers list', loadJsonArray('providers.example.json'));
-  printList('aip providers', [{ id: 'providers.manager', name: 'Provider Manager', kind: 'provider', lifecycle: 'registered', permissionLevel: 'L1' }]);
-}
-
-export async function runApps(sub?: string) {
-  if (sub === 'list') return printList('aip apps list', loadJsonArray('local-apps.example.json'));
-  printList('aip apps', [{ id: 'apps.center', name: 'Local Apps Center', kind: 'local_app', lifecycle: 'registered', permissionLevel: 'L1' }]);
 }
