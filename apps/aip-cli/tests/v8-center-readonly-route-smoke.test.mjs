@@ -96,7 +96,7 @@ test('forbidden action labels absent from v8 pages', () => {
 
 test('no Launch/Restart/Restore/Release as action labels outside safety descriptions', () => {
   const riskyLabels = ['Launch', 'Restart', 'Restore', 'Release'];
-    const standalonePages = ['OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx', 'OpenAIPv8PolicyCapabilityCenterPreview.tsx'];
+    const standalonePages = ['OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx', 'OpenAIPv8PolicyCapabilityCenterPreview.tsx', 'OpenAIPv8ExecutionGatewayPreview.tsx'];
   for (const file of V8_PAGE_FILES) {
     if (standalonePages.includes(file)) continue;
     const content = fs.readFileSync(path.join(PAGES_DIR, file), 'utf8');
@@ -140,7 +140,7 @@ test('integration center shows migration bridge', () => {
 });
 
 test('all 5 config-based pages have relatedCenters in their config', () => {
-  const standalone = ['OpenAIPv8CommandCenterPreview.tsx', 'OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx', 'OpenAIPv8PolicyCapabilityCenterPreview.tsx'];
+  const standalone = ['OpenAIPv8CommandCenterPreview.tsx', 'OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx', 'OpenAIPv8PolicyCapabilityCenterPreview.tsx', 'OpenAIPv8ExecutionGatewayPreview.tsx'];
   const V8_CENTER_FILES = V8_PAGE_FILES.filter(f => !standalone.includes(f));
   for (const file of V8_CENTER_FILES) {
     const content = fs.readFileSync(path.join(PAGES_DIR, file), 'utf8');
@@ -694,5 +694,157 @@ test('no risky labels in actionable contexts on policy capability center', () =>
     const beforeSafety = content.substring(0, safetyBoundaryStart >= 0 ? safetyBoundaryStart : content.length);
     const inActionableContext = beforeSafety.includes(label) && !beforeSafety.includes('blockedActions') && !beforeSafety.includes('No ') && !beforeSafety.includes('not available') && !beforeSafety.includes('BLOCKED') && !beforeSafety.includes('blockedReason') && !beforeSafety.includes('blocked');
     assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Policy Capability Center`);
+  }
+});
+
+// ── Execution Gateway MVP Tests ──
+
+const EXECUTION_GATEWAY_PAGE = path.join(PAGES_DIR, 'OpenAIPv8ExecutionGatewayPreview.tsx');
+const CLI_EXECUTION_GATEWAY_FILE = 'E:\\AIP\\apps\\aip-cli\\src\\commands\\execution-gateway.ts';
+
+test('execution gateway route exists in App.tsx', () => {
+  const appContent = fs.readFileSync(APP_TSX, 'utf8');
+  assert.ok(appContent.includes('openaip-v8-execution-gateway-preview'), 'Execution Gateway route missing from App.tsx');
+});
+
+test('execution gateway page file exists', () => {
+  assert.ok(fs.existsSync(EXECUTION_GATEWAY_PAGE), 'Execution Gateway page file not found');
+});
+
+test('execution gateway page includes key UI sections', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  assert.ok(content.includes('Execution Boundary Matrix'), 'Missing Execution Boundary Matrix');
+  assert.ok(content.includes('Approval Chain'), 'Missing Approval Chain');
+  assert.ok(content.includes('Gate + Stage C Truth'), 'Missing Gate + Stage C Truth');
+  assert.ok(content.includes('Blocked Actions'), 'Missing Blocked Actions');
+});
+
+test('execution gateway page shows safety labels', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  assert.ok(content.includes('No execution controls'), 'Missing No execution controls');
+  assert.ok(content.includes('No runtime mutation'), 'Missing No runtime mutation');
+  assert.ok(content.includes('Gate CLOSED'), 'Missing Gate CLOSED');
+  assert.ok(content.includes('Stage C disabled'), 'Missing Stage C disabled');
+});
+
+test('execution gateway page includes critical boundary categories', () => {
+  const pageContent = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  assert.ok(regContent.includes('exec-boundary.command'), 'Registry missing Command Execution boundary');
+  assert.ok(regContent.includes('exec-boundary.connector'), 'Registry missing Connector Action boundary');
+  assert.ok(regContent.includes('exec-boundary.local-app'), 'Registry missing Local App Launch boundary');
+  assert.ok(regContent.includes('exec-boundary.memory-write'), 'Registry missing Memory Write boundary');
+  assert.ok(regContent.includes('exec-boundary.release-tag'), 'Registry missing Release/Tag boundary');
+  assert.ok(regContent.includes('exec-boundary.gate-open'), 'Registry missing Gate Opening boundary');
+  assert.ok(regContent.includes('exec-boundary.stage-c-enable'), 'Registry missing Stage C Enablement boundary');
+  assert.ok(pageContent.includes('Command execution') || pageContent.includes('command execution'), 'Page missing Command Execution mention');
+  assert.ok(pageContent.includes('Connector') || pageContent.includes('connector'), 'Page missing Connector mention');
+  assert.ok(pageContent.includes('Local app') || pageContent.includes('local app'), 'Page missing Local App mention');
+  assert.ok(pageContent.includes('Memory write') || pageContent.includes('memory write'), 'Page missing Memory Write mention');
+  assert.ok(pageContent.includes('Release') || pageContent.includes('release'), 'Page missing Release mention');
+  assert.ok(pageContent.includes('Gate opening') || pageContent.includes('gate opening'), 'Page missing Gate Opening mention');
+  assert.ok(pageContent.includes('Stage C') || pageContent.includes('stage c'), 'Page missing Stage C mention');
+});
+
+test('execution gateway page includes safe links to related centers', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  assert.ok(content.includes('/openaip-v8-agent-center-preview'), 'Missing link to Agent Center');
+  assert.ok(content.includes('/openaip-v8-task-center-preview'), 'Missing link to Task Center');
+  assert.ok(content.includes('/openaip-v8-audit-center-preview'), 'Missing link to Audit Center');
+  assert.ok(content.includes('/openaip-v8-policy-capability-center-preview'), 'Missing link to Policy/Capability Center');
+  assert.ok(content.includes('/openaip-v8-command-center-preview'), 'Missing link to Command Center');
+});
+
+test('execution gateway page includes Safety Boundary with all forbidden actions', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  assert.ok(content.includes('Safety Boundary'), 'Missing Safety Boundary heading');
+  assert.ok(content.includes('No execution'), 'Missing no execution');
+  assert.ok(content.includes('No Gate opening'), 'Missing no Gate opening');
+  assert.ok(content.includes('No Stage C enablement'), 'Missing no Stage C enablement');
+  assert.ok(content.includes('No release/tag/restore'), 'Missing no release/tag/restore');
+  assert.ok(content.includes('No DB write'), 'Missing no DB write');
+  assert.ok(content.includes('No connector action'), 'Missing no connector action');
+  assert.ok(content.includes('No external call'), 'Missing no external call');
+});
+
+test('execution gateway page has Approval Chain with this preview does not execute chain warning', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  assert.ok(content.includes('This preview does not execute this chain'), 'Missing approval chain preview warning');
+  assert.ok(content.includes('Task created'), 'Missing Task created step');
+  assert.ok(content.includes('Human approval'), 'Missing Human approval step');
+  assert.ok(content.includes('Gate check'), 'Missing Gate check step');
+  assert.ok(content.includes('Audit receipt'), 'Missing Audit receipt step');
+});
+
+test('execution gateway page has Gate + Stage C Truth panel', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  assert.ok(content.includes('backend/runtime truth'), 'Missing backend truth statement');
+  assert.ok(content.includes('not a UI decoration'), 'Missing not a UI decoration statement');
+  assert.ok(content.includes('UI links and badges do not grant permission'), 'Missing no permission from badges statement');
+  assert.ok(content.includes('No Gate/Stage C mutation exists in this preview'), 'Missing no mutation statement');
+});
+
+test('execution gateway page has Blocked Actions panel with critical items', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  assert.ok(content.includes('Command execution'), 'Missing command execution in blocked');
+  assert.ok(content.includes('Connector actions'), 'Missing connector actions in blocked');
+  assert.ok(content.includes('Local app launches'), 'Missing local app launches in blocked');
+  assert.ok(content.includes('Release / Tag / Restore'), 'Missing release/tag/restore in blocked');
+  assert.ok(content.includes('Gate opening'), 'Missing gate opening in blocked');
+  assert.ok(content.includes('Stage C enablement'), 'Missing Stage C enablement in blocked');
+});
+
+test('execution gateway page is standalone not using shared component', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  assert.equal(content.includes('OpenAIPv8ReadonlyCenterPreview'), false, 'Execution Gateway should not use shared component');
+  assert.ok(content.includes('V8_EXECUTION_BOUNDARIES'), 'Missing V8_EXECUTION_BOUNDARIES import');
+});
+
+test('execution boundary registry has all 8 entries', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  assert.ok(regContent.includes('exec-boundary.command'), 'Registry missing Command Execution boundary');
+  assert.ok(regContent.includes('exec-boundary.connector'), 'Registry missing Connector Action boundary');
+  assert.ok(regContent.includes('exec-boundary.local-app'), 'Registry missing Local App Launch boundary');
+  assert.ok(regContent.includes('exec-boundary.memory-write'), 'Registry missing Memory Write boundary');
+  assert.ok(regContent.includes('exec-boundary.file-apply'), 'Registry missing File Apply boundary');
+  assert.ok(regContent.includes('exec-boundary.release-tag'), 'Registry missing Release/Tag boundary');
+  assert.ok(regContent.includes('exec-boundary.gate-open'), 'Registry missing Gate Opening boundary');
+  assert.ok(regContent.includes('exec-boundary.stage-c-enable'), 'Registry missing Stage C Enablement boundary');
+});
+
+test('execution boundary entries have required fields', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  const requiredFields = ['id', 'name', 'capabilityId', 'category', 'currentState', 'risk', 'requiredPermissionLevel', 'gateRequired', 'stageCRequired', 'humanAuthorizationRequired', 'auditRequired', 'dryRunRequired', 'blockedReason', 'allowedInPreview', 'requiredEvidence', 'relatedPolicies', 'relatedCenters', 'readonly'];
+  for (const field of requiredFields) {
+    assert.ok(regContent.includes(field), `Execution boundary missing field "${field}"`);
+  }
+});
+
+test('CLI execution-gateway status command shows readonly source and blocked count', () => {
+  const cliContent = fs.readFileSync(CLI_EXECUTION_GATEWAY_FILE, 'utf8');
+  assert.ok(cliContent.includes('readonly static/example registry'), 'CLI execution-gateway missing readonly source note');
+  assert.ok(cliContent.includes('Total boundary items:'), 'CLI execution-gateway missing total count');
+  assert.ok(cliContent.includes('Blocked:'), 'CLI execution-gateway missing blocked count');
+  assert.ok(cliContent.includes('Critical:'), 'CLI execution-gateway missing critical count');
+  assert.ok(cliContent.includes('Gate required:'), 'CLI execution-gateway missing gate required count');
+  assert.ok(cliContent.includes('Human authorization required:'), 'CLI execution-gateway missing human auth count');
+  assert.ok(cliContent.includes('No execution'), 'CLI execution-gateway missing no execution');
+  assert.ok(cliContent.includes('Gate remains CLOSED'), 'CLI execution-gateway missing Gate remains CLOSED');
+});
+
+test('execution-gateway command is registered in index.ts', () => {
+  const indexContent = fs.readFileSync('E:\\AIP\\apps\\aip-cli\\src\\index.ts', 'utf8');
+  assert.ok(indexContent.includes('execution-gateway'), 'execution-gateway command not found in index.ts');
+  assert.ok(indexContent.includes('runExecutionGateway'), 'runExecutionGateway import missing from index.ts');
+});
+
+test('no risky labels in actionable contexts on execution gateway', () => {
+  const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
+  const riskyLabels = ['Execute Now', 'Launch', 'Enable Gate', 'Enable Stage C', 'Open master-switch', 'Write config', 'Release', 'Restore'];
+  const safetyBoundaryStart = content.indexOf('Safety Boundary');
+  for (const label of riskyLabels) {
+    const beforeSafety = content.substring(0, safetyBoundaryStart >= 0 ? safetyBoundaryStart : content.length);
+    const inActionableContext = beforeSafety.includes(label) && !beforeSafety.includes('blockedActions') && !beforeSafety.includes('No ') && !beforeSafety.includes('blockedReason') && !beforeSafety.includes('blocked') && !beforeSafety.includes('Blocked');
+    assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Execution Gateway`);
   }
 });

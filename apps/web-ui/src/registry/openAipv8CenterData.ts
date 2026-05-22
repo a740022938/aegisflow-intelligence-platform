@@ -360,6 +360,24 @@ export const V8_CAPABILITIES: V8CapabilityEntry[] = [
     relatedCenters: ['Execution Gateway'],
     dataSource: 'static_registry', safetyNote: 'Gate opening blocked in preview. Requires human authorization form.',
   },
+  {
+    id: 'cap.connector.action', name: 'Connector Action', category: 'execute', kind: 'connector_action',
+    risk: 'high', permissionLevel: 'L4', defaultPolicy: 'blocked — integration policy + Gate required',
+    approvalRequired: true, gateRequired: true, stageCRequired: false, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Connector action requires integration policy + Gate + audit',
+    examples: ['call external API', 'webhook execution', 'service integration action'],
+    relatedCenters: ['Integration Center', 'Execution Gateway'],
+    dataSource: 'static_registry', safetyNote: 'Connector action blocked in preview. No external call.',
+  },
+  {
+    id: 'cap.enable.stage-c', name: 'Enable Stage C', category: 'gate', kind: 'enable_stage_c',
+    risk: 'critical', permissionLevel: 'L5', defaultPolicy: 'blocked — separate authorization required',
+    approvalRequired: true, gateRequired: false, stageCRequired: false, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Stage C enablement blocked in preview — requires separate authorization process + audit',
+    examples: ['enable Stage C capability', 'activate advanced execution'],
+    relatedCenters: ['Execution Gateway'],
+    dataSource: 'static_registry', safetyNote: 'Stage C enablement blocked in preview. Requires separate authorization.',
+  },
 ];
 
 // ── Policies Registry ──
@@ -682,6 +700,228 @@ export const V8_CONNECTOR_MIGRATIONS: V8ConnectorMigrationEntry[] = [
   { id: 'migration.modelgateway', legacyConnectorId: 'model-gateway', legacyConnectorName: 'Model Gateway', v8Center: 'Provider Manager', v8Mapping: 'provider.*', migrationStatus: 'planned', notes: 'Model Gateway legacy page exists; Provider Manager is the v8 successor. Classified as provider/config switcher, not execution engine.' },
 ];
 
+// ── Execution Boundary Registry ──
+// Execution Gateway data layer — all readonly, no execution, no Gate/Stage C enablement.
+// These entries document WHY execution is blocked and WHAT future conditions are required.
+export interface V8ExecutionBoundaryEntry {
+  id: string;
+  name: string;
+  capabilityId: string;
+  category: string;
+  currentState: string;
+  risk: V8RiskLevel;
+  requiredPermissionLevel: V8PermissionLevel;
+  gateRequired: boolean;
+  stageCRequired: boolean;
+  humanAuthorizationRequired: boolean;
+  auditRequired: boolean;
+  dryRunRequired: boolean;
+  blockedReason: string;
+  allowedInPreview: boolean;
+  requiredEvidence: string[];
+  relatedPolicies: string[];
+  relatedCenters: string[];
+  dataSource: V8DataSource;
+  readonly: boolean;
+  futurePhase: string;
+}
+
+export const V8_EXECUTION_BOUNDARIES: V8ExecutionBoundaryEntry[] = [
+  {
+    id: 'exec-boundary.command',
+    name: 'Command Execution',
+    capabilityId: 'cap.execute.command',
+    category: 'execute',
+    currentState: 'blocked',
+    risk: 'critical',
+    requiredPermissionLevel: 'L5',
+    gateRequired: true,
+    stageCRequired: true,
+    humanAuthorizationRequired: true,
+    auditRequired: true,
+    dryRunRequired: true,
+    blockedReason: 'Command execution requires Gate open + Stage C enabled + L5 permission + human authorization + dry-run + audit receipt',
+    allowedInPreview: false,
+    requiredEvidence: ['human authorization form', 'Gate open confirmation', 'Stage C enablement record', 'dry-run results', 'audit trail'],
+    relatedPolicies: ['policy.gated-execution', 'policy.release-boundary'],
+    relatedCenters: ['Command Center'],
+    dataSource: 'static_registry',
+    readonly: true,
+    futurePhase: 'Gated command execution with human approval workflow'
+  },
+  {
+    id: 'exec-boundary.connector',
+    name: 'Connector Action',
+    capabilityId: 'cap.connector.action',
+    category: 'execute',
+    currentState: 'blocked',
+    risk: 'high',
+    requiredPermissionLevel: 'L4',
+    gateRequired: true,
+    stageCRequired: false,
+    humanAuthorizationRequired: true,
+    auditRequired: true,
+    dryRunRequired: true,
+    blockedReason: 'Connector action requires integration policy + Gate + audit — no external call in preview',
+    allowedInPreview: false,
+    requiredEvidence: ['integration policy', 'Gate open confirmation', 'audit receipt', 'dry-run evidence'],
+    relatedPolicies: ['policy.apply-approval', 'policy.gated-execution'],
+    relatedCenters: ['Integration Center'],
+    dataSource: 'static_registry',
+    readonly: true,
+    futurePhase: 'Connector action execution with integration policy enforcement'
+  },
+  {
+    id: 'exec-boundary.local-app',
+    name: 'Local App Launch',
+    capabilityId: 'cap.launch.local-app',
+    category: 'launch',
+    currentState: 'blocked',
+    risk: 'high',
+    requiredPermissionLevel: 'L4',
+    gateRequired: false,
+    stageCRequired: false,
+    humanAuthorizationRequired: true,
+    auditRequired: true,
+    dryRunRequired: false,
+    blockedReason: 'Local app launch blocked in preview — requires human approval + audit receipt',
+    allowedInPreview: false,
+    requiredEvidence: ['human approval', 'audit receipt', 'local app policy confirmation'],
+    relatedPolicies: ['policy.apply-approval'],
+    relatedCenters: ['Local Apps Center'],
+    dataSource: 'static_registry',
+    readonly: true,
+    futurePhase: 'Local app launch with approval workflow'
+  },
+  {
+    id: 'exec-boundary.memory-write',
+    name: 'Memory Write',
+    capabilityId: 'cap.memory.write',
+    category: 'write',
+    currentState: 'blocked except scoped_write_draft',
+    risk: 'high',
+    requiredPermissionLevel: 'L3',
+    gateRequired: true,
+    stageCRequired: true,
+    humanAuthorizationRequired: true,
+    auditRequired: true,
+    dryRunRequired: true,
+    blockedReason: 'Memory write requires Gate open + Stage C enabled + memory policy + review + audit',
+    allowedInPreview: false,
+    requiredEvidence: ['memory policy', 'Gate open confirmation', 'Stage C enablement record', 'review acceptance', 'audit trail'],
+    relatedPolicies: ['policy.memory-draft', 'policy.gated-execution'],
+    relatedCenters: ['Memory + Knowledge Center'],
+    dataSource: 'static_registry',
+    readonly: true,
+    futurePhase: 'Scoped memory write with review pipeline'
+  },
+  {
+    id: 'exec-boundary.file-apply',
+    name: 'File Apply / Patch Apply',
+    capabilityId: 'cap.edit.files',
+    category: 'write',
+    currentState: 'approval required — blocked in preview',
+    risk: 'high',
+    requiredPermissionLevel: 'L4',
+    gateRequired: false,
+    stageCRequired: false,
+    humanAuthorizationRequired: true,
+    auditRequired: true,
+    dryRunRequired: true,
+    blockedReason: 'File edits require L4 permission + human approval + audit — no write in preview',
+    allowedInPreview: false,
+    requiredEvidence: ['human approval', 'dry-run diff', 'review acceptance', 'audit receipt'],
+    relatedPolicies: ['policy.apply-approval'],
+    relatedCenters: ['Agent Center', 'Task Center'],
+    dataSource: 'static_registry',
+    readonly: true,
+    futurePhase: 'File apply with approval + dry-run pipeline'
+  },
+  {
+    id: 'exec-boundary.release-tag',
+    name: 'Release / Tag / Restore',
+    capabilityId: 'cap.release.tag',
+    category: 'release',
+    currentState: 'blocked',
+    risk: 'critical',
+    requiredPermissionLevel: 'L5',
+    gateRequired: false,
+    stageCRequired: false,
+    humanAuthorizationRequired: true,
+    auditRequired: true,
+    dryRunRequired: true,
+    blockedReason: 'Release/tag/restore blocked in preview — requires explicit human authorization + audit',
+    allowedInPreview: false,
+    requiredEvidence: ['human authorization form', 'release policy confirmation', 'dry-run plan', 'audit trail'],
+    relatedPolicies: ['policy.release-boundary'],
+    relatedCenters: ['Command Center'],
+    dataSource: 'static_registry',
+    readonly: true,
+    futurePhase: 'Release/tag/restore with human authorization workflow'
+  },
+  {
+    id: 'exec-boundary.gate-open',
+    name: 'Gate Opening',
+    capabilityId: 'cap.gate.open',
+    category: 'gate',
+    currentState: 'blocked',
+    risk: 'critical',
+    requiredPermissionLevel: 'L5',
+    gateRequired: false,
+    stageCRequired: false,
+    humanAuthorizationRequired: true,
+    auditRequired: true,
+    dryRunRequired: false,
+    blockedReason: 'Gate opening blocked in preview — requires explicit human authorization + backend truth + audit',
+    allowedInPreview: false,
+    requiredEvidence: ['human authorization form', 'safety boundary confirmation', 'audit trail'],
+    relatedPolicies: ['policy.gated-execution', 'policy.release-boundary'],
+    relatedCenters: [],
+    dataSource: 'static_registry',
+    readonly: true,
+    futurePhase: 'Gate open/close controls (gated by human authorization)'
+  },
+  {
+    id: 'exec-boundary.stage-c-enable',
+    name: 'Stage C Enablement',
+    capabilityId: 'cap.enable.stage-c',
+    category: 'gate',
+    currentState: 'blocked',
+    risk: 'critical',
+    requiredPermissionLevel: 'L5',
+    gateRequired: false,
+    stageCRequired: false,
+    humanAuthorizationRequired: true,
+    auditRequired: true,
+    dryRunRequired: true,
+    blockedReason: 'Stage C enablement blocked in preview — requires separate authorization process + audit',
+    allowedInPreview: false,
+    requiredEvidence: ['human authorization form', 'pre-enable review', 'safety boundary confirmation', 'audit trail'],
+    relatedPolicies: ['policy.gated-execution'],
+    relatedCenters: [],
+    dataSource: 'static_registry',
+    readonly: true,
+    futurePhase: 'Stage C enablement workflow with pre-enable review'
+  },
+];
+
+export function getV8ExecutionBoundarySummary() {
+  const all = V8_EXECUTION_BOUNDARIES;
+  return {
+    total: all.length,
+    blocked: all.filter(b => b.currentState.includes('blocked')).length,
+    critical: all.filter(b => b.risk === 'critical').length,
+    high: all.filter(b => b.risk === 'high').length,
+    gateRequired: all.filter(b => b.gateRequired).length,
+    stageCRequired: all.filter(b => b.stageCRequired).length,
+    humanAuthRequired: all.filter(b => b.humanAuthorizationRequired).length,
+    auditRequired: all.filter(b => b.auditRequired).length,
+    dryRunRequired: all.filter(b => b.dryRunRequired).length,
+    allowedInPreview: all.filter(b => b.allowedInPreview).length,
+    blockedInPreview: all.filter(b => !b.allowedInPreview).length,
+  };
+}
+
 // ── Summary helpers ──
 
 export function getV8AgentCenterSummary() {
@@ -836,5 +1076,6 @@ export function getV8RegistryCounts() {
     audits: getV8AuditSummary().total,
     memoryKnowledge: getV8MemoryKnowledgeSummary().total,
     connectorMigrations: getV8ConnectorMigrationSummary().total,
+    executionBoundaries: getV8ExecutionBoundarySummary().total,
   };
 }

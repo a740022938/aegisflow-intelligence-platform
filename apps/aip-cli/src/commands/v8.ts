@@ -48,12 +48,13 @@ export async function runV8(sub?: string) {
     console.log('  Foundation Docs:              COMPLETE');
     console.log('  CLI Readonly Commands:        COMPLETE (agents/providers/integrations/apps/runtime/task/audit/policy/v8)');
     console.log('  UI Preview Pages:             COMPLETE (10 hidden readonly routes with registry-backed data)');
-  console.log('  Registry Data Layer:          COMPLETE (openAipv8CenterData.ts with typed entries + dataSource/safetyNote/blockedActions/futurePhase)');
+  console.log('  Registry Data Layer:          COMPLETE (openAipv8CenterData.ts with typed entries + dataSource/safetyNote/blockedActions/futurePhase + V8ExecutionBoundaryEntry)');
   console.log('  Connector → v8 Migration:     COMPLETE (bridge banners on legacy Connector Center pages)');
   console.log('  UX Polish:                    COMPLETE (Command Center hub + shared component + role descriptions + related centers nav)');
   console.log('  Data Quality Upgrade:         COMPLETE (V8BaseEntry fields: dataSource, safetyNote, blockedActions, futurePhase)');
   console.log('  Navigation Deep Links:        COMPLETE (related centers links on all 9 pages, standard back text)');
   console.log('  Route Smoke Test:             COMPLETE (tests/v8-center-readonly-route-smoke.test.mjs)');
+  console.log('  Execution Gateway:            MVP (V8_EXECUTION_BOUNDARIES + standalone UI + CLI execution-gateway + tests)');
     console.log('  Gate:                         CLOSED');
     console.log('  Stage C:                      DISABLED');
     console.log('  Runtime Mutation:             NONE');
@@ -61,9 +62,9 @@ export async function runV8(sub?: string) {
     console.log('  Services Restarted:           NONE');
     console.log('  Release/Tag:                  NONE');
     console.log('');
-    console.log('  Registry-backed centers: agents, providers, integrations, localApps, capabilities, policies, tasks, audits, memoryKnowledge');
-    console.log('  Migration entries: connector→v8, assistant→agent, governanceHub→policy, modelGateway→provider');
-    console.log('  UX: consistent global status strip, role descriptions, footer safety text on all 9 center pages');
+  console.log('  Registry-backed centers: agents, providers, integrations, localApps, capabilities, policies, tasks, audits, memoryKnowledge, executionBoundaries');
+  console.log('  Migration entries: connector→v8, assistant→agent, governanceHub→policy, modelGateway→provider');
+  console.log('  UX: consistent global status strip, role descriptions, footer safety text on all 9 center pages');
     console.log('');
     console.log('  This is a readonly command. No files were modified.');
   }

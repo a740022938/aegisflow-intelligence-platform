@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getV8RegistryCounts, getV8ConnectorMigrationSummary } from '../registry/openAipv8CenterData';
+import { getV8RegistryCounts, getV8ConnectorMigrationSummary, getV8ExecutionBoundarySummary } from '../registry/openAipv8CenterData';
 
 const shellStyle: React.CSSProperties = {
   minHeight: '100vh',
@@ -146,9 +146,9 @@ const centers: CenterDef[] = [
     route: '/openaip-v8-execution-gateway-preview',
     tag: 'closed',
     role: 'Execution Gate (closed)',
-    items: ['Default closed', 'Gate CLOSED', 'Stage C disabled', 'Dry-run/approval required before future execution'],
+    items: ['Default closed', 'Gate CLOSED', 'Stage C disabled', 'Dry-run/approval required before future execution', `${getV8ExecutionBoundarySummary().total} execution boundary entries`],
     safetyNote: 'Gate remains closed',
-    count: `${counts.policies} gate policies`
+    count: `${getV8ExecutionBoundarySummary().blocked}/${getV8ExecutionBoundarySummary().total} blocked`
   }
 ];
 
@@ -203,6 +203,7 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
             { label: 'Audits', value: counts.audits, color: '#ef4444' },
             { label: 'Memory/Knowledge', value: counts.memoryKnowledge, color: '#14b8a6' },
             { label: 'Connector Migrations', value: counts.connectorMigrations, color: '#8b5cf6' },
+            { label: 'Execution Boundaries', value: counts.executionBoundaries, color: '#ef4444' },
           ].map(item => (
             <div key={item.label} style={{ textAlign: 'center', minWidth: 90 }}>
               <div style={{ fontSize: 22, fontWeight: 700, color: item.color }}>{item.value}</div>

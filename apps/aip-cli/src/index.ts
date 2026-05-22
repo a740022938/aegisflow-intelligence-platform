@@ -12,6 +12,7 @@ import { runVersion } from './commands/version.js';
 import { runDoctor } from './commands/doctor.js';
 import { runConfig } from './commands/config.js';
 import { runGateway } from './commands/gateway.js';
+import { runExecutionGateway } from './commands/execution-gateway.js';
 import { runRepair } from './commands/repair.js';
 import { runWhere } from './commands/where.js';
 import { runSafeStatus } from './commands/safe-status.js';
@@ -221,6 +222,7 @@ function printCommandCenter() {
   console.log(helpCmd('aip audit', 'Audit Center — 审计链与凭证', 'dim'));
   console.log(helpCmd('aip policy', 'Policy Router — 策略与能力', 'dim'));
   console.log(helpCmd('aip v8 centers', '列出所有隐藏只读中心预览路由', 'dim'));
+  console.log(helpCmd('aip execution-gateway status', 'Execution Gateway — 边界状态摘要', 'dim'));
   console.log(helpCmd('aip v8 status', 'v8 基础状态摘要', 'dim'));
   console.log('');
 
@@ -262,6 +264,7 @@ function printHelpFor(cmd: string) {
     audit: 'aip audit [list|status]\n  OpenAIP v8 Audit Center 只读基础命令',
     policy: 'aip policy [list|status]\n  OpenAIP v8 Policy Router + Capability Center 只读基础命令',
     v8: 'aip v8 <centers|status>\n  OpenAIP v8 foundation 信息',
+    'execution-gateway': 'aip execution-gateway status\n  OpenAIP v8 Execution Gateway 只读状态',
   };
   const text = tips[cmd] || `未知命令: ${cmd}`;
   console.log(text);
@@ -305,6 +308,7 @@ async function main() {
     case 'config': await runConfig(sub, allArgs.filter(a => !a.startsWith('--')).slice(2)); break;
     case 'repair': await runRepair(sub, rest); break;
     case 'gateway': await runGateway(sub); break;
+    case 'execution-gateway': await runExecutionGateway(sub); break;
     case 'where': await runWhere(); break;
     case 'next': await runNext(); break;
     case 'release-status': await runReleaseStatus(); break;
