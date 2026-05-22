@@ -187,8 +187,19 @@ export interface V8AuditEntry extends V8BaseEntry {
 
 export interface V8MemoryKnowledgeEntry extends V8BaseEntry {
   id: string;
+  name: string;
   source: string;
-  accessMode: string;
+  kind: 'decision_register' | 'report_index' | 'receipt_index' | 'task_pack_knowledge' | 'known_pitfalls_registry' | 'code_history_source' | 'dataset_knowledge_source' | 'external_knowledge_source' | 'memory_access_policy';
+  sourceType: string;
+  accessMode: 'none' | 'readonly' | 'scoped_write_draft' | 'full_write_prohibited_by_default';
+  writeState: 'blocked' | 'readonly_only';
+  indexingState: 'not_indexed' | 'conceptual' | 'blocked';
+  relatedCenters: string[];
+  risk: V8RiskLevel;
+  permissionRequired: V8PermissionLevel;
+  allowedInPreview: boolean;
+  retentionNote: string;
+  readonly: boolean;
   lifecycle: V8Lifecycle;
   permissionLevel: V8PermissionLevel;
 }
@@ -762,14 +773,14 @@ export const V8_AUDITS: V8AuditEntry[] = [
 
 // ── Memory + Knowledge Registry ──
 export const V8_MEMORY_KNOWLEDGE: V8MemoryKnowledgeEntry[] = [
-  { id: 'mem.knowledge.docs', source: 'docs', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly access — no content extraction.' },
-  { id: 'mem.knowledge.reports', source: 'reports', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly access — no content extraction.' },
-  { id: 'mem.knowledge.receipts', source: 'receipts', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly access — no receipt mutation.' },
-  { id: 'mem.knowledge.repo', source: 'repo', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly access — no repo writes.' },
-  { id: 'mem.knowledge.datasets', source: 'datasets', accessMode: 'readonly', lifecycle: 'registered', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Registered but not yet indexed.' },
-  { id: 'mem.knowledge.local-files', source: 'local files', accessMode: 'readonly', lifecycle: 'registered', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Registered but not yet indexed.' },
-  { id: 'mem.access.readonly', source: 'memory-access', accessMode: 'readonly', lifecycle: 'enabled', permissionLevel: 'L1', dataSource: 'static_registry', safetyNote: 'Readonly mode is the default safe mode. Memory write blocked.' },
-  { id: 'mem.access.scoped-write', source: 'memory-access', accessMode: 'scoped_write_draft', lifecycle: 'disabled', permissionLevel: 'L2', dataSource: 'static_registry', safetyNote: 'Scoped write mode defined but DISABLED in this preview.', blockedActions: ['memory write', 'knowledge source mutation', 'content extraction', 'policy changes'] },
+  { id: 'mem.project-decisions', name: 'Project Decisions', source: 'docs/product decisions', kind: 'decision_register', sourceType: 'docs', accessMode: 'readonly', writeState: 'blocked', indexingState: 'conceptual', relatedCenters: ['Policy Capability Center','Task Center'], risk: 'medium', permissionLevel: 'L1', permissionRequired: 'L1', allowedInPreview: true, retentionNote: 'Decisions retained as audit-context metadata.', readonly: true, lifecycle: 'enabled', dataSource: 'static_registry', safetyNote: 'Memory visible != memory writable.', blockedActions: ['memory write','policy mutation'] },
+  { id: 'mem.reports', name: 'Reports', source: 'docs/product reports', kind: 'report_index', sourceType: 'reports', accessMode: 'readonly', writeState: 'blocked', indexingState: 'conceptual', relatedCenters: ['Audit Center'], risk: 'low', permissionLevel: 'L1', permissionRequired: 'L1', allowedInPreview: true, retentionNote: 'Reports are immutable evidence references.', readonly: true, lifecycle: 'enabled', dataSource: 'static_registry', safetyNote: 'Report exists != verified.', blockedActions: ['memory write','indexing job'] },
+  { id: 'mem.receipts', name: 'Receipts', source: 'docs/product receipts', kind: 'receipt_index', sourceType: 'receipts', accessMode: 'readonly', writeState: 'blocked', indexingState: 'conceptual', relatedCenters: ['Audit Center','Task Center'], risk: 'low', permissionLevel: 'L1', permissionRequired: 'L1', allowedInPreview: true, retentionNote: 'Receipt metadata retained for traceability.', readonly: true, lifecycle: 'enabled', dataSource: 'static_registry', safetyNote: 'Receipt exists != accepted.', blockedActions: ['memory write','audit DB write'] },
+  { id: 'mem.task-packs', name: 'Task Packs', source: 'task pack contracts', kind: 'task_pack_knowledge', sourceType: 'task_packs', accessMode: 'readonly', writeState: 'blocked', indexingState: 'conceptual', relatedCenters: ['Task Center'], risk: 'medium', permissionLevel: 'L2', permissionRequired: 'L2', allowedInPreview: true, retentionNote: 'Task packs archived as reusable templates.', readonly: true, lifecycle: 'enabled', dataSource: 'static_registry', safetyNote: 'Task pack knowledge is readonly in preview.', blockedActions: ['task dispatch','memory write'] },
+  { id: 'mem.known-pitfalls', name: 'Known Pitfalls', source: 'pitfall registry', kind: 'known_pitfalls_registry', sourceType: 'safety_registry', accessMode: 'readonly', writeState: 'blocked', indexingState: 'blocked', relatedCenters: ['Execution Gateway','Policy Capability Center'], risk: 'high', permissionLevel: 'L2', permissionRequired: 'L2', allowedInPreview: true, retentionNote: 'Pitfalls retained to prevent repeat failures: config=permission, enabled=execution, all-done without evidence.', readonly: true, lifecycle: 'enabled', dataSource: 'static_registry', safetyNote: 'Known pitfalls are rules, not execution grants.', blockedActions: ['execution','memory write'] },
+  { id: 'mem.git-evidence', name: 'Git Evidence', source: 'git commit/log metadata', kind: 'code_history_source', sourceType: 'git', accessMode: 'readonly', writeState: 'blocked', indexingState: 'conceptual', relatedCenters: ['Audit Center'], risk: 'medium', permissionLevel: 'L1', permissionRequired: 'L1', allowedInPreview: true, retentionNote: 'Commit evidence retained for receipts.', readonly: true, lifecycle: 'enabled', dataSource: 'static_registry', safetyNote: 'Git evidence read-only; no git mutation.', blockedActions: ['git mutation','release/tag'] },
+  { id: 'mem.dataset-knowledge', name: 'Dataset Knowledge', source: 'dataset docs/local references', kind: 'dataset_knowledge_source', sourceType: 'datasets', accessMode: 'readonly', writeState: 'blocked', indexingState: 'blocked', relatedCenters: ['Task Center','Local Apps Center'], risk: 'high', permissionLevel: 'L2', permissionRequired: 'L2', allowedInPreview: true, retentionNote: 'Dataset knowledge references kept without scanning.', readonly: true, lifecycle: 'registered', dataSource: 'static_registry', safetyNote: 'No dataset scanning or writes in preview.', blockedActions: ['dataset scan','dataset write','training execution'] },
+  { id: 'mem.external-knowledge-placeholder', name: 'External Knowledge Placeholder', source: 'external sources (planned)', kind: 'external_knowledge_source', sourceType: 'external', accessMode: 'none', writeState: 'blocked', indexingState: 'blocked', relatedCenters: ['Integration Center'], risk: 'high', permissionLevel: 'L3', permissionRequired: 'L3', allowedInPreview: false, retentionNote: 'Placeholder only; disabled by default.', readonly: true, lifecycle: 'disabled', dataSource: 'future_integration', safetyNote: 'External knowledge calls are blocked.', blockedActions: ['external calls','sync','indexing job'] },
 ];
 
 
@@ -780,6 +791,31 @@ export const V8_INTEGRATION_PROVIDER_HANDSHAKE_MATRIX: V8IntegrationProviderHand
   { id: 'handshake.hf-provider-knowledge', integrationId: 'integration.huggingface', providerOrCenter: 'Provider/Knowledge/Data', relationship: 'model registry and dataset source linkage', currentPreviewState: 'static reference only', blockedActions: ['downloads', 'API calls'], risk: 'medium', requiredPolicy: 'policy.readonly-observer', auditRequired: true, gateRequired: false, dataSource: 'example_json', readonly: true },
   { id: 'handshake.github-codehost-audit', integrationId: 'integration.github', providerOrCenter: 'Code Host / Task / Audit', relationship: 'code host evidence and future workflow integration', currentPreviewState: 'local git evidence only', blockedActions: ['release/tag', 'workflow dispatch', 'API calls'], risk: 'high', requiredPolicy: 'policy.release-boundary', auditRequired: true, gateRequired: false, dataSource: 'static_registry', readonly: true },
   { id: 'handshake.memoryhub-memorycenter', integrationId: 'integration.memoryhub-bridge', providerOrCenter: 'Memory + Knowledge Center', relationship: 'memory provider bridge with readonly report indexing', currentPreviewState: 'readonly bridge concept', blockedActions: ['memory writes', 'connector actions'], risk: 'high', requiredPolicy: 'policy.memory-draft', auditRequired: true, gateRequired: true, dataSource: 'static_registry', readonly: true },
+];
+
+export interface V8MemoryKnowledgeRelationRow {
+  id: string;
+  sourceId: string;
+  relatedCenter: string;
+  relationship: string;
+  currentPreviewState: string;
+  blockedActions: string[];
+  risk: V8RiskLevel;
+  requiredPolicy: string;
+  auditRequired: boolean;
+  dataSource: V8DataSource;
+  readonly: boolean;
+}
+
+export const V8_MEMORY_KNOWLEDGE_RELATIONS: V8MemoryKnowledgeRelationRow[] = [
+  { id: 'mk-rel-receipts-audit', sourceId: 'mem.receipts', relatedCenter: 'Audit Center', relationship: 'receipts become evidence metadata', currentPreviewState: 'readonly concept', blockedActions: ['audit DB write'], risk: 'low', requiredPolicy: 'policy.readonly-observer', auditRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'mk-rel-taskpacks-task', sourceId: 'mem.task-packs', relatedCenter: 'Task Center', relationship: 'tasks generate reusable task packs', currentPreviewState: 'readonly templates/contracts', blockedActions: ['task dispatch'], risk: 'medium', requiredPolicy: 'policy.suggest-planner', auditRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'mk-rel-decisions-policy', sourceId: 'mem.project-decisions', relatedCenter: 'Policy Capability Center', relationship: 'decisions inform policy baselines', currentPreviewState: 'readonly docs', blockedActions: ['policy mutation'], risk: 'medium', requiredPolicy: 'policy.readonly-observer', auditRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'mk-rel-localapps-local', sourceId: 'mem.dataset-knowledge', relatedCenter: 'Local Apps Center', relationship: 'local app inventory knowledge linkage', currentPreviewState: 'static registry', blockedActions: ['app launch','local API call'], risk: 'high', requiredPolicy: 'policy.apply-approval', auditRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'mk-rel-provider-provider', sourceId: 'mem.project-decisions', relatedCenter: 'Provider Manager', relationship: 'provider profiles/cost/routing concepts', currentPreviewState: 'static registry', blockedActions: ['provider call','config writes'], risk: 'medium', requiredPolicy: 'policy.readonly-observer', auditRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'mk-rel-pitfalls-exec', sourceId: 'mem.known-pitfalls', relatedCenter: 'Execution Gateway', relationship: 'risk patterns block unsafe execution', currentPreviewState: 'readonly safety rules', blockedActions: ['execution'], risk: 'high', requiredPolicy: 'policy.gated-execution', auditRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'mk-rel-git-audit', sourceId: 'mem.git-evidence', relatedCenter: 'Audit Center', relationship: 'commit/push/tree evidence feed', currentPreviewState: 'receipt metadata concept', blockedActions: ['git mutation'], risk: 'medium', requiredPolicy: 'policy.readonly-observer', auditRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'mk-rel-dataset-task', sourceId: 'mem.dataset-knowledge', relatedCenter: 'Task/Local Apps', relationship: 'future vision/data workflows', currentPreviewState: 'conceptual/readonly', blockedActions: ['dataset scan','dataset write'], risk: 'high', requiredPolicy: 'policy.gated-execution', auditRequired: true, dataSource: 'static_registry', readonly: true },
 ];
 
 // ── Connector → v8 Migration Registry ──
@@ -1149,7 +1185,7 @@ export function getV8AuditSummary() {
 
 export function getV8MemoryKnowledgeSummary() {
   const all = V8_MEMORY_KNOWLEDGE;
-  return { total: all.length, enabled: all.filter(m => m.lifecycle === 'enabled').length, registered: all.filter(m => m.lifecycle === 'registered').length, disabled: all.filter(m => m.lifecycle === 'disabled').length, readonly: all.filter(m => m.accessMode === 'readonly').length, scopedWrite: all.filter(m => m.accessMode === 'scoped_write_draft').length };
+  return { total: all.length, enabled: all.filter(m => m.lifecycle === 'enabled').length, registered: all.filter(m => m.lifecycle === 'registered').length, disabled: all.filter(m => m.lifecycle === 'disabled').length, readonly: all.filter(m => m.readonly).length, scopedWrite: all.filter(m => m.accessMode === 'scoped_write_draft').length, memorySources: all.filter(m => m.kind === 'decision_register' || m.kind === 'report_index' || m.kind === 'receipt_index' || m.kind === 'task_pack_knowledge' || m.kind === 'known_pitfalls_registry').length, knowledgeSources: all.filter(m => m.kind === 'dataset_knowledge_source' || m.kind === 'code_history_source' || m.kind === 'external_knowledge_source').length, indexingBlocked: all.filter(m => m.indexingState === 'blocked').length, writeBlocked: all.filter(m => m.writeState === 'blocked').length, externalCallBlocked: all.filter(m => (m.blockedActions || []).some((x: string) => x.includes('external'))).length };
 }
 
 export function getV8ConnectorMigrationSummary() {

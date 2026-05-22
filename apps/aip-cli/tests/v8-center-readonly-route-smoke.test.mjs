@@ -914,3 +914,19 @@ test('CLI apps list includes readonly source and local app count', () => {
   assert.ok(cliContent.includes('readonly static/example registry'), 'CLI apps missing readonly source');
   assert.ok(cliContent.includes('Local apps count:'), 'CLI apps missing local app count');
 });
+
+
+test('memory knowledge center includes required sections and safety phrases', () => {
+  const content = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8MemoryKnowledgeCenterPreview.tsx'), 'utf8');
+  const req = ['Memory/Knowledge Source Matrix','Relation Matrix','Memory Access Modes','Knowledge Source Registry','Known Pitfalls','No memory write','No indexing job','No external knowledge call','No runtime mutation','Gate CLOSED','Stage C disabled'];
+  for (const x of req) assert.ok(content.includes(x), `Memory center missing ${x}`);
+});
+
+test('memory knowledge registry includes required entries', () => {
+  const reg = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  const names = ['Project Decisions','Reports','Receipts','Task Packs','Known Pitfalls','Git Evidence','Dataset Knowledge','External Knowledge Placeholder'];
+  for (const n of names) assert.ok(reg.includes(n), `Memory registry missing ${n}`);
+  assert.ok(reg.includes('config=permission'));
+  assert.ok(reg.includes('enabled=execution'));
+  assert.ok(reg.includes('all-done without evidence'));
+});
