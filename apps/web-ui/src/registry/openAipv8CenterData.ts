@@ -65,6 +65,16 @@ export interface V8IntegrationEntry extends V8RegistryTruthFields, V8BaseEntry {
   name: string;
   kind: string;
   lifecycle: V8Lifecycle;
+  connectionMode: string;
+  authState: 'none' | 'registered' | 'connected_readonly' | 'authorized_readonly';
+  actionState: 'blocked' | 'readonly_only';
+  relatedProviderId: string | null;
+  relatedLocalAppId: string | null;
+  relatedAgentId: string | null;
+  risk: V8RiskLevel;
+  permissionRequired: V8PermissionLevel;
+  allowedInPreview: boolean;
+  readonly: boolean;
   permissionLevel: V8PermissionLevel;
 }
 
@@ -170,6 +180,21 @@ export interface V8MemoryKnowledgeEntry extends V8BaseEntry {
   permissionLevel: V8PermissionLevel;
 }
 
+export interface V8IntegrationProviderHandshakeRow {
+  id: string;
+  integrationId: string;
+  providerOrCenter: string;
+  relationship: string;
+  currentPreviewState: string;
+  blockedActions: string[];
+  risk: V8RiskLevel;
+  requiredPolicy: string;
+  auditRequired: boolean;
+  gateRequired: boolean;
+  dataSource: V8DataSource;
+  readonly: boolean;
+}
+
 export interface V8ConnectorMigrationEntry {
   id: string;
   legacyConnectorId: string;
@@ -263,10 +288,14 @@ export const V8_PROVIDERS: V8ProviderEntry[] = [
 // Memory Hub = memory_provider
 // Knowledge Base = knowledge_provider
 export const V8_INTEGRATIONS: V8IntegrationEntry[] = [
-  { id: 'integration.github', name: 'GitHub', kind: 'code_host', lifecycle: 'enabled', permissionLevel: 'L1', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Integration online does not mean connector action allowed.', blockedActions: ['connector actions', 'external service calls', 'webhook execution', 'integration mutation'] },
-  { id: 'integration.memoryhub', name: 'Memory Hub', kind: 'memory_provider', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Memory Hub is a memory provider, not a runtime service.', blockedActions: ['connector actions', 'memory writes', 'candidate processing'], futurePhase: 'Integration registry management' },
-  { id: 'integration.knowledgebase', name: 'Knowledge Base', kind: 'knowledge_provider', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Knowledge source registration does not authorize content extraction.', blockedActions: ['connector actions', 'content extraction', 'knowledge source mutation'], futurePhase: 'Knowledge source management' },
-  { id: 'integration.webhook', name: 'Webhook Bridge', kind: 'webhook', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Not configured. Webhook execution requires Gate open and Stage C enabled.', blockedActions: ['webhook execution', 'connector actions', 'external service calls'], futurePhase: 'Webhook configuration UI' },
+  { id: 'integration.openclaw-gateway', name: 'OpenClaw Gateway', kind: 'agent_runtime_gateway', lifecycle: 'registered', connectionMode: 'WebSocket local gateway concept', authState: 'registered', actionState: 'blocked', relatedProviderId: 'provider.cc-switch', relatedLocalAppId: null, relatedAgentId: 'agent.openclaw', risk: 'high', permissionLevel: 'L3', permissionRequired: 'L3', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'OpenClaw online != Gate open. No gateway/browser call in preview.', blockedActions: ['connector actions', 'execution', 'browser control', 'provider calls'] },
+  { id: 'integration.github', name: 'GitHub', kind: 'code_host', lifecycle: 'enabled', connectionMode: 'remote git/API concept', authState: 'authorized_readonly', actionState: 'blocked', relatedProviderId: null, relatedLocalAppId: null, relatedAgentId: 'agent.codex', risk: 'high', permissionLevel: 'L2', permissionRequired: 'L2', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'Connected/authorized does not allow push/release/workflow dispatch in preview.', blockedActions: ['connector actions', 'push', 'release/tag', 'workflow dispatch', 'external API calls'] },
+  { id: 'integration.huggingface', name: 'Hugging Face', kind: 'model_registry', lifecycle: 'registered', connectionMode: 'external service concept', authState: 'registered', actionState: 'blocked', relatedProviderId: 'provider.openai-compatible', relatedLocalAppId: null, relatedAgentId: null, risk: 'medium', permissionLevel: 'L2', permissionRequired: 'L2', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'example_json', safetyNote: 'Registry/data source reference only; no API/download calls in preview.', blockedActions: ['connector actions', 'external API calls', 'downloads', 'provider calls'] },
+  { id: 'integration.webhook-external', name: 'Webhook / External API', kind: 'webhook', lifecycle: 'registered', connectionMode: 'HTTP outbound concept', authState: 'none', actionState: 'blocked', relatedProviderId: null, relatedLocalAppId: null, relatedAgentId: null, risk: 'high', permissionLevel: 'L3', permissionRequired: 'L3', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'No webhook/API calls in preview.', blockedActions: ['connector actions', 'send webhook', 'external API calls', 'config writes'] },
+  { id: 'integration.claude-proxy-bridge', name: 'Claude Proxy Bridge', kind: 'provider_proxy', lifecycle: 'registered', connectionMode: 'local proxy bridge concept', authState: 'registered', actionState: 'blocked', relatedProviderId: 'provider.claude-proxy', relatedLocalAppId: null, relatedAgentId: null, risk: 'high', permissionLevel: 'L3', permissionRequired: 'L3', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'example_json', safetyNote: 'Proxy bridge is reference-only; no secret read and no routing mutation.', blockedActions: ['connector actions', 'proxy launch', 'provider calls', 'config writes'] },
+  { id: 'integration.cc-switch-bridge', name: 'CC Switch-like Config Bridge', kind: 'provider_config_switcher_reference', lifecycle: 'registered', connectionMode: 'config ecosystem reference', authState: 'registered', actionState: 'blocked', relatedProviderId: 'provider.cc-switch', relatedLocalAppId: null, relatedAgentId: null, risk: 'high', permissionLevel: 'L3', permissionRequired: 'L3', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'Bridge exists != switching allowed. No config mutation in preview.', blockedActions: ['connector actions', 'switch provider', 'config writes', 'provider calls'] },
+  { id: 'integration.memoryhub-bridge', name: 'Memory Hub Bridge', kind: 'memory_provider_bridge', lifecycle: 'registered', connectionMode: 'local memory/report registry concept', authState: 'connected_readonly', actionState: 'readonly_only', relatedProviderId: null, relatedLocalAppId: null, relatedAgentId: 'agent.openclaw', risk: 'high', permissionLevel: 'L2', permissionRequired: 'L2', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'Readonly bridge only. Memory writes remain blocked.', blockedActions: ['memory writes', 'connector actions', 'config writes'] },
+  { id: 'integration.future-placeholder', name: 'Future Integration Placeholder', kind: 'unknown_integration', lifecycle: 'disabled', connectionMode: 'planned', authState: 'none', actionState: 'blocked', relatedProviderId: null, relatedLocalAppId: null, relatedAgentId: null, risk: 'low', permissionLevel: 'L0', permissionRequired: 'L0', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: false, readonly: true, dataSource: 'future_integration', safetyNote: 'Disabled placeholder, no permissions.', blockedActions: ['all integration operations'] },
 ];
 
 // ── Local Apps Registry ──
@@ -703,6 +732,16 @@ export const V8_MEMORY_KNOWLEDGE: V8MemoryKnowledgeEntry[] = [
   { id: 'mem.access.scoped-write', source: 'memory-access', accessMode: 'scoped_write_draft', lifecycle: 'disabled', permissionLevel: 'L2', dataSource: 'static_registry', safetyNote: 'Scoped write mode defined but DISABLED in this preview.', blockedActions: ['memory write', 'knowledge source mutation', 'content extraction', 'policy changes'] },
 ];
 
+
+export const V8_INTEGRATION_PROVIDER_HANDSHAKE_MATRIX: V8IntegrationProviderHandshakeRow[] = [
+  { id: 'handshake.openclaw-provider-manager', integrationId: 'integration.openclaw-gateway', providerOrCenter: 'Provider Manager', relationship: 'runtime gateway may route through provider profiles in future', currentPreviewState: 'no live routing', blockedActions: ['execution', 'browser control', 'provider calls'], risk: 'high', requiredPolicy: 'policy.gated-execution', auditRequired: true, gateRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'handshake.claude-proxy-claude', integrationId: 'integration.claude-proxy-bridge', providerOrCenter: 'Claude / Anthropic', relationship: 'proxy-provider bridge for profile compatibility', currentPreviewState: 'static reference only', blockedActions: ['API calls', 'config writes', 'secret reads'], risk: 'high', requiredPolicy: 'policy.apply-approval', auditRequired: true, gateRequired: false, dataSource: 'example_json', readonly: true },
+  { id: 'handshake.ccswitch-profiles', integrationId: 'integration.cc-switch-bridge', providerOrCenter: 'Provider Profiles', relationship: 'config switcher reference across provider presets', currentPreviewState: 'dry-run concept', blockedActions: ['provider switching', 'config mutation'], risk: 'high', requiredPolicy: 'policy.apply-approval', auditRequired: true, gateRequired: false, dataSource: 'static_registry', readonly: true },
+  { id: 'handshake.hf-provider-knowledge', integrationId: 'integration.huggingface', providerOrCenter: 'Provider/Knowledge/Data', relationship: 'model registry and dataset source linkage', currentPreviewState: 'static reference only', blockedActions: ['downloads', 'API calls'], risk: 'medium', requiredPolicy: 'policy.readonly-observer', auditRequired: true, gateRequired: false, dataSource: 'example_json', readonly: true },
+  { id: 'handshake.github-codehost-audit', integrationId: 'integration.github', providerOrCenter: 'Code Host / Task / Audit', relationship: 'code host evidence and future workflow integration', currentPreviewState: 'local git evidence only', blockedActions: ['release/tag', 'workflow dispatch', 'API calls'], risk: 'high', requiredPolicy: 'policy.release-boundary', auditRequired: true, gateRequired: false, dataSource: 'static_registry', readonly: true },
+  { id: 'handshake.memoryhub-memorycenter', integrationId: 'integration.memoryhub-bridge', providerOrCenter: 'Memory + Knowledge Center', relationship: 'memory provider bridge with readonly report indexing', currentPreviewState: 'readonly bridge concept', blockedActions: ['memory writes', 'connector actions'], risk: 'high', requiredPolicy: 'policy.memory-draft', auditRequired: true, gateRequired: true, dataSource: 'static_registry', readonly: true },
+];
+
 // ── Connector → v8 Migration Registry ──
 export const V8_CONNECTOR_MIGRATIONS: V8ConnectorMigrationEntry[] = [
   { id: 'migration.openaxiom', legacyConnectorId: 'openaxiom', legacyConnectorName: 'OpenAxiom', v8Center: 'Local Apps Center', v8Mapping: 'app.openaxiom', migrationStatus: 'migrated', notes: 'Legacy connector page exists as OpenAxiomReadonly; v8 Local Apps Center entry registered. OpenAxiom classified as local_app / UI Lab / Vision Tool.' },
@@ -976,7 +1015,7 @@ export function getV8ProviderSummary() {
 
 export function getV8IntegrationSummary() {
   const all = V8_INTEGRATIONS;
-  return { total: all.length, enabled: all.filter(i => i.lifecycle === 'enabled').length, registered: all.filter(i => i.lifecycle === 'registered').length };
+  return { total: all.length, enabled: all.filter(i => i.lifecycle === 'enabled').length, registered: all.filter(i => i.lifecycle === 'registered').length, blockedActions: all.filter(i => i.actionState === 'blocked').length, highOrCriticalRisk: all.filter(i => i.risk === 'high' || i.risk === 'critical').length, relatedProviders: new Set(all.map(i => i.relatedProviderId).filter(Boolean)).size, relatedLocalApps: new Set(all.map(i => i.relatedLocalAppId).filter(Boolean)).size, relatedAgents: new Set(all.map(i => i.relatedAgentId).filter(Boolean)).size, actionsAllowedInPreview: all.filter(i => i.allowedInPreview && i.actionState !== 'blocked').length };
 }
 
 export function getV8LocalAppSummary() {

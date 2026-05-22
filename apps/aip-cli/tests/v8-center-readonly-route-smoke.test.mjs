@@ -871,3 +871,27 @@ test('CLI providers list output contains readonly source and counts', () => {
   assert.ok(cliContent.includes('Registry count:'), 'CLI providers missing registry count');
   assert.ok(cliContent.includes('Config-write blocked:'), 'CLI providers missing blocked config count');
 });
+
+test('integration center includes required readonly MVP sections and safety phrases', () => {
+  const content = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8IntegrationCenterPreview.tsx'), 'utf8');
+  const required = [
+    'Integration Matrix', 'Integration ↔ Provider Handshake Matrix', 'Legacy Connector Migration', 'External Action Safety',
+    'No connector actions', 'No external calls', 'No config writes', 'No runtime mutation', 'Gate CLOSED', 'Stage C disabled',
+    '/connector-center-readonly'
+  ];
+  for (const item of required) assert.ok(content.includes(item), `Integration Center missing ${item}`);
+});
+
+test('integration registry includes required integration entries', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  const names = ['OpenClaw Gateway', 'GitHub', 'Hugging Face', 'Webhook / External API', 'Claude Proxy Bridge', 'CC Switch-like Config Bridge', 'Memory Hub Bridge'];
+  for (const n of names) assert.ok(regContent.includes(n), `Integration registry missing ${n}`);
+});
+
+test('CLI integrations list and matrix include readonly source and matrix rows', () => {
+  const cliContent = fs.readFileSync('E:\\AIP\\apps\\aip-cli\\src\\commands\\integrations.ts', 'utf8');
+  assert.ok(cliContent.includes('readonly static/example registry'), 'CLI integrations missing readonly source note');
+  assert.ok(cliContent.includes('Integration count:'), 'CLI integrations missing count');
+  assert.ok(cliContent.includes('aip integrations matrix'), 'CLI integrations missing matrix subcommand');
+  assert.ok(cliContent.includes('Integration ↔ Provider Handshake Matrix'), 'CLI integrations missing matrix output');
+});
