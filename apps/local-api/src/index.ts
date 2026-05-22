@@ -611,7 +611,9 @@ app.get('/api/openclaw/master-switch', async (request: any, reply: any) => {
   return {
     ok: true,
     enabled: state.enabled,
-    message: state.enabled ? 'OpenClaw 执行层已开启' : 'OpenClaw 执行层已关闭',
+    gateOpen: false,
+    stageCEnabled: false,
+    message: 'Gate CLOSED — Stage C disabled, master-switch POST returns 403',
     token_configured: openClawHeartbeatConfigured(),
     switch: {
       enabled: state.enabled,

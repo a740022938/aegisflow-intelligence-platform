@@ -41,6 +41,7 @@ type Snapshot = {
   apiVersion: string;
   db: string;
   openclawEnabled: boolean;
+  openclawGateOpen: boolean;
   openclawOnline: string;
   openclawCircuit: string;
   pluginsTotal: number;
@@ -183,11 +184,13 @@ export default function ModuleCenter() {
       const policies = Array.isArray(routes?.items) ? routes.items : Array.isArray(routes?.policies) ? routes.policies : [];
       const auditRecent = Array.isArray(audits?.data) ? audits.data : [];
 
+      const ocGateOpen = !!oc?.gateOpen;
       setSnapshot({
         healthOk: !!health?.ok,
         apiVersion: String(health?.version || '—'),
         db: formatDbStatus(health?.database),
-        openclawEnabled: !!oc?.switch?.enabled || !!oc?.enabled,
+        openclawEnabled: (!!oc?.switch?.enabled || !!oc?.enabled) && ocGateOpen,
+        openclawGateOpen: ocGateOpen,
         openclawOnline: String(oc?.status?.online_status || oc?.online_status || 'offline'),
         openclawCircuit: String(oc?.status?.circuit_status || oc?.circuit_state || 'unknown'),
         pluginsTotal: plugins.length,
@@ -235,7 +238,7 @@ export default function ModuleCenter() {
   }, [layouts, layoutEdit, canUseLayoutEditor]);
 
   const toggleOpenClaw = useCallback(async () => {
-    if (!snapshot) return;
+    if (!snapshot || !snapshot.openclawGateOpen) return;
     const next = !snapshot.openclawEnabled;
     setBusyKey('openclaw');
     try {
@@ -336,7 +339,7 @@ export default function ModuleCenter() {
         name: 'OpenClaw执行层',
         status: openclawStatus,
         score: statusScore(openclawStatus),
-        summary: `${snapshot.openclawEnabled ? '总闸开启' : '总闸关闭'} · ${snapshot.openclawOnline}`,
+        summary: `${!snapshot.openclawGateOpen ? 'Gate CLOSED' : snapshot.openclawEnabled ? '总闸开启' : '总闸关闭'} · ${snapshot.openclawOnline}`,
         detail: `熔断状态: ${snapshot.openclawCircuit}`,
       },
       {
@@ -472,8 +475,8 @@ export default function ModuleCenter() {
       content: (
         <SectionCard title="模块操作" description="常用维护动作" bodyClassName="module-section-body module-section-body-actions">
           <div className="module-actions">
-            <button className={`ui-btn ui-btn-sm ${snapshot?.openclawEnabled ? 'ui-btn-outline' : 'ui-btn-success'}`} onClick={toggleOpenClaw} disabled={busyKey === 'openclaw' || authState !== 'authorized'} title={authState !== 'authorized' ? '请先完成授权验证' : ''}>
-              {busyKey === 'openclaw' ? '处理中...' : snapshot?.openclawEnabled ? '关闭 OpenClaw 总闸' : '开启 OpenClaw 总闸'}
+            <button className={`ui-btn ui-btn-sm ${snapshot?.openclawEnabled ? 'ui-btn-outline' : 'ui-btn-success'}`} onClick={toggleOpenClaw} disabled={busyKey === 'openclaw' || authState !== 'authorized' || !snapshot?.openclawGateOpen} title={!snapshot?.openclawGateOpen ? 'Gate CLOSED — Stage C disabled, master-switch POST blocked' : authState !== 'authorized' ? '请先完成授权验证' : ''}>
+              {busyKey === 'openclaw' ? '处理中...' : !snapshot?.openclawGateOpen ? 'Gate CLOSED' : snapshot?.openclawEnabled ? '关闭 OpenClaw 总闸' : '开启 OpenClaw 总闸'}
             </button>
             <button className="ui-btn ui-btn-outline ui-btn-sm" onClick={reconcileWorkflow} disabled={busyKey === 'workflow-reconcile'}>
               {busyKey === 'workflow-reconcile' ? '处理中...' : '修复僵尸工作流'}
@@ -592,7 +595,7 @@ export default function ModuleCenter() {
                     : '已授权，但总闸仍保持关闭。开启前需要二次确认。'}
             </div>
             <div style={{ marginTop: 4, opacity: 0.7 }}>
-              {snapshot?.openclawEnabled ? '总闸状态: 已开启' : '总闸状态: 已关闭'}
+              {!snapshot?.openclawGateOpen ? '总闸状态: Gate CLOSED (Stage C disabled)' : snapshot?.openclawEnabled ? '总闸状态: 已开启' : '总闸状态: 已关闭'}
             </div>
           </div>
         </SectionCard>

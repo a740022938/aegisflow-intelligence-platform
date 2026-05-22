@@ -27,6 +27,8 @@ type OpenClawSwitchResponse = {
   ok: boolean;
   token_configured?: boolean;
   message?: string;
+  gateOpen?: boolean;
+  stageCEnabled?: boolean;
   switch?: {
     enabled: boolean;
     status_text: string;
@@ -182,11 +184,17 @@ export default function Dashboard() {
   const s = summary || {};
   const ocSwitch = openclaw?.switch;
   const ocStatus = openclaw?.status;
-  const openclawEnabled = !!(openclaw as any)?.enabled || !!ocSwitch?.enabled;
+  const legacyEnabled = !!(openclaw as any)?.enabled || !!ocSwitch?.enabled;
+  const gateOpen = !!(openclaw as any)?.gateOpen;
+  const stageCEnabled = !!(openclaw as any)?.stageCEnabled;
+  const openclawEnabled = legacyEnabled && gateOpen;
   const displayVersion = apiVersion || APP_VERSION;
 
   const toggleOpenClawSwitch = async () => {
-    if (!ocSwitch || switchBusy) return;
+    if (!gateOpen || !ocSwitch || switchBusy) {
+      if (!gateOpen) window.alert('Gate CLOSED — Stage C disabled, master-switch POST is blocked.');
+      return;
+    }
     const nextEnabled = !ocSwitch.enabled;
     setSwitchBusy(true);
     try {
@@ -239,25 +247,28 @@ export default function Dashboard() {
       {
         id: 'openclaw',
         content: (
-          <div className={`dash-openclaw-card role-card ${roleClass(openclawEnabled ? 'exec' : 'risk')} ${openclawEnabled ? 'enabled' : 'disabled'}`}>
+          <div className={`dash-openclaw-card role-card ${roleClass('risk')} ${gateOpen ? (openclawEnabled ? 'enabled' : 'disabled') : 'disabled'}`}>
             <div className="dash-openclaw-header">
               <div>
                 <div className="dash-openclaw-title role-title">OpenClaw 总闸</div>
                 <div className="dash-openclaw-subtitle">
-                  {openclawEnabled ? '开启' : '关闭'} · {openclaw?.message || '执行层状态'}
+                  {gateOpen ? (openclawEnabled ? '开启' : '关闭') : 'Gate CLOSED'} · 已授权 ≠ Gate opened · Stage C disabled
                 </div>
               </div>
               <button
                 type="button"
-                className={`dash-openclaw-switch ${openclawEnabled ? 'on' : 'off'} ${switchBusy ? 'busy' : ''}`}
+                className={`dash-openclaw-switch ${gateOpen && openclawEnabled ? 'on' : 'off'} ${switchBusy ? 'busy' : ''}`}
                 onClick={toggleOpenClawSwitch}
-                disabled={switchBusy}
+                disabled={!gateOpen || switchBusy}
                 aria-label="OpenClaw 总闸"
               >
                 <span className="dash-openclaw-switch-knob" />
               </button>
             </div>
-            {!openclawEnabled && (
+            {!gateOpen && (
+              <div className="dash-openclaw-banner">Gate CLOSED — Stage C disabled, execution disabled, master-switch POST blocked</div>
+            )}
+            {gateOpen && !openclawEnabled && (
               <div className="dash-openclaw-banner">OpenClaw 执行层已关闭</div>
             )}
             {openclaw && openclaw.token_configured === false && (
@@ -624,7 +635,7 @@ export default function Dashboard() {
       },
     ];
     return cardList;
-  }, [s, activities, plugins, lang, t, td, openclaw, openclawEnabled, ocStatus, switchBusy, toggleOpenClawSwitch, navigate, isActive, pluginStats]);
+  }, [s, activities, plugins, lang, t, td, openclaw, openclawEnabled, gateOpen, stageCEnabled, ocStatus, switchBusy, toggleOpenClawSwitch, navigate, isActive, pluginStats]);
 
   return (
     <PageShell
