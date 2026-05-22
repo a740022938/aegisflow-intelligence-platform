@@ -1,7 +1,7 @@
 // OpenAIP v8 Center Registry — shared static data layer
 // READONLY METADATA ONLY. Does not call real APIs, write to databases, or execute.
 
-export type V8Lifecycle = 'registered' | 'enabled' | 'paused' | 'disabled' | 'quarantined' | 'draft' | 'running' | 'stopped' | 'error';
+export type V8Lifecycle = 'planned' | 'registered' | 'enabled' | 'paused' | 'disabled' | 'quarantined' | 'draft' | 'running' | 'stopped' | 'error';
 export type V8PermissionLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
 export type V8RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 export type V8DataSource = 'static_registry' | 'example_json' | 'future_integration';
@@ -28,6 +28,13 @@ export interface V8AgentEntry extends V8RegistryTruthFields, V8BaseEntry {
   integrationKind: string;
   lifecycle: V8Lifecycle;
   permissionLevel: V8PermissionLevel;
+  status?: string;
+  capabilities?: string[];
+  risk?: V8RiskLevel;
+  taskReadiness?: 'ready' | 'partial' | 'not_ready';
+  auditReadiness?: 'ready' | 'partial' | 'not_ready';
+  memoryAccess?: 'readonly' | 'scoped_write' | 'none';
+  knowledgeAccess?: 'readonly' | 'none';
 }
 
 export interface V8ProviderEntry extends V8RegistryTruthFields, V8BaseEntry {
@@ -110,9 +117,66 @@ export interface V8ConnectorMigrationEntry {
 // ── Agents Registry ──
 // OpenClaw: agent + runtime gateway integration, optional but first-class
 export const V8_AGENTS: V8AgentEntry[] = [
-  { id: 'agent.openclaw', name: 'OpenClaw', kind: 'agent', integrationKind: 'runtime_service', lifecycle: 'enabled', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Agent registered does not mean execution allowed.', blockedActions: ['agent execution', 'lifecycle mutation', 'permission level changes', 'agent launch/stop'] },
-  { id: 'agent.codex', name: 'Codex', kind: 'agent', integrationKind: 'coding_agent', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Authorized != gateOpen. Gate remains CLOSED.', blockedActions: ['agent execution', 'lifecycle mutation'] },
-  { id: 'agent.future', name: 'Future Agent', kind: 'agent', integrationKind: 'pending', lifecycle: 'disabled', permissionLevel: 'L0', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Placeholder entry. No operations available.', blockedActions: ['all agent operations'], futurePhase: 'Agent registration and lifecycle UI' },
+  {
+    id: 'agent.openclaw', name: 'OpenClaw', kind: 'agent', integrationKind: 'runtime_service',
+    lifecycle: 'enabled', permissionLevel: 'L2', status: 'online — no execution',
+    configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false,
+    dataSource: 'static_registry', risk: 'high',
+    safetyNote: 'Agent registered does not mean execution allowed. OpenClaw is optional but first-class.',
+    blockedActions: ['agent execution', 'browser control', 'connector action', 'lifecycle mutation', 'permission level changes', 'agent launch/stop'],
+    capabilities: ['runtime_observation', 'gateway_status', 'agent_registry_read'],
+    taskReadiness: 'partial', auditReadiness: 'ready',
+    memoryAccess: 'readonly', knowledgeAccess: 'readonly',
+    futurePhase: 'Agent health dashboard, task-agent binding, gated execution'
+  },
+  {
+    id: 'agent.claude-code', name: 'Claude Code', kind: 'agent', integrationKind: 'coding_agent',
+    lifecycle: 'registered', permissionLevel: 'L3', status: 'registered — not executing',
+    configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false,
+    dataSource: 'static_registry', risk: 'high',
+    safetyNote: 'Authorized != gateOpen. Gate remains CLOSED. Claude Code is a coding agent, not a runtime executor.',
+    blockedActions: ['agent execution', 'code push', 'release/tag', 'Gate operations', 'lifecycle mutation'],
+    capabilities: ['read_repo', 'draft_patch', 'run_tests', 'code_generation', 'test_generation', 'review'],
+    taskReadiness: 'partial', auditReadiness: 'partial',
+    memoryAccess: 'readonly', knowledgeAccess: 'readonly',
+    futurePhase: 'Task-agent binding, code review integration, permission escalation flow'
+  },
+  {
+    id: 'agent.codex', name: 'Codex', kind: 'agent', integrationKind: 'coding_agent',
+    lifecycle: 'registered', permissionLevel: 'L3', status: 'registered — not executing',
+    configured: true, online: true, authorized: true, gateOpen: false, stageCEnabled: false,
+    dataSource: 'static_registry', risk: 'medium',
+    safetyNote: 'Authorized != gateOpen. Gate remains CLOSED. Codex is a coding agent.',
+    blockedActions: ['agent execution', 'code push', 'release/tag', 'lifecycle mutation'],
+    capabilities: ['code_generation', 'test_generation', 'review'],
+    taskReadiness: 'partial', auditReadiness: 'partial',
+    memoryAccess: 'readonly', knowledgeAccess: 'readonly',
+    futurePhase: 'Code review integration, task-agent binding'
+  },
+  {
+    id: 'agent.reviewer', name: 'Reviewer Agent', kind: 'agent', integrationKind: 'reviewer_agent',
+    lifecycle: 'planned', permissionLevel: 'L2', status: 'planned — not yet registered',
+    configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false,
+    dataSource: 'static_registry', risk: 'low',
+    safetyNote: 'Reviewer Agent is planned. No operations available.',
+    blockedActions: ['all agent operations'],
+    capabilities: ['receipt_review', 'safety_check', 'diff_review'],
+    taskReadiness: 'not_ready', auditReadiness: 'partial',
+    memoryAccess: 'none', knowledgeAccess: 'readonly',
+    futurePhase: 'Reviewer agent registration and capability activation'
+  },
+  {
+    id: 'agent.future', name: 'Future Agent', kind: 'agent', integrationKind: 'unknown',
+    lifecycle: 'disabled', permissionLevel: 'L0', status: 'disabled — placeholder',
+    configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false,
+    dataSource: 'static_registry', risk: 'low',
+    safetyNote: 'Placeholder entry. No operations available.',
+    blockedActions: ['all agent operations'],
+    capabilities: [],
+    taskReadiness: 'not_ready', auditReadiness: 'not_ready',
+    memoryAccess: 'none', knowledgeAccess: 'none',
+    futurePhase: 'Agent registration and lifecycle UI'
+  },
 ];
 
 // ── Providers Registry ──
@@ -211,7 +275,33 @@ export const V8_CONNECTOR_MIGRATIONS: V8ConnectorMigrationEntry[] = [
 
 export function getV8AgentCenterSummary() {
   const all = V8_AGENTS;
-  return { total: all.length, enabled: all.filter(a => a.lifecycle === 'enabled').length, registered: all.filter(a => a.lifecycle === 'registered').length, disabled: all.filter(a => a.lifecycle === 'disabled').length, configured: all.filter(a => a.configured).length, online: all.filter(a => a.online).length, authorized: all.filter(a => a.authorized).length, gateOpen: all.filter(a => a.gateOpen).length };
+  return {
+    total: all.length,
+    enabled: all.filter(a => a.lifecycle === 'enabled').length,
+    registered: all.filter(a => a.lifecycle === 'registered').length,
+    planned: all.filter(a => a.lifecycle === 'planned').length,
+    disabled: all.filter(a => a.lifecycle === 'disabled').length,
+    configured: all.filter(a => a.configured).length,
+    online: all.filter(a => a.online).length,
+    authorized: all.filter(a => a.authorized).length,
+    gateOpen: all.filter(a => a.gateOpen).length,
+    executionBlocked: all.filter(a => a.lifecycle !== 'disabled').length,
+    riskHigh: all.filter(a => a.risk === 'high').length,
+    riskMedium: all.filter(a => a.risk === 'medium').length,
+    riskLow: all.filter(a => a.risk === 'low').length,
+    l0: all.filter(a => a.permissionLevel === 'L0').length,
+    l1: all.filter(a => a.permissionLevel === 'L1').length,
+    l2: all.filter(a => a.permissionLevel === 'L2').length,
+    l3: all.filter(a => a.permissionLevel === 'L3').length,
+    l4: all.filter(a => a.permissionLevel === 'L4').length,
+    l5: all.filter(a => a.permissionLevel === 'L5').length,
+    taskReady: all.filter(a => a.taskReadiness === 'ready').length,
+    taskPartial: all.filter(a => a.taskReadiness === 'partial').length,
+    taskNotReady: all.filter(a => a.taskReadiness === 'not_ready').length,
+    auditReady: all.filter(a => a.auditReadiness === 'ready').length,
+    auditPartial: all.filter(a => a.auditReadiness === 'partial').length,
+    auditNotReady: all.filter(a => a.auditReadiness === 'not_ready').length,
+  };
 }
 
 export function getV8ProviderSummary() {
