@@ -731,7 +731,13 @@ app.post('/api/openclaw/auth/check', async (request: any, reply: any) => {
   if (!valid) {
     return { ok: true, valid: false, configured: true, error: 'Token 验证失败' };
   }
-  return { ok: true, valid: true, configured: true };
+  const accessToken = await reply.jwtSign({
+    sub: 'openclaw_token_user',
+    username: 'openclaw_token_user',
+    role: 'viewer',
+    display_name: 'OpenClaw Token User',
+  }, { expiresIn: '1h' });
+  return { ok: true, valid: true, configured: true, access_token: accessToken };
 });
 
 app.post('/api/openclaw/circuit/recover', async (request: any, reply: any) => {

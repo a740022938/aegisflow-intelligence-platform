@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { setJwt, clearJwt } from '../services/authStore';
 
 export type AuthState = 'unknown' | 'unauthenticated' | 'validating' | 'authorized' | 'invalid' | 'expired' | 'timeout' | 'network_error' | 'openclaw_unreachable';
 
@@ -53,17 +54,26 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>(defaultStatus);
+  const prevJwtRef = useRef<JwtStatus>(defaultStatus.jwt);
 
   const refreshStatus = useCallback(async () => {
     try {
       const r = await fetch('/api/auth/status');
       const d = await r.json().catch(() => null);
+      if (d?._unauthorized) {
+        clearJwt();
+        setStatus(prev => ({ ...prev, state: 'unauthenticated', jwt: { ...prev.jwt, authenticated: false }, verifiedToken: false }));
+        return;
+      }
       if (!d?.ok) return;
+      const nextJwt = d.jwt || prevJwtRef.current;
+      prevJwtRef.current = nextJwt;
       setStatus(prev => ({
         ...prev,
-        jwt: d.jwt || prev.jwt,
+        jwt: nextJwt,
         openclaw: d.openclaw || prev.openclaw,
         lastVerified: Date.now(),
+        ...(nextJwt.authenticated ? { state: 'authorized' as const, verifiedToken: true } : {}),
       }));
       if (d.openclaw) {
         setStatus(prev => {
@@ -79,7 +89,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     refreshStatus();
     const t = setInterval(refreshStatus, 300000);
-    return () => clearInterval(t);
+    const onJwtExpired = () => {
+      prevJwtRef.current = { authenticated: false, username: null, role: null };
+      setStatus(prev => ({ ...prev, state: 'unauthenticated', verifiedToken: false, jwt: { authenticated: false, username: null, role: null } }));
+    };
+    window.addEventListener('auth:jwt-expired', onJwtExpired);
+    return () => {
+      clearInterval(t);
+      window.removeEventListener('auth:jwt-expired', onJwtExpired);
+    };
   }, [refreshStatus]);
 
   const verifyTokenAbortRef = React.useRef<AbortController | null>(null);
@@ -101,11 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(timeout);
       const d = await r.json().catch(() => null);
       if (d?.ok && d?.valid) {
+        if (d.access_token) setJwt(d.access_token);
         await refreshStatus();
-        setStatus(prev => ({ ...prev, state: 'authorized', verifiedToken: true }));
+        setStatus(prev => ({ ...prev, state: 'authorized', verifiedToken: true, jwt: { ...prev.jwt, authenticated: true } }));
         return true;
       }
-      const configured = d?.configured;
       setStatus(prev => ({
         ...prev,
         state: d?.error?.includes('未配置') ? 'unauthenticated' : 'invalid',
@@ -124,7 +142,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (verifyTokenAbortRef.current === controller) {
         verifyTokenAbortRef.current = null;
       }
-      setStatus(prev => prev.state === 'validating' ? { ...prev, state: 'timeout', verifiedToken: false } : prev);
     }
   }, [refreshStatus]);
 
@@ -135,10 +152,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearToken = useCallback(() => {
     abortVerify();
+    clearJwt();
+    prevJwtRef.current = { authenticated: false, username: null, role: null };
     setStatus(prev => ({
       ...prev,
       state: 'unauthenticated',
       verifiedToken: false,
+      jwt: { authenticated: false, username: null, role: null },
     }));
   }, [abortVerify]);
 

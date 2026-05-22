@@ -173,8 +173,13 @@ export default function PluginPool() {
       const r = await fetch('/api/plugins/registry', { signal: controller.signal });
       const d = await r.json().catch(() => ({}));
       if (d?._unauthorized) {
+        if (!auth.status.jwt.authenticated) {
+          setItems([]);
+          setLoadError('需要有效会话凭证才能加载插件池数据。请先完成授权验证。');
+          return;
+        }
         setItems([]);
-        setLoadError('API requires authentication token. Configure OPENCLAW tokens or JWT.');
+        setLoadError('会话凭证已过期，请重新授权。');
         return;
       }
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -183,13 +188,13 @@ export default function PluginPool() {
       }
       setItems(Array.isArray(d?.items) ? d.items : []);
     } catch (err: any) {
-      setLoadError(err?.name === 'AbortError' ? 'Request timeout' : `Load failed: ${String(err?.message || err)}`);
+      setLoadError(err?.name === 'AbortError' ? '请求超时，请检查网络后重试' : `加载失败: ${String(err?.message || err)}`);
       setItems([]);
     } finally {
       clearTimeout(timer);
       setLoading(false);
     }
-  }, []);
+  }, [auth.status.jwt.authenticated]);
 
   useEffect(() => { fetchPool(); }, [fetchPool]);
 
@@ -437,24 +442,36 @@ export default function PluginPool() {
     },
   ], [stats, trialItems, enabledItems, frozenItems, plannedItems, capabilityStats, riskStats, q, loading, busyId, selected, togglePlugin, fetchPool]);
 
+  const authState = auth.status.state;
+  const hasJwt = auth.status.jwt.authenticated;
+
+  // Auto-retry fetchPool when token verification succeeds and JWT is available
+  useEffect(() => {
+    if (tokenVerified && hasJwt && loadError) {
+      fetchPool();
+    }
+  }, [tokenVerified, hasJwt]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (loadError && items.length === 0) {
     return (
       <div className="page-root" style={{ padding: 40 }}>
         <EmptyState icon="!" title="Plugin Pool" description={loadError} />
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
-          <button className="ui-btn ui-btn-primary" onClick={fetchPool}>Retry</button>
+          <button className="ui-btn ui-btn-primary" onClick={fetchPool} disabled={loading}>
+            {loading ? '加载中...' : '重试'}
+          </button>
         </div>
-        {loadError.includes('authentication') && (
+        {loadError.includes('凭证') && !hasJwt && (
           <div style={{ maxWidth: 500, margin: '20px auto 0' }}>
             <SectionCard title="授权验证">
               <div style={{ marginBottom: 12, fontSize: 13, color: 'var(--text-secondary)' }}>
-                插件池需要授权后查看。请输入 OpenClaw Token 进行当前会话验证。验证不会自动开启执行总闸。
+                请输入 OpenClaw Token 进行当前会话验证。验证通过后将自动加载数据。验证不会自动开启执行总闸。
               </div>
               <TokenInput onVerifiedChange={setTokenVerified} />
-              {tokenVerified && (
+              {tokenVerified && hasJwt && (
                 <div style={{ marginTop: 12 }}>
-                  <button className="ui-btn ui-btn-primary ui-btn-sm" onClick={fetchPool}>
-                    重新加载插件池
+                  <button className="ui-btn ui-btn-primary ui-btn-sm" onClick={fetchPool} disabled={loading}>
+                    {loading ? '加载中...' : '重新加载插件池'}
                   </button>
                 </div>
               )}

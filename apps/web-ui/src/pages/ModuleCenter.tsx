@@ -137,8 +137,10 @@ export default function ModuleCenter() {
   const [busyKey, setBusyKey] = useState('');
   const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({ health: true, openclaw: true, pool: true, jobs: true, routes: true, audit: true, summary: true });
   const [unauthorized, setUnauthorized] = useState(false);
+  const [tokenVerified, setTokenVerified] = useState(false);
   const auth = useAuth();
   const authState = auth.status.state;
+  const hasJwt = auth.status.jwt.authenticated;
   const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
   const [layouts, setLayouts] = useState<LayoutConfig>(() => loadLayout(LAYOUT_KEY) || DEFAULT_LAYOUTS);
 
@@ -220,6 +222,13 @@ export default function ModuleCenter() {
     const t = setInterval(refresh, 30000);
     return () => clearInterval(t);
   }, [refresh]);
+
+  // Auto-refresh when token verification succeeds
+  useEffect(() => {
+    if (tokenVerified && hasJwt) {
+      refresh();
+    }
+  }, [tokenVerified, hasJwt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (layoutEdit && canUseLayoutEditor) saveLayout(LAYOUT_KEY, layouts);
@@ -568,9 +577,9 @@ export default function ModuleCenter() {
       {unauthorized && (
         <SectionCard title="身份认证" style={{ marginBottom: 16 }}>
           <div style={{ marginBottom: 12, fontSize: 13, color: 'var(--text-secondary)' }}>
-            部分数据未返回，请输入 Token 进行当前会话验证。以下可能显示缓存/默认值。
+            部分数据需要会话凭证。请输入 Token 进行授权验证，验证通过后将自动刷新数据。
           </div>
-          <TokenInput />
+          <TokenInput onVerifiedChange={setTokenVerified} />
           <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 8, background: '#fefce8', border: '1px solid #fde68a', fontSize: 12 }}>
             <div style={{ fontWeight: 700, color: '#92400e', marginBottom: 4 }}>OpenClaw 总闸状态</div>
             <div style={{ color: '#78350f' }}>

@@ -30,13 +30,12 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
     setVerifying(true);
 
     verifyHardTimeoutRef.current = setTimeout(() => {
-      abortVerify();
       if (verifyHardTimeoutRef.current) {
         clearTimeout(verifyHardTimeoutRef.current);
         verifyHardTimeoutRef.current = null;
       }
       if (mountedRef.current) setVerifying(false);
-    }, 9000);
+    }, 15000);
 
     try {
       const ok = await verifyToken(token.trim());
@@ -93,7 +92,7 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
       case 'validating':
         return '正在验证 Token…';
       case 'authorized':
-        return '授权有效。执行总闸仍保持关闭。';
+        return '授权有效，会话凭证已就绪。执行总闸仍保持关闭，不影响插件数据加载。';
       case 'invalid':
       case 'expired':
         return 'Token 无效或已过期，请重新输入。';
@@ -170,7 +169,7 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
         </div>
       )}
       <div style={{ marginTop: 4, fontSize: 11, color: 'var(--text-muted)' }}>
-        Token 只用于当前会话验证，不会自动打开执行总闸。
+        Token 只用于当前会话验证，不会自动打开执行总闸。如页面状态与预期不符，请尝试 Ctrl+F5 硬刷新。
       </div>
     </div>
   );

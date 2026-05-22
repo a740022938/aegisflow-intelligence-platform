@@ -118,15 +118,15 @@ if (checkEndpoint) {
       const trimmed = line.trim();
       if ((trimmed.startsWith('"token"') || trimmed.startsWith("'token'") || trimmed.startsWith('token:')) &&
           !trimmed.includes('heartbeat_token') && !trimmed.includes('configuredToken') &&
-          !trimmed.includes('expectedToken') && !trimmed.includes('providedAdminToken')) {
-        // response body containing token value — should not echo
+          !trimmed.includes('expectedToken') && !trimmed.includes('providedAdminToken') &&
+          !trimmed.includes('access_token')) {
         failures.push(`Backend auth check: response may echo token: ${trimmed.substring(0, 60)}`);
       }
     }
   }
 }
 
-// ===== NEW P2 checks for timeout hotfix =====
+// ===== P2 checks for timeout hotfix =====
 
 // 15. AbortController present in verifyToken
 if (!useAuthContent.includes('AbortController')) {
@@ -177,45 +177,129 @@ if (!tokenInput.includes('mountedRef')) {
 if (tokenInput.includes("disabled={state === 'unauthenticated' || state === 'unknown'}")) {
   failures.push('TokenInput: clear button must not be disabled based on old condition');
 }
-// 26. POST /api/openclaw/master-switch still returns 403
+
+// 25. POST /api/openclaw/master-switch still returns 403
 if (!apiIndex.includes('Stage C is not enabled')) {
   failures.push('Backend: master-switch POST must still return 403');
 }
 
-// ===== NEW P3 checks: hard timeout safety net =====
+// ===== P3 checks: hard timeout safety net =====
 
-// 27. TokenInput has hard timeout ref (verifyHardTimeoutRef)
+// 26. TokenInput has hard timeout ref (verifyHardTimeoutRef)
 if (!tokenInput.includes('verifyHardTimeoutRef')) {
   failures.push('TokenInput: must have verifyHardTimeoutRef for hard timeout safety net');
 }
 
-// 28. TokenInput hard timeout is 9000ms
-if (!tokenInput.includes('9000')) {
-  failures.push('TokenInput: hard timeout must be 9000ms');
-}
-
-// 29. TokenInput handleClear sets verifying to false directly
+// 27. TokenInput handleClear sets verifying to false directly
 if (!tokenInput.includes('setVerifying(false)')) {
   failures.push('TokenInput: handleClear must force setVerifying(false)');
 }
 
-// 30. TokenInput handleClear cancels hard timeout ref
+// 28. TokenInput handleClear cancels hard timeout ref
 if (!tokenInput.includes('verifyHardTimeoutRef.current = null')) {
   failures.push('TokenInput: handleClear must clear verifyHardTimeoutRef');
 }
 
-// 31. useAuth verifyToken finally force-exits "validating" state
-if (!useAuthContent.includes(`prev.state === 'validating'`)) {
-  failures.push('useAuth: verifyToken finally must force-exit validating state');
+// ===== P1 v7.66 new checks: JWT integration =====
+
+// 29. Backend issues access_token on successful token verification
+if (!apiIndex.includes('access_token')) {
+  failures.push('Backend: auth/check must return access_token on success');
+}
+
+// 30. Backend issues JWT via jwtSign
+if (!apiIndex.includes('jwtSign')) {
+  failures.push('Backend: auth/check must call jwtSign to issue JWT');
+}
+
+// 31. useAuth stores JWT via setJwt
+if (!useAuthContent.includes('setJwt(')) {
+  failures.push('useAuth: must call setJwt to store JWT');
+}
+
+// 32. authStore module exists with getJwt / setJwt / clearJwt
+const authStore = readFileSync('apps/web-ui/src/services/authStore.ts', 'utf8');
+if (!authStore.includes('export function setJwt')) {
+  failures.push('authStore: must export setJwt');
+}
+if (!authStore.includes('export function getJwt')) {
+  failures.push('authStore: must export getJwt');
+}
+if (!authStore.includes('export function clearJwt')) {
+  failures.push('authStore: must export clearJwt');
+}
+
+// 33. authStore does not use localStorage or sessionStorage
+if (authStore.includes('localStorage') || authStore.includes('sessionStorage')) {
+  failures.push('authStore: must not use localStorage or sessionStorage');
+}
+
+// 34. Fetch interceptor attaches JWT from authStore
+const indexContent = readFileSync('apps/web-ui/src/index.tsx', 'utf8');
+if (!indexContent.includes("getJwt")) {
+  failures.push('index.tsx: fetch interceptor must read JWT from authStore');
+}
+
+// 35. Fetch interceptor dispatches auth:jwt-expired event on 401 with JWT
+if (!indexContent.includes('auth:jwt-expired')) {
+  failures.push('index.tsx: fetch interceptor must dispatch auth:jwt-expired on 401');
+}
+
+// 36. useAuth listens for auth:jwt-expired event
+if (!useAuthContent.includes('auth:jwt-expired')) {
+  failures.push('useAuth: must listen for auth:jwt-expired event');
+}
+
+// 37. TokenInput uses 15000ms hard timeout (was 9000ms)
+if (!tokenInput.includes('15000')) {
+  failures.push('TokenInput: hard timeout must be 15000ms (was 9000ms, increased to separate from 8s AbortController)');
+}
+
+// 38. TokenInput hard timeout no longer calls abortVerify
+if (tokenInput.includes('abortVerify()') && tokenInput.includes('setTimeout')) {
+  const lines = tokenInput.split('\n');
+  let inHardTimeout = false;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes('verifyHardTimeoutRef.current = setTimeout')) inHardTimeout = true;
+    if (inHardTimeout && lines[i].includes(');')) inHardTimeout = false;
+    if (inHardTimeout && lines[i].includes('abortVerify')) {
+      failures.push('TokenInput: hard timeout must not call abortVerify');
+    }
+  }
+}
+
+// 39. PluginPool auto-retries on token verification success
+if (!pluginPool.includes('tokenVerified && hasJwt')) {
+  failures.push('PluginPool: must auto-retry fetchPool when tokenVerified && hasJwt');
+}
+
+// 40. ModuleCenter auto-refreshes on token verification success
+if (!moduleCenter.includes('tokenVerified && hasJwt')) {
+  failures.push('ModuleCenter: must auto-refresh when tokenVerified && hasJwt');
+}
+
+// 41. TokenInput has stale frontend hint (Ctrl+F5)
+if (!tokenInput.includes('Ctrl+F5')) {
+  failures.push('TokenInput: must include stale frontend hint (Ctrl+F5)');
+}
+
+// 42. useAuth verifyToken finally no longer force-overwrites state
+if (useAuthContent.includes(`prev.state === 'validating'`)) {
+  failures.push('useAuth: verifyToken finally must no longer force-overwrite validating state');
+}
+
+// 43. clearToken clears JWT
+if (!useAuthContent.includes('clearJwt()')) {
+  failures.push('useAuth: clearToken must call clearJwt');
 }
 
 if (failures.length) {
-  console.error('FAIL v7.65-P2 auth UX timeout hotfix tests:');
+  console.error('FAIL v7.66-P1 auth truth alignment tests:');
   for (const f of failures) console.error(`  - ${f}`);
   process.exit(1);
 }
 
-console.log('PASS v7.65-P3 auth UX live hang hotfix tests');
+console.log('PASS v7.66-P1 auth truth alignment tests');
 console.log(`  ${failures.length} failures`);
 console.log('  Token input masked: ✅');
 console.log('  No localStorage token: ✅');
@@ -242,7 +326,20 @@ console.log('  TokenInput mountedRef guard: ✅');
 console.log('  Clear button not stuck: ✅');
 console.log('  Master-switch still 403: ✅');
 console.log('  Hard timeout ref present: ✅');
-console.log('  9000ms hard timeout: ✅');
 console.log('  handleClear forces setVerifying(false): ✅');
 console.log('  handleClear cancels hard timeout: ✅');
-console.log('  verifyToken finally force-exits validating: ✅');
+console.log('  Backend issues access_token: ✅');
+console.log('  Backend calls jwtSign: ✅');
+console.log('  useAuth stores JWT via setJwt: ✅');
+console.log('  authStore module complete: ✅');
+console.log('  authStore no localStorage: ✅');
+console.log('  Fetch interceptor reads JWT: ✅');
+console.log('  Fetch interceptor dispatches jwt-expired: ✅');
+console.log('  useAuth listens for jwt-expired: ✅');
+console.log('  Hard timeout 15000ms: ✅');
+console.log('  Hard timeout no abortVerify: ✅');
+console.log('  PluginPool auto-retry: ✅');
+console.log('  ModuleCenter auto-refresh: ✅');
+console.log('  Ctrl+F5 stale frontend hint: ✅');
+console.log('  verifyToken finally no overwrite: ✅');
+console.log('  clearToken clears JWT: ✅');
