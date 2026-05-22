@@ -1,9 +1,9 @@
 # OPENAIP v8 Integration Center Readonly MVP Receipt
 
 - verdict: OPENAIP_V8_INTEGRATION_CENTER_READONLY_MVP_READY_WITH_GATE_CLOSED
-- commit hash: PENDING
-- pushed: PENDING
-- working tree clean: PENDING
+- commit hash: 6ed111b
+- pushed: yes
+- working tree clean: yes
 - files changed: 7
 - integration entries: 8
 - handshake matrix rows: 6
@@ -22,3 +22,4 @@
 - external calls made: no
 - human authorization needed: no
 - recommended next step: Local Apps Center readonly MVP with Integration/Provider handshake consumption checks (still no runtime action)
+
