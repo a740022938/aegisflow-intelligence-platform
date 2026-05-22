@@ -68,15 +68,36 @@ export interface V8LocalAppEntry extends V8RegistryTruthFields, V8BaseEntry {
 
 export interface V8CapabilityEntry extends V8BaseEntry {
   id: string;
+  name: string;
+  category: string;
   kind: string;
   risk: V8RiskLevel;
   permissionLevel: V8PermissionLevel;
-  requiresGate?: boolean;
-  requiresStageC?: boolean;
+  approvalRequired: boolean;
+  gateRequired: boolean;
+  stageCRequired: boolean;
+  auditRequired: boolean;
+  allowedInPreview: boolean;
+  blockedReason?: string;
+  defaultPolicy: string;
+  examples: string[];
+  relatedCenters: string[];
 }
 
 export interface V8PolicyEntry extends V8BaseEntry {
   id: string;
+  name: string;
+  permissionLevel: V8PermissionLevel;
+  scope: string;
+  allowedCapabilities: string[];
+  blockedCapabilities: string[];
+  approvalRequired: boolean;
+  gateRequired: boolean;
+  stageCRequired: boolean;
+  auditRequired: boolean;
+  defaultState: string;
+  appliesTo: string[];
+  enforcementPhase: string;
   gateOpen: boolean;
   stageCEnabled: boolean;
   rule: string;
@@ -249,21 +270,163 @@ export const V8_LOCAL_APPS: V8LocalAppEntry[] = [
 
 // ── Capabilities Registry ──
 export const V8_CAPABILITIES: V8CapabilityEntry[] = [
-  { id: 'cap.runtime.status', kind: 'runtime_status', risk: 'low', permissionLevel: 'L1', requiresGate: false, dataSource: 'static_registry', safetyNote: 'Readonly status observation.' },
-  { id: 'cap.runtime.execute', kind: 'runtime_execute', risk: 'critical', permissionLevel: 'L5', requiresGate: true, requiresStageC: true, dataSource: 'static_registry', safetyNote: 'Execution requires Gate open + Stage C enabled.' },
-  { id: 'cap.agent.list', kind: 'agent_list', risk: 'low', permissionLevel: 'L1', requiresGate: false, dataSource: 'static_registry', safetyNote: 'Readonly agent catalog view.' },
-  { id: 'cap.agent.configure', kind: 'agent_configure', risk: 'high', permissionLevel: 'L3', requiresGate: true, dataSource: 'static_registry', safetyNote: 'Agent configuration requires Gate open.' },
-  { id: 'cap.memory.read', kind: 'memory_read', risk: 'low', permissionLevel: 'L1', requiresGate: false, dataSource: 'static_registry', safetyNote: 'Readonly memory access.' },
-  { id: 'cap.memory.write', kind: 'memory_write', risk: 'high', permissionLevel: 'L3', requiresGate: true, requiresStageC: true, dataSource: 'static_registry', safetyNote: 'Memory write requires Gate open + Stage C enabled.' },
-  { id: 'cap.connector.route', kind: 'connector_route', risk: 'medium', permissionLevel: 'L2', requiresGate: false, dataSource: 'static_registry', safetyNote: 'Readonly route inspection.' },
-  { id: 'cap.connector.execute', kind: 'connector_execute', risk: 'critical', permissionLevel: 'L5', requiresGate: true, requiresStageC: true, dataSource: 'static_registry', safetyNote: 'Connector execution requires Gate open + Stage C enabled.' },
+  {
+    id: 'cap.read.repo', name: 'Read Repository', category: 'read', kind: 'read_repo',
+    risk: 'low', permissionLevel: 'L1', defaultPolicy: 'allowed for readonly agents',
+    approvalRequired: false, gateRequired: false, stageCRequired: false, auditRequired: false,
+    allowedInPreview: true, blockedReason: undefined,
+    examples: ['git diff', 'git log', 'read file content'],
+    relatedCenters: ['Agent Center'],
+    dataSource: 'static_registry', safetyNote: 'Readonly repo access — no file writes.',
+  },
+  {
+    id: 'cap.draft.patch', name: 'Draft Patch', category: 'write', kind: 'draft_patch',
+    risk: 'medium', permissionLevel: 'L3', defaultPolicy: 'draft only, no apply',
+    approvalRequired: false, gateRequired: false, stageCRequired: false, auditRequired: true,
+    allowedInPreview: true, blockedReason: undefined,
+    examples: ['draft code changes', 'create patch file'],
+    relatedCenters: ['Agent Center', 'Task Center'],
+    dataSource: 'static_registry', safetyNote: 'Draft only — applying patches requires approval.',
+  },
+  {
+    id: 'cap.edit.files', name: 'Edit Files', category: 'write', kind: 'edit_files',
+    risk: 'high', permissionLevel: 'L4', defaultPolicy: 'approval required',
+    approvalRequired: true, gateRequired: false, stageCRequired: false, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Requires L4 permission and human approval',
+    examples: ['modify source files', 'apply patch'],
+    relatedCenters: ['Agent Center', 'Execution Gateway'],
+    dataSource: 'static_registry', safetyNote: 'File edits require human approval. Not allowed in preview.',
+  },
+  {
+    id: 'cap.run.tests', name: 'Run Tests', category: 'execute', kind: 'run_tests',
+    risk: 'medium', permissionLevel: 'L2', defaultPolicy: 'approval or safe context required',
+    approvalRequired: true, gateRequired: false, stageCRequired: false, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Requires approval in this preview',
+    examples: ['npm test', 'node --test', 'pytest'],
+    relatedCenters: ['Task Center'],
+    dataSource: 'static_registry', safetyNote: 'Running tests requires approval in preview.',
+  },
+  {
+    id: 'cap.model.call', name: 'Call Model', category: 'execute', kind: 'call_model',
+    risk: 'medium', permissionLevel: 'L2', defaultPolicy: 'provider policy required',
+    approvalRequired: false, gateRequired: false, stageCRequired: false, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Model calls blocked in preview — no provider routing enabled',
+    examples: ['LLM inference', 'API call to model provider'],
+    relatedCenters: ['Provider Manager'],
+    dataSource: 'static_registry', safetyNote: 'Model calls require provider policy in preview.',
+  },
+  {
+    id: 'cap.memory.write', name: 'Write Memory', category: 'write', kind: 'memory_write',
+    risk: 'high', permissionLevel: 'L3', defaultPolicy: 'scoped_write_draft only',
+    approvalRequired: true, gateRequired: true, stageCRequired: true, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Memory write requires Gate open + Stage C enabled',
+    examples: ['store agent memory', 'write knowledge entry'],
+    relatedCenters: ['Memory + Knowledge Center', 'Execution Gateway'],
+    dataSource: 'static_registry', safetyNote: 'Memory write requires Gate open + Stage C enabled.',
+  },
+  {
+    id: 'cap.launch.local-app', name: 'Launch Local App', category: 'launch', kind: 'launch_local_app',
+    risk: 'high', permissionLevel: 'L4', defaultPolicy: 'blocked in preview',
+    approvalRequired: true, gateRequired: false, stageCRequired: false, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Local app launch blocked in preview — requires human approval',
+    examples: ['start OpenAxiom', 'start ComfyUI', 'start Ollama'],
+    relatedCenters: ['Local Apps Center'],
+    dataSource: 'static_registry', safetyNote: 'Launching local apps requires human approval in preview.',
+  },
+  {
+    id: 'cap.execute.command', name: 'Execute Command', category: 'execute', kind: 'execute_command',
+    risk: 'critical', permissionLevel: 'L5', defaultPolicy: 'blocked',
+    approvalRequired: true, gateRequired: true, stageCRequired: true, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Command execution requires Gate open + Stage C enabled + human authorization',
+    examples: ['shell command', 'process execution'],
+    relatedCenters: ['Execution Gateway', 'Command Center'],
+    dataSource: 'static_registry', safetyNote: 'Command execution requires Gate open + Stage C enabled.',
+  },
+  {
+    id: 'cap.release.tag', name: 'Create Release/Tag', category: 'release', kind: 'release_tag',
+    risk: 'critical', permissionLevel: 'L5', defaultPolicy: 'blocked',
+    approvalRequired: true, gateRequired: false, stageCRequired: false, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Release/tag creation blocked in preview — requires human authorization',
+    examples: ['git tag v1.0', 'npm version patch', 'create release'],
+    relatedCenters: ['Command Center'],
+    dataSource: 'static_registry', safetyNote: 'Release/tag creation blocked in preview.',
+  },
+  {
+    id: 'cap.gate.open', name: 'Open Gate', category: 'gate', kind: 'open_gate',
+    risk: 'critical', permissionLevel: 'L5', defaultPolicy: 'blocked — human authorization required',
+    approvalRequired: true, gateRequired: false, stageCRequired: false, auditRequired: true,
+    allowedInPreview: false, blockedReason: 'Gate opening blocked in preview — requires human authorization + audit',
+    examples: ['enable Gate', 'open master switch'],
+    relatedCenters: ['Execution Gateway'],
+    dataSource: 'static_registry', safetyNote: 'Gate opening blocked in preview. Requires human authorization form.',
+  },
 ];
 
 // ── Policies Registry ──
 export const V8_POLICIES: V8PolicyEntry[] = [
-  { id: 'policy.default', gateOpen: false, stageCEnabled: false, rule: 'configured!=online && authorized!=gateOpen && enabled!=execution', dataSource: 'static_registry', safetyNote: 'Default policy: all actions requiring Gate are blocked.' },
-  { id: 'policy.gate', gateOpen: false, stageCEnabled: false, rule: 'gate remains CLOSED in preview; requires human authorization to open', dataSource: 'static_registry', safetyNote: 'Gate policy: CLOSED. No execution path available.' },
-  { id: 'policy.stage-c', gateOpen: false, stageCEnabled: false, rule: 'Stage C remains disabled; requires pre-enable review to enable', dataSource: 'static_registry', safetyNote: 'Stage C remains disabled. All Stage C actions blocked.' },
+  {
+    id: 'policy.readonly-observer', name: 'Read-only Observer Policy', permissionLevel: 'L1', scope: 'all readonly agents',
+    allowedCapabilities: ['cap.read.repo', 'cap.agent.list', 'cap.memory.read', 'cap.connector.route', 'cap.runtime.status'],
+    blockedCapabilities: ['cap.draft.patch', 'cap.edit.files', 'cap.run.tests', 'cap.model.call', 'cap.memory.write', 'cap.launch.local-app', 'cap.execute.command', 'cap.release.tag', 'cap.gate.open', 'cap.runtime.execute', 'cap.agent.configure', 'cap.connector.execute'],
+    approvalRequired: false, gateRequired: false, stageCRequired: false, auditRequired: false,
+    defaultState: 'active', appliesTo: ['L1 agents', 'readonly reviewers'], enforcementPhase: 'runtime',
+    gateOpen: false, stageCEnabled: false, rule: 'readonly observer — no write/execute/launch',
+    dataSource: 'static_registry', safetyNote: 'Readonly Observer Policy — blocks all write/execute/launch.',
+  },
+  {
+    id: 'policy.suggest-planner', name: 'Suggest-only Planner Policy', permissionLevel: 'L2', scope: 'planning agents',
+    allowedCapabilities: ['cap.read.repo', 'cap.agent.list', 'cap.memory.read', 'cap.connector.route', 'cap.draft.patch'],
+    blockedCapabilities: ['cap.edit.files', 'cap.run.tests', 'cap.model.call', 'cap.memory.write', 'cap.launch.local-app', 'cap.execute.command', 'cap.release.tag', 'cap.gate.open', 'cap.runtime.execute', 'cap.agent.configure', 'cap.connector.execute'],
+    approvalRequired: false, gateRequired: false, stageCRequired: false, auditRequired: false,
+    defaultState: 'active', appliesTo: ['L2 agents', 'planner agents'], enforcementPhase: 'runtime',
+    gateOpen: false, stageCEnabled: false, rule: 'suggest/plan only — no direct modification',
+    dataSource: 'static_registry', safetyNote: 'Suggest-only Planner Policy — blocks applying changes.',
+  },
+  {
+    id: 'policy.draft-worker', name: 'Draft Worker Policy', permissionLevel: 'L3', scope: 'coding agents (draft)',
+    allowedCapabilities: ['cap.read.repo', 'cap.agent.list', 'cap.memory.read', 'cap.connector.route', 'cap.draft.patch', 'cap.model.call'],
+    blockedCapabilities: ['cap.edit.files', 'cap.run.tests', 'cap.memory.write', 'cap.launch.local-app', 'cap.execute.command', 'cap.release.tag', 'cap.gate.open', 'cap.runtime.execute', 'cap.agent.configure', 'cap.connector.execute'],
+    approvalRequired: false, gateRequired: false, stageCRequired: false, auditRequired: true,
+    defaultState: 'active', appliesTo: ['L3 agents', 'Claude Code', 'Codex'], enforcementPhase: 'runtime',
+    gateOpen: false, stageCEnabled: false, rule: 'draft patch/task pack — blocks high-risk changes without review',
+    dataSource: 'static_registry', safetyNote: 'Draft Worker Policy — blocking high-risk changes without review.',
+  },
+  {
+    id: 'policy.apply-approval', name: 'Apply with Approval Policy', permissionLevel: 'L4', scope: 'approved agents',
+    allowedCapabilities: ['cap.read.repo', 'cap.agent.list', 'cap.memory.read', 'cap.connector.route', 'cap.draft.patch', 'cap.edit.files', 'cap.run.tests', 'cap.model.call'],
+    blockedCapabilities: ['cap.memory.write', 'cap.launch.local-app', 'cap.execute.command', 'cap.release.tag', 'cap.gate.open', 'cap.runtime.execute', 'cap.agent.configure', 'cap.connector.execute'],
+    approvalRequired: true, gateRequired: false, stageCRequired: false, auditRequired: true,
+    defaultState: 'active (dormant — no L4 agents registered)', appliesTo: ['L4 agents', 'human-approved execution'], enforcementPhase: 'runtime',
+    gateOpen: false, stageCEnabled: false, rule: 'safe apply after human review — blocks Gate/Stage C/release unless separately authorized',
+    dataSource: 'static_registry', safetyNote: 'Apply with Approval Policy — Gate/Stage C/release still blocked.',
+  },
+  {
+    id: 'policy.gated-execution', name: 'Gated Execution Policy', permissionLevel: 'L5', scope: 'future high-risk execution',
+    allowedCapabilities: ['cap.read.repo', 'cap.agent.list', 'cap.memory.read', 'cap.connector.route', 'cap.draft.patch', 'cap.edit.files', 'cap.run.tests', 'cap.model.call', 'cap.execute.command'],
+    blockedCapabilities: ['cap.memory.write', 'cap.launch.local-app', 'cap.release.tag', 'cap.gate.open', 'cap.runtime.execute', 'cap.agent.configure', 'cap.connector.execute'],
+    approvalRequired: true, gateRequired: true, stageCRequired: true, auditRequired: true,
+    defaultState: 'blocked in current preview', appliesTo: ['L5 agents', 'future runtime'], enforcementPhase: 'gate',
+    gateOpen: false, stageCEnabled: false, rule: 'requires Gate + human approval + audit receipt — blocked in preview',
+    dataSource: 'static_registry', safetyNote: 'Gated Execution Policy — blocked in current preview.',
+  },
+  {
+    id: 'policy.memory-draft', name: 'Memory Write Draft Policy', permissionLevel: 'L3', scope: 'memory agents',
+    allowedCapabilities: ['cap.memory.read'],
+    blockedCapabilities: ['cap.memory.write', 'cap.draft.patch', 'cap.edit.files', 'cap.run.tests', 'cap.model.call', 'cap.launch.local-app', 'cap.execute.command', 'cap.release.tag', 'cap.gate.open', 'cap.read.repo', 'cap.agent.list', 'cap.connector.route', 'cap.runtime.execute', 'cap.agent.configure', 'cap.connector.execute'],
+    approvalRequired: true, gateRequired: true, stageCRequired: true, auditRequired: true,
+    defaultState: 'active (scoped_write_draft only)', appliesTo: ['memory agents', 'knowledge workers'], enforcementPhase: 'runtime',
+    gateOpen: false, stageCEnabled: false, rule: 'scoped_write_draft only — blocks direct full memory write',
+    dataSource: 'static_registry', safetyNote: 'Memory Write Draft Policy — blocking full memory writes.',
+  },
+  {
+    id: 'policy.release-boundary', name: 'Release Boundary Policy', permissionLevel: 'L0', scope: 'all agents',
+    allowedCapabilities: [],
+    blockedCapabilities: ['cap.release.tag', 'cap.gate.open', 'cap.execute.command', 'cap.runtime.execute', 'cap.agent.configure', 'cap.connector.execute'],
+    approvalRequired: true, gateRequired: false, stageCRequired: false, auditRequired: true,
+    defaultState: 'active', appliesTo: ['all agents', 'all users'], enforcementPhase: 'runtime',
+    gateOpen: false, stageCEnabled: false, rule: 'blocks tag/release/restore unless explicit authorization',
+    dataSource: 'static_registry', safetyNote: 'Release Boundary Policy — all releases blocked in preview.',
+  },
 ];
 
 // ── Tasks Registry ──
@@ -569,12 +732,38 @@ export function getV8LocalAppSummary() {
 
 export function getV8CapabilitySummary() {
   const all = V8_CAPABILITIES;
-  return { total: all.length, low: all.filter(c => c.risk === 'low').length, medium: all.filter(c => c.risk === 'medium').length, high: all.filter(c => c.risk === 'high').length, critical: all.filter(c => c.risk === 'critical').length, requiresGate: all.filter(c => c.requiresGate).length, requiresStageC: all.filter(c => c.requiresStageC).length };
+  return {
+    total: all.length,
+    low: all.filter(c => c.risk === 'low').length,
+    medium: all.filter(c => c.risk === 'medium').length,
+    high: all.filter(c => c.risk === 'high').length,
+    critical: all.filter(c => c.risk === 'critical').length,
+    approvalRequired: all.filter(c => c.approvalRequired).length,
+    gateRequired: all.filter(c => c.gateRequired).length,
+    stageCRequired: all.filter(c => c.stageCRequired).length,
+    auditRequired: all.filter(c => c.auditRequired).length,
+    allowedInPreview: all.filter(c => c.allowedInPreview).length,
+    blockedInPreview: all.filter(c => !c.allowedInPreview).length,
+  };
 }
 
 export function getV8PolicySummary() {
   const all = V8_POLICIES;
-  return { total: all.length, gateClosed: all.filter(p => !p.gateOpen).length, stageCDisabled: all.filter(p => !p.stageCEnabled).length };
+  return {
+    total: all.length,
+    gateClosed: all.filter(p => !p.gateOpen).length,
+    stageCDisabled: all.filter(p => !p.stageCEnabled).length,
+    approvalRequired: all.filter(p => p.approvalRequired).length,
+    gateRequired: all.filter(p => p.gateRequired).length,
+    stageCRequired: all.filter(p => p.stageCRequired).length,
+    auditRequired: all.filter(p => p.auditRequired).length,
+    l0: all.filter(p => p.permissionLevel === 'L0').length,
+    l1: all.filter(p => p.permissionLevel === 'L1').length,
+    l2: all.filter(p => p.permissionLevel === 'L2').length,
+    l3: all.filter(p => p.permissionLevel === 'L3').length,
+    l4: all.filter(p => p.permissionLevel === 'L4').length,
+    l5: all.filter(p => p.permissionLevel === 'L5').length,
+  };
 }
 
 export function getV8TaskSummary() {

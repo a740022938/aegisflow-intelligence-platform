@@ -96,7 +96,7 @@ test('forbidden action labels absent from v8 pages', () => {
 
 test('no Launch/Restart/Restore/Release as action labels outside safety descriptions', () => {
   const riskyLabels = ['Launch', 'Restart', 'Restore', 'Release'];
-  const standalonePages = ['OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx'];
+    const standalonePages = ['OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx', 'OpenAIPv8PolicyCapabilityCenterPreview.tsx'];
   for (const file of V8_PAGE_FILES) {
     if (standalonePages.includes(file)) continue;
     const content = fs.readFileSync(path.join(PAGES_DIR, file), 'utf8');
@@ -139,8 +139,8 @@ test('integration center shows migration bridge', () => {
   assert.ok(icContent.includes('legacyConnectorName'));
 });
 
-test('all 6 config-based pages have relatedCenters in their config', () => {
-  const standalone = ['OpenAIPv8CommandCenterPreview.tsx', 'OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx'];
+test('all 5 config-based pages have relatedCenters in their config', () => {
+  const standalone = ['OpenAIPv8CommandCenterPreview.tsx', 'OpenAIPv8ReadonlyCenterPreview.tsx', 'OpenAIPv8AgentCenterPreview.tsx', 'OpenAIPv8TaskCenterPreview.tsx', 'OpenAIPv8AuditCenterPreview.tsx', 'OpenAIPv8PolicyCapabilityCenterPreview.tsx'];
   const V8_CENTER_FILES = V8_PAGE_FILES.filter(f => !standalone.includes(f));
   for (const file of V8_CENTER_FILES) {
     const content = fs.readFileSync(path.join(PAGES_DIR, file), 'utf8');
@@ -544,5 +544,155 @@ test('no risky labels in actionable contexts on audit center', () => {
     const beforeSafety = content.substring(0, safetyBoundaryStart >= 0 ? safetyBoundaryStart : content.length);
     const inActionableContext = beforeSafety.includes(label) && !beforeSafety.includes('blockedActions') && !beforeSafety.includes('No ') && !beforeSafety.includes('cannot proceed') && !beforeSafety.includes('not available');
     assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Audit Center`);
+  }
+});
+
+// ── Policy + Capability Center MVP Tests ──
+
+const POLICY_PAGE = path.join(PAGES_DIR, 'OpenAIPv8PolicyCapabilityCenterPreview.tsx');
+const POLICIES_EXAMPLE = 'E:\\AIP\\docs\\product\\examples\\policies.example.json';
+const CAPABILITIES_EXAMPLE = 'E:\\AIP\\docs\\product\\examples\\capabilities.example.json';
+const CLI_POLICY_FILE = 'E:\\AIP\\apps\\aip-cli\\src\\commands\\policy.ts';
+
+test('policy capability center route exists in App.tsx', () => {
+  const appContent = fs.readFileSync(APP_TSX, 'utf8');
+  assert.ok(appContent.includes('openaip-v8-policy-capability-center-preview'), 'Policy Capability Center route missing from App.tsx');
+});
+
+test('policy capability center page includes Capability Matrix, Policy Matrix, Permission Ladder', () => {
+  const content = fs.readFileSync(POLICY_PAGE, 'utf8');
+  assert.ok(content.includes('Capability Matrix'), 'Missing Capability Matrix');
+  assert.ok(content.includes('Policy Matrix'), 'Missing Policy Matrix');
+  assert.ok(content.includes('Permission Ladder'), 'Missing Permission Ladder');
+  assert.ok(content.includes('capability != permission'), 'Missing capability != permission rule');
+  assert.ok(content.includes('policy before buttons'), 'Missing policy before buttons rule');
+});
+
+test('policy capability center includes risk levels', () => {
+  const content = fs.readFileSync(POLICY_PAGE, 'utf8');
+  assert.ok(content.includes('low'), 'Missing low risk');
+  assert.ok(content.includes('medium'), 'Missing medium risk');
+  assert.ok(content.includes('high'), 'Missing high risk');
+  assert.ok(content.includes('critical'), 'Missing critical risk');
+});
+
+test('policy capability center includes all permission levels L0-L5', () => {
+  const content = fs.readFileSync(POLICY_PAGE, 'utf8');
+  const levels = ['L0', 'L1', 'L2', 'L3', 'L4', 'L5'];
+  for (const l of levels) assert.ok(content.includes(l), `Permission level "${l}" missing`);
+  assert.ok(content.includes('This preview does not grant L4/L5 actions'), 'Missing L4/L5 warning');
+});
+
+test('policy capability center shows safety phrases', () => {
+  const content = fs.readFileSync(POLICY_PAGE, 'utf8');
+  assert.ok(content.includes('No policy mutation'), 'Missing No policy mutation');
+  assert.ok(content.includes('No runtime mutation'), 'Missing No runtime mutation');
+  assert.ok(content.includes('Gate CLOSED'), 'Missing Gate CLOSED');
+  assert.ok(content.includes('Stage C disabled'), 'Missing Stage C disabled');
+});
+
+test('policy capability center includes safe links to related centers', () => {
+  const content = fs.readFileSync(POLICY_PAGE, 'utf8');
+  assert.ok(content.includes('/openaip-v8-agent-center-preview'), 'Missing link to Agent Center');
+  assert.ok(content.includes('/openaip-v8-task-center-preview'), 'Missing link to Task Center');
+  assert.ok(content.includes('/openaip-v8-audit-center-preview'), 'Missing link to Audit Center');
+  assert.ok(content.includes('/openaip-v8-execution-gateway-preview'), 'Missing link to Execution Gateway');
+  assert.ok(content.includes('/openaip-v8-command-center-preview'), 'Missing link to Command Center');
+});
+
+test('CLI policy list command shows policy/capability count and readonly/static source', () => {
+  const cliContent = fs.readFileSync(CLI_POLICY_FILE, 'utf8');
+  assert.ok(cliContent.includes('readonly static/example registry'), 'CLI policy missing readonly source note');
+  assert.ok(cliContent.includes('Total policies:'), 'CLI policy missing total policy count');
+  assert.ok(cliContent.includes('Total capabilities:'), 'CLI policy missing total capability count');
+  assert.ok(cliContent.includes('Risk critical:'), 'CLI policy missing risk critical count');
+  assert.ok(cliContent.includes('Gate req:'), 'CLI policy missing gate required count');
+});
+
+test('CLI policy list shows policy scope, approval, gate, audit', () => {
+  const cliContent = fs.readFileSync(CLI_POLICY_FILE, 'utf8');
+  assert.ok(cliContent.includes('scope='), 'CLI policy missing scope output');
+  assert.ok(cliContent.includes('approval='), 'CLI policy missing approval output');
+  assert.ok(cliContent.includes('gate='), 'CLI policy missing gate output');
+  assert.ok(cliContent.includes('audit='), 'CLI policy missing audit output');
+});
+
+test('CLI policy capabilities subcommand shows capability catalog', () => {
+  const cliContent = fs.readFileSync(CLI_POLICY_FILE, 'utf8');
+  assert.ok(cliContent.includes('capabilities'), 'CLI policy missing capabilities subcommand');
+  assert.ok(cliContent.includes('Capability Catalog'), 'CLI policy missing Capability Catalog');
+  assert.ok(cliContent.includes('category='), 'CLI policy missing category output');
+});
+
+test('policies example JSON has all 7 policy entries with full fields', () => {
+  const exampleContent = fs.readFileSync(POLICIES_EXAMPLE, 'utf8');
+  assert.ok(exampleContent.includes('policy.readonly-observer'), 'Example missing Readonly Observer');
+  assert.ok(exampleContent.includes('policy.suggest-planner'), 'Example missing Suggest Planner');
+  assert.ok(exampleContent.includes('policy.draft-worker'), 'Example missing Draft Worker');
+  assert.ok(exampleContent.includes('policy.apply-approval'), 'Example missing Apply Approval');
+  assert.ok(exampleContent.includes('policy.gated-execution'), 'Example missing Gated Execution');
+  assert.ok(exampleContent.includes('policy.memory-draft'), 'Example missing Memory Draft');
+  assert.ok(exampleContent.includes('policy.release-boundary'), 'Example missing Release Boundary');
+  assert.ok(exampleContent.includes('allowedCapabilities'), 'Example missing allowedCapabilities');
+  assert.ok(exampleContent.includes('blockedCapabilities'), 'Example missing blockedCapabilities');
+  assert.ok(exampleContent.includes('appliesTo'), 'Example missing appliesTo field');
+});
+
+test('capabilities example JSON has all 10 capability entries with full fields', () => {
+  const exampleContent = fs.readFileSync(CAPABILITIES_EXAMPLE, 'utf8');
+  assert.ok(exampleContent.includes('cap.read.repo'), 'Example missing Read Repo');
+  assert.ok(exampleContent.includes('cap.draft.patch'), 'Example missing Draft Patch');
+  assert.ok(exampleContent.includes('cap.edit.files'), 'Example missing Edit Files');
+  assert.ok(exampleContent.includes('cap.run.tests'), 'Example missing Run Tests');
+  assert.ok(exampleContent.includes('cap.model.call'), 'Example missing Call Model');
+  assert.ok(exampleContent.includes('cap.memory.write'), 'Example missing Write Memory');
+  assert.ok(exampleContent.includes('cap.launch.local-app'), 'Example missing Launch Local App');
+  assert.ok(exampleContent.includes('cap.execute.command'), 'Example missing Execute Command');
+  assert.ok(exampleContent.includes('cap.release.tag'), 'Example missing Release Tag');
+  assert.ok(exampleContent.includes('cap.gate.open'), 'Example missing Open Gate');
+  assert.ok(exampleContent.includes('blockedReason'), 'Example missing blockedReason field');
+  assert.ok(exampleContent.includes('allowedInPreview'), 'Example missing allowedInPreview field');
+});
+
+test('critical capabilities are not allowed in preview', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  const criticalIds = ['cap.execute.command', 'cap.release.tag', 'cap.gate.open'];
+  for (const id of criticalIds) {
+    const fullEntry = regContent.split(`id: '${id}'`)[1]?.split('},')[0] || '';
+    assert.ok(fullEntry.includes('allowedInPreview: false'), `Critical capability ${id} should have allowedInPreview: false`);
+    assert.ok(fullEntry.includes("risk: 'critical'"), `Capability ${id} should be critical risk`);
+  }
+});
+
+test('policy capability center includes Core Rules panel', () => {
+  const content = fs.readFileSync(POLICY_PAGE, 'utf8');
+  assert.ok(content.includes('Core Rules'), 'Missing Core Rules panel');
+  assert.ok(content.includes('capability != permission'), 'Missing capability != permission');
+  assert.ok(content.includes('config != permission'), 'Missing config != permission');
+  assert.ok(content.includes('policy before buttons'), 'Missing policy before buttons');
+  assert.ok(content.includes('dry-run before execution'), 'Missing dry-run before execution');
+});
+
+test('policy capability center safety boundary lists all forbidden actions', () => {
+  const content = fs.readFileSync(POLICY_PAGE, 'utf8');
+  assert.ok(content.includes('Safety Boundary'), 'Missing Safety Boundary');
+  assert.ok(content.includes('No policy mutation'), 'Missing no policy mutation');
+  assert.ok(content.includes('No capability enablement'), 'Missing no capability enablement');
+  assert.ok(content.includes('No Gate opening'), 'Missing no Gate opening');
+  assert.ok(content.includes('No Stage C enablement'), 'Missing no Stage C enablement');
+  assert.ok(content.includes('No execution'), 'Missing no execution');
+  assert.ok(content.includes('No config write'), 'Missing no config write');
+  assert.ok(content.includes('No release/tag/restore'), 'Missing no release/tag/restore');
+  assert.ok(content.includes('No connector action'), 'Missing no connector action');
+});
+
+test('no risky labels in actionable contexts on policy capability center', () => {
+  const content = fs.readFileSync(POLICY_PAGE, 'utf8');
+  const riskyLabels = ['Enable Gate', 'Enable Stage C', 'Execute', 'Launch', 'Write policy', 'Enable capability', 'Write config', 'Release', 'Restore'];
+  const safetyBoundaryStart = content.indexOf('Safety Boundary');
+  for (const label of riskyLabels) {
+    const beforeSafety = content.substring(0, safetyBoundaryStart >= 0 ? safetyBoundaryStart : content.length);
+    const inActionableContext = beforeSafety.includes(label) && !beforeSafety.includes('blockedActions') && !beforeSafety.includes('No ') && !beforeSafety.includes('not available') && !beforeSafety.includes('BLOCKED') && !beforeSafety.includes('blockedReason') && !beforeSafety.includes('blocked');
+    assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Policy Capability Center`);
   }
 });
