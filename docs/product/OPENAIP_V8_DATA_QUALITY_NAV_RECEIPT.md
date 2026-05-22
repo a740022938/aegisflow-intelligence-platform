@@ -6,7 +6,7 @@ OPENAIP_V8_DATA_QUALITY_NAV_READY_WITH_GATE_CLOSED
 
 | Item | Value |
 |---|---|
-| Commit hash | set after verification |
+| Commit hash | 27562ad |
 | Pushed | yes |
 | Working tree clean | yes |
 | Routes checked | 10 |
