@@ -848,3 +848,26 @@ test('no risky labels in actionable contexts on execution gateway', () => {
     assert.equal(inActionableContext, false, `Risky label "${label}" found in actionable context on Execution Gateway`);
   }
 });
+
+test('provider manager includes required readonly MVP sections and safety phrases', () => {
+  const content = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8ProviderManagerPreview.tsx'), 'utf8');
+  const required = [
+    'Provider Profile Matrix', 'CC Switch-like Strengths', 'Secret Safety', 'Provider Routing Preview',
+    'No provider switching', 'No model calls', 'No API keys shown', 'No runtime mutation', 'Gate CLOSED', 'Stage C disabled'
+  ];
+  for (const item of required) assert.ok(content.includes(item), `Provider Manager missing ${item}`);
+});
+
+test('provider registry includes all required provider entries', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  const names = ['Claude / Anthropic', 'OpenAI-compatible', 'DeepSeek', 'Ollama', 'LM Studio', 'Claude Proxy', 'CC Switch-like Provider Switcher'];
+  for (const n of names) assert.ok(regContent.includes(n), `Registry missing provider ${n}`);
+  assert.ok(regContent.includes('config_switcher_reference'), 'CC Switch-like should be reference kind');
+});
+
+test('CLI providers list output contains readonly source and counts', () => {
+  const cliContent = fs.readFileSync('E:\\AIP\\apps\\aip-cli\\src\\commands\\providers.ts', 'utf8');
+  assert.ok(cliContent.includes('readonly static/example registry'), 'CLI providers missing readonly source note');
+  assert.ok(cliContent.includes('Registry count:'), 'CLI providers missing registry count');
+  assert.ok(cliContent.includes('Config-write blocked:'), 'CLI providers missing blocked config count');
+});

@@ -2,79 +2,70 @@ import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
 import { V8_PROVIDERS, getV8ProviderSummary } from '../registry/openAipv8CenterData';
 
 const s = getV8ProviderSummary();
+
 const config = {
-  title: 'Provider Manager',
-  subtitle: '模型提供商路由与配置管理',
-  purpose: '吸收 CC Switch 的提供商配置/路由优势，统一管理模型提供商。',
-  role: 'Model provider registry, dry-run routing, and cost/usage visibility concepts',
+  title: 'OpenAIP v8 Provider Manager Preview',
+  subtitle: 'Readonly Preview · Gate CLOSED · Stage C disabled',
+  purpose: 'Registry-backed provider ecosystem center for profiles, safety, and routing concepts without runtime mutation.',
+  role: 'Provider profile matrix + safety boundary + conceptual routing preview',
   sections: [
-    {
-      title: 'CC Switch-like Strengths',
-      items: [
-        'Provider profiles — 每个提供商独立配置',
-        'Config switching — 在提供商间切换',
-        'Dry-run routing — 先模拟再切换',
-        'Cost/usage visibility — 用量与费用可视化'
-      ]
-    },
-    {
-      title: 'Provider Registry',
-      items: [
-        'Claude / OpenAI-compatible / DeepSeek',
-        'Ollama (local)',
-        'LM Studio (local)',
-        'Future: 更多 provider adapters'
-      ]
-    },
-    {
-      title: 'Registry Summary',
-      items: [
-        `Total providers: ${s.total}`,
-        `Enabled: ${s.enabled}`,
-        `Configured: ${s.configured}`,
-        `Online: ${s.online}`,
-        `Authorized: ${s.authorized}`,
-      ]
-    }
+    { title: 'Provider Summary Strip', items: [
+      `Total providers/profiles: ${s.total}`,
+      `Cloud providers: ${V8_PROVIDERS.filter(p => p.providerKind === 'cloud_provider' || p.providerKind === 'openai_compatible_provider').length}`,
+      `Local model servers: ${V8_PROVIDERS.filter(p => p.providerKind === 'local_model_server').length}`,
+      `Proxy/config switcher references: ${V8_PROVIDERS.filter(p => p.providerKind === 'provider_proxy' || p.providerKind === 'config_switcher_reference').length}`,
+      `Disabled/planned: ${V8_PROVIDERS.filter(p => p.lifecycle === 'disabled').length}`,
+      `Config-write blocked: ${V8_PROVIDERS.filter(p => p.blockedActions?.includes('provider config write')).length}`,
+      `Model-call blocked: ${V8_PROVIDERS.filter(p => p.blockedActions?.includes('model calls')).length}`,
+      `Secret-safe entries: ${V8_PROVIDERS.filter(p => p.secretHandling === 'no_secret_display' || p.secretHandling === 'masked_reference_only').length}`,
+    ] },
+    { title: 'CC Switch-like Strengths', items: [
+      'Provider profiles', 'Model presets', 'Config switch dry-run', 'Router/failover concepts', 'Cost/usage visibility', 'Local proxy awareness',
+      'This preview does not write CC Switch, Claude, Codex, OpenClaw, or provider configs.'
+    ]},
+    { title: 'Secret Safety', items: [
+      'No API keys shown', 'No token/JWT output', 'No localStorage/sessionStorage secret write',
+      'No provider config mutation', 'No live provider call'
+    ]},
+    { title: 'Provider Routing Preview', items: [
+      'Task type', 'Risk', 'Cost', 'Privacy', 'Model capability', 'Human approval', 'Policy requirement',
+      'Routing is conceptual/read-only in this preview.'
+    ]}
   ],
-  registryTables: [
-    {
-      title: `Provider Registry (${V8_PROVIDERS.length} entries)`,
-      columns: [
-        { label: 'Name', key: 'name' },
-        { label: 'Lifecycle', key: 'lifecycle' },
-        { label: 'Permission', key: 'permissionLevel' },
-        { label: 'Online', key: 'online' },
-        { label: 'Authorized', key: 'authorized' },
-      ],
-      rows: V8_PROVIDERS.map(p => ({ name: p.name, lifecycle: p.lifecycle, permissionLevel: p.permissionLevel, online: p.online, authorized: p.authorized }))
-    }
-  ],
+  registryTables: [{
+    title: `Provider Profile Matrix (${V8_PROVIDERS.length} entries)`,
+    columns: [
+      { label: 'Name', key: 'name' }, { label: 'Kind', key: 'providerKind' }, { label: 'Config', key: 'configStatus' },
+      { label: 'Selection', key: 'selectionState' }, { label: 'Profiles', key: 'modelProfileExamples' }, { label: 'Routing', key: 'routingRole' },
+      { label: 'Cost', key: 'costVisibility' }, { label: 'Secret', key: 'secretHandling' }, { label: 'Risk', key: 'risk' },
+      { label: 'Permission', key: 'permissionRequired' }, { label: 'Allowed', key: 'allowedInPreview' }, { label: 'Blocked Actions', key: 'blockedActions' }
+    ],
+    rows: V8_PROVIDERS.map(p => ({ ...p, modelProfileExamples: p.modelProfileExamples.join(', '), blockedActions: (p.blockedActions || []).join(', ') }))
+  }],
   keyRules: [
-    'Provider configured does not mean provider selected for execution.',
-    'Config switched in dry-run only — no live routing change.',
-    'Provider online status is advisory, not execution guarantee.'
+    'Provider registered != configured with secrets.',
+    'Provider configured != selected.',
+    'Provider selected != model call allowed.',
+    'CC Switch-like switching is reference/dry-run only.',
+    'Local provider configured != local app launch allowed.'
   ],
   notAllowed: [
-    'No provider switching in this preview',
-    'No config mutation',
-    'No live routing changes',
-    'No provider execution'
+    'No provider switching', 'No model calls', 'No API keys shown', 'No config write', 'No local app launch',
+    'No Gate opening', 'No Stage C enablement', 'No release/tag/restore', 'No connector action'
   ],
-  futurePhases: [
-    'Provider profile management UI',
-    'Dry-run routing simulation',
-    'Cost/usage analytics',
-    'Multi-provider failover'
-  ],
+  futurePhases: ['Provider profile management UI', 'Routing policy compiler', 'Cost/usage telemetry', 'Gated execution handshake'],
   sampleData: [
-    { label: 'CC Switch-like Router', value: 'registered | L2 | online=true' },
-    { label: 'Ollama', value: 'enabled | L1 | online=false' },
-    { label: 'LM Studio', value: 'registered | L1 | online=false' }
+    { label: 'Readonly Preview', value: 'No runtime mutation' },
+    { label: 'Gate', value: 'CLOSED' },
+    { label: 'Stage C', value: 'disabled' }
   ],
   relatedCenters: [
-    { title: 'Integration Center', route: '/openaip-v8-integration-center-preview' },
-    { title: 'Local Apps Center', route: '/openaip-v8-local-apps-center-preview' },
+    { title: 'Agent Center', route: '/openaip-v8-agent-center-preview' },
+    { title: 'Task Center', route: '/openaip-v8-task-center-preview' },
+    { title: 'Policy Capability Center', route: '/openaip-v8-policy-capability-center-preview' },
+    { title: 'Audit Center', route: '/openaip-v8-audit-center-preview' },
+    { title: 'Execution Gateway', route: '/openaip-v8-execution-gateway-preview' },
+    { title: 'Command Center', route: '/openaip-v8-command-center-preview' },
   ],
   backLink: '/openaip-v8-command-center-preview'
 };
