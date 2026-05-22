@@ -895,3 +895,22 @@ test('CLI integrations list and matrix include readonly source and matrix rows',
   assert.ok(cliContent.includes('aip integrations matrix'), 'CLI integrations missing matrix subcommand');
   assert.ok(cliContent.includes('Integration ↔ Provider Handshake Matrix'), 'CLI integrations missing matrix output');
 });
+
+test('local apps center includes required readonly MVP sections and safety phrases', () => {
+  const content = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8LocalAppsCenterPreview.tsx'), 'utf8');
+  const required = ['Local Apps Matrix', 'Local Apps ↔ Provider/Integration Matrix', 'OpenAxiom Positioning', 'Local Runtime Safety', 'No local app launch', 'No local app API calls', 'No config writes', 'No runtime mutation', 'Gate CLOSED', 'Stage C disabled'];
+  for (const item of required) assert.ok(content.includes(item), `Local Apps Center missing ${item}`);
+});
+
+test('local apps registry includes required entries and OpenAxiom classification', () => {
+  const regContent = fs.readFileSync(REGISTRY_FILE, 'utf8');
+  const names = ['OpenAxiom', 'ComfyUI', 'Ollama', 'LM Studio', 'YOLO / SAM Toolchain', 'Python Worker', 'AIP Local API'];
+  for (const n of names) assert.ok(regContent.includes(n), `Local apps registry missing ${n}`);
+  assert.ok(regContent.includes('not agent and not primary provider'), 'OpenAxiom positioning text missing');
+});
+
+test('CLI apps list includes readonly source and local app count', () => {
+  const cliContent = fs.readFileSync('E:\\AIP\\apps\\aip-cli\\src\\commands\\apps.ts', 'utf8');
+  assert.ok(cliContent.includes('readonly static/example registry'), 'CLI apps missing readonly source');
+  assert.ok(cliContent.includes('Local apps count:'), 'CLI apps missing local app count');
+});

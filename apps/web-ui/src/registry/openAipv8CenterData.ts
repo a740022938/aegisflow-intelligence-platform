@@ -83,7 +83,20 @@ export interface V8LocalAppEntry extends V8RegistryTruthFields, V8BaseEntry {
   name: string;
   kind: string;
   subtype?: string;
+  category: 'local_app' | 'local_model_server' | 'workflow_engine' | 'local_vision_pipeline_tool' | 'local_runtime_service' | 'unknown_local_app';
   lifecycle: V8Lifecycle;
+  configuredState: 'configured' | 'registered' | 'unconfigured';
+  installedState: 'installed' | 'not_installed' | 'unknown';
+  runningState: 'running' | 'stopped' | 'unknown';
+  launchState: 'blocked' | 'readonly_only';
+  connectionMode: string;
+  relatedProviderId: string | null;
+  relatedIntegrationId: string | null;
+  relatedCapabilityIds: string[];
+  risk: V8RiskLevel;
+  permissionRequired: V8PermissionLevel;
+  allowedInPreview: boolean;
+  readonly: boolean;
   permissionLevel: V8PermissionLevel;
 }
 
@@ -303,12 +316,39 @@ export const V8_INTEGRATIONS: V8IntegrationEntry[] = [
 // ComfyUI: local_app / workflow_engine
 // YOLO/SAM: local tools / vision pipeline
 export const V8_LOCAL_APPS: V8LocalAppEntry[] = [
-  { id: 'app.openaxiom', name: 'OpenAxiom', kind: 'local_app', subtype: 'ui_lab_vision_tool', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'OpenAxiom is a local_app / UI Lab / Vision Tool, not a primary model provider.', blockedActions: ['app launch', 'app stop/restart', 'app configuration write', 'model execution'] },
-  { id: 'app.comfyui', name: 'ComfyUI', kind: 'workflow_engine', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'ComfyUI is a local_app / workflow_engine.', blockedActions: ['app launch', 'workflow execution'], futurePhase: 'App launch/stop controls (gated)' },
-  { id: 'app.ollama', name: 'Ollama (Local LLM)', kind: 'local_app', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Local LLM, not a primary provider for routing.', blockedActions: ['app launch', 'model execution'], futurePhase: 'App launch/stop controls (gated)' },
-  { id: 'app.lmstudio', name: 'LM Studio (Local LLM)', kind: 'local_app', lifecycle: 'registered', permissionLevel: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Local LLM, registered but not currently online.', blockedActions: ['app launch', 'model execution'], futurePhase: 'Local app registry management' },
-  { id: 'app.yolo', name: 'YOLO / SAM Vision Tools', kind: 'local_app', subtype: 'vision_tool', lifecycle: 'registered', permissionLevel: 'L1', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Local tools / vision pipeline. Not configured.', blockedActions: ['app launch', 'vision processing execution'], futurePhase: 'Local app registry management' },
-  { id: 'app.python-workers', name: 'Python Workers', kind: 'local_app', lifecycle: 'disabled', permissionLevel: 'L0', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, dataSource: 'static_registry', safetyNote: 'Placeholder. Disabled in this preview.', blockedActions: ['all local app operations'], futurePhase: 'Custom work process management' },
+  { id: 'app.openaxiom', name: 'OpenAxiom', kind: 'local_app', subtype: 'ui_lab_vision_tool', category: 'local_app', lifecycle: 'registered', configuredState: 'configured', installedState: 'installed', runningState: 'stopped', launchState: 'blocked', connectionMode: 'desktop local app concept', relatedProviderId: null, relatedIntegrationId: 'integration.openclaw-gateway', relatedCapabilityIds: ['cap.launch.local-app'], risk: 'high', permissionLevel: 'L2', permissionRequired: 'L2', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'OpenAxiom is Local App / UI Lab / Vision Tool, not agent and not primary provider.', blockedActions: ['launch', 'stop/restart', 'file writes', 'config writes'] },
+  { id: 'app.comfyui', name: 'ComfyUI', kind: 'workflow_engine', category: 'workflow_engine', lifecycle: 'registered', configuredState: 'configured', installedState: 'installed', runningState: 'stopped', launchState: 'blocked', connectionMode: 'local workflow engine concept', relatedProviderId: null, relatedIntegrationId: 'integration.webhook-external', relatedCapabilityIds: ['cap.launch.local-app'], risk: 'high', permissionLevel: 'L2', permissionRequired: 'L2', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'Workflow engine configured != workflow execution allowed.', blockedActions: ['launch', 'workflow execution', 'local API calls'] },
+  { id: 'app.ollama', name: 'Ollama', kind: 'local_app', category: 'local_model_server', lifecycle: 'registered', configuredState: 'configured', installedState: 'installed', runningState: 'stopped', launchState: 'blocked', connectionMode: 'local model server concept', relatedProviderId: 'provider.ollama', relatedIntegrationId: null, relatedCapabilityIds: ['cap.model.call','cap.launch.local-app'], risk: 'medium', permissionLevel: 'L1', permissionRequired: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'Configured local model server != model call allowed.', blockedActions: ['launch', 'model calls', 'config writes'] },
+  { id: 'app.lmstudio', name: 'LM Studio', kind: 'local_app', category: 'local_model_server', lifecycle: 'registered', configuredState: 'configured', installedState: 'installed', runningState: 'stopped', launchState: 'blocked', connectionMode: 'desktop local model host concept', relatedProviderId: 'provider.lmstudio', relatedIntegrationId: null, relatedCapabilityIds: ['cap.model.call','cap.launch.local-app'], risk: 'medium', permissionLevel: 'L1', permissionRequired: 'L1', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'Installed local model host != running/authorized.', blockedActions: ['launch', 'model calls', 'config writes'] },
+  { id: 'app.yolo-sam', name: 'YOLO / SAM Toolchain', kind: 'local_app', subtype: 'vision_tool', category: 'local_vision_pipeline_tool', lifecycle: 'registered', configuredState: 'registered', installedState: 'unknown', runningState: 'unknown', launchState: 'blocked', connectionMode: 'local vision pipeline concept', relatedProviderId: null, relatedIntegrationId: 'integration.memoryhub-bridge', relatedCapabilityIds: ['cap.execute.command'], risk: 'high', permissionLevel: 'L3', permissionRequired: 'L3', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'Vision pipeline registered != training or write operations allowed.', blockedActions: ['training', 'file writes', 'execution'] },
+  { id: 'app.python-worker', name: 'Python Worker', kind: 'local_app', category: 'local_runtime_service', lifecycle: 'registered', configuredState: 'registered', installedState: 'unknown', runningState: 'stopped', launchState: 'blocked', connectionMode: 'local runtime worker concept', relatedProviderId: null, relatedIntegrationId: null, relatedCapabilityIds: ['cap.execute.command'], risk: 'high', permissionLevel: 'L4', permissionRequired: 'L4', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'example_json', safetyNote: 'Worker runtime concept only; no process execution in preview.', blockedActions: ['process execution', 'restart', 'config writes'] },
+  { id: 'app.aip-local-api', name: 'AIP Local API', kind: 'local_app', category: 'local_runtime_service', lifecycle: 'registered', configuredState: 'configured', installedState: 'installed', runningState: 'unknown', launchState: 'blocked', connectionMode: 'local backend service concept', relatedProviderId: null, relatedIntegrationId: 'integration.openclaw-gateway', relatedCapabilityIds: ['cap.execute.command'], risk: 'high', permissionLevel: 'L4', permissionRequired: 'L4', configured: true, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: true, readonly: true, dataSource: 'static_registry', safetyNote: 'Local API known concept only; no mutation/restart calls allowed.', blockedActions: ['restart', 'mutation APIs', 'config writes'] },
+  { id: 'app.future-local-placeholder', name: 'Future Local App Placeholder', kind: 'local_app', category: 'unknown_local_app', lifecycle: 'disabled', configuredState: 'unconfigured', installedState: 'not_installed', runningState: 'stopped', launchState: 'blocked', connectionMode: 'planned', relatedProviderId: null, relatedIntegrationId: null, relatedCapabilityIds: [], risk: 'low', permissionLevel: 'L0', permissionRequired: 'L0', configured: false, online: false, authorized: false, gateOpen: false, stageCEnabled: false, allowedInPreview: false, readonly: true, dataSource: 'future_integration', safetyNote: 'Disabled placeholder.', blockedActions: ['all local app operations'] },
+];
+
+export interface V8LocalAppRelationshipRow {
+  id: string;
+  localAppId: string;
+  relatedCenter: string;
+  relationship: string;
+  currentPreviewState: string;
+  blockedActions: string[];
+  risk: V8RiskLevel;
+  requiredPolicy: string;
+  auditRequired: boolean;
+  gateRequired: boolean;
+  dataSource: V8DataSource;
+  readonly: boolean;
+}
+
+export const V8_LOCAL_APP_RELATION_MATRIX: V8LocalAppRelationshipRow[] = [
+  { id: 'local-rel-openaxiom-integration', localAppId: 'app.openaxiom', relatedCenter: 'Integration Center', relationship: 'Local UI/vision app referenced by integration catalog', currentPreviewState: 'static reference', blockedActions: ['launch','file writes','app control'], risk: 'high', requiredPolicy: 'policy.apply-approval', auditRequired: true, gateRequired: false, dataSource: 'static_registry', readonly: true },
+  { id: 'local-rel-comfyui-integration', localAppId: 'app.comfyui', relatedCenter: 'Integration Center', relationship: 'Workflow engine as local app', currentPreviewState: 'static reference', blockedActions: ['workflow execution','API calls'], risk: 'high', requiredPolicy: 'policy.apply-approval', auditRequired: true, gateRequired: false, dataSource: 'static_registry', readonly: true },
+  { id: 'local-rel-ollama-provider', localAppId: 'app.ollama', relatedCenter: 'Provider Manager', relationship: 'Local model server for provider profile', currentPreviewState: 'static reference', blockedActions: ['launch','model calls'], risk: 'medium', requiredPolicy: 'policy.readonly-observer', auditRequired: true, gateRequired: false, dataSource: 'static_registry', readonly: true },
+  { id: 'local-rel-lmstudio-provider', localAppId: 'app.lmstudio', relatedCenter: 'Provider Manager', relationship: 'Local model host for provider profile', currentPreviewState: 'static reference', blockedActions: ['launch','model calls'], risk: 'medium', requiredPolicy: 'policy.readonly-observer', auditRequired: true, gateRequired: false, dataSource: 'static_registry', readonly: true },
+  { id: 'local-rel-yolosam-knowledge', localAppId: 'app.yolo-sam', relatedCenter: 'Knowledge/Data/Task', relationship: 'Vision pipeline tooling', currentPreviewState: 'static reference', blockedActions: ['training','file writes'], risk: 'high', requiredPolicy: 'policy.gated-execution', auditRequired: true, gateRequired: true, dataSource: 'static_registry', readonly: true },
+  { id: 'local-rel-pythonworker-exec', localAppId: 'app.python-worker', relatedCenter: 'Execution Gateway', relationship: 'Local runtime worker', currentPreviewState: 'blocked concept', blockedActions: ['process execution'], risk: 'high', requiredPolicy: 'policy.gated-execution', auditRequired: true, gateRequired: true, dataSource: 'example_json', readonly: true },
+  { id: 'local-rel-aipapi-runtime', localAppId: 'app.aip-local-api', relatedCenter: 'Runtime Gateway', relationship: 'Local backend service', currentPreviewState: 'readonly status concept', blockedActions: ['mutation','restart'], risk: 'high', requiredPolicy: 'policy.release-boundary', auditRequired: true, gateRequired: true, dataSource: 'static_registry', readonly: true },
 ];
 
 // ── Capabilities Registry ──
@@ -1020,7 +1060,7 @@ export function getV8IntegrationSummary() {
 
 export function getV8LocalAppSummary() {
   const all = V8_LOCAL_APPS;
-  return { total: all.length, registered: all.filter(a => a.lifecycle === 'registered').length, enabled: all.filter(a => a.lifecycle === 'enabled').length, disabled: all.filter(a => a.lifecycle === 'disabled').length };
+  return { total: all.length, registered: all.filter(a => a.lifecycle === 'registered').length, enabled: all.filter(a => a.lifecycle === 'enabled').length, disabled: all.filter(a => a.lifecycle === 'disabled').length, localModelServers: all.filter(a => a.category === 'local_model_server').length, workflowEngines: all.filter(a => a.category === 'workflow_engine').length, visionTools: all.filter(a => a.category === 'local_vision_pipeline_tool').length, runtimeServices: all.filter(a => a.category === 'local_runtime_service').length, launchBlocked: all.filter(a => a.launchState === 'blocked').length, configWriteBlocked: all.filter(a => (a.blockedActions || []).includes('config writes') || (a.blockedActions || []).includes('app configuration write')).length, executionBlocked: all.filter(a => (a.blockedActions || []).some((x: string) => x.includes('execution') || x.includes('training') || x.includes('workflow'))).length };
 }
 
 export function getV8CapabilitySummary() {
