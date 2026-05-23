@@ -119,6 +119,28 @@ test('old Connector Center routes still exist', () => {
   assert.ok(appContent.includes('connector-center-readonly'), 'connector-center-readonly route missing from App.tsx');
 });
 
+test('legacy Connector Center wording and migration links exist', () => {
+  const readonlyContent = fs.readFileSync(path.join(PAGES_DIR, 'ConnectorCenterReadonly.tsx'), 'utf8');
+  const legacyContent = fs.readFileSync(path.join(PAGES_DIR, 'ConnectorCenter.tsx'), 'utf8');
+  const i18nContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/i18n.ts'), 'utf8');
+  const menuContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/menu-registry.ts'), 'utf8');
+
+  assert.ok(readonlyContent.includes('Legacy Connector Center'), 'readonly connector center missing Legacy title');
+  assert.ok(readonlyContent.includes('v7 readonly view'), 'readonly connector center missing v7 readonly wording');
+  assert.ok(legacyContent.includes('连接器中心（旧）'), 'legacy connector center missing old-entry Chinese title');
+  assert.ok(i18nContent.includes("connectorCenterReadonly: '连接器中心（旧）'"), 'Chinese sidebar label missing old marker');
+  assert.ok(i18nContent.includes("connectorCenterReadonly: 'Legacy Connector Center'"), 'English sidebar label missing Legacy marker');
+  assert.ok(menuContent.includes("label: '连接器中心（旧）'"), 'menu registry label missing old marker');
+  for (const route of [
+    '/openaip-v8-integration-center-preview',
+    '/openaip-v8-local-apps-center-preview',
+    '/openaip-v8-provider-manager-preview'
+  ]) {
+    assert.ok(readonlyContent.includes(route), `readonly connector center missing safe link ${route}`);
+    assert.ok(legacyContent.includes(route), `legacy connector center missing safe link ${route}`);
+  }
+});
+
 test('v8 pages use registry-backed data', () => {
   for (const file of V8_PAGE_FILES) {
     if (file === 'OpenAIPv8CommandCenterPreview.tsx') {

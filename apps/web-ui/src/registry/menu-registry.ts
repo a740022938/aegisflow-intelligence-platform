@@ -343,7 +343,7 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
       },
       {
         id: 'connector-center-readonly',
-        label: '连接器中心',
+        label: '连接器中心（旧）',
         labelKey: 'nav.connectorCenterReadonly',
         path: '/connector-center-readonly',
         icon: 'route',
@@ -351,7 +351,7 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
         riskLevel: 'low',
         pageType: 'connector',
         owner: 'connector',
-        notes: '只读连接器中心。不接真实控制，不写外部系统，不显示 token/API key 输入框，不启用 Stage C。',
+        notes: '旧入口只读连接器中心。迁移到 OpenAIP v8 Integration Center / Local Apps Center / Provider Manager；不接真实控制，不写外部系统，不显示 token/API key 输入框，不启用 Stage C。',
         currentNav: true,
       },
     ],

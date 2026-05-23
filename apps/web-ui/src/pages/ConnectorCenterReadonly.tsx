@@ -105,7 +105,7 @@ function PreviewFooter({ color, text }: { color: string; text: string }) {
   );
 }
 
-const READONLY_FOOTER_TEXT = '只读预览 · 不控制外部工具 · 不写数据库 · 不启用 Stage C';
+const READONLY_FOOTER_TEXT = '旧入口只读预览 · 不控制外部工具 · 不写数据库 · 不启用 Stage C';
 
 export default function ConnectorCenterReadonly() {
   const total = useMemo(() => getConnectorRegistryCount(), []);
@@ -131,9 +131,9 @@ export default function ConnectorCenterReadonly() {
 
   return (
     <PageShell
-      title="Connector Center"
-      subtitle="Readonly capability overview — external tools, AI assistants, model platforms, and memory system integration status"
-      versionLabel="AIP v7.62.0 · Connector Center Preview"
+      title="Legacy Connector Center"
+      subtitle="v7 readonly connector view — migrating to OpenAIP v8 Integration, Local Apps, and Provider surfaces"
+      versionLabel="AIP v7.62.0 · Connector Center Preview · Legacy v7 Readonly View"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly · No external writes · No connector control · No API calls"
@@ -141,18 +141,20 @@ export default function ConnectorCenterReadonly() {
       <StatusStrip items={stripItems} />
 
       {/* Migration Bridge Banner */}
-      <SectionCard title="Connector → v8 Integration Center Migration" style={{ marginTop: 16, border: '1px solid #8B5CF6', background: 'rgba(139,92,246,0.06)' }}>
+      <SectionCard title="Legacy Connector Center → v8 Migration" style={{ marginTop: 16, border: '1px solid #8B5CF6', background: 'rgba(139,92,246,0.06)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
           <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: '#8B5CF6', color: '#fff' }}>MIGRATION BRIDGE</span>
-          <span style={{ fontSize: 12, color: '#c4b5fd' }}>Connector Center → v8 Integration Center</span>
+          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: '#475569', color: '#fff' }}>LEGACY V7 READONLY VIEW</span>
+          <span style={{ fontSize: 12, color: '#c4b5fd' }}>Legacy Connector Center → v8 Integration / Local Apps / Provider surfaces</span>
         </div>
         <div style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.7 }}>
           <p style={{ margin: '0 0 6px' }}>
-            This page is the <strong>legacy Connector Center</strong>. New integration development is on the v8 track.
+            This legacy Connector Center is a <strong>v7 readonly view</strong>. OpenAIP v8 consolidates external tools under
+            <strong> Integration Center</strong>, <strong>Local Apps Center</strong>, and <strong>Provider Manager</strong>.
           </p>
           <p style={{ margin: '0 0 6px' }}>
-            The <strong>v8 Integration Center</strong> absorbs connector management with registry-backed data,
-            integration lifecycle management, and a full migration registry from legacy connectors.
+            Use this page only as a safe compatibility overview. New connector wording should point users to the v8 surfaces;
+            this page does not execute connector actions, call APIs, or write configuration.
           </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>
             <Link
@@ -160,6 +162,18 @@ export default function ConnectorCenterReadonly() {
               style={{ fontSize: 12, color: '#8B5CF6', textDecoration: 'underline', fontWeight: 600 }}
             >
               Open v8 Integration Center →
+            </Link>
+            <Link
+              to="/openaip-v8-local-apps-center-preview"
+              style={{ fontSize: 12, color: '#93c5fd', textDecoration: 'underline' }}
+            >
+              v8 Local Apps Center
+            </Link>
+            <Link
+              to="/openaip-v8-provider-manager-preview"
+              style={{ fontSize: 12, color: '#93c5fd', textDecoration: 'underline' }}
+            >
+              v8 Provider Manager
             </Link>
             <Link
               to="/openaip-v8-command-center-preview"
@@ -216,7 +230,7 @@ export default function ConnectorCenterReadonly() {
           ])}
         />
         <div style={{ marginTop: 8, padding: '6px 10px', borderRadius: 4, background: 'rgba(34,197,94,0.06)', fontSize: 10, color: 'var(--success)' }}>
-          All governance gates pass. Connector Center is a fully readonly metadata overview.
+          All governance gates pass. Legacy Connector Center is a fully readonly metadata overview.
         </div>
       </SectionCard>
 
@@ -347,7 +361,7 @@ export default function ConnectorCenterReadonly() {
       {/* Boundary Notice */}
       <div className="ui-card" style={{ marginTop: 16, padding: '14px 16px', fontSize: 11, lineHeight: 1.7 }}>
         <strong>Readonly boundary notice:</strong><br />
-        This is a <u>Connector Center readonly overview</u>. Connector Registry is readonly metadata. Does not call external APIs, write to external systems, control connectors, process Memory Hub candidates, or enable Stage C. All <code>actionsBlocked</code> labels are prohibited capabilities, not enabled permissions.
+        This is a <u>Legacy Connector Center readonly overview</u>. Connector Registry is readonly metadata. Does not call external APIs, write to external systems, control connectors, process Memory Hub candidates, or enable Stage C. All <code>actionsBlocked</code> labels are prohibited capabilities, not enabled permissions.
       </div>
 
       {/* Governance Console Traceability */}

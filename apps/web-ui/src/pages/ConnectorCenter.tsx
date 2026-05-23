@@ -140,8 +140,8 @@ export default function ConnectorCenter() {
 
   return (
     <PageShell
-      title="连接器中心"
-      subtitle="AIP v7.14.0-P2 Connector Center Readonly Shell"
+      title="连接器中心（旧）"
+      subtitle="AIP v7.14.0-P2 Legacy Connector Center Readonly Shell"
       versionLabel="AIP v7.14.0-P2"
       maturity="preview"
       safetyBoundary="readonly"
@@ -170,15 +170,17 @@ export default function ConnectorCenter() {
       </div>
 
       {/* Migration Bridge Banner */}
-      <SectionCard title="Connector → v8 Migration Bridge" style={{ border: '1px solid #8B5CF6', background: 'rgba(139,92,246,0.06)', marginTop: 16 }}>
+      <SectionCard title="Legacy Connector Center → v8 Migration Bridge" style={{ border: '1px solid #8B5CF6', background: 'rgba(139,92,246,0.06)', marginTop: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
           <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: '#8B5CF6', color: '#fff' }}>MIGRATION BRIDGE</span>
+          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, background: '#475569', color: '#fff' }}>LEGACY V7 READONLY VIEW</span>
           <span style={{ fontSize: 12, color: '#c4b5fd' }}>Legacy Connector Centers → v8 Integration Center / Provider Manager</span>
         </div>
         <div style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.7 }}>
           <p style={{ margin: '0 0 6px' }}>
-            This page (Connector Center) and its readonly variant (ConnectorCenterReadonly) are <strong>legacy pages</strong>.
-            The v8 track provides registry-backed Integration Center, Provider Manager, and Local Apps Center.
+            This legacy Connector Center is a <strong>v7 readonly view</strong>.
+            OpenAIP v8 consolidates external tools under Integration Center, Local Apps Center, and Provider Manager.
+            This page remains a compatibility overview and does not change connector behavior.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 6 }}>
             <Link to="/openaip-v8-integration-center-preview" style={{ fontSize: 12, color: '#8B5CF6', textDecoration: 'underline', fontWeight: 600 }}>v8 Integration Center →</Link>
@@ -200,8 +202,8 @@ export default function ConnectorCenter() {
       <SectionCard title="迁移状态说明" style={{ marginTop: 20 }}>
         <div style={{ fontSize: 12, lineHeight: 1.7, color: 'var(--text-secondary)' }}>
           <p>
-            <strong>当前状态：</strong>OpenAxiomReadonly 和 MemoryHubReadonly 仍保留原左侧菜单入口。
-            本轮 Connector Center 是 <strong>duplicate readonly view</strong>，不移动任何菜单。
+          <strong>当前状态：</strong>OpenAxiomReadonly 和 MemoryHubReadonly 仍保留原左侧菜单入口。
+            本轮 Connector Center 是 <strong>旧入口 duplicate readonly view</strong>，不移动任何菜单。
           </p>
           <p>
             <strong>迁移计划：</strong>Connector Center 后续施工将逐步：
