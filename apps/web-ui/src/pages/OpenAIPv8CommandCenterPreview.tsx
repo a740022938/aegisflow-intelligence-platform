@@ -187,7 +187,7 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
           </div>
           <p style={{ margin: 0, fontSize: 12, color: '#9ca3af' }}>
             All safety boundaries are enforced. This preview does not mutate runtime, write to DB, open Gate, or enable Stage C.
-            {' '}Wave 1 exposes only this Command Center in the sidebar; detailed centers remain readonly/direct until separately approved.
+            {' '}Wave 2 confirms all 10 readonly centers are visible in the sidebar; visibility is not execution.
           </p>
         </div>
 

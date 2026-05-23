@@ -1,0 +1,59 @@
+# OpenAIP v8 Wave 2 All Centers Sidebar Promotion Receipt
+
+- Verdict: OPENAIP_V8_WAVE2_ALL_CENTERS_SIDEBAR_PROMOTION_READY_WITH_GATE_CLOSED
+- Baseline HEAD: `c31e4a5`
+- Commit hash: pending until this receipt is committed; final operator receipt records pushed HEAD
+- Pushed: pending
+- Working tree clean: pending
+- Sidebar changed: yes
+- Routes promoted:
+  - `/openaip-v8-agent-center-preview`
+  - `/openaip-v8-task-center-preview`
+  - `/openaip-v8-provider-manager-preview`
+  - `/openaip-v8-integration-center-preview`
+  - `/openaip-v8-local-apps-center-preview`
+  - `/openaip-v8-memory-knowledge-center-preview`
+  - `/openaip-v8-policy-capability-center-preview`
+  - `/openaip-v8-audit-center-preview`
+  - `/openaip-v8-execution-gateway-preview`
+- Routes kept hidden: none among v8 MVP center routes
+- Legacy connector remains visible: yes
+- Docs changed: yes
+- Source changed: yes
+- UI changed: yes
+- CLI changed: yes
+- Tests changed: yes
+- Runtime changed: no
+- Standard `aip start` used: yes
+- Services restarted: no
+- Taskkill/Stop-Process used: no
+- DB written: no
+- Memory DB written: no
+- Vector DB written: no
+- Indexing job run: no
+- Gate opened: no
+- Stage C enabled: no
+- Release/tag created: no
+- Auth/Gate changed: no
+- Connector action executed: no
+- External/local/provider calls made: no
+- Browser visual smoke: yes, via Playwright + installed Chrome
+- Screenshots: yes
+  - `docs/product/screenshots/openAip-v8-wave2-sidebar-promotion/sidebar-full-v8-group.png`
+  - `docs/product/screenshots/openAip-v8-wave2-sidebar-promotion/command-center.png`
+  - `docs/product/screenshots/openAip-v8-wave2-sidebar-promotion/execution-gateway.png`
+  - `docs/product/screenshots/openAip-v8-wave2-sidebar-promotion/provider-manager.png`
+  - `docs/product/screenshots/openAip-v8-wave2-sidebar-promotion/integration-center.png`
+  - `docs/product/screenshots/openAip-v8-wave2-sidebar-promotion/local-apps-center.png`
+- Verification:
+  - `git diff --check`: PASS
+  - `v8-center-readonly-route-smoke`: PASS 100/100
+  - `project-root-and-stubs`: PASS 15/15
+  - v8 registry validators: PASS
+  - `npm run typecheck`: PASS
+  - `npm run lint`: PASS
+  - `npm run build`: PASS
+  - `npm test --silent`: PASS 9/9
+- Human authorization needed for next step: yes, for any execution enablement, Gate opening, Stage C enablement, connector action, provider/local app call, DB write, memory/vector write, indexing, release, tag, or Auth/Gate change
+- Recommended next step: product owner visual review of the now-visible readonly v8 sidebar group; keep Gate CLOSED until a separate enablement package is authorized
+

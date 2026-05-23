@@ -266,6 +266,15 @@ function AppShell() {
               </div>
               {!collapsed.has('openAipV8') && (<>
                 <NavItem to="/openaip-v8-command-center-preview" icon="route" label={t.nav.openAipV8CommandCenter} />
+                <NavItem to="/openaip-v8-agent-center-preview" icon="route" label={t.nav.openAipV8AgentCenter} />
+                <NavItem to="/openaip-v8-task-center-preview" icon="route" label={t.nav.openAipV8TaskCenter} />
+                <NavItem to="/openaip-v8-audit-center-preview" icon="route" label={t.nav.openAipV8AuditCenter} />
+                <NavItem to="/openaip-v8-policy-capability-center-preview" icon="route" label={t.nav.openAipV8PolicyCapabilityCenter} />
+                <NavItem to="/openaip-v8-execution-gateway-preview" icon="route" label={t.nav.openAipV8ExecutionGateway} />
+                <NavItem to="/openaip-v8-provider-manager-preview" icon="route" label={t.nav.openAipV8ProviderManager} />
+                <NavItem to="/openaip-v8-integration-center-preview" icon="route" label={t.nav.openAipV8IntegrationCenter} />
+                <NavItem to="/openaip-v8-local-apps-center-preview" icon="route" label={t.nav.openAipV8LocalAppsCenter} />
+                <NavItem to="/openaip-v8-memory-knowledge-center-preview" icon="route" label={t.nav.openAipV8MemoryKnowledgeCenter} />
               </>)}
             </div>
 

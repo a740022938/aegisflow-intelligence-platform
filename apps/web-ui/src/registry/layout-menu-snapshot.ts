@@ -31,6 +31,15 @@ const SNAPSHOT: LayoutSectionSnapshot[] = [
     sectionLabelKey: 'nav.openAipV8',
     items: [
       { path: '/openaip-v8-command-center-preview', icon: 'route', labelKey: 'nav.openAipV8CommandCenter' },
+      { path: '/openaip-v8-agent-center-preview', icon: 'route', labelKey: 'nav.openAipV8AgentCenter' },
+      { path: '/openaip-v8-task-center-preview', icon: 'route', labelKey: 'nav.openAipV8TaskCenter' },
+      { path: '/openaip-v8-audit-center-preview', icon: 'route', labelKey: 'nav.openAipV8AuditCenter' },
+      { path: '/openaip-v8-policy-capability-center-preview', icon: 'route', labelKey: 'nav.openAipV8PolicyCapabilityCenter' },
+      { path: '/openaip-v8-execution-gateway-preview', icon: 'route', labelKey: 'nav.openAipV8ExecutionGateway' },
+      { path: '/openaip-v8-provider-manager-preview', icon: 'route', labelKey: 'nav.openAipV8ProviderManager' },
+      { path: '/openaip-v8-integration-center-preview', icon: 'route', labelKey: 'nav.openAipV8IntegrationCenter' },
+      { path: '/openaip-v8-local-apps-center-preview', icon: 'route', labelKey: 'nav.openAipV8LocalAppsCenter' },
+      { path: '/openaip-v8-memory-knowledge-center-preview', icon: 'route', labelKey: 'nav.openAipV8MemoryKnowledgeCenter' },
     ],
   },
   {

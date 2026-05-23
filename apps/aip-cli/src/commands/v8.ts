@@ -5,7 +5,7 @@ export async function runV8(sub?: string) {
     console.log('Usage: aip v8 <subcommand>');
     console.log('');
     console.log('Subcommands:');
-    console.log('  centers    List all hidden readonly center preview routes');
+    console.log('  centers    List all visible readonly center sidebar routes');
     console.log('  status     Show v8 foundation status summary with registry counts');
     return;
   }
@@ -24,16 +24,16 @@ export async function runV8(sub?: string) {
       { route: '/openaip-v8-execution-gateway-preview', name: 'Execution Gateway', tag: 'closed', purpose: 'Execution Gate (closed)' },
     ];
     console.log('');
-    console.log('OpenAIP v8 Hidden Readonly Center Preview Routes');
-    console.log('================================================');
-    console.log('Mode: hidden/direct, readonly, Gate CLOSED, Stage C disabled');
+    console.log('OpenAIP v8 Visible Readonly Center Sidebar Routes');
+    console.log('=================================================');
+    console.log('Mode: visible in sidebar, readonly, Gate CLOSED, Stage C disabled');
     console.log('Data: registry-backed (openAipv8CenterData.ts)');
     console.log('');
     for (const c of centers) {
       console.log(`  ${c.route.padEnd(52)} ${c.name.padEnd(30)} [${c.tag.padEnd(10)}] ${c.purpose}`);
     }
     console.log('');
-    console.log('These routes are not exposed in sidebar. Access by direct URL only.');
+    console.log('All 10 v8 MVP center routes are exposed in sidebar as readonly entries.');
     console.log('');
     console.log('Connector → v8 Migration:');
     console.log('  Legacy Connector Centers bridge to v8 Integration Center + Provider Manager + Local Apps Center.');
@@ -47,7 +47,7 @@ export async function runV8(sub?: string) {
     console.log('============================');
     console.log('  Foundation Docs:              COMPLETE');
     console.log('  CLI Readonly Commands:        COMPLETE (agents/providers/integrations/apps/runtime/task/audit/policy/v8)');
-    console.log('  UI Preview Pages:             COMPLETE (10 hidden readonly routes with registry-backed data)');
+    console.log('  UI Preview Pages:             COMPLETE (10 visible readonly sidebar routes with registry-backed data)');
   console.log('  Registry Data Layer:          COMPLETE (openAipv8CenterData.ts with typed entries + dataSource/safetyNote/blockedActions/futurePhase + V8ExecutionBoundaryEntry)');
   console.log('  Connector → v8 Migration:     COMPLETE (bridge banners on legacy Connector Center pages)');
   console.log('  UX Polish:                    COMPLETE (Command Center hub + shared component + role descriptions + related centers nav)');

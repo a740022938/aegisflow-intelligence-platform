@@ -57,28 +57,102 @@ test('all 10 v8 page files exist in pages directory', () => {
   }
 });
 
-test('only command center v8 route is exposed in sidebar Layout.tsx', () => {
+const V8_SIDEBAR_ITEMS = [
+  {
+    route: '/openaip-v8-command-center-preview',
+    id: 'openaip-v8-command-center-preview',
+    zhLabel: 'OpenAIP v8 指挥中心',
+    enLabel: 'OpenAIP v8 Command Center',
+    labelKey: 'openAipV8CommandCenter',
+  },
+  {
+    route: '/openaip-v8-agent-center-preview',
+    id: 'openaip-v8-agent-center-preview',
+    zhLabel: '智能体中心',
+    enLabel: 'Agent Center',
+    labelKey: 'openAipV8AgentCenter',
+  },
+  {
+    route: '/openaip-v8-task-center-preview',
+    id: 'openaip-v8-task-center-preview',
+    zhLabel: '任务中心',
+    enLabel: 'Task Center',
+    labelKey: 'openAipV8TaskCenter',
+  },
+  {
+    route: '/openaip-v8-audit-center-preview',
+    id: 'openaip-v8-audit-center-preview',
+    zhLabel: '审计中心',
+    enLabel: 'Audit Center',
+    labelKey: 'openAipV8AuditCenter',
+  },
+  {
+    route: '/openaip-v8-policy-capability-center-preview',
+    id: 'openaip-v8-policy-capability-center-preview',
+    zhLabel: '策略与能力中心',
+    enLabel: 'Policy + Capability Center',
+    labelKey: 'openAipV8PolicyCapabilityCenter',
+  },
+  {
+    route: '/openaip-v8-execution-gateway-preview',
+    id: 'openaip-v8-execution-gateway-preview',
+    zhLabel: '执行网关',
+    enLabel: 'Execution Gateway',
+    labelKey: 'openAipV8ExecutionGateway',
+  },
+  {
+    route: '/openaip-v8-provider-manager-preview',
+    id: 'openaip-v8-provider-manager-preview',
+    zhLabel: '供应商管理',
+    enLabel: 'Provider Manager',
+    labelKey: 'openAipV8ProviderManager',
+  },
+  {
+    route: '/openaip-v8-integration-center-preview',
+    id: 'openaip-v8-integration-center-preview',
+    zhLabel: '集成中心',
+    enLabel: 'Integration Center',
+    labelKey: 'openAipV8IntegrationCenter',
+  },
+  {
+    route: '/openaip-v8-local-apps-center-preview',
+    id: 'openaip-v8-local-apps-center-preview',
+    zhLabel: '本地应用中心',
+    enLabel: 'Local Apps Center',
+    labelKey: 'openAipV8LocalAppsCenter',
+  },
+  {
+    route: '/openaip-v8-memory-knowledge-center-preview',
+    id: 'openaip-v8-memory-knowledge-center-preview',
+    zhLabel: '记忆与知识中心',
+    enLabel: 'Memory + Knowledge Center',
+    labelKey: 'openAipV8MemoryKnowledgeCenter',
+  },
+];
+
+test('all 10 v8 routes are exposed in sidebar Layout.tsx', () => {
   const layoutContent = fs.readFileSync(LAYOUT_TSX, 'utf8');
-  const allowedSidebarRoute = '/openaip-v8-command-center-preview';
-  assert.ok(layoutContent.includes(allowedSidebarRoute), 'Command Center route missing from Layout.tsx sidebar');
-  for (const route of V8_ROUTES.filter(r => r !== allowedSidebarRoute)) {
-    assert.equal(layoutContent.includes(route), false, `Route ${route} found in Layout.tsx sidebar`);
+  assert.ok(layoutContent.includes('{t.nav.openAipV8}'), 'OpenAIP v8 sidebar group missing');
+  for (const item of V8_SIDEBAR_ITEMS) {
+    assert.ok(layoutContent.includes(`to="${item.route}"`), `Route ${item.route} missing from Layout.tsx sidebar`);
+    assert.ok(layoutContent.includes(`t.nav.${item.labelKey}`), `Route ${item.route} missing label key ${item.labelKey}`);
   }
 });
 
-test('command center sidebar label and shadow menu registry exist', () => {
+test('all 10 v8 sidebar labels and shadow menu registry entries exist', () => {
   const i18nContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/i18n.ts'), 'utf8');
   const snapshotContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/layout-menu-snapshot.ts'), 'utf8');
   const menuContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/menu-registry.ts'), 'utf8');
 
-  assert.ok(i18nContent.includes("openAipV8CommandCenter: 'OpenAIP v8 指挥中心'"), 'Chinese Command Center sidebar label missing');
-  assert.ok(i18nContent.includes("openAipV8CommandCenter: 'OpenAIP v8 Command Center'"), 'English Command Center sidebar label missing');
-  assert.ok(snapshotContent.includes('/openaip-v8-command-center-preview'), 'layout snapshot missing Command Center route');
-  assert.ok(menuContent.includes("id: 'openaip-v8-command-center-preview'"), 'menu registry missing Command Center item');
-
-  for (const route of V8_ROUTES.filter(r => r !== '/openaip-v8-command-center-preview')) {
-    assert.equal(snapshotContent.includes(route), false, `Detailed v8 route ${route} found in layout snapshot`);
-    assert.equal(menuContent.includes(route), false, `Detailed v8 route ${route} found in menu registry`);
+  assert.ok(i18nContent.includes("openAipV8: 'OpenAIP v8 指挥中心'"), 'Chinese OpenAIP v8 sidebar group label missing');
+  assert.ok(i18nContent.includes("openAipV8: 'OpenAIP v8 Control Plane'"), 'English OpenAIP v8 sidebar group label missing');
+  for (const item of V8_SIDEBAR_ITEMS) {
+    assert.ok(i18nContent.includes(`${item.labelKey}: '${item.zhLabel}'`), `Chinese label missing for ${item.route}`);
+    assert.ok(i18nContent.includes(`${item.labelKey}: '${item.enLabel}'`), `English label missing for ${item.route}`);
+    assert.ok(snapshotContent.includes(item.route), `layout snapshot missing ${item.route}`);
+    assert.ok(snapshotContent.includes(`labelKey: 'nav.${item.labelKey}'`), `layout snapshot missing ${item.labelKey}`);
+    assert.ok(menuContent.includes(`id: '${item.id}'`), `menu registry missing ${item.id}`);
+    assert.ok(menuContent.includes(`path: '${item.route}'`), `menu registry missing ${item.route}`);
   }
 });
 
@@ -89,7 +163,7 @@ test('command center links to all 9 center pages', () => {
     assert.ok(ccContent.includes(route), `Command Center missing link to ${route}`);
   }
   assert.ok(ccContent.includes('Readonly Agent Control Plane MVP'), 'Command Center missing Wave 1 readonly MVP context');
-  assert.ok(ccContent.includes('detailed centers remain readonly/direct'), 'Command Center missing detailed centers hidden/direct context');
+  assert.ok(ccContent.includes('all 10 readonly centers are visible in the sidebar'), 'Command Center missing Wave 2 sidebar visibility context');
 });
 
 test('safety strings exist in shared component', () => {

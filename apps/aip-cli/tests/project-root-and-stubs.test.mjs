@@ -61,7 +61,7 @@ test('v8 list/status commands show registry counts', () => {
   }
 });
 
-test('v8 centers command lists all hidden readonly routes with registry data note', () => {
+test('v8 centers command lists all visible readonly sidebar routes with registry data note', () => {
   const out = runCli('v8 centers');
   assert.match(out, /openaip-v8-command-center-preview/);
   assert.match(out, /openaip-v8-agent-center-preview/);
@@ -73,7 +73,7 @@ test('v8 centers command lists all hidden readonly routes with registry data not
   assert.match(out, /openaip-v8-policy-capability-center-preview/);
   assert.match(out, /openaip-v8-audit-center-preview/);
   assert.match(out, /openaip-v8-execution-gateway-preview/);
-  assert.match(out, /hidden\/direct, readonly, Gate CLOSED/);
+  assert.match(out, /visible in sidebar, readonly, Gate CLOSED/);
   assert.match(out, /registry-backed/);
   assert.match(out, /Migration bridge banner/);
 });
@@ -112,11 +112,10 @@ test('all 10 v8 center routes exist in App.tsx', () => {
   }
 });
 
-test('only command center v8 route is exposed in sidebar', () => {
+test('all 10 v8 center routes are exposed in sidebar', () => {
   const layoutContent = fs.readFileSync('E:\\AIP\\apps\\web-ui\\src\\components\\Layout.tsx', 'utf8');
-  const allowedSidebarRoute = 'openaip-v8-command-center-preview';
-  assert.ok(layoutContent.includes(allowedSidebarRoute), 'Command Center route missing from Layout.tsx sidebar');
-  const hiddenV8Routes = [
+  const promotedV8Routes = [
+    'openaip-v8-command-center-preview',
     'openaip-v8-agent-center-preview',
     'openaip-v8-task-center-preview',
     'openaip-v8-provider-manager-preview',
@@ -127,8 +126,8 @@ test('only command center v8 route is exposed in sidebar', () => {
     'openaip-v8-audit-center-preview',
     'openaip-v8-execution-gateway-preview',
   ];
-  for (const route of hiddenV8Routes) {
-    assert.equal(layoutContent.includes(route), false, `Route ${route} found in Layout.tsx sidebar`);
+  for (const route of promotedV8Routes) {
+    assert.ok(layoutContent.includes(route), `Route ${route} missing from Layout.tsx sidebar`);
   }
 });
 
