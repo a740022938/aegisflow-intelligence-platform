@@ -1,0 +1,1477 @@
+{
+  "base": "http://127.0.0.1:5173",
+  "browser": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "generatedAt": "2026-05-23T15:00:04.884Z",
+  "results": [
+    {
+      "route": "/connector-center-readonly",
+      "status": 200,
+      "title": "天枢智治平台 (OpenAIP) - Web UI",
+      "h1Text": "",
+      "screenshot": "E:\\AIP\\docs\\product\\screenshots\\connector-center-readonly.png",
+      "required": {
+        "Legacy Connector Center": true,
+        "Legacy v7 Readonly View": true,
+        "Integration Center": true,
+        "Local Apps Center": true,
+        "Provider Manager": true
+      },
+      "hasSidebarLegacyLabel": true,
+      "hiddenV8SidebarMentions": [
+        {
+          "tag": "a",
+          "text": "Open v8 Integration Center →",
+          "href": "http://127.0.0.1:5173/openaip-v8-integration-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "v8 Local Apps Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-local-apps-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "v8 Provider Manager",
+          "href": "http://127.0.0.1:5173/openaip-v8-provider-manager-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "v8 Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        }
+      ],
+      "visibleControls": [
+        {
+          "tag": "button",
+          "text": "首页",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "关于",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "系统",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "帮助",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "EN",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "切换主题",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "仪表板",
+          "href": "http://127.0.0.1:5173/",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工厂状态",
+          "href": "http://127.0.0.1:5173/factory-status",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "助手中心",
+          "href": "http://127.0.0.1:5173/assistant-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "数据集",
+          "href": "http://127.0.0.1:5173/datasets",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "训练中心",
+          "href": "http://127.0.0.1:5173/training",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "运行中心",
+          "href": "http://127.0.0.1:5173/runs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模板中心",
+          "href": "http://127.0.0.1:5173/templates",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型管理",
+          "href": "http://127.0.0.1:5173/models",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型产物",
+          "href": "http://127.0.0.1:5173/artifacts",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "评估中心",
+          "href": "http://127.0.0.1:5173/evaluations",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "部署中心",
+          "href": "http://127.0.0.1:5173/deployments",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流",
+          "href": "http://127.0.0.1:5173/workflow-jobs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流编排器",
+          "href": "http://127.0.0.1:5173/workflow-composer",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "流程运行画布",
+          "href": "http://127.0.0.1:5173/workflow-canvas",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模块中心",
+          "href": "http://127.0.0.1:5173/module-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "插件池",
+          "href": "http://127.0.0.1:5173/plugin-pool",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "任务编排",
+          "href": "http://127.0.0.1:5173/tasks",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "成本路由",
+          "href": "http://127.0.0.1:5173/cost-routing",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "OpenAxiom 只读检查",
+          "href": "http://127.0.0.1:5173/openaxiom-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Memory Hub 只读查看",
+          "href": "http://127.0.0.1:5173/memory-hub",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "连接器中心（旧）",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "麻将视觉调试台",
+          "href": "http://127.0.0.1:5173/vision-lab/mahjong-debug",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Open v8 Integration Center →",
+          "href": "http://127.0.0.1:5173/openaip-v8-integration-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "v8 Local Apps Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-local-apps-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "v8 Provider Manager",
+          "href": "http://127.0.0.1:5173/openaip-v8-provider-manager-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "v8 Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "/openaxiom-readonly",
+          "href": "http://127.0.0.1:5173/openaxiom-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "/memory-hub",
+          "href": "http://127.0.0.1:5173/memory-hub",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "打开完整 Runtime Registry 预览",
+          "href": "http://127.0.0.1:5173/runtime-registry-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "打开完整 Dry-run 计划预览",
+          "href": "http://127.0.0.1:5173/dry-run-plan-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "打开完整审计日志预览",
+          "href": "http://127.0.0.1:5173/audit-log-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "打开治理状态机预览",
+          "href": "http://127.0.0.1:5173/governance-state-machine-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "打开回滚预览",
+          "href": "http://127.0.0.1:5173/rollback-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "打开证据模型预览",
+          "href": "http://127.0.0.1:5173/evidence-schema-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "打开人工审批流程预览",
+          "href": "http://127.0.0.1:5173/human-approval-workflow-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "/governance-console-preview",
+          "href": "http://127.0.0.1:5173/governance-console-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "view contract",
+          "href": "http://127.0.0.1:5173/runtime-readonly-status-api-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "view contract",
+          "href": "http://127.0.0.1:5173/runtime-dry-run-contract-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "view contract",
+          "href": "http://127.0.0.1:5173/runtime-audit-store-contract-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "view pack",
+          "href": "http://127.0.0.1:5173/stage-c-preenable-review-preview",
+          "role": ""
+        }
+      ],
+      "riskyControls": [],
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off AIP v7.62.0 · Connector Center Preview · Legacy v7 Readonly View Preview Legacy Connector Center v7 readonly connector view — migrating to OpenAIP v8 Integration, Local Apps, and Provider surfaces Read Only Readonly · No external writes · No connector control · No API calls TOTAL CONNECTORS 8 ACTIVE 3 FUTURE 5 SIDEBAR READY 3 AVAILABLE ROUTES 2"
+    },
+    {
+      "route": "/openaip-v8-integration-center-preview",
+      "status": 200,
+      "title": "天枢智治平台 (OpenAIP) - Web UI",
+      "h1Text": "OpenAIP v8 Integration Center Preview",
+      "screenshot": "E:\\AIP\\docs\\product\\screenshots\\openaip-v8-integration-center-preview.png",
+      "required": {
+        "Integration Center": true,
+        "Integration Matrix": true,
+        "Provider": true,
+        "Legacy Connector": true
+      },
+      "hasSidebarLegacyLabel": true,
+      "hiddenV8SidebarMentions": [
+        {
+          "tag": "a",
+          "text": "Agent Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-agent-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Provider Manager",
+          "href": "http://127.0.0.1:5173/openaip-v8-provider-manager-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Local Apps Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-local-apps-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Policy Capability Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-policy-capability-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Audit Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-audit-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Execution Gateway",
+          "href": "http://127.0.0.1:5173/openaip-v8-execution-gateway-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "← Back to OpenAIP v8 Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        }
+      ],
+      "visibleControls": [
+        {
+          "tag": "button",
+          "text": "首页",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "关于",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "系统",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "帮助",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "EN",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "切换主题",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "仪表板",
+          "href": "http://127.0.0.1:5173/",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工厂状态",
+          "href": "http://127.0.0.1:5173/factory-status",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "助手中心",
+          "href": "http://127.0.0.1:5173/assistant-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "数据集",
+          "href": "http://127.0.0.1:5173/datasets",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "训练中心",
+          "href": "http://127.0.0.1:5173/training",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "运行中心",
+          "href": "http://127.0.0.1:5173/runs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模板中心",
+          "href": "http://127.0.0.1:5173/templates",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型管理",
+          "href": "http://127.0.0.1:5173/models",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型产物",
+          "href": "http://127.0.0.1:5173/artifacts",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "评估中心",
+          "href": "http://127.0.0.1:5173/evaluations",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "部署中心",
+          "href": "http://127.0.0.1:5173/deployments",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流",
+          "href": "http://127.0.0.1:5173/workflow-jobs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流编排器",
+          "href": "http://127.0.0.1:5173/workflow-composer",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "流程运行画布",
+          "href": "http://127.0.0.1:5173/workflow-canvas",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模块中心",
+          "href": "http://127.0.0.1:5173/module-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "插件池",
+          "href": "http://127.0.0.1:5173/plugin-pool",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "任务编排",
+          "href": "http://127.0.0.1:5173/tasks",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "成本路由",
+          "href": "http://127.0.0.1:5173/cost-routing",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "OpenAxiom 只读检查",
+          "href": "http://127.0.0.1:5173/openaxiom-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Memory Hub 只读查看",
+          "href": "http://127.0.0.1:5173/memory-hub",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "连接器中心（旧）",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "麻将视觉调试台",
+          "href": "http://127.0.0.1:5173/vision-lab/mahjong-debug",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Agent Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-agent-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Provider Manager",
+          "href": "http://127.0.0.1:5173/openaip-v8-provider-manager-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Local Apps Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-local-apps-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Policy Capability Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-policy-capability-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Audit Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-audit-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Execution Gateway",
+          "href": "http://127.0.0.1:5173/openaip-v8-execution-gateway-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Legacy Connector Center",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "← Back to OpenAIP v8 Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        }
+      ],
+      "riskyControls": [],
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Integration Center Preview Readonly Preview · Gate CLOSED · Stage C disabled External integration governance, bridge classification, and readonly handshake planning Registry-backed integration center with Integration ↔ Provider handshake matrix and migration bridge, without connector actions. Readonly Preview No runtime mutation "
+    },
+    {
+      "route": "/openaip-v8-local-apps-center-preview",
+      "status": 200,
+      "title": "天枢智治平台 (OpenAIP) - Web UI",
+      "h1Text": "OpenAIP v8 Local Apps Center Preview",
+      "screenshot": "E:\\AIP\\docs\\product\\screenshots\\openaip-v8-local-apps-center-preview.png",
+      "required": {
+        "Local Apps Center": true,
+        "OpenAxiom": true,
+        "Local Apps Matrix": true,
+        "No local app launch": true
+      },
+      "hasSidebarLegacyLabel": true,
+      "hiddenV8SidebarMentions": [
+        {
+          "tag": "a",
+          "text": "Integration Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-integration-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Provider Manager",
+          "href": "http://127.0.0.1:5173/openaip-v8-provider-manager-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Memory + Knowledge Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-memory-knowledge-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Policy Capability Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-policy-capability-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Execution Gateway",
+          "href": "http://127.0.0.1:5173/openaip-v8-execution-gateway-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "← Back to OpenAIP v8 Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        }
+      ],
+      "visibleControls": [
+        {
+          "tag": "button",
+          "text": "首页",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "关于",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "系统",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "帮助",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "EN",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "切换主题",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "仪表板",
+          "href": "http://127.0.0.1:5173/",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工厂状态",
+          "href": "http://127.0.0.1:5173/factory-status",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "助手中心",
+          "href": "http://127.0.0.1:5173/assistant-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "数据集",
+          "href": "http://127.0.0.1:5173/datasets",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "训练中心",
+          "href": "http://127.0.0.1:5173/training",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "运行中心",
+          "href": "http://127.0.0.1:5173/runs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模板中心",
+          "href": "http://127.0.0.1:5173/templates",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型管理",
+          "href": "http://127.0.0.1:5173/models",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型产物",
+          "href": "http://127.0.0.1:5173/artifacts",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "评估中心",
+          "href": "http://127.0.0.1:5173/evaluations",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "部署中心",
+          "href": "http://127.0.0.1:5173/deployments",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流",
+          "href": "http://127.0.0.1:5173/workflow-jobs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流编排器",
+          "href": "http://127.0.0.1:5173/workflow-composer",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "流程运行画布",
+          "href": "http://127.0.0.1:5173/workflow-canvas",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模块中心",
+          "href": "http://127.0.0.1:5173/module-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "插件池",
+          "href": "http://127.0.0.1:5173/plugin-pool",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "任务编排",
+          "href": "http://127.0.0.1:5173/tasks",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "成本路由",
+          "href": "http://127.0.0.1:5173/cost-routing",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "OpenAxiom 只读检查",
+          "href": "http://127.0.0.1:5173/openaxiom-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Memory Hub 只读查看",
+          "href": "http://127.0.0.1:5173/memory-hub",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "连接器中心（旧）",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "麻将视觉调试台",
+          "href": "http://127.0.0.1:5173/vision-lab/mahjong-debug",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Integration Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-integration-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Provider Manager",
+          "href": "http://127.0.0.1:5173/openaip-v8-provider-manager-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Memory + Knowledge Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-memory-knowledge-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Policy Capability Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-policy-capability-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Execution Gateway",
+          "href": "http://127.0.0.1:5173/openaip-v8-execution-gateway-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Legacy Connector Center",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "← Back to OpenAIP v8 Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        }
+      ],
+      "riskyControls": [],
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Local Apps Center Preview Readonly Preview · Gate CLOSED · Stage C disabled Local app classification, safety boundary, and center relations Registry-backed local apps inventory and relationship matrix without launch/control. Readonly Preview No runtime mutation Gate CLOSED Stage C disabled Registry-backed Preview only No runtime "
+    },
+    {
+      "route": "/openaip-v8-provider-manager-preview",
+      "status": 200,
+      "title": "天枢智治平台 (OpenAIP) - Web UI",
+      "h1Text": "OpenAIP v8 Provider Manager Preview",
+      "screenshot": "E:\\AIP\\docs\\product\\screenshots\\openaip-v8-provider-manager-preview.png",
+      "required": {
+        "Provider Manager": true,
+        "Provider Profile Matrix": true,
+        "Secret": true,
+        "No provider switching": true
+      },
+      "hasSidebarLegacyLabel": true,
+      "hiddenV8SidebarMentions": [
+        {
+          "tag": "a",
+          "text": "Agent Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-agent-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Task Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-task-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Policy Capability Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-policy-capability-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Audit Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-audit-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Execution Gateway",
+          "href": "http://127.0.0.1:5173/openaip-v8-execution-gateway-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "← Back to OpenAIP v8 Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        }
+      ],
+      "visibleControls": [
+        {
+          "tag": "button",
+          "text": "首页",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "关于",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "系统",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "帮助",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "EN",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "切换主题",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "仪表板",
+          "href": "http://127.0.0.1:5173/",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工厂状态",
+          "href": "http://127.0.0.1:5173/factory-status",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "助手中心",
+          "href": "http://127.0.0.1:5173/assistant-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "数据集",
+          "href": "http://127.0.0.1:5173/datasets",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "训练中心",
+          "href": "http://127.0.0.1:5173/training",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "运行中心",
+          "href": "http://127.0.0.1:5173/runs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模板中心",
+          "href": "http://127.0.0.1:5173/templates",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型管理",
+          "href": "http://127.0.0.1:5173/models",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型产物",
+          "href": "http://127.0.0.1:5173/artifacts",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "评估中心",
+          "href": "http://127.0.0.1:5173/evaluations",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "部署中心",
+          "href": "http://127.0.0.1:5173/deployments",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流",
+          "href": "http://127.0.0.1:5173/workflow-jobs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流编排器",
+          "href": "http://127.0.0.1:5173/workflow-composer",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "流程运行画布",
+          "href": "http://127.0.0.1:5173/workflow-canvas",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模块中心",
+          "href": "http://127.0.0.1:5173/module-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "插件池",
+          "href": "http://127.0.0.1:5173/plugin-pool",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "任务编排",
+          "href": "http://127.0.0.1:5173/tasks",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "成本路由",
+          "href": "http://127.0.0.1:5173/cost-routing",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "OpenAxiom 只读检查",
+          "href": "http://127.0.0.1:5173/openaxiom-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Memory Hub 只读查看",
+          "href": "http://127.0.0.1:5173/memory-hub",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "连接器中心（旧）",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "麻将视觉调试台",
+          "href": "http://127.0.0.1:5173/vision-lab/mahjong-debug",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Agent Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-agent-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Task Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-task-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Policy Capability Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-policy-capability-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Audit Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-audit-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Execution Gateway",
+          "href": "http://127.0.0.1:5173/openaip-v8-execution-gateway-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "← Back to OpenAIP v8 Command Center",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "role": ""
+        }
+      ],
+      "riskyControls": [],
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Provider Manager Preview Readonly Preview · Gate CLOSED · Stage C disabled Provider profile matrix + safety boundary + conceptual routing preview Registry-backed provider ecosystem center for profiles, safety, and routing concepts without runtime mutation. Readonly Preview No runtime mutation Gate CLOSED Stage C disabled Registry"
+    },
+    {
+      "route": "/openaip-v8-command-center-preview",
+      "status": 200,
+      "title": "天枢智治平台 (OpenAIP) - Web UI",
+      "h1Text": "OpenAIP v8 Command Center Preview",
+      "screenshot": "E:\\AIP\\docs\\product\\screenshots\\openaip-v8-command-center-preview.png",
+      "required": {
+        "OpenAIP v8 Command Center": true,
+        "Gate CLOSED": true,
+        "Stage C disabled": true,
+        "Readonly": true
+      },
+      "hasSidebarLegacyLabel": true,
+      "hiddenV8SidebarMentions": [
+        {
+          "tag": "a",
+          "text": "READONLY Agent Center AI Agent Lifecycle & Permissions AI agents lifecycle: enabled / paused / disabled / quarantined Permission levels L0-L5 Task/audit linkage No agent launch, no lifecycle mutation 5",
+          "href": "http://127.0.0.1:5173/openaip-v8-agent-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "DRAFT Task Center Task Pack & Receipt Pipeline Task pack generation Receipt intake pipeline Review queue Human-fatigue reduction No task execution, no write 5",
+          "href": "http://127.0.0.1:5173/openaip-v8-task-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Provider Manager Model Provider Routing CC Switch-like provider/config/router Provider registry Readonly/dry-run first No provider action, dry-run only 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-provider-manager-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Integration Center External Service Binding OpenClaw GitHub Webhooks/external services Connector → v8 migration bridge No connector action in preview 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-integration-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Local Apps Center Local Micro App Runtime OpenAxiom as Local App / UI Lab / Vision Tool ComfyUI Ollama / LM Studio YOLO / SAM tools No app launch in preview 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-local-apps-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Memory + Knowledge Center Long-term Memory & Knowledge Memory access policy Knowledge source registry Receipt/report indexing No memory write in preview 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-memory-knowledge-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Policy Router + Capability Center Policy & Capability Governance Capability != permission Permission levels Policy-before-buttons No policy mutation 7 policies, 12 caps",
+          "href": "http://127.0.0.1:5173/openaip-v8-policy-capability-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Audit Center Audit Trail & Evidence Receipts Reports Evidence Commit/push/verification trail Readonly audit trail 5",
+          "href": "http://127.0.0.1:5173/openaip-v8-audit-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "CLOSED Execution Gateway Execution Gate (closed) Default closed Gate CLOSED Stage C disabled Dry-run/approval required before future execution 8 execution boundary entries Gate remains closed 8/8 blocked",
+          "href": "http://127.0.0.1:5173/openaip-v8-execution-gateway-preview",
+          "role": ""
+        }
+      ],
+      "visibleControls": [
+        {
+          "tag": "button",
+          "text": "首页",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "关于",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "系统",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "帮助",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "EN",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "button",
+          "text": "切换主题",
+          "href": "",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "仪表板",
+          "href": "http://127.0.0.1:5173/",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工厂状态",
+          "href": "http://127.0.0.1:5173/factory-status",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "助手中心",
+          "href": "http://127.0.0.1:5173/assistant-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "数据集",
+          "href": "http://127.0.0.1:5173/datasets",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "训练中心",
+          "href": "http://127.0.0.1:5173/training",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "运行中心",
+          "href": "http://127.0.0.1:5173/runs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模板中心",
+          "href": "http://127.0.0.1:5173/templates",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型管理",
+          "href": "http://127.0.0.1:5173/models",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模型产物",
+          "href": "http://127.0.0.1:5173/artifacts",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "评估中心",
+          "href": "http://127.0.0.1:5173/evaluations",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "部署中心",
+          "href": "http://127.0.0.1:5173/deployments",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流",
+          "href": "http://127.0.0.1:5173/workflow-jobs",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "工作流编排器",
+          "href": "http://127.0.0.1:5173/workflow-composer",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "流程运行画布",
+          "href": "http://127.0.0.1:5173/workflow-canvas",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "模块中心",
+          "href": "http://127.0.0.1:5173/module-center",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "插件池",
+          "href": "http://127.0.0.1:5173/plugin-pool",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "任务编排",
+          "href": "http://127.0.0.1:5173/tasks",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "成本路由",
+          "href": "http://127.0.0.1:5173/cost-routing",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "OpenAxiom 只读检查",
+          "href": "http://127.0.0.1:5173/openaxiom-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "Memory Hub 只读查看",
+          "href": "http://127.0.0.1:5173/memory-hub",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "连接器中心（旧）",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "麻将视觉调试台",
+          "href": "http://127.0.0.1:5173/vision-lab/mahjong-debug",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Agent Center AI Agent Lifecycle & Permissions AI agents lifecycle: enabled / paused / disabled / quarantined Permission levels L0-L5 Task/audit linkage No agent launch, no lifecycle mutation 5",
+          "href": "http://127.0.0.1:5173/openaip-v8-agent-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "DRAFT Task Center Task Pack & Receipt Pipeline Task pack generation Receipt intake pipeline Review queue Human-fatigue reduction No task execution, no write 5",
+          "href": "http://127.0.0.1:5173/openaip-v8-task-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Provider Manager Model Provider Routing CC Switch-like provider/config/router Provider registry Readonly/dry-run first No provider action, dry-run only 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-provider-manager-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Integration Center External Service Binding OpenClaw GitHub Webhooks/external services Connector → v8 migration bridge No connector action in preview 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-integration-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Local Apps Center Local Micro App Runtime OpenAxiom as Local App / UI Lab / Vision Tool ComfyUI Ollama / LM Studio YOLO / SAM tools No app launch in preview 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-local-apps-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Memory + Knowledge Center Long-term Memory & Knowledge Memory access policy Knowledge source registry Receipt/report indexing No memory write in preview 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-memory-knowledge-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Policy Router + Capability Center Policy & Capability Governance Capability != permission Permission levels Policy-before-buttons No policy mutation 7 policies, 12 caps",
+          "href": "http://127.0.0.1:5173/openaip-v8-policy-capability-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Audit Center Audit Trail & Evidence Receipts Reports Evidence Commit/push/verification trail Readonly audit trail 5",
+          "href": "http://127.0.0.1:5173/openaip-v8-audit-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "CLOSED Execution Gateway Execution Gate (closed) Default closed Gate CLOSED Stage C disabled Dry-run/approval required before future execution 8 execution boundary entries Gate remains closed 8/8 blocked",
+          "href": "http://127.0.0.1:5173/openaip-v8-execution-gateway-preview",
+          "role": ""
+        }
+      ],
+      "riskyControls": [
+        {
+          "tag": "a",
+          "text": "READONLY Agent Center AI Agent Lifecycle & Permissions AI agents lifecycle: enabled / paused / disabled / quarantined Permission levels L0-L5 Task/audit linkage No agent launch, no lifecycle mutation 5",
+          "href": "http://127.0.0.1:5173/openaip-v8-agent-center-preview",
+          "role": ""
+        },
+        {
+          "tag": "a",
+          "text": "READONLY Local Apps Center Local Micro App Runtime OpenAxiom as Local App / UI Lab / Vision Tool ComfyUI Ollama / LM Studio YOLO / SAM tools No app launch in preview 8",
+          "href": "http://127.0.0.1:5173/openaip-v8-local-apps-center-preview",
+          "role": ""
+        }
+      ],
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Command Center Preview 各路 AI 工具都是英雄，OpenAIP 是指挥中心。 GATE CLOSED STAGE C DISABLED Readonly Foundation Gate CLOSED Stage C disabled No runtime mutation Registry-backed Config != permission Enabled != execution Authorized != gateOpen Capability != permission UI switch != backend truth All safety boundaries are enforced. This preview d"
+    }
+  ]
+}
