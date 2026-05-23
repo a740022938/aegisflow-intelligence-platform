@@ -24,7 +24,7 @@ const capabilities = load(files.capabilities);
 const policies = load(files.policies);
 
 const permissionSet = new Set(['L0','L1','L2','L3','L4','L5']);
-const lifecycleSet = new Set(['registered','enabled','paused','disabled','quarantined']);
+const lifecycleSet = new Set(['planned','registered','enabled','paused','disabled','quarantined']);
 
 function checkPermissionAndLifecycle(items, path, lifecycleRequired = true) {
   for (const item of items) {
@@ -57,7 +57,7 @@ if (!integrations.some(i => i.name === 'GitHub' && i.kind === 'code_host')) {
 if (!policies.some(p => p.gateOpen === false && p.stageCEnabled === false)) {
   throw new Error('policies: gateOpen/stageCEnabled baseline missing');
 }
-if (!capabilities.some(c => c.requiresGate === true && c.requiresStageC === true)) {
+if (!capabilities.some(c => c.gateRequired === true && c.stageCRequired === true)) {
   throw new Error('capabilities: gate/stageC protected capability missing');
 }
 

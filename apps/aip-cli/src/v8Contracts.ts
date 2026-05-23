@@ -1,4 +1,4 @@
-export type AgentLifecycle = 'registered' | 'enabled' | 'paused' | 'disabled' | 'quarantined';
+export type AgentLifecycle = 'planned' | 'registered' | 'enabled' | 'paused' | 'disabled' | 'quarantined';
 export type PermissionLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
 export type IntegrationKind = 'agent' | 'provider' | 'local_app' | 'workflow_engine' | 'memory_provider' | 'knowledge_provider' | 'code_host' | 'runtime_service' | 'internal_plugin' | 'coding_agent' | 'unknown';
 export type CapabilityRisk = 'low' | 'medium' | 'high' | 'critical';
@@ -48,8 +48,8 @@ export interface CapabilityRegistryEntry {
   kind: string;
   risk: CapabilityRisk;
   permissionLevel: PermissionLevel;
-  requiresGate?: boolean;
-  requiresStageC?: boolean;
+  gateRequired?: boolean;
+  stageCRequired?: boolean;
 }
 export interface PolicyRegistryEntry {
   id: string;

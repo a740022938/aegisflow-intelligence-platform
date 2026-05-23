@@ -4,6 +4,8 @@
     "name": "OpenClaw",
     "kind": "agent",
     "integrationKind": "runtime_service",
+    "firstClass": true,
+    "optional": true,
     "lifecycle": "enabled",
     "permissionLevel": "L2",
     "status": "online — no execution",
