@@ -20,44 +20,44 @@ test('status lines no stale track', async () => {
 test('v8 list/status commands show readonly source and classify entities', () => {
   const checks = [
     ['agents list', /OpenClaw/, /Source: example\/static readonly registry/],
-    ['providers list', /Ollama/, /Source: example\/static readonly registry/],
-    ['integrations list', /GitHub/, /Source: example\/static readonly registry/],
-    ['apps list', /OpenAxiom/, /kind=local_app/],
+    ['providers list', /Ollama/, /Registry count: \d+ providers/],
+    ['integrations list', /GitHub/, /Integration count: \d+/],
+    ['apps list', /OpenAxiom/, /category=local_app/],
     ['runtime status', /gateOpen=false/, /stageCEnabled=false/],
     ['runtime list', /OpenClaw/, /Ollama/],
-    ['task list', /Task Pack Registry/, /lifecycle=draft/],
-    ['task status', /draft items/, /receipt required/],
-    ['audit list', /P1A/, /verdict=passed/],
-    ['audit status', /total receipts/, /latest phase/],
-    ['policy list', /gateOpen=false/, /cap\.runtime\.status/],
-    ['policy status', /gateOpen/, /stageCEnabled/],
+    ['task list', /Task Archetype List/, /lifecycle=draft/],
+    ['task status', /Task Summary/, /All tasks are readonly/],
+    ['audit list', /audit\.cli-identity-foundation/, /state=accepted/],
+    ['audit status', /Total audit entries/, /Audit Summary/],
+    ['policy list', /Gate CLOSED/, /policy\.gated-execution/],
+    ['policy status', /Gate CLOSED/, /Stage C disabled/],
   ];
   for (const [cmd, p1, p2] of checks) {
     const out = runCli(cmd);
     assert.match(out, p1);
     assert.match(out, p2);
-    assert.match(out, /readonly foundation stub/);
+    assert.match(out, /readonly (registry|static\/example registry)|example\/static readonly registry/);
   }
 });
 
 test('v8 list/status commands show registry counts', () => {
   const countChecks = [
-    ['agents list', /Registry count/],
-    ['providers list', /Registry count/],
-    ['integrations list', /Registry count/],
-    ['apps list', /Registry count/],
+    ['agents list', /Total agents: \d+/],
+    ['providers list', /Registry count: \d+ providers/],
+    ['integrations list', /Integration count: \d+/],
+    ['apps list', /Local apps count: \d+/],
     ['runtime status', /total runtime entries/],
-    ['runtime list', /Registry count/],
-    ['task list', /Registry count/],
-    ['task status', /Registry count/],
-    ['audit list', /Registry count/],
-    ['audit status', /Registry count/],
-    ['policy list', /Registry count/],
-    ['policy status', /Registry count/],
+    ['runtime list', /Registry count: \d+ total runtime entries/],
+    ['task list', /Total task archetypes: \d+/],
+    ['task status', /Total task archetypes: \d+/],
+    ['audit list', /Total audit entries: \d+/],
+    ['audit status', /Total audit entries: \d+/],
+    ['policy list', /Total policies: \d+/],
+    ['policy status', /Total policies: \d+/],
   ];
   for (const [cmd, pattern] of countChecks) {
     const out = runCli(cmd);
-    assert.match(out, pattern, `${cmd} should show Registry count`);
+    assert.match(out, pattern, `${cmd} should show registry-backed count`);
   }
 });
 
@@ -112,10 +112,11 @@ test('all 10 v8 center routes exist in App.tsx', () => {
   }
 });
 
-test('no v8 route exposed in sidebar', () => {
+test('only command center v8 route is exposed in sidebar', () => {
   const layoutContent = fs.readFileSync('E:\\AIP\\apps\\web-ui\\src\\components\\Layout.tsx', 'utf8');
-  const v8RoutesInSidebar = [
-    'openaip-v8-command-center-preview',
+  const allowedSidebarRoute = 'openaip-v8-command-center-preview';
+  assert.ok(layoutContent.includes(allowedSidebarRoute), 'Command Center route missing from Layout.tsx sidebar');
+  const hiddenV8Routes = [
     'openaip-v8-agent-center-preview',
     'openaip-v8-task-center-preview',
     'openaip-v8-provider-manager-preview',
@@ -126,7 +127,7 @@ test('no v8 route exposed in sidebar', () => {
     'openaip-v8-audit-center-preview',
     'openaip-v8-execution-gateway-preview',
   ];
-  for (const route of v8RoutesInSidebar) {
+  for (const route of hiddenV8Routes) {
     assert.equal(layoutContent.includes(route), false, `Route ${route} found in Layout.tsx sidebar`);
   }
 });
@@ -142,23 +143,22 @@ test('center pages contain required safety phrases', () => {
       assert.ok(content.includes('Stage C disabled'), `${file} missing Stage C disabled`);
       assert.ok(content.includes('No runtime mutation'), `${file} missing No runtime mutation`);
     } else {
-      assert.ok(content.includes('ReadonlyCenterPreview') || content.includes('readonly'), `${file} missing readonly reference`);
+      assert.ok(content.includes('ReadonlyCenterPreview') || /readonly/i.test(content), `${file} missing readonly reference`);
     }
   }
 });
 
-test('no risky button labels in v8 center pages', () => {
+test('no executable controls in v8 center pages', () => {
   const pagesDir = 'E:\\AIP\\apps\\web-ui\\src\\pages';
-  const riskyPatterns = ['Execute', 'Launch', 'Enable Gate', 'Enable Stage C', 'Release', 'Restore', 'Restart', 'Write config'];
   const centerFiles = fs.readdirSync(pagesDir).filter(f => f.startsWith('OpenAIPv8') && f.endsWith('.tsx') && f !== 'OpenAIPv8ReadonlyCenterPreview.tsx');
   for (const file of centerFiles) {
     const content = fs.readFileSync(path.join(pagesDir, file), 'utf8');
-    for (const pattern of riskyPatterns) {
-      const inSafetySection = content.includes(pattern) && (content.includes('Not allowed') || content.includes('notAllowed'));
-      if (!inSafetySection) {
-        assert.equal(content.includes(pattern), false, `${file} contains risky text "${pattern}" outside safety section`);
-      }
-    }
+    assert.equal(content.includes('<button'), false, `${file} contains a button control`);
+    assert.equal(content.includes('role="button"'), false, `${file} contains a button role`);
+    assert.equal(content.includes('onClick'), false, `${file} contains an onClick handler`);
+    assert.equal(content.includes('Enable Gate'), false, `${file} contains Enable Gate action text`);
+    assert.equal(content.includes('Enable Stage C'), false, `${file} contains Enable Stage C action text`);
+    assert.equal(content.includes('Write config'), false, `${file} contains Write config action text`);
   }
 });
 

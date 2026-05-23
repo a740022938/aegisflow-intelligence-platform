@@ -59,6 +59,7 @@ const GOVERNANCE: Record<string, GovernanceDecision> = {
   'standard-output': { action: 'KEEP' },
   'connector-center-readonly': { action: 'KEEP' },
   'advanced-mode-readonly': { action: 'KEEP' },
+  'openaip-v8-command-center-preview': { action: 'KEEP' },
 };
 
 // ── Types ──

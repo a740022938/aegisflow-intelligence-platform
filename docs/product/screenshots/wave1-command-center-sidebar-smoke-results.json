@@ -1,0 +1,223 @@
+{
+  "base": "http://127.0.0.1:5173",
+  "browser": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "generatedAt": "2026-05-23T22:26:09.464Z",
+  "commandCenter": {
+    "status": 200,
+    "hasTitle": true,
+    "hasReadonlyMvp": true,
+    "hasPrinciple": true,
+    "hasGateClosed": true,
+    "hasStageCDisabled": true,
+    "hasNoRuntimeMutation": true,
+    "hasWave1Note": true,
+    "sidebar": {
+      "text": "概览▾仪表板工厂状态助手中心OpenAIP v8▾OpenAIP v8 指挥中心数据与训练▾数据集训练中心运行中心模板中心模型与发布▾模型管理模型产物评估中心部署中心流程与编排▾工作流工作流编排器流程运行画布能力与模块▾模块中心插件池任务编排成本路由OpenAxiom 只读检查Memory Hub 只读查看连接器中心（旧）视觉实验室▾麻将视觉调试台治理与回流▸知识▸输出▸AIP v7.62.0Build 2026.05.22Stable · Stage C disabled · Feature flag: off",
+      "anchors": [
+        {
+          "text": "仪表板",
+          "href": "http://127.0.0.1:5173/",
+          "path": "/"
+        },
+        {
+          "text": "工厂状态",
+          "href": "http://127.0.0.1:5173/factory-status",
+          "path": "/factory-status"
+        },
+        {
+          "text": "助手中心",
+          "href": "http://127.0.0.1:5173/assistant-center",
+          "path": "/assistant-center"
+        },
+        {
+          "text": "OpenAIP v8 指挥中心",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "path": "/openaip-v8-command-center-preview"
+        },
+        {
+          "text": "数据集",
+          "href": "http://127.0.0.1:5173/datasets",
+          "path": "/datasets"
+        },
+        {
+          "text": "训练中心",
+          "href": "http://127.0.0.1:5173/training",
+          "path": "/training"
+        },
+        {
+          "text": "运行中心",
+          "href": "http://127.0.0.1:5173/runs",
+          "path": "/runs"
+        },
+        {
+          "text": "模板中心",
+          "href": "http://127.0.0.1:5173/templates",
+          "path": "/templates"
+        },
+        {
+          "text": "模型管理",
+          "href": "http://127.0.0.1:5173/models",
+          "path": "/models"
+        },
+        {
+          "text": "模型产物",
+          "href": "http://127.0.0.1:5173/artifacts",
+          "path": "/artifacts"
+        },
+        {
+          "text": "评估中心",
+          "href": "http://127.0.0.1:5173/evaluations",
+          "path": "/evaluations"
+        },
+        {
+          "text": "部署中心",
+          "href": "http://127.0.0.1:5173/deployments",
+          "path": "/deployments"
+        },
+        {
+          "text": "工作流",
+          "href": "http://127.0.0.1:5173/workflow-jobs",
+          "path": "/workflow-jobs"
+        },
+        {
+          "text": "工作流编排器",
+          "href": "http://127.0.0.1:5173/workflow-composer",
+          "path": "/workflow-composer"
+        },
+        {
+          "text": "流程运行画布",
+          "href": "http://127.0.0.1:5173/workflow-canvas",
+          "path": "/workflow-canvas"
+        },
+        {
+          "text": "模块中心",
+          "href": "http://127.0.0.1:5173/module-center",
+          "path": "/module-center"
+        },
+        {
+          "text": "插件池",
+          "href": "http://127.0.0.1:5173/plugin-pool",
+          "path": "/plugin-pool"
+        },
+        {
+          "text": "任务编排",
+          "href": "http://127.0.0.1:5173/tasks",
+          "path": "/tasks"
+        },
+        {
+          "text": "成本路由",
+          "href": "http://127.0.0.1:5173/cost-routing",
+          "path": "/cost-routing"
+        },
+        {
+          "text": "OpenAxiom 只读检查",
+          "href": "http://127.0.0.1:5173/openaxiom-readonly",
+          "path": "/openaxiom-readonly"
+        },
+        {
+          "text": "Memory Hub 只读查看",
+          "href": "http://127.0.0.1:5173/memory-hub",
+          "path": "/memory-hub"
+        },
+        {
+          "text": "连接器中心（旧）",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "path": "/connector-center-readonly"
+        },
+        {
+          "text": "麻将视觉调试台",
+          "href": "http://127.0.0.1:5173/vision-lab/mahjong-debug",
+          "path": "/vision-lab/mahjong-debug"
+        }
+      ],
+      "v8Anchors": [
+        {
+          "text": "OpenAIP v8 指挥中心",
+          "href": "http://127.0.0.1:5173/openaip-v8-command-center-preview",
+          "path": "/openaip-v8-command-center-preview"
+        }
+      ],
+      "legacyConnectorAnchors": [
+        {
+          "text": "连接器中心（旧）",
+          "href": "http://127.0.0.1:5173/connector-center-readonly",
+          "path": "/connector-center-readonly"
+        }
+      ]
+    },
+    "riskyControls": [
+      {
+        "tag": "a",
+        "text": "READONLY Agent Center AI Agent Lifecycle & Permissions AI agents lifecycle: enabled / paused / disabled / quarantined Permission levels L0-L5 Task/audit linkage No agent launch, no lifecycle mutation 5",
+        "href": "http://127.0.0.1:5173/openaip-v8-agent-center-preview",
+        "inSidebar": false
+      },
+      {
+        "tag": "a",
+        "text": "READONLY Local Apps Center Local Micro App Runtime OpenAxiom as Local App / UI Lab / Vision Tool ComfyUI Ollama / LM Studio YOLO / SAM tools No app launch in preview 8",
+        "href": "http://127.0.0.1:5173/openaip-v8-local-apps-center-preview",
+        "inSidebar": false
+      }
+    ],
+    "screenshots": {
+      "sidebarCommandCenter": "E:\\AIP\\docs\\product\\screenshots\\wave1-command-center-sidebar.png",
+      "commandCenterFull": "E:\\AIP\\docs\\product\\screenshots\\wave1-command-center-full.png"
+    }
+  },
+  "directResults": [
+    {
+      "route": "/openaip-v8-agent-center-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Agent Center Preview"
+    },
+    {
+      "route": "/openaip-v8-task-center-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Task Center Preview"
+    },
+    {
+      "route": "/openaip-v8-provider-manager-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Provider Manager Preview"
+    },
+    {
+      "route": "/openaip-v8-integration-center-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Integration Center Preview"
+    },
+    {
+      "route": "/openaip-v8-local-apps-center-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Local Apps Center Preview"
+    },
+    {
+      "route": "/openaip-v8-memory-knowledge-center-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Memory + Knowledge Center Preview"
+    },
+    {
+      "route": "/openaip-v8-policy-capability-center-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Policy + Capability Center Preview"
+    },
+    {
+      "route": "/openaip-v8-audit-center-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Audit Center Preview"
+    },
+    {
+      "route": "/openaip-v8-execution-gateway-preview",
+      "status": 200,
+      "notBlank": true,
+      "title": "OpenAIP v8 Execution Gateway Preview"
+    }
+  ]
+}

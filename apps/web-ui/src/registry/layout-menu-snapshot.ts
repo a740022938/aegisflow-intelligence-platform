@@ -27,6 +27,13 @@ const SNAPSHOT: LayoutSectionSnapshot[] = [
     ],
   },
   {
+    sectionId: 'openaip-v8',
+    sectionLabelKey: 'nav.openAipV8',
+    items: [
+      { path: '/openaip-v8-command-center-preview', icon: 'route', labelKey: 'nav.openAipV8CommandCenter' },
+    ],
+  },
+  {
     sectionId: 'data-and-training',
     sectionLabelKey: 'nav.dataAndTraining',
     items: [

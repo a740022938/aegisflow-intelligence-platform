@@ -18,6 +18,7 @@ export const translations = {
       visionLab: '视觉实验室',
       knowledge: '知识',
       output: '输出',
+      openAipV8: 'OpenAIP v8',
       // ── 菜单项 ──
       dashboard: '仪表板',
       factoryStatus: '工厂状态',
@@ -41,6 +42,7 @@ export const translations = {
       audit: '审计',
       feedback: '回流池',
       advancedModeReadonly: '高级模式预览',
+      openAipV8CommandCenter: 'OpenAIP v8 指挥中心',
       connectorCenterReadonly: '连接器中心（旧）',
       knowledgeCenter: '知识中心',
       standardOutput: '标准输出',
@@ -179,6 +181,7 @@ export const translations = {
       visionLab: 'Vision Lab',
       knowledge: 'Knowledge',
       output: 'Output',
+      openAipV8: 'OpenAIP v8',
       // ── Nav items ──
       dashboard: 'Dashboard',
       factoryStatus: 'Factory Status',
@@ -202,6 +205,7 @@ export const translations = {
       audit: 'Audit',
       feedback: 'Feedback Pool',
       advancedModeReadonly: 'Advanced Mode Preview',
+      openAipV8CommandCenter: 'OpenAIP v8 Command Center',
       connectorCenterReadonly: 'Legacy Connector Center',
       knowledgeCenter: 'Knowledge Center',
       standardOutput: 'Standard Output',

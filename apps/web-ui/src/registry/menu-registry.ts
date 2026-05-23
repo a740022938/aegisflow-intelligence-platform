@@ -87,6 +87,28 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
     ],
   },
 
+  // ── OpenAIP v8 / Wave 1 ──
+  {
+    id: 'openaip-v8',
+    label: 'OpenAIP v8',
+    labelKey: 'nav.openAipV8',
+    items: [
+      {
+        id: 'openaip-v8-command-center-preview',
+        label: 'OpenAIP v8 指挥中心',
+        labelKey: 'nav.openAipV8CommandCenter',
+        path: '/openaip-v8-command-center-preview',
+        icon: 'route',
+        maturity: 'preview',
+        riskLevel: 'low',
+        pageType: 'core',
+        owner: 'openaip-v8',
+        notes: 'Wave 1 唯一可见 v8 入口。只读指挥中心；9 个详细 v8 center 仍保持 hidden/direct，不提供执行、启动、provider 切换或配置写入能力。',
+        currentNav: true,
+      },
+    ],
+  },
+
   // ── 数据与训练 / Data & Training ──
   {
     id: 'data-and-training',

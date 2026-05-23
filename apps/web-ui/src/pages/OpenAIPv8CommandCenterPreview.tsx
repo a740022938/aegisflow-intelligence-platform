@@ -164,8 +164,8 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 28 }}>OpenAIP v8 Command Center Preview</h1>
-            <p style={{ marginTop: 8, color: '#93c5fd', fontSize: 14 }}>各路 AI 工具都是英雄，OpenAIP 是指挥中心。</p>
+            <h1 style={{ margin: 0, fontSize: 28 }}>OpenAIP v8 Command Center</h1>
+            <p style={{ marginTop: 8, color: '#93c5fd', fontSize: 14 }}>Readonly Agent Control Plane MVP · 各路 AI 工具都是英雄，OpenAIP 是指挥中心。</p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ ...badgeStyle, background: '#dc2626', color: '#fff' }}>GATE CLOSED</span>
@@ -187,6 +187,7 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
           </div>
           <p style={{ margin: 0, fontSize: 12, color: '#9ca3af' }}>
             All safety boundaries are enforced. This preview does not mutate runtime, write to DB, open Gate, or enable Stage C.
+            {' '}Wave 1 exposes only this Command Center in the sidebar; detailed centers remain readonly/direct until separately approved.
           </p>
         </div>
 

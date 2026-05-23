@@ -57,10 +57,28 @@ test('all 10 v8 page files exist in pages directory', () => {
   }
 });
 
-test('no v8 routes are exposed in sidebar Layout.tsx', () => {
+test('only command center v8 route is exposed in sidebar Layout.tsx', () => {
   const layoutContent = fs.readFileSync(LAYOUT_TSX, 'utf8');
-  for (const route of V8_ROUTES) {
+  const allowedSidebarRoute = '/openaip-v8-command-center-preview';
+  assert.ok(layoutContent.includes(allowedSidebarRoute), 'Command Center route missing from Layout.tsx sidebar');
+  for (const route of V8_ROUTES.filter(r => r !== allowedSidebarRoute)) {
     assert.equal(layoutContent.includes(route), false, `Route ${route} found in Layout.tsx sidebar`);
+  }
+});
+
+test('command center sidebar label and shadow menu registry exist', () => {
+  const i18nContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/i18n.ts'), 'utf8');
+  const snapshotContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/layout-menu-snapshot.ts'), 'utf8');
+  const menuContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/menu-registry.ts'), 'utf8');
+
+  assert.ok(i18nContent.includes("openAipV8CommandCenter: 'OpenAIP v8 指挥中心'"), 'Chinese Command Center sidebar label missing');
+  assert.ok(i18nContent.includes("openAipV8CommandCenter: 'OpenAIP v8 Command Center'"), 'English Command Center sidebar label missing');
+  assert.ok(snapshotContent.includes('/openaip-v8-command-center-preview'), 'layout snapshot missing Command Center route');
+  assert.ok(menuContent.includes("id: 'openaip-v8-command-center-preview'"), 'menu registry missing Command Center item');
+
+  for (const route of V8_ROUTES.filter(r => r !== '/openaip-v8-command-center-preview')) {
+    assert.equal(snapshotContent.includes(route), false, `Detailed v8 route ${route} found in layout snapshot`);
+    assert.equal(menuContent.includes(route), false, `Detailed v8 route ${route} found in menu registry`);
   }
 });
 
@@ -70,6 +88,8 @@ test('command center links to all 9 center pages', () => {
   for (const route of linkedRoutes) {
     assert.ok(ccContent.includes(route), `Command Center missing link to ${route}`);
   }
+  assert.ok(ccContent.includes('Readonly Agent Control Plane MVP'), 'Command Center missing Wave 1 readonly MVP context');
+  assert.ok(ccContent.includes('detailed centers remain readonly/direct'), 'Command Center missing detailed centers hidden/direct context');
 });
 
 test('safety strings exist in shared component', () => {

@@ -258,6 +258,17 @@ function AppShell() {
               </>)}
             </div>
 
+            {/* ── OpenAIP v8 ── */}
+            <div className="nav-section">
+              <div className="nav-section-label" onClick={() => toggleSection('openAipV8')}>
+                {t.nav.openAipV8}
+                <span className="nav-section-arrow">{collapsed.has('openAipV8') ? '▸' : '▾'}</span>
+              </div>
+              {!collapsed.has('openAipV8') && (<>
+                <NavItem to="/openaip-v8-command-center-preview" icon="route" label={t.nav.openAipV8CommandCenter} />
+              </>)}
+            </div>
+
             {/* ── 数据与训练 ── */}
             <div className="nav-section">
               <div className="nav-section-label" onClick={() => toggleSection('dataAndTraining')}>
