@@ -503,7 +503,7 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
       },
       {
         id: 'advanced-mode-readonly',
-        label: '高级模式预览',
+        label: '高级模式',
         labelKey: 'nav.advancedModeReadonly',
         path: '/advanced-mode-readonly',
         icon: 'audit',
@@ -604,7 +604,7 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
       },
       {
         id: 'training-v2',
-        label: '训练中心 v2',
+        label: '训练工具',
         labelKey: 'nav.trainingV2',
         path: '/training-v2',
         icon: 'training',
@@ -682,7 +682,7 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
       },
       {
         id: 'huggingface',
-        label: 'HuggingFace',
+        label: '模型仓库',
         labelKey: 'nav.huggingface',
         path: '/huggingface',
         icon: 'api',

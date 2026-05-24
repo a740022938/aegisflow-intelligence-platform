@@ -64,7 +64,7 @@ const V8_SIDEBAR_ITEMS = [
     route: '/openaip-v8-command-center-preview',
     id: 'openaip-v8-command-center-preview',
     zhLabel: '指挥中心',
-    enLabel: 'Command',
+    enLabel: 'Command Center',
     labelKey: 'openAipV8CommandCenter',
   },
   {
