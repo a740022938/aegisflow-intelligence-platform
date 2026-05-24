@@ -1,0 +1,116 @@
+# OpenAIP v8.1 — D5A Pre-Release Visual Screenshot Gate Report
+
+| Field | Value |
+|-------|-------|
+| **Phase** | D5A — Pre-Release Visual Screenshot Gate Capture |
+| **D5A HEAD** | `29a053f` |
+| **Date** | 2026-05-24 |
+| **Nature** | Screenshot evidence capture for release visual gate. Docs + screenshots only. No tag, release, Gate, or execution changes. |
+| **Final Verdict** | `OPENAIP_V8_1_D5A_SCREENSHOT_GATE_STILL_PENDING_NO_GUI_WITH_RELEASE_ON_HOLD` |
+
+---
+
+## 1. Screenshot Gate Status
+
+| Item | Status |
+|------|--------|
+| Vite dev server (PID 17572) | RUNNING — serving HTTP 200 at localhost:5173 |
+| Page title confirmed | `OpenAIP · Console` — matches product branding |
+| GUI browser available | **NO** — no Playwright, Puppeteer, or GUI browser in CLI environment |
+| Screenshots captured | **NO** |
+| Screenshot directory | CREATED — `docs/product/screenshots/openaip-v8-1-d5a-pre-release-visual-gate/` (empty) |
+| Visual gate satisfied | **NO — PENDING** |
+
+**Reason screenshots skipped:** This environment has no GUI browser (no Playwright, no Puppeteer, no X display). The Vite dev server is confirmed running and serving content correctly, but actual browser rendering cannot be visually captured.
+
+---
+
+## 2. Visual Acceptance Source-Level Assessment
+
+Since browser screenshots cannot be captured, visual quality is assessed via source code inspection (Layout.tsx, i18n.ts, Layout.css, smoke tests) as in D2/D4:
+
+| Criterion | Standard | Source-Level Result | Screenshot-Verified? |
+|-----------|----------|---------------------|----------------------|
+| Product identity | Looks like a real local AI console, not experiment MVP | PASS — no MVP/preview/experiment in primary UI | NOT VERIFIED (no screenshot) |
+| Navigation IA | OpenAIP is primary; OpenAIP/Tools/Services/Governance/Advanced structure | PASS — 5 sections with `nav-section-primary` → `nav-section-subtle` | NOT VERIFIED (no screenshot) |
+| zh labels | Natural Chinese, no "中心指挥"/"霓" artifacts | PASS — D1/D1A verified 指挥中心, 智能体, 任务 etc. | NOT VERIFIED (no screenshot) |
+| en labels | Natural English: Command Center, Resources, Workbench, System, Advanced Tools | PASS — verified in i18n.ts | NOT VERIFIED (no screenshot) |
+| Footer | No MVP, shows mature product + safety boundary | PASS — footer shows "Local AI Console · Gate Closed" | NOT VERIFIED (no screenshot) |
+| Advanced Tools | De-emphasized, not competing with OpenAIP | PASS — `nav-section-subtle` class, last position | NOT VERIFIED (no screenshot) |
+| Safety | Gate Closed / Stage C Off / execution disabled visible | PASS — source verified; 108/108 smoke test confirms | NOT VERIFIED (no screenshot) |
+| Hidden pages | No dangerous hidden pages exposed | PASS — no new sidebar entries | NOT VERIFIED (no screenshot) |
+| Browser QA | Auto-translate off | NOT VERIFIED — no browser available | NOT VERIFIED (no screenshot) |
+
+---
+
+## 3. Validation Results
+
+| Validator | Result | Notes |
+|-----------|--------|-------|
+| `npm run typecheck` | PASS | 0 errors |
+| `npm run lint` | PASS | 0 warnings |
+| `npm run build` | PASS | 758 modules; chunk-size warning non-blocking |
+| `npm test --silent` | PASS | 9/9 |
+| `node --test apps/aip-cli/tests/v8-center-readonly-route-smoke.test.mjs` | PASS | 108/108 |
+
+---
+
+## 4. Browser Auto-Translate Rule
+
+> Auto-translate must be OFF. Only use OpenAIP's internal EN/中文 switch.
+> Not verifiable without a browser.
+
+Will be flagged for human verification before D6 release execution.
+
+---
+
+## 5. Screenshot Gap Decision
+
+| Item | Decision |
+|------|----------|
+| Screenshots created | NO |
+| Visual gate | **NOT SATISFIED** |
+| D5A planning complete | YES — report and receipt generated |
+| D6 precondition | Screenshots must be captured OR owner must explicitly waive before D6 execution |
+
+---
+
+## 6. D5A Documents Produced
+
+| Document | Purpose |
+|----------|---------|
+| `OPENAIP_V8_1_D5A_PRE_RELEASE_VISUAL_SCREENSHOT_GATE_REPORT.md` | This report |
+| `OPENAIP_V8_1_D5A_PRE_RELEASE_VISUAL_SCREENSHOT_GATE_RECEIPT.md` | Short receipt |
+
+---
+
+## 7. No-Action Confirmation
+
+| Action | Performed? |
+|--------|-----------|
+| Git tag created | NO |
+| Tag pushed to origin | NO |
+| GitHub Release created | NO |
+| Gate opened | NO |
+| Stage C enabled | NO |
+| Execution enabled | NO |
+| Auth/Gate logic changed | NO |
+| DB/Memory DB/Vector DB written | NO |
+| Server restarted | NO |
+| Owner signature forged | NO |
+
+---
+
+## 8. Verdict
+
+```
+OPENAIP_V8_1_D5A_SCREENSHOT_GATE_STILL_PENDING_NO_GUI_WITH_RELEASE_ON_HOLD
+```
+
+**Screenshot Gate Status: PENDING — no GUI browser available in CLI**
+
+The visual screenshot gate remains unsatisfied. Source-level analysis continues to PASS all visual acceptance criteria, but actual browser rendering cannot be confirmed. The human owner must either capture screenshots or explicitly waive this gate before D6 release execution can proceed.
+
+---
+
+*Generated by opencode automated pipeline — 2026-05-24*
