@@ -98,6 +98,110 @@ export const openAipv8NoActionBadges: Record<Lang, Record<OpenAipv8CenterKey, st
   },
 };
 
+const commandTagline: Record<Lang, string> = {
+  zh: '各路 AI 工具都是英雄，OpenAIP 是指挥中心。',
+  en: 'All AI tools are heroes. OpenAIP is the command center.',
+};
+
+const commandSafetyPreamble: Record<Lang, string> = {
+  zh: '所有安全边界均已强制执行。此预览不会变更运行时、写入数据库、打开大门或启用 C 阶段。Wave 2 确认全部 10 个只读中心已在侧边栏可见；可见不等于可执行。',
+  en: 'All safety boundaries are enforced. This preview does not mutate runtime, write to DB, open Gate, or enable Stage C. Wave 2 confirms all 10 readonly centers are visible in the sidebar; visibility is not execution.',
+};
+
+const commandExtendedSafetyItems: Record<Lang, string[]> = {
+  zh: ['仅预览', '只读', '无运行时突变', '大门关闭', 'C 阶段已禁用', '配置 != 权限', '启用 != 执行', '授权 != 开门', '能力 != 权限', 'UI 开关 != 后端真相'],
+  en: ['Preview only', 'Read-only', 'No runtime mutation', 'Gate CLOSED', 'Stage C disabled', 'Config != permission', 'Enabled != execution', 'Authorized != gateOpen', 'Capability != permission', 'UI switch != backend truth'],
+};
+
+const commandRegistryLabels: Record<Lang, string[]> = {
+  zh: ['智能体', '供应商', '集成', '本地应用', '能力', '策略', '任务', '审计', '记忆/知识', '连接器迁移', '执行边界'],
+  en: ['Agents', 'Providers', 'Integrations', 'Local Apps', 'Capabilities', 'Policies', 'Tasks', 'Audits', 'Memory/Knowledge', 'Connector Migrations', 'Execution Boundaries'],
+};
+
+const commandMigrationStatusLabels: Record<Lang, { heading: string; migrated: string; inProgress: string; planned: string; total: string; legacy: string }> = {
+  zh: {
+    heading: '连接器 → v8 迁移状态',
+    migrated: '已迁移',
+    inProgress: '进行中',
+    planned: '已计划',
+    total: '总计',
+    legacy: '旧版: 连接器中心 → 集成中心 / 本地应用中心 / 供应商管理中心',
+  },
+  en: {
+    heading: 'Connector → v8 Migration Status',
+    migrated: 'Migrated',
+    inProgress: 'In Progress',
+    planned: 'Planned',
+    total: 'Total',
+    legacy: 'Legacy: ConnectorCenter → Integration / Local Apps / Provider Manager',
+  },
+};
+
+const commandCenterRoles: Record<Lang, Record<OpenAipv8CenterKey, string>> = {
+  zh: {
+    agent: 'AI 智能体生命周期与权限',
+    task: '任务包与回执管道',
+    provider: '模型供应商路由',
+    integration: '外部服务绑定',
+    localApps: '本地微应用运行时',
+    memory: '长期记忆与知识',
+    policy: '策略与能力治理',
+    audit: '审计追踪与证据',
+    execution: '执行大门（已关闭）',
+    command: '只读控制平面',
+  },
+  en: {
+    agent: 'AI Agent Lifecycle & Permissions',
+    task: 'Task Pack & Receipt Pipeline',
+    provider: 'Model Provider Routing',
+    integration: 'External Service Binding',
+    localApps: 'Local Micro App Runtime',
+    memory: 'Long-term Memory & Knowledge',
+    policy: 'Policy & Capability Governance',
+    audit: 'Audit Trail & Evidence',
+    execution: 'Execution Gate (closed)',
+    command: 'Readonly Control Plane',
+  },
+};
+
+const commandCenterItems: Record<Lang, Record<OpenAipv8CenterKey, string[]>> = {
+  zh: {
+    agent: ['智能体生命周期: 启用 / 暂停 / 禁用 / 隔离', '权限等级 L0-L5', '任务/审计关联'],
+    task: ['任务包生成', '回执接收管道', '复核队列', '减少人工疲劳'],
+    provider: ['CC Switch 式供应商/配置/路由', '供应商注册表', '只读/空运行优先'],
+    integration: ['OpenClaw', 'GitHub', 'Webhooks/外部服务', '连接器 → v8 迁移桥'],
+    localApps: ['OpenAxiom 本地应用 / UI 实验室 / 视觉工具', 'ComfyUI', 'Ollama / LM Studio', 'YOLO / SAM 工具'],
+    memory: ['记忆访问策略', '知识源注册表', '回执/报告索引'],
+    policy: ['能力 != 权限', '权限等级', '策略先于按钮'],
+    audit: ['回执', '报告', '证据', '提交/推送/验证追溯'],
+    execution: ['默认关闭', '大门关闭', 'C 阶段已禁用', '未来执行前需空运行/审批'],
+    command: [],
+  },
+  en: {
+    agent: ['AI agents lifecycle: enabled / paused / disabled / quarantined', 'Permission levels L0-L5', 'Task/audit linkage'],
+    task: ['Task pack generation', 'Receipt intake pipeline', 'Review queue', 'Human-fatigue reduction'],
+    provider: ['CC Switch-like provider/config/router', 'Provider registry', 'Readonly/dry-run first'],
+    integration: ['OpenClaw', 'GitHub', 'Webhooks/external services', 'Connector → v8 migration bridge'],
+    localApps: ['OpenAxiom as Local App / UI Lab / Vision Tool', 'ComfyUI', 'Ollama / LM Studio', 'YOLO / SAM tools'],
+    memory: ['Memory access policy', 'Knowledge source registry', 'Receipt/report indexing'],
+    policy: ['Capability != permission', 'Permission levels', 'Policy-before-buttons'],
+    audit: ['Receipts', 'Reports', 'Evidence', 'Commit/push/verification trail'],
+    execution: ['Default closed', 'Gate CLOSED', 'Stage C disabled', 'Dry-run/approval required before future execution'],
+    command: [],
+  },
+};
+
+const commandNextPhase: Record<Lang, { heading: string; items: string[] }> = {
+  zh: {
+    heading: '建议后续阶段',
+    items: ['只读路由烟雾测试 — 验证全部 10 个 v8 只读路由正确加载。', '不执行 — 所有操作保持阻断。大门保持关闭。C 阶段保持禁用。'],
+  },
+  en: {
+    heading: 'Recommended Next Phase',
+    items: ['Readonly route smoke — Verify all 10 v8 readonly routes load correctly.', 'No execution — All actions remain blocked. Gate stays CLOSED. Stage C stays disabled.'],
+  },
+};
+
 export function getOpenAipv8Lang(): Lang {
   return getStoredLang();
 }
@@ -114,5 +218,13 @@ export function getOpenAipv8Copy(center: OpenAipv8CenterKey, lang = getOpenAipv8
     safetyRules: lang === 'zh' ? '安全规则' : 'Safety Rules',
     notAllowed: lang === 'zh' ? '此预览中不可用' : 'Not Allowed in This Preview',
     futurePhases: lang === 'zh' ? '后续阶段' : 'Future Phases',
+    tagline: commandTagline[lang],
+    safetyPreamble: commandSafetyPreamble[lang],
+    extendedSafetyItems: commandExtendedSafetyItems[lang],
+    registryLabels: commandRegistryLabels[lang],
+    migrationStatusLabels: commandMigrationStatusLabels[lang],
+    centerRole: commandCenterRoles[lang][center],
+    centerItems: commandCenterItems[lang][center],
+    nextPhase: commandNextPhase[lang],
   };
 }

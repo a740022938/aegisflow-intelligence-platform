@@ -231,7 +231,10 @@ test('command center links to all 9 center pages', () => {
     ccContent.includes('Readonly control plane for all v8 centers') || copyContent.includes('Readonly control plane for all v8 centers'),
     'Command Center missing readonly control plane context'
   );
-  assert.ok(ccContent.includes('all 10 readonly centers are visible in the sidebar'), 'Command Center missing Wave 2 sidebar visibility context');
+  assert.ok(
+    ccContent.includes('all 10 readonly centers are visible in the sidebar') || copyContent.includes('all 10 readonly centers are visible in the sidebar'),
+    'Command Center missing Wave 2 sidebar visibility context'
+  );
 });
 
 test('safety strings exist in shared component', () => {
@@ -906,10 +909,11 @@ test('execution gateway page includes key UI sections', () => {
 
 test('execution gateway page shows safety labels', () => {
   const content = fs.readFileSync(EXECUTION_GATEWAY_PAGE, 'utf8');
-  assert.ok(content.includes('No execution controls'), 'Missing No execution controls');
-  assert.ok(content.includes('No runtime mutation'), 'Missing No runtime mutation');
-  assert.ok(content.includes('Gate CLOSED'), 'Missing Gate CLOSED');
-  assert.ok(content.includes('Stage C disabled'), 'Missing Stage C disabled');
+  const copyContent = fs.readFileSync(SHARED_V8_COPY_FILE, 'utf8');
+  assert.ok(content.includes('No execution controls') || copyContent.includes('No execution controls'), 'Missing No execution controls');
+  assert.ok(content.includes('No runtime mutation') || copyContent.includes('No runtime mutation'), 'Missing No runtime mutation');
+  assert.ok(content.includes('Gate CLOSED') || copyContent.includes('Gate CLOSED'), 'Missing Gate CLOSED');
+  assert.ok(content.includes('Stage C disabled') || copyContent.includes('Stage C disabled'), 'Missing Stage C disabled');
 });
 
 test('execution gateway page includes critical boundary categories', () => {
@@ -1114,4 +1118,45 @@ test('memory knowledge registry includes required entries', () => {
   assert.ok(reg.includes('config=permission'));
   assert.ok(reg.includes('enabled=execution'));
   assert.ok(reg.includes('all-done without evidence'));
+});
+
+test('i18n: Command Center English mode uses English title and tagline', () => {
+  const ccContent = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8CommandCenterPreview.tsx'), 'utf8');
+  const copyContent = fs.readFileSync(SHARED_V8_COPY_FILE, 'utf8');
+
+  assert.ok(copyContent.includes("commandTagline: Record<Lang, string> = {\n  zh: '各路 AI 工具都是英雄，OpenAIP 是指挥中心。',\n  en: 'All AI tools are heroes. OpenAIP is the command center.'"), 'English tagline missing in copy module');
+  assert.ok(copyContent.includes("All safety boundaries are enforced. This preview does not mutate runtime"), 'English safety preamble missing in copy module');
+  assert.ok(copyContent.includes("'Preview only', 'Read-only', 'No runtime mutation', 'Gate CLOSED', 'Stage C disabled'"), 'English extended safety items missing');
+  assert.ok(ccContent.includes('{copy.tagline}'), 'Command Center tagline not localized');
+  assert.ok(ccContent.includes('{copy.safetyPreamble}'), 'Command Center safety preamble not localized');
+  assert.ok(ccContent.includes('{copy.extendedSafetyItems'), 'Command Center extended safety items not localized');
+  assert.ok(ccContent.includes('{copy.registryLabels'), 'Command Center registry labels not localized');
+  assert.ok(ccContent.includes('{copy.migrationStatusLabels'), 'Command Center migration labels not localized');
+  assert.ok(ccContent.includes('{copy.nextPhase'), 'Command Center next phase not localized');
+});
+
+test('i18n: Command Center center card titles and roles use localized copy', () => {
+  const ccContent = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8CommandCenterPreview.tsx'), 'utf8');
+  const copyContent = fs.readFileSync(SHARED_V8_COPY_FILE, 'utf8');
+
+  assert.ok(ccContent.includes('{c.title}'), 'center card title not using localized copy');
+  assert.ok(ccContent.includes('{c.centerRole}'), 'center card role not using localized copy');
+  assert.ok(ccContent.includes('{c.centerItems.map'), 'center card items not using localized copy');
+  assert.ok(ccContent.includes('{c.noActionBadges'), 'center card safety note not using localized copy');
+  assert.ok(copyContent.includes("agent: 'AI Agent Lifecycle & Permissions'"), 'English agent center role missing');
+  assert.ok(copyContent.includes("agent: 'AI 智能体生命周期与权限'"), 'Chinese agent center role missing');
+  assert.ok(copyContent.includes("agent: ['AI agents lifecycle"), 'English agent center items missing');
+  assert.ok(copyContent.includes("agent: ['智能体生命周期:"), 'Chinese agent center items missing');
+});
+
+test('i18n: Execution Gateway uses localized global safety badges', () => {
+  const egContent = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8ExecutionGatewayPreview.tsx'), 'utf8');
+  assert.ok(egContent.includes('{copy.globalSafetyBadges.map'), 'Execution Gateway status badges not using localized safety badges');
+});
+
+test('i18n: document/browser title no longer shows old Chinese brand', () => {
+  const htmlContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/index.html'), 'utf8');
+  assert.equal(htmlContent.includes('天枢智治平台'), false, 'document title still contains old Chinese brand');
+  assert.equal(htmlContent.includes('AGI Model Factory'), false, 'document title still contains AGI Model Factory');
+  assert.ok(htmlContent.includes('<title>OpenAIP · Console</title>'), 'document title missing OpenAIP · Console');
 });
