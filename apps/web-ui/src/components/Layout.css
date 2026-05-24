@@ -243,6 +243,19 @@ body.layout-resizing * {
   margin-top: 6px;
   padding-top: 10px;
 }
+.nav-section-primary > .nav-section-label {
+  color: #5eead4;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+.nav-section-subtle > .nav-section-label {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
 .nav-section-label {
   padding: 0 12px;
   margin-bottom: 6px;
@@ -320,16 +333,17 @@ body.layout-resizing * {
 
 .nav-item.active {
   color: #ffffff;
-  background: linear-gradient(120deg, rgba(16, 163, 127, 0.24), rgba(59, 130, 246, 0.2), rgba(236, 72, 153, 0.16));
-  box-shadow: 0 0 0 1px rgba(95, 222, 197, 0.35), 0 8px 20px rgba(7, 16, 30, 0.45);
-  animation: navActivePulse 2.8s ease-in-out infinite;
+  background: linear-gradient(120deg, rgba(16, 163, 127, 0.18), rgba(59, 130, 246, 0.15), rgba(236, 72, 153, 0.10));
+  border-radius: 8px;
 }
 .nav-item.active::before {
   background: linear-gradient(180deg, #22d3ee, #2dd4bf, #a78bfa);
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+  top: 15%;
+  bottom: 15%;
 }
 .nav-item.active::after {
-  opacity: 0.7;
+  opacity: 0.5;
   transform: translateX(0);
 }
 
@@ -356,12 +370,19 @@ body.layout-resizing * {
 .sidebar-footer {
   padding: 13px 12px;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
 }
 .sidebar-footer-text {
   font-size: 13px;
   color: var(--text-main);
   font-weight: 600;
   line-height: 1.35;
+}
+.sidebar-footer-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+  font-weight: 400;
 }
 .sidebar-footer-build {
   font-size: 11px;

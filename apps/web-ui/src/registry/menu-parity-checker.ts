@@ -60,6 +60,15 @@ const GOVERNANCE: Record<string, GovernanceDecision> = {
   'connector-center-readonly': { action: 'KEEP' },
   'advanced-mode-readonly': { action: 'KEEP' },
   'openaip-v8-command-center-preview': { action: 'KEEP' },
+  'openaip-v8-agent-center-preview': { action: 'KEEP' },
+  'openaip-v8-task-center-preview': { action: 'KEEP' },
+  'openaip-v8-audit-center-preview': { action: 'KEEP' },
+  'openaip-v8-policy-capability-center-preview': { action: 'KEEP' },
+  'openaip-v8-execution-gateway-preview': { action: 'KEEP' },
+  'openaip-v8-provider-manager-preview': { action: 'KEEP' },
+  'openaip-v8-integration-center-preview': { action: 'KEEP' },
+  'openaip-v8-local-apps-center-preview': { action: 'KEEP' },
+  'openaip-v8-memory-knowledge-center-preview': { action: 'KEEP' },
 };
 
 // ── Types ──

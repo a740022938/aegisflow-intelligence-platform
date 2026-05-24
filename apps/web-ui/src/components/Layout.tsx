@@ -40,6 +40,15 @@ const Icon = ({ name, size = 16 }: { name: string; size?: number }) => {
     merge:      <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><circle cx="4" cy="4" r="2.5"/><circle cx="4" cy="12" r="2.5"/><circle cx="12" cy="8" r="2.5"/><path d="M4 6.5v3M5.5 4.5l5 2.5M5.5 11.5l5-2.5" stroke="currentColor" strokeWidth="1.2" fill="none"/></svg>,
     database:   <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><ellipse cx="8" cy="4" rx="6" ry="2.5"/><path d="M2 4v4c0 1.38 2.68 2.5 6 2.5s6-1.12 6-2.5V4M2 8v4c0 1.38 2.68 2.5 6 2.5s6-1.12 6-2.5V8" stroke="#24384C" strokeWidth="1" fill="none"/></svg>,
     label:      <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="3" width="12" height="10" rx="2"/><circle cx="6" cy="6" r="1.5"/><path d="M6 10l3-3 3 3" stroke="#24384C" strokeWidth="1.2" fill="none"/></svg>,
+    command:    <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.2" fill="none"/><path d="M8 2v4l2.5 2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" fill="none"/><path d="M3.5 3.5l2 2M12.5 3.5l-2 2M3.5 12.5l2-2M12.5 12.5l-2-2" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" fill="none"/></svg>,
+    bot:        <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="5" width="10" height="8" rx="2"/><circle cx="8" cy="9" r="1.8"/><rect x="1" y="7" width="2" height="4" rx="0.8"/><rect x="13" y="7" width="2" height="4" rx="0.8"/><rect x="6" y="3" width="4" height="2" rx="0.8"/><path d="M8 13v2" stroke="currentColor" strokeWidth="1" fill="none"/></svg>,
+    shield:     <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L2 3.5v4c0 4 2.5 6.5 6 7.5 3.5-1 6-3.5 6-7.5v-4L8 1z"/><path d="M5 8l2 2 4-4" stroke="#24384C" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>,
+    lock:       <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><rect x="3.5" y="7.5" width="9" height="6.5" rx="1.5"/><circle cx="8" cy="10.5" r="1.2"/><path d="M5 7V5c0-1.7 1.3-3 3-3s3 1.3 3 3v2" stroke="currentColor" strokeWidth="1.2" fill="none"/><path d="M8 10.5v1.5" stroke="#24384C" strokeWidth="1.1" fill="none"/></svg>,
+    power:      <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.2" fill="none"/><path d="M8 2v6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none"/><path d="M10.5 3.5a5 5 0 1 1-5 0" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" fill="none"/></svg>,
+    server:     <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="1.5" width="12" height="4.5" rx="1.2"/><rect x="2" y="10" width="12" height="4.5" rx="1.2"/><rect x="2" y="5.8" width="12" height="4.5" rx="1.2"/><circle cx="11.5" cy="3.8" r="0.8"/><circle cx="11.5" cy="8" r="0.8"/><circle cx="11.5" cy="12.2" r="0.8"/></svg>,
+    plug:       <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><rect x="6" y="2" width="4" height="5" rx="1"/><path d="M6 7v3a2 2 0 0 0 4 0V7M3 7h10" stroke="currentColor" strokeWidth="1.2" fill="none"/><path d="M5 12v2M11 12v2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" fill="none"/></svg>,
+    monitor:    <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><rect x="1.5" y="2" width="13" height="9" rx="1.3"/><path d="M5 14h6M8 11v3" stroke="currentColor" strokeWidth="1.2" fill="none"/><path d="M4 5h8M4 7.5h6" stroke="#24384C" strokeWidth="1" strokeLinecap="round" fill="none"/></svg>,
+    zap:        <svg width={s} height={s} viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 1L4 8.5H7.5L6.5 15l5.5-7.5H8.5L9.5 1z"/></svg>,
   };
   return <span style={{ display: 'flex', alignItems: 'center' }}>{icons[name] || icons.tasks}</span>;
 };
@@ -88,7 +97,7 @@ function AppShell() {
   const dragState = useRef<{ active: boolean; startX: number; startWidth: number }>({ active: false, startX: 0, startWidth: 288 });
 
   // ── 侧边栏分组折叠 ──
-  const DEFAULT_COLLAPSED = ['governance', 'systemAdmin', 'knowledge', 'output'];
+  const DEFAULT_COLLAPSED = ['advancedTools'];
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set(DEFAULT_COLLAPSED));
   const toggleSection = useCallback((key: string) => {
     setCollapsed(prev => {
@@ -145,6 +154,10 @@ function AppShell() {
     apiStatusPending: t.common.apiStatusPending,
     apiStatusOk: t.common.apiStatusOk,
     apiStatusBad: t.common.apiStatusBad,
+    footerTitle: t.common.footerTitle,
+    footerSubtitle: t.common.footerSubtitle,
+    footerBuildPrefix: t.common.footerBuildPrefix,
+    footerStatus: t.common.footerStatus,
   };
   const displayVersion = apiVersion && apiVersion !== '…' ? apiVersion : APP_VERSION;
   const auth = useAuth();
@@ -258,150 +271,114 @@ function AppShell() {
         {/* ── Sidebar ── */}
         <nav className={`sidebar${sidebarOpen ? ' open' : ''}`} style={{ width: sidebarWidth }}>
           <div className="sidebar-scroll" onClick={(e) => { const target = e.target as HTMLElement; if (target.closest('.nav-item')) setSidebarOpen(false); }}>
-            {/* ── 概览 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('overview')}>
-                {t.nav.overview}
-                <span className="nav-section-arrow">{collapsed.has('overview') ? '▸' : '▾'}</span>
+            {/* ── OpenAIP ── */}
+            <div className="nav-section nav-section-primary">
+              <div className="nav-section-label" onClick={() => toggleSection('openAip')}>
+                {t.nav.openAip}
+                <span className="nav-section-arrow">{collapsed.has('openAip') ? '▸' : '▾'}</span>
               </div>
-              {!collapsed.has('overview') && (<>
-                <NavItem to="/" icon="dashboard" label={t.nav.dashboard} />
-                <NavItem to="/factory-status" icon="factory" label={t.nav.factoryStatus} />
-                <NavItem to="/assistant-center" icon="modules" label={t.nav.assistantCenter} />
+              {!collapsed.has('openAip') && (<>
+                <NavItem to="/openaip-v8-command-center-preview" icon="command" label={t.nav.openAipV8CommandCenter} />
+                <NavItem to="/openaip-v8-agent-center-preview" icon="bot" label={t.nav.openAipV8AgentCenter} />
+                <NavItem to="/openaip-v8-task-center-preview" icon="tasks" label={t.nav.openAipV8TaskCenter} />
+                <NavItem to="/openaip-v8-audit-center-preview" icon="shield" label={t.nav.openAipV8AuditCenter} />
+                <NavItem to="/openaip-v8-policy-capability-center-preview" icon="lock" label={t.nav.openAipV8PolicyCapabilityCenter} />
+                <NavItem to="/openaip-v8-execution-gateway-preview" icon="power" label={t.nav.openAipV8ExecutionGateway} />
               </>)}
             </div>
 
-            {/* ── OpenAIP v8 ── */}
+            {/* ── Resources ── */}
             <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('openAipV8')}>
-                {t.nav.openAipV8}
-                <span className="nav-section-arrow">{collapsed.has('openAipV8') ? '▸' : '▾'}</span>
+              <div className="nav-section-label" onClick={() => toggleSection('resources')}>
+                {t.nav.resources}
+                <span className="nav-section-arrow">{collapsed.has('resources') ? '▸' : '▾'}</span>
               </div>
-              {!collapsed.has('openAipV8') && (<>
-                <NavItem to="/openaip-v8-command-center-preview" icon="route" label={t.nav.openAipV8CommandCenter} />
-                <NavItem to="/openaip-v8-agent-center-preview" icon="route" label={t.nav.openAipV8AgentCenter} />
-                <NavItem to="/openaip-v8-task-center-preview" icon="route" label={t.nav.openAipV8TaskCenter} />
-                <NavItem to="/openaip-v8-audit-center-preview" icon="route" label={t.nav.openAipV8AuditCenter} />
-                <NavItem to="/openaip-v8-policy-capability-center-preview" icon="route" label={t.nav.openAipV8PolicyCapabilityCenter} />
-                <NavItem to="/openaip-v8-execution-gateway-preview" icon="route" label={t.nav.openAipV8ExecutionGateway} />
-                <NavItem to="/openaip-v8-provider-manager-preview" icon="route" label={t.nav.openAipV8ProviderManager} />
-                <NavItem to="/openaip-v8-integration-center-preview" icon="route" label={t.nav.openAipV8IntegrationCenter} />
-                <NavItem to="/openaip-v8-local-apps-center-preview" icon="route" label={t.nav.openAipV8LocalAppsCenter} />
-                <NavItem to="/openaip-v8-memory-knowledge-center-preview" icon="route" label={t.nav.openAipV8MemoryKnowledgeCenter} />
-                <NavItem to="/connector-center-readonly" icon="route" label={t.nav.connectorCenterReadonly} />
+              {!collapsed.has('resources') && (<>
+                <NavItem to="/openaip-v8-provider-manager-preview" icon="server" label={t.nav.openAipV8ProviderManager} />
+                <NavItem to="/openaip-v8-integration-center-preview" icon="plug" label={t.nav.openAipV8IntegrationCenter} />
+                <NavItem to="/openaip-v8-local-apps-center-preview" icon="monitor" label={t.nav.openAipV8LocalAppsCenter} />
+                <NavItem to="/openaip-v8-memory-knowledge-center-preview" icon="database" label={t.nav.openAipV8MemoryKnowledgeCenter} />
+                <NavItem to="/connector-center-readonly" icon="zap" label={t.nav.connectorCenterReadonly} />
               </>)}
             </div>
 
-            {/* ── 数据与训练 ── */}
+            {/* ── Workbench ── */}
             <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('dataAndTraining')}>
-                {t.nav.dataAndTraining}
-                <span className="nav-section-arrow">{collapsed.has('dataAndTraining') ? '▸' : '▾'}</span>
+              <div className="nav-section-label" onClick={() => toggleSection('workbench')}>
+                {t.nav.workbench}
+                <span className="nav-section-arrow">{collapsed.has('workbench') ? '▸' : '▾'}</span>
               </div>
-              {!collapsed.has('dataAndTraining') && (<>
+              {!collapsed.has('workbench') && (<>
                 <NavItem to="/datasets" icon="dataset" label={t.nav.datasets} />
                 <NavItem to="/training" icon="training" label={t.nav.trainingCenter} />
                 <NavItem to="/runs" icon="run" label={t.nav.runCenter} />
                 <NavItem to="/templates" icon="template" label={t.nav.templates} />
-              </>)}
-            </div>
-
-            {/* ── 模型与发布 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('modelAndRelease')}>
-                {t.nav.modelAndRelease}
-                <span className="nav-section-arrow">{collapsed.has('modelAndRelease') ? '▸' : '▾'}</span>
-              </div>
-              {!collapsed.has('modelAndRelease') && (<>
                 <NavItem to="/models" icon="artifact" label={t.nav.modelMgmt} />
                 {MODEL_GATEWAY_NAV_VISIBLE && <NavItem to="/model-gateway" icon="route" label="模型网关" />}
                 <NavItem to="/artifacts" icon="artifact" label={t.nav.artifacts} />
                 <NavItem to="/evaluations" icon="eval" label={t.nav.evalCenter} />
                 <NavItem to="/deployments" icon="deploy" label={t.nav.deployCenter} />
-              </>)}
-            </div>
-
-            {/* ── 流程与编排 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('workflowAndComposer')}>
-                {t.nav.workflowAndComposer}
-                <span className="nav-section-arrow">{collapsed.has('workflowAndComposer') ? '▸' : '▾'}</span>
-              </div>
-              {!collapsed.has('workflowAndComposer') && (<>
                 <NavItem to="/workflow-jobs" icon="workflow" label={t.nav.workflow} />
                 <NavItem to="/workflow-composer" icon="composer" label={t.nav.workflowComposer} />
                 <NavItem to="/workflow-canvas" icon="workflow" label={t.nav.workflowCanvas} />
               </>)}
             </div>
 
-            {/* ── 能力与模块 ── */}
+            {/* ── System ── */}
             <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('capabilities')}>
-                {t.nav.capabilities}
-                <span className="nav-section-arrow">{collapsed.has('capabilities') ? '▸' : '▾'}</span>
+              <div className="nav-section-label" onClick={() => toggleSection('system')}>
+                {t.nav.system}
+                <span className="nav-section-arrow">{collapsed.has('system') ? '▸' : '▾'}</span>
               </div>
-              {!collapsed.has('capabilities') && (<>
+              {!collapsed.has('system') && (<>
+                <NavItem to="/" icon="dashboard" label={t.nav.dashboard} />
+                <NavItem to="/factory-status" icon="factory" label={t.nav.factoryStatus} />
+                <NavItem to="/assistant-center" icon="modules" label={t.nav.assistantCenter} />
                 <NavItem to="/module-center" icon="modules" label={t.nav.moduleCenter} />
                 <NavItem to="/plugin-pool" icon="api" label={t.nav.pluginPool} />
                 <NavItem to="/tasks" icon="tasks" label={t.nav.taskOrchestration} />
                 <NavItem to="/cost-routing" icon="route" label={t.nav.costRouting} />
-                <NavItem to="/openaxiom-readonly" icon="label" label={t.nav.openAxiomReadonly} />
-                <NavItem to="/memory-hub" icon="label" label={t.nav.memoryHubReadonly} />
-              </>)}
-            </div>
-
-            {/* ── 视觉实验室 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('visionLab')}>
-                {t.nav.visionLab}
-                <span className="nav-section-arrow">{collapsed.has('visionLab') ? '▸' : '▾'}</span>
-              </div>
-              {!collapsed.has('visionLab') && (<>
-                <NavItem to="/vision-lab/mahjong-debug" icon="template" label={t.nav.mahjongDebug} />
-              </>)}
-            </div>
-
-            {/* ── 治理与回流 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('governance')}>
-                {t.nav.governance}
-                <span className="nav-section-arrow">{collapsed.has('governance') ? '▸' : '▾'}</span>
-              </div>
-              {!collapsed.has('governance') && (<>
                 <NavItem to="/approvals" icon="approval" label={t.nav.approvals} />
                 <NavItem to="/governance-hub" icon="audit" label={t.nav.governanceHub} />
                 <NavItem to="/audit" icon="audit" label={t.nav.audit} />
                 <NavItem to="/feedback" icon="feedback" label={t.nav.feedback} />
                 <NavItem to="/advanced-mode-readonly" icon="audit" label={t.nav.advancedModeReadonly} />
-              </>)}
-            </div>
-
-            {/* ── 知识 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('knowledge')}>
-                {t.nav.knowledge}
-                <span className="nav-section-arrow">{collapsed.has('knowledge') ? '▸' : '▾'}</span>
-              </div>
-              {!collapsed.has('knowledge') && (<>
                 <NavItem to="/knowledge" icon="knowledge" label={t.nav.knowledgeCenter} />
+                <NavItem to="/outputs" icon="output" label={t.nav.standardOutput} />
               </>)}
             </div>
 
-            {/* ── 输出 ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('output')}>
-                {t.nav.output}
-                <span className="nav-section-arrow">{collapsed.has('output') ? '▸' : '▾'}</span>
+            {/* ── Advanced Tools ── */}
+            <div className="nav-section nav-section-subtle">
+              <div className="nav-section-label" onClick={() => toggleSection('advancedTools')}>
+                {t.nav.advancedTools}
+                <span className="nav-section-arrow">{collapsed.has('advancedTools') ? '▸' : '▾'}</span>
               </div>
-              {!collapsed.has('output') && (<>
-                <NavItem to="/outputs" icon="output" label={t.nav.standardOutput} />
+              {!collapsed.has('advancedTools') && (<>
+                <NavItem to="/openaxiom-readonly" icon="label" label={t.nav.openAxiomReadonly} />
+                <NavItem to="/memory-hub" icon="database" label={t.nav.memoryHubReadonly} />
+                <NavItem to="/vision-lab/mahjong-debug" icon="template" label={t.nav.mahjongDebug} />
+                <NavItem to="/digital-employee" icon="brain" label={t.nav.digitalEmployee} />
+                <NavItem to="/training-v2" icon="training" label={t.nav.trainingV2} />
+                <NavItem to="/hpo" icon="run" label={t.nav.hpo} />
+                <NavItem to="/distill" icon="eval" label={t.nav.distill} />
+                <NavItem to="/model-merge" icon="merge" label={t.nav.modelMerge} />
+                <NavItem to="/inference" icon="run" label={t.nav.inference} />
+                <NavItem to="/annotation" icon="label" label={t.nav.annotation} />
+                <NavItem to="/huggingface" icon="api" label={t.nav.huggingface} />
+                <NavItem to="/backflow-v2" icon="feedback" label={t.nav.backflowV2} />
+                <NavItem to="/scheduler" icon="clock" label={t.nav.scheduler} />
+                <NavItem to="/alerting" icon="bell" label={t.nav.alerting} />
+                <NavItem to="/model-monitor" icon="eval" label={t.nav.modelMonitor} />
+                <NavItem to="/deploy-v2" icon="deploy" label={t.nav.deployV2} />
               </>)}
             </div>
           </div>
           <div className="sidebar-footer">
-            <div className="sidebar-footer-text">OpenAIP v8 Readonly MVP</div>
-            <div className="sidebar-footer-build">Core {APP_VERSION} · Build {BUILD_DATE}</div>
-            <div className="sidebar-footer-status">Gate CLOSED · Stage C disabled</div>
+            <div className="sidebar-footer-text">{text.footerTitle}</div>
+            <div className="sidebar-footer-subtitle">{text.footerSubtitle}</div>
+            <div className="sidebar-footer-build">{text.footerBuildPrefix} {APP_VERSION} · Build {BUILD_DATE}</div>
+            <div className="sidebar-footer-status">{text.footerStatus}</div>
           </div>
         </nav>
         <div className={`sidebar-backdrop${sidebarOpen ? ' visible' : ''}`} onClick={() => setSidebarOpen(false)} />

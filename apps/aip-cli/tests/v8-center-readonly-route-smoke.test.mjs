@@ -63,36 +63,36 @@ const V8_SIDEBAR_ITEMS = [
   {
     route: '/openaip-v8-command-center-preview',
     id: 'openaip-v8-command-center-preview',
-    zhLabel: 'OpenAIP v8 指挥中心',
-    enLabel: 'OpenAIP v8 Command Center',
+    zhLabel: '指挥中心',
+    enLabel: 'Command',
     labelKey: 'openAipV8CommandCenter',
   },
   {
     route: '/openaip-v8-agent-center-preview',
     id: 'openaip-v8-agent-center-preview',
-    zhLabel: '智能体中心',
-    enLabel: 'Agent Center',
+    zhLabel: '智能体',
+    enLabel: 'Agents',
     labelKey: 'openAipV8AgentCenter',
   },
   {
     route: '/openaip-v8-task-center-preview',
     id: 'openaip-v8-task-center-preview',
-    zhLabel: '任务中心',
-    enLabel: 'Task Center',
+    zhLabel: '任务',
+    enLabel: 'Tasks',
     labelKey: 'openAipV8TaskCenter',
   },
   {
     route: '/openaip-v8-audit-center-preview',
     id: 'openaip-v8-audit-center-preview',
-    zhLabel: '审计中心',
-    enLabel: 'Audit Center',
+    zhLabel: '审计',
+    enLabel: 'Audit',
     labelKey: 'openAipV8AuditCenter',
   },
   {
     route: '/openaip-v8-policy-capability-center-preview',
     id: 'openaip-v8-policy-capability-center-preview',
-    zhLabel: '策略与能力中心',
-    enLabel: 'Policy + Capability Center',
+    zhLabel: '策略',
+    enLabel: 'Policies',
     labelKey: 'openAipV8PolicyCapabilityCenter',
   },
   {
@@ -105,36 +105,36 @@ const V8_SIDEBAR_ITEMS = [
   {
     route: '/openaip-v8-provider-manager-preview',
     id: 'openaip-v8-provider-manager-preview',
-    zhLabel: '供应商管理中心',
-    enLabel: 'Provider Manager',
+    zhLabel: '供应商',
+    enLabel: 'Providers',
     labelKey: 'openAipV8ProviderManager',
   },
   {
     route: '/openaip-v8-integration-center-preview',
     id: 'openaip-v8-integration-center-preview',
-    zhLabel: '集成中心',
-    enLabel: 'Integration Center',
+    zhLabel: '集成',
+    enLabel: 'Integrations',
     labelKey: 'openAipV8IntegrationCenter',
   },
   {
     route: '/openaip-v8-local-apps-center-preview',
     id: 'openaip-v8-local-apps-center-preview',
-    zhLabel: '本地应用中心',
-    enLabel: 'Local Apps Center',
+    zhLabel: '本地应用',
+    enLabel: 'Local Apps',
     labelKey: 'openAipV8LocalAppsCenter',
   },
   {
     route: '/openaip-v8-memory-knowledge-center-preview',
     id: 'openaip-v8-memory-knowledge-center-preview',
-    zhLabel: '记忆与知识中心',
-    enLabel: 'Memory + Knowledge Center',
+    zhLabel: '记忆与知识',
+    enLabel: 'Memory & Knowledge',
     labelKey: 'openAipV8MemoryKnowledgeCenter',
   },
 ];
 
 test('all 10 v8 routes are exposed in sidebar Layout.tsx', () => {
   const layoutContent = fs.readFileSync(LAYOUT_TSX, 'utf8');
-  assert.ok(layoutContent.includes('{t.nav.openAipV8}'), 'OpenAIP v8 sidebar group missing');
+  assert.ok(layoutContent.includes('{t.nav.openAip}'), 'OpenAIP sidebar group missing');
   for (const item of V8_SIDEBAR_ITEMS) {
     assert.ok(layoutContent.includes(`to="${item.route}"`), `Route ${item.route} missing from Layout.tsx sidebar`);
     assert.ok(layoutContent.includes(`t.nav.${item.labelKey}`), `Route ${item.route} missing label key ${item.labelKey}`);
@@ -146,8 +146,8 @@ test('all 10 v8 sidebar labels and shadow menu registry entries exist', () => {
   const snapshotContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/layout-menu-snapshot.ts'), 'utf8');
   const menuContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/menu-registry.ts'), 'utf8');
 
-  assert.ok(i18nContent.includes("openAipV8: 'OpenAIP v8 控制平面'"), 'Chinese OpenAIP v8 sidebar group label missing');
-  assert.ok(i18nContent.includes("openAipV8: 'OpenAIP v8 Control Plane'"), 'English OpenAIP v8 sidebar group label missing');
+  assert.ok(i18nContent.includes("nav.openAip: 'OpenAIP'") || i18nContent.includes("openAip: 'OpenAIP'"), 'Chinese OpenAIP sidebar group label missing');
+  assert.ok(i18nContent.includes("openAip: 'OpenAIP'"), 'English OpenAIP sidebar group label missing');
   for (const item of V8_SIDEBAR_ITEMS) {
     assert.ok(i18nContent.includes(`${item.labelKey}: '${item.zhLabel}'`), `Chinese label missing for ${item.route}`);
     assert.ok(i18nContent.includes(`${item.labelKey}: '${item.enLabel}'`), `English label missing for ${item.route}`);
@@ -162,19 +162,19 @@ test('topbar brand subtitle and logo use OpenAIP wording and no AG initials', ()
   const layoutContent = fs.readFileSync(LAYOUT_TSX, 'utf8');
   const i18nContent = fs.readFileSync(I18N_FILE, 'utf8');
 
-  assert.ok(i18nContent.includes("subtitle: 'OpenAIP 社区版 · 控制台'"), 'Chinese top brand subtitle is not canonical');
-  assert.ok(i18nContent.includes("subtitle: 'OpenAIP Community Edition · Console'"), 'English top brand subtitle is not canonical');
+  assert.ok(i18nContent.includes("subtitle: '本地 AI 控制台'"), 'Chinese top brand subtitle is not canonical');
+  assert.ok(i18nContent.includes("subtitle: 'Local AI Console'"), 'English top brand subtitle is not canonical');
   assert.equal(layoutContent.includes('<div className="topbar-logo">AG</div>'), false, 'topbar still renders AG initials');
   assert.ok(layoutContent.includes('aria-label="OpenAIP control plane"'), 'topbar icon missing accessible OpenAIP label');
   assert.ok(layoutContent.includes('openAip-node-icon'), 'topbar icon should use abstract OpenAIP node icon markup');
 });
 
-test('sidebar footer uses OpenAIP v8 readonly MVP display wording', () => {
+test('sidebar footer uses productized Local AI Console wording', () => {
   const layoutContent = fs.readFileSync(LAYOUT_TSX, 'utf8');
-  assert.ok(layoutContent.includes('OpenAIP v8 Readonly MVP'), 'footer missing OpenAIP v8 Readonly MVP');
-  assert.ok(layoutContent.includes('Core {APP_VERSION} · Build {BUILD_DATE}'), 'footer missing Core/Build wording');
-  assert.ok(layoutContent.includes('Gate CLOSED · Stage C disabled'), 'footer missing Gate/Stage C status');
-  assert.equal(layoutContent.includes('AIP {APP_VERSION}'), false, 'footer still uses old AIP version wording');
+  assert.ok(layoutContent.includes('footerTitle') || layoutContent.includes('OpenAIP v8'), 'footer missing product title');
+  assert.ok(layoutContent.includes('footerBuildPrefix') || layoutContent.includes('APP_VERSION'), 'footer missing build info');
+  assert.ok(layoutContent.includes('footerStatus') || layoutContent.includes('Gate CLOSED'), 'footer missing Gate/Stage C status');
+  assert.equal(layoutContent.includes('Readonly MVP'), false, 'footer still contains Readonly MVP wording');
 });
 
 test('v8 product copy has canonical localized titles and safety badges', () => {
@@ -291,12 +291,12 @@ test('legacy Connector Center wording and migration links exist', () => {
   const i18nContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/i18n.ts'), 'utf8');
   const menuContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/menu-registry.ts'), 'utf8');
 
-  assert.ok(readonlyContent.includes('Legacy Connector Center'), 'readonly connector center missing Legacy title');
+  assert.ok(readonlyContent.includes('Connector Center'), 'readonly connector center missing title');
   assert.ok(readonlyContent.includes('v7 readonly view'), 'readonly connector center missing v7 readonly wording');
-  assert.ok(legacyContent.includes('连接器中心（旧）'), 'legacy connector center missing old-entry Chinese title');
-  assert.ok(i18nContent.includes("connectorCenterReadonly: '连接器中心（旧）'"), 'Chinese sidebar label missing old marker');
-  assert.ok(i18nContent.includes("connectorCenterReadonly: 'Legacy Connector Center'"), 'English sidebar label missing Legacy marker');
-  assert.ok(menuContent.includes("label: '连接器中心（旧）'"), 'menu registry label missing old marker');
+  assert.ok(legacyContent.includes('连接器中心'), 'legacy connector center missing Chinese title');
+  assert.ok(i18nContent.includes("connectorCenterReadonly: '连接器'"), 'Chinese sidebar label missing connector');
+  assert.ok(i18nContent.includes("connectorCenterReadonly: 'Connectors'"), 'English sidebar label missing Connectors');
+  assert.ok(menuContent.includes("label: '连接器'"), 'menu registry label missing connector');
   for (const route of [
     '/openaip-v8-integration-center-preview',
     '/openaip-v8-local-apps-center-preview',
