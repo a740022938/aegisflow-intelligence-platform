@@ -43,7 +43,18 @@ The human product owner provided browser screenshots in the coordinating chat. T
 | Image files archived | **NO** — screenshots reviewed in coordinating chat but image files not accessible in this CLI environment |
 | Archive status | **REVIEWED-PASS, ARCHIVE-PENDING** |
 
-> The human owner may manually place screenshot PNG files into the archive directory if file-based evidence is required for the permanent record.
+> **Action required:** The human owner must manually copy the 6 screenshot PNG files into `docs/product/screenshots/openaip-v8-1-d5b-human-visual-gate/`. This tool cannot access the coordinating chat's image files. Until all 6 files are present, the archive status remains **ARCHIVE-PENDING** and D6 remains NO-GO.
+
+**Required filenames for archive (based on reviewed screenshots):**
+
+| # | Expected Filename | Description |
+|---|------------------|-------------|
+| 1 | `zh-sidebar-command-center.png` | ZH Command Center / sidebar top — OpenAIP first, 指挥中心 selected |
+| 2 | `zh-system-footer.png` | ZH System + footer — v8 / Gate Closed / no MVP |
+| 3 | `zh-advanced-tools.png` | ZH Advanced Tools expanded — de-emphasized, not competing |
+| 4 | `en-sidebar-command-center.png` | EN Command Center / sidebar top — Command Center, Agents, Tasks |
+| 5 | `en-footer.png` | EN footer — Local AI Console / Core baseline / Gate Closed |
+| 6 | `en-execution-gateway.png` | Execution Gateway card — Gate CLOSED / Stage C disabled / No execution |
 
 ---
 

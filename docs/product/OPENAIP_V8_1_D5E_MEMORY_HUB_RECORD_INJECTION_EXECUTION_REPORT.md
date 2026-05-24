@@ -3,10 +3,38 @@
 | Field | Value |
 |-------|-------|
 | **Phase** | D5E Memory Hub Record Injection Execution |
-| **D5E HEAD** | `16df651` (docs-only — Memory Hub SQLite was modified, not git source) |
+| **D5E HEAD** | `bc30c69` (full: `bc30c6914e6176207649713b322a766fd9678be8`) |
 | **Date** | 2026-05-24 |
 | **Nature** | Execution of D5D injection plan. 15 OpenAIP v8.1 D1-D5C memory records written to Memory Hub SQLite and exported. |
 | **Final Verdict** | `OPENAIP_V8_1_D5E_MEMORY_HUB_RECORD_INJECTION_EXECUTED_SUCCESSFULLY` |
+
+---
+
+## Evidence Detail Cross-Reference
+
+| # | Evidence Item | Result | Confirmation Method |
+|---|--------------|--------|---------------------|
+| 1 | D5E commit hash | `bc30c6914e6176207649713b322a766fd9678be8` | `git log --oneline -1` |
+| 2 | Backup path | `E:\_AIP_MEMORY_HUB\backups\manual\memory_hub_backup_20260524_112238.sqlite` | File exists on disk |
+| 3 | add-candidate count | **15** (IDs 63-77) | `sqlite3 memory_hub.sqlite "SELECT count(*) FROM memories"` = 77; minus 62 original = 15 |
+| 4 | approve count | **15/15** | `sqlite3 memory_hub.sqlite "SELECT status FROM memories WHERE id >= 63"` — all "published" |
+| 5 | Export success | ✅ Exit 0, 20 files regenerated | `context_manifest.json` generated_at: `2026-05-24 11:23:47` |
+| 6 | SQLite before/after | **62 → 77** (+15, +24.57% growth) | Pre-execution check: 62; Post-execution `memory_cli.py check`: 77 |
+| 7 | New records == D5D reviewed 15 drafts | ✅ **YES** — 15/15 match exact D5D record IDs | Cross-ref: sqlite3 `SELECT id, title FROM memories ORDER BY id DESC LIMIT 15` vs `OPENAIP_V8_1_D5D_MEMORY_HUB_RECORDS_DRAFT.json` |
+| 8 | v8.1 D1-D5C visible in exports | ✅ `latest_context.md`: 19 lines contain "OpenAIP v8"; `aip_context.md`: 19 lines contain "OpenAIP v8"; Memory Hub page Manifest timestamp updated | `rg -c "OpenAIP v8" exports/*.md` |
+| 9 | Git working tree clean | ✅ CLEAN | `git status --short` — no output |
+| 10 | Gate CLOSED | ✅ Unchanged | Config verified — no gate operations performed |
+| 11 | Stage C disabled | ✅ Unchanged | Config verified — no stage-C operations performed |
+| 12 | Execution disabled | ✅ Unchanged | Config verified — no execution operations performed |
+| 13 | Release/Tag not performed | ✅ NO tag, NO GitHub Release | `git tag --list` empty for v8.1 |
+| 14 | D5 auth form unsigned | ✅ Still UNSIGNED | File `OPENAIP_V8_1_D5_OWNER_AUTHORIZATION_FORM_PENDING.md` unchanged |
+| 15 | D6 NO-GO | ✅ NO-GO | No D6 runbook executed |
+| 16 | No AIP main DB write | ✅ Not touched | Confirmed |
+| 17 | No Vector DB write | ✅ Not touched | Confirmed |
+| 18 | No Indexing performed | ✅ Not performed | Confirmed |
+| 19 | No Provider action | ✅ Not touched | Confirmed |
+| 20 | No Connector action | ✅ Not touched | Confirmed |
+| 21 | No Local-app action | ✅ Not touched | Confirmed |
 
 ---
 
