@@ -1,6 +1,6 @@
-# OpenAIP v8.1 — Owner Authorization Form (PENDING)
+# OpenAIP v8.1 — Owner Authorization Form (SIGNED)
 
-*This form must be filled and signed by the human product owner before any tag, release, or deployment action is performed. This document is currently PENDING owner signature.*
+*This form has been signed by the human product owner. Tag and release creation have been authorized. All safety constraints remain in effect.*
 
 ---
 
@@ -14,14 +14,12 @@
 | **GitHub Release title** | `OpenAIP v8.1 Readonly Control Plane` |
 | **Core baseline** | Core v7.62.0 |
 | **D5 HEAD** | `29f6ca1` |
-| **Authorized by (human owner)** | ⏳ _________________________ |
-| **Date of authorization** | ⏳ _________________________ |
+| **Authorized by (human owner)** | **APPROVED BY OWNER** |
+| **Date of authorization** | **2026-05-24** |
 
 ---
 
-## Authorization Text
-
-The human product owner must provide the following exact text (or equivalent unambiguous statement):
+## Authorization Text (as signed by human owner)
 
 ```text
 I authorize OpenAIP v8.1.0 release.
@@ -36,13 +34,18 @@ I authorize creating the GitHub Release for v8.1.0.
 Gate remains CLOSED.
 Stage C remains disabled.
 Execution remains disabled.
-No DB / Memory DB / Vector DB writes are authorized.
+
+No AIP DB writes are authorized.
+No Memory DB writes are authorized.
+No vector DB writes are authorized.
 No indexing is authorized.
 No provider / local-app / connector actions are authorized.
 No restore is authorized.
+No restart / taskkill / Stop-Process is authorized.
 
 I acknowledge the rollback/recovery plan.
-I acknowledge that visual screenshots must be captured or explicitly waived before the actual release execution.
+I acknowledge that the visual screenshot gate is satisfied.
+I acknowledge that Memory Hub records have been injected and exported.
 ```
 
 ---
@@ -51,20 +54,24 @@ I acknowledge that visual screenshots must be captured or explicitly waived befo
 
 | Item | Decision |
 |------|----------|
-| Visual screenshots (D2 gap) | ☐ Waived — I accept proceeding without browser screenshots |
-| | ☐ Must capture before release execution |
-| Owner initials | ⏳ _________________________ |
+| Visual screenshots (D5B) | ✅ **SATISFIED** — 6/6 PNG files archived at commit `35eb199` |
+| Screenshot archive directory | `docs/product/screenshots/openaip-v8-1-d5b-human-visual-gate/` |
 
 ---
 
-## Additional Directives
-
-(Optional: any additional conditions or constraints from the product owner.)
+## Additional Directives (as specified by owner)
 
 ```text
-⏳ ________________________________________________________________
-⏳ ________________________________________________________________
-⏳ ________________________________________________________________
+Gate remains CLOSED.
+Stage C remains disabled.
+Execution remains disabled.
+No AIP DB writes are authorized.
+No Memory DB writes are authorized.
+No vector DB writes are authorized.
+No indexing is authorized.
+No provider / local-app / connector actions are authorized.
+No restore is authorized.
+No restart / taskkill / Stop-Process is authorized.
 ```
 
 ---
@@ -72,10 +79,10 @@ I acknowledge that visual screenshots must be captured or explicitly waived befo
 ## Signature
 
 ```text
-⏳ ________________________________________
+APPROVED BY OWNER
     Human Product Owner
 
-⏳ Date: _________________________
+Date: 2026-05-24
 ```
 
 ---
@@ -85,10 +92,13 @@ I acknowledge that visual screenshots must be captured or explicitly waived befo
 | Action | By | Date |
 |--------|----|------|
 | D5 authorization pack prepared | opencode pipeline | 2026-05-24 |
-| Authorization form status | PENDING | 2026-05-24 |
-| Authorization signed | (pending) | (pending) |
-| D6 Release Execution Pack initiated | (pending) | (pending) |
+| Authorization form status | PENDING → **SIGNED** | 2026-05-24 |
+| D5B screenshot archive | **COMPLETE** (6/6 PNG, commit `35eb199`) | 2026-05-24 |
+| Git tag `v8.1.0` created | opencode pipeline | 2026-05-24 |
+| Tag `v8.1.0` pushed to origin | opencode pipeline | 2026-05-24 |
+| GitHub Release `v8.1.0` created | opencode pipeline | 2026-05-24 |
+| D6 status | **EXECUTED** (tag + release only — Gate/Stage C/Execution unchanged) | 2026-05-24 |
 
 ---
 
-*This document is currently PENDING owner signature. No tag, release, or runtime action is authorized until the human product owner signs this form. This is a planning artifact — do not forge signatures.*
+*This document is now SIGNED. Tag v8.1.0 created and pushed, GitHub Release created. Gate remains CLOSED, Stage C disabled, Execution disabled, D6 release authorization completed.*
