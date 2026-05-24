@@ -16,7 +16,7 @@
 |------|-----------|----------------|
 | Screenshots captured by CLI | NO (no GUI browser) | Resolved: human owner provided screenshots |
 | Visual gate status | PENDING | **SATISFIED** (human-reviewed) |
-| Archive status | directory created, empty | **REVIEWED-PASS, ARCHIVE-PENDING** (no image files in CLI) |
+| Archive status | directory created, empty | **ARCHIVE-COMPLETE** (6 PNG files archived) |
 
 ---
 
@@ -35,26 +35,22 @@ The human product owner provided browser screenshots in the coordinating chat. T
 
 **Browser auto-translate:** Confirmed not used. OpenAIP internal EN/zh-CN switch was used for language toggling.
 
-### Screenshot Archive Status
+### Screenshot Archive Status (Closure)
 
 | Field | Value |
 |-------|-------|
-| Screenshot directory | `docs/product/screenshots/openaip-v8-1-d5b-human-visual-gate/` (created) |
-| Image files archived | **NO** — screenshots reviewed in coordinating chat but image files not accessible in this CLI environment |
-| Archive status | **REVIEWED-PASS, ARCHIVE-PENDING** |
+| Screenshot directory | `docs/product/screenshots/openaip-v8-1-d5b-human-visual-gate/` |
+| Image files archived | **YES** — 6/6 PNG files present |
+| Archive status | **ARCHIVE-COMPLETE** |
 
-> **Action required:** The human owner must manually copy the 6 screenshot PNG files into `docs/product/screenshots/openaip-v8-1-d5b-human-visual-gate/`. This tool cannot access the coordinating chat's image files. Until all 6 files are present, the archive status remains **ARCHIVE-PENDING** and D6 remains NO-GO.
-
-**Required filenames for archive (based on reviewed screenshots):**
-
-| # | Expected Filename | Description |
-|---|------------------|-------------|
-| 1 | `zh-sidebar-command-center.png` | ZH Command Center / sidebar top — OpenAIP first, 指挥中心 selected |
-| 2 | `zh-system-footer.png` | ZH System + footer — v8 / Gate Closed / no MVP |
-| 3 | `zh-advanced-tools.png` | ZH Advanced Tools expanded — de-emphasized, not competing |
-| 4 | `en-sidebar-command-center.png` | EN Command Center / sidebar top — Command Center, Agents, Tasks |
-| 5 | `en-footer.png` | EN footer — Local AI Console / Core baseline / Gate Closed |
-| 6 | `en-execution-gateway.png` | Execution Gateway card — Gate CLOSED / Stage C disabled / No execution |
+| # | Archived File | Size | Verified |
+|---|--------------|------|----------|
+| 1 | `zh-sidebar-command-center.png` | 1,006,261 bytes | ✅ exists |
+| 2 | `zh-system-footer.png` | 79,803 bytes | ✅ exists |
+| 3 | `zh-advanced-tools.png` | 74,066 bytes | ✅ exists |
+| 4 | `en-sidebar-command-center.png` | 641,884 bytes | ✅ exists |
+| 5 | `en-footer.png` | 80,719 bytes | ✅ exists |
+| 6 | `en-execution-gateway.png` | 162,727 bytes | ✅ exists |
 
 ---
 
@@ -82,7 +78,7 @@ The human product owner provided browser screenshots in the coordinating chat. T
 |------|--------|
 | Visual screenshot gate | **SATISFIED** |
 | Gate satisfaction basis | Human owner browser screenshots reviewed in coordinating chat |
-| Archive completeness | Reviewed-pass — archive-pending (image files not in CLI) |
+| Archive completeness | **ARCHIVE-COMPLETE** — 6/6 PNG files verified in directory |
 | Release blocking | **NOT BLOCKED** — visual gate is satisfied |
 
 ---

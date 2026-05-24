@@ -1,0 +1,16 @@
+{
+  "package": "OpenAIP v8.1 D5B human visual gate final required PNG set",
+  "target_directory": "E:\\AIP\\docs\\product\\screenshots\\openaip-v8-1-d5b-human-visual-gate",
+  "files": [
+    "zh-sidebar-command-center.png",
+    "zh-system-footer.png",
+    "zh-advanced-tools.png",
+    "en-sidebar-command-center.png",
+    "en-footer.png",
+    "en-execution-gateway.png"
+  ],
+  "notes": [
+    "EN footer and execution-gateway images were cropped from the human-reviewed EN screenshot.",
+    "Release/tag remains NO-GO until D5 authorization is signed and screenshot archive is committed."
+  ]
+}
