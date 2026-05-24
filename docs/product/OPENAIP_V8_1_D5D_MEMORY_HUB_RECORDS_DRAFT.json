@@ -1,0 +1,495 @@
+{
+  "schema_version": "openaip-memory-record-draft-v1",
+  "generated_for": "OpenAIP v8.1 D5D",
+  "write_status": "draft_only_not_injected",
+  "generated_at": "2026-05-24",
+  "total_records": 15,
+  "records": [
+    {
+      "id": "openaip-v8-1-d1-d5c-journey",
+      "type": "project_milestone",
+      "title": "OpenAIP v8.1 Release Readiness Journey D1-D5C",
+      "summary": "Records the full OpenAIP v8.1 pipeline from navigation productization through release authorization preparation: D1 navigation finalization, D1A copy/footer hotfix, D2 visual acceptance seal, D3 release workflow readiness, D4 product owner Go/No-Go review, D5 authorization pack preparation, D5A CLI screenshot gate attempt, D5B human visual gate pass, D5C Memory Hub freshness audit.",
+      "details": [
+        "D1: Product navigation finalized — c9f48dd",
+        "D1A: Navigation copy and footer hotfix — 1ef8015",
+        "D2: Visual acceptance seal documented — 00b452f",
+        "D3: Release workflow readiness planned — 0f90f22",
+        "D4: Product owner Go/No-Go review — 29f6ca1",
+        "D5: Release authorization pack prepared — 29a053f",
+        "D5A: CLI screenshot gate attempted (no GUI) — ddff846",
+        "D5B: Human visual gate passed — 314e836",
+        "D5C: Memory Hub freshness audit — 8376934"
+      ],
+      "evidence": {
+        "commits": ["c9f48dd", "1ef8015", "00b452f", "0f90f22", "29f6ca1", "29a053f", "ddff846", "314e836", "8376934"],
+        "docs": [
+          "docs/product/OPENAIP_V8_1_D1_PRODUCT_NAVIGATION_FINALIZATION_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D2_VISUAL_ACCEPTANCE_SEAL_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D3_RELEASE_WORKFLOW_READINESS_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D4_PRODUCT_OWNER_RELEASE_GO_NOGO_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D5_RELEASE_AUTHORIZATION_PACK_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D5B_HUMAN_VISUAL_SCREENSHOT_GATE_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D5C_MEMORY_HUB_FRESHNESS_AUDIT_REPORT.md"
+        ]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled",
+        "release_tag": "not_performed"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8.1, release-readiness, memory-hub, project-milestone",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-1-nav-finalized",
+      "type": "ui_product_decision",
+      "title": "OpenAIP v8.1 Product Navigation Finalized",
+      "summary": "D1 upgraded the sidebar from a historical feature directory to a formal product navigation: 9 readonly centers with bilingual labels and semantic icons. Sidebar top shows OpenAIP as the primary brand identity. Command Center is the first entry under the primary label.",
+      "details": [
+        "Sidebar reorganized with OpenAIP as the primary product brand",
+        "9 readonly centers promoted to sidebar: Command, Agent, Task, Provider, Integration, Local Apps, Memory+Knowledge, Policy+Capability, Audit",
+        "Bilingual (zh/en) i18n for all nav labels and section headers",
+        "Footer shows productized 'Local AI Console' copy instead of technical identifiers"
+      ],
+      "evidence": {
+        "commits": ["c9f48dd"],
+        "docs": ["docs/product/OPENAIP_V8_1_D1_PRODUCT_NAVIGATION_FINALIZATION_REPORT.md"],
+        "files": ["apps/web-ui/src/components/Layout.tsx", "apps/web-ui/src/i18n.ts"]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8.1, navigation, sidebar, i18n, decision",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-1-copy-hotfix",
+      "type": "ui_copy_decision",
+      "title": "OpenAIP v8.1 Navigation Copy and Footer Hotfix",
+      "summary": "D1A corrected product copy across multiple sidebar items: Command Center, Advanced Mode, Training Tools, Hugging Face/Model Repository, and footer state labels. Ensured all visible text uses product-grade wording.",
+      "details": [
+        "Fixed Command Center entry label consistency",
+        "Corrected Advanced Mode, Training Tools, Hugging Face copy",
+        "Footer state labels updated to reflect product posture"
+      ],
+      "evidence": {
+        "commits": ["1ef8015"],
+        "docs": []
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8.1, copy, footer, hotfix, i18n",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-1-visual-gate-passed",
+      "type": "visual_acceptance",
+      "title": "Human Visual Gate Passed for OpenAIP v8.1",
+      "summary": "All visual acceptance criteria for OpenAIP v8.1 were reviewed and passed by the human product owner. The visual gate was satisfied via human-provided browser screenshots covering Chinese and English sidebar views, footer status, Execution Gateway safety state, and absence of MVP/preview/experiment wording.",
+      "details": [
+        "D2: Source-level visual acceptance sealed — 00b452f",
+        "D5A: CLI screenshot gate attempted — no GUI browser available — ddff846",
+        "D5B: Human owner reviewed 6 screenshots in coordinating chat — all PASS — 314e836",
+        "Screenshot archive: reviewed-pass, archive-pending (image files not in CLI environment)"
+      ],
+      "evidence": {
+        "commits": ["00b452f", "ddff846", "314e836"],
+        "docs": [
+          "docs/product/OPENAIP_V8_1_D2_VISUAL_ACCEPTANCE_SEAL_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D5B_HUMAN_VISUAL_SCREENSHOT_GATE_REPORT.md"
+        ]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "human_product_owner_review",
+      "source_type": "manual",
+      "tags": "openaip, v8.1, visual-acceptance, screenshot-gate, human-review",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-1-release-workflow",
+      "type": "release_process",
+      "title": "OpenAIP v8.1 Release Workflow Readiness Planned",
+      "summary": "D3 established a 6-gate release checklist covering Source, Validation, Visual, Product, Safety, and Authorization gates. Includes rollback plan, release version strategy (v8.1.0 tag recommended), Core baseline v7.62.0, and release authorization template.",
+      "details": [
+        "6-gate checklist: Source, Validation, Visual, Product, Safety, Authorization",
+        "Rollback plan documents pre/post-tag steps",
+        "Version strategy: v8.1.0 tag, Core v7.62.0 baseline"
+      ],
+      "evidence": {
+        "commits": ["0f90f22"],
+        "docs": [
+          "docs/product/OPENAIP_V8_1_D3_RELEASE_GATE_CHECKLIST.md",
+          "docs/product/OPENAIP_V8_1_D3_ROLLBACK_RECOVERY_PLAN.md",
+          "docs/product/OPENAIP_V8_1_D3_RELEASE_AUTHORIZATION_TEMPLATE.md"
+        ]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled",
+        "release_tag": "not_performed"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8.1, release, workflow, gate-checklist, rollback",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-1-owner-review",
+      "type": "product_owner_decision",
+      "title": "Product Owner Release Review Ready with Release on Hold",
+      "summary": "D4 product owner Go/No-Go review concluded with 9 PASS / 1 WARN / 0 BLOCK. Authorized to proceed to release authorization pack preparation but NOT to execute release. Visual screenshot evidence remained pending at that time.",
+      "details": [
+        "9 criteria PASS: navigation, visual acceptance zh/en, safety UI, hidden pages, execution gateway",
+        "1 WARN: visual screenshots not yet taken (no GUI browser)",
+        "0 BLOCK: no release-blocking issues found",
+        "Verdict: GO_TO_RELEASE_AUTHORIZATION_PACK_WITH_SCREENSHOT_GATE_PENDING"
+      ],
+      "evidence": {
+        "commits": ["29f6ca1"],
+        "docs": ["docs/product/OPENAIP_V8_1_D4_PRODUCT_OWNER_RELEASE_GO_NOGO_REPORT.md"]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled",
+        "release_tag": "not_performed"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "human_product_owner_review",
+      "source_type": "manual",
+      "tags": "openaip, v8.1, go-nogo, owner-review, release-blocker",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-1-auth-unsigned",
+      "type": "authorization_state",
+      "title": "OpenAIP v8.1 Release Authorization Remains Unsigned",
+      "summary": "D5 prepared the full release authorization pack including the owner authorization form, D6 execution runbook, and draft release notes. The authorization form remains unsigned by the human product owner. D6 release execution remains NO-GO until signed.",
+      "details": [
+        "D5 authorization pack includes: report, authorization form (unsigned), D6 runbook, release notes draft",
+        "Owner authorization form: PENDING — cannot be auto-signed by pipeline",
+        "D6 release execution: NO-GO — blocked by unsigned authorization",
+        "No tag, no release, no deployment performed"
+      ],
+      "evidence": {
+        "commits": ["29a053f"],
+        "docs": [
+          "docs/product/OPENAIP_V8_1_D5_OWNER_AUTHORIZATION_FORM_PENDING.md",
+          "docs/product/OPENAIP_V8_1_D5_RELEASE_EXECUTION_RUNBOOK_DRAFT.md",
+          "docs/product/OPENAIP_V8_1_D5_RELEASE_NOTES_DRAFT_PENDING_AUTHORIZATION.md"
+        ]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled",
+        "release_tag": "not_performed"
+      },
+      "status": "blocker_for_release",
+      "project": "AIP",
+      "level": "L1_current",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8.1, authorization, unsigned, blocker, release-gate",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-1-safety-boundary",
+      "type": "safety_boundary",
+      "title": "OpenAIP v8.1 Safety Boundary Preserved Across All Phases",
+      "summary": "Throughout the entire D1-D5C pipeline, the safety boundary has been strictly maintained: Gate CLOSED, Stage C disabled, execution disabled. No DB writes, no vector/indexing operations, no provider/local-app/connector actions, no release/tag operations. All validations pass at every phase (typecheck, lint, build, test, smoke).",
+      "details": [
+        "Gate: CLOSED throughout all phases",
+        "Stage C: disabled throughout all phases",
+        "Execution: disabled throughout all phases",
+        "No DB, vector, or indexing writes",
+        "No provider, local-app, or connector actions",
+        "No release or tag operations",
+        "Validations: typecheck pass, lint pass (0 warnings), build pass (758 modules), tests 9/9, smoke 108/108"
+      ],
+      "evidence": {
+        "commits": ["c9f48dd", "1ef8015", "00b452f", "0f90f22", "29f6ca1", "29a053f", "ddff846", "314e836", "8376934"],
+        "docs": ["docs/product/OPENAIP_V8_1_D3_RELEASE_GATE_CHECKLIST.md"]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled",
+        "release_tag": "not_performed"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L0_safety",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8.1, safety, gate-closed, stage-c-disabled, no-execution",
+      "sensitive": 0
+    },
+    {
+      "id": "memory-hub-freshness-gap",
+      "type": "memory_hub_finding",
+      "title": "Memory Hub Export Timestamp Refreshed but Content Remains Stale",
+      "summary": "D5C discovered the Memory Hub data lives at E:\\_AIP_MEMORY_HUB (external, not git-tracked). Last export timestamp was 2026-05-14. After owner authorization, python memory_cli.py export refreshed timestamps to 2026-05-24. However, the memory content remains at AIP v7.3.0 era because the export command re-reads the same 62 SQLite seed entries (no v8.1 memories were added to the DB).",
+      "details": [
+        "Data source: E:\\_AIP_MEMORY_HUB (underscore prefix)",
+        "Route: Route B (external non-git-tracked file refresh)",
+        "Export refresh: 20 files updated to 2026-05-24 11:09:51",
+        "Memory content: still at v7.3.0 — no v8.1 D1-D5C in DB",
+        "Next: D5D record injection plan drafted — awaiting authorization"
+      ],
+      "evidence": {
+        "commits": ["8376934"],
+        "docs": [
+          "docs/product/OPENAIP_V8_1_D5C_MEMORY_HUB_FRESHNESS_AUDIT_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D5C_MEMORY_HUB_REFRESH_AUTHORIZATION_TEMPLATE.md"
+        ]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled"
+      },
+      "status": "requires_record_injection_authorization",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "memory-hub, freshness, d5c, export-refresh, stale-content",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-1-d6-no-go",
+      "type": "release_blocker",
+      "title": "D6 Release Execution Remains NO-GO",
+      "summary": "D6 is blocked by two conditions: (1) the D5 release authorization form remains unsigned by the human product owner; (2) Memory Hub content record injection is still pending. Neither condition is resolved. No tag, release, Gate opening, Stage C enablement, or execution has been performed.",
+      "details": [
+        "Blocker 1: Release authorization form unsigned (D5)",
+        "Blocker 2: Memory Hub record injection pending (D5C/D5D)",
+        "Gate: CLOSED — unchanged",
+        "Stage C: disabled — unchanged",
+        "Execution: disabled — unchanged",
+        "Release/tag: not performed"
+      ],
+      "evidence": {
+        "commits": ["29a053f"],
+        "docs": [
+          "docs/product/OPENAIP_V8_1_D5_OWNER_AUTHORIZATION_FORM_PENDING.md",
+          "docs/product/OPENAIP_V8_1_D5C_MEMORY_HUB_FRESHNESS_AUDIT_REPORT.md"
+        ]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled",
+        "release_tag": "not_performed"
+      },
+      "status": "no-go",
+      "project": "AIP",
+      "level": "L1_current",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8.1, d6, no-go, blocker, release",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-product-positioning",
+      "type": "product_principle",
+      "title": "OpenAIP Must Present as a Real Usable Local AI Console",
+      "summary": "Product positioning principle: OpenAIP must not appear as an experimental MVP or demo. The readonly state is a deliberate safety boundary, not a sign of incompleteness. Gate Closed is a professional control mechanism, not a defect. All UI copy, labels, and footers have been cleaned to remove MVP/preview/experiment wording.",
+      "details": [
+        "Footer shows 'Local AI Console' not 'AG Dev Console'",
+        "Gate Closed shown as product safety, not work-in-progress",
+        "Advanced Tools de-emphasized, not competing with primary nav",
+        "No 霓 (ni) single-character artifact in visible UI"
+      ],
+      "evidence": {
+        "commits": ["886f0a4", "1ef8015", "b04f35f"],
+        "files": ["apps/web-ui/src/i18n.ts", "apps/web-ui/src/components/Layout.tsx"]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L0_safety",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, product-positioning, safety, principle, no-mvp",
+      "sensitive": 0
+    },
+    {
+      "id": "memory-hub-purpose",
+      "type": "product_principle",
+      "title": "Memory Hub is the Traceable Decision Memory Layer",
+      "summary": "Purpose principle: Memory Hub serves as the project's traceable decision memory layer. It records phase milestones, visual acceptances, authorizations, safety boundaries, release preparations, and blockers. This allows the project to retrospectively trace the complete decision journey. Memory records are not just data dumps — they are structured decision artifacts with evidence, safety state, and next steps.",
+      "details": [
+        "Each record should be a discrete project event with verifiable evidence",
+        "Records carry safety state snapshots (Gate/Stage C/Execution)",
+        "Records link to git commits and source documents",
+        "Records have clear status: active, blocker, resolved, superseded"
+      ],
+      "evidence": {
+        "docs": [
+          "docs/product/OPENAIP_V8_1_D5C_MEMORY_HUB_FRESHNESS_AUDIT_REPORT.md",
+          "docs/product/OPENAIP_V8_1_D5D_MEMORY_HUB_RECORDS_DRAFT.json"
+        ]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L3_history",
+      "confidence": "high",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "memory-hub, principle, traceability, decision-layer, architecture",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-i18n-sealed",
+      "type": "ui_completion",
+      "title": "OpenAIP v8 Bilingual i18n Sealed",
+      "summary": "All product-shell strings in the v8 readonly center suite fully localized with zh/en pairs. Document title, sidebar labels, footer copy, center card roles, Execution Gateway safety badges, and Command Center tagline all sourced from openAipv8Copy.ts. No remaining unlocalized strings in visible product shell.",
+      "details": [
+        "Document title fixed: 'OpenAIP' instead of old Chinese brand",
+        "EN sidebar: Command Center, Agents, Tasks, Audit, Policies, Execution Gateway",
+        "ZH sidebar: 指挥中心, 代理中心, 任务中心, 审计中心, 策略中心, 执行网关",
+        "Footer: 'Local AI Console' (EN) / '本地 AI 控制台' (ZH)",
+        "108/108 i18n smoke tests passing"
+      ],
+      "evidence": {
+        "commits": ["886f0a4", "b04f35f"],
+        "files": ["apps/web-ui/src/i18n.ts", "apps/web-ui/src/pages/openAipv8Copy.ts"]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8, i18n, localization, zh, en, sealed",
+      "sensitive": 0
+    },
+    {
+      "id": "openaip-v8-execution-gateway",
+      "type": "ui_safety_feature",
+      "title": "Execution Gateway Shows Closed Gate and Disabled Stage C",
+      "summary": "The Execution Gateway page at /openaip-v8-execution-gateway-preview clearly displays: Gate CLOSED, Stage C disabled, No execution, No DB writes. All Execution Gateway tests pass (test IDs 78-93 in v8 smoke suite). Safety boundary registry has 8 entries all blocked.",
+      "details": [
+        "Gate CLOSED, Stage C disabled — displayed on the page",
+        "Approval Chain: 'This preview does not execute chain'",
+        "Blocked Actions panel: critical items listed",
+        "8 execution boundary registry entries, all blocked"
+      ],
+      "evidence": {
+        "commits": ["c9f48dd"],
+        "files": ["apps/web-ui/src/pages/OpenAIPv8ExecutionGatewayPreview.tsx"]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "openaip, v8, execution-gateway, safety, gate-closed, stage-c",
+      "sensitive": 0
+    },
+    {
+      "id": "memory-hub-d5d-plan-status",
+      "type": "plan_status",
+      "title": "D5D Memory Hub Record Injection Plan Completed",
+      "summary": "D5D completed the record injection plan: 15 draft records designed covering the OpenAIP v8.1 D1-D5C journey. SQLite schema surveyed (memories table with 21 columns, 62 existing rows). Injection tooling reviewed (add-candidate + approve + export flow). Authorization template generated. All docs only — no SQLite writes, no export.",
+      "details": [
+        "15 draft records designed with full evidence chains",
+        "SQLite schema: memories table (21 columns), audit_log, decisions, exports, etc.",
+        "Injection flow: add-candidate → approve → export",
+        "Backup command available: memory_cli.py backup",
+        "Dry-run: review draft JSON before insertion",
+        "Authorization template: requires human owner signature"
+      ],
+      "evidence": {
+        "docs": [
+          "docs/product/OPENAIP_V8_1_D5D_MEMORY_HUB_RECORD_INJECTION_PLAN.md",
+          "docs/product/OPENAIP_V8_1_D5D_MEMORY_HUB_RECORD_INJECTION_AUTHORIZATION_TEMPLATE.md",
+          "docs/product/OPENAIP_V8_1_D5D_MEMORY_HUB_RECORDS_DRAFT.json",
+          "docs/product/OPENAIP_V8_1_D5D_MEMORY_HUB_RECORDS_DRAFT.md"
+        ]
+      },
+      "safety": {
+        "gate": "CLOSED",
+        "stage_c": "disabled",
+        "execution": "disabled",
+        "release_tag": "not_performed"
+      },
+      "status": "active",
+      "project": "AIP",
+      "level": "L2_project",
+      "confidence": "verified",
+      "source": "opencode_automated_pipeline",
+      "source_type": "auto",
+      "tags": "memory-hub, d5d, injection-plan, draft-records, authorization-pending",
+      "sensitive": 0
+    }
+  ]
+}
