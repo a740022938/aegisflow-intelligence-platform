@@ -14,7 +14,7 @@
 
 | Field | Value |
 |-------|-------|
-| Commit hash | TBD |
+| Commit hash | `886f0a4` |
 | Pushed | yes |
 | Working tree clean | yes |
 
