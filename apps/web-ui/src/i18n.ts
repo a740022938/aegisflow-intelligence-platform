@@ -18,7 +18,7 @@ export const translations = {
       visionLab: '视觉实验室',
       knowledge: '知识',
       output: '输出',
-      openAipV8: 'OpenAIP v8 指挥中心',
+      openAipV8: 'OpenAIP v8 控制平面',
       // ── 菜单项 ──
       dashboard: '仪表板',
       factoryStatus: '工厂状态',
@@ -45,7 +45,7 @@ export const translations = {
       openAipV8CommandCenter: 'OpenAIP v8 指挥中心',
       openAipV8AgentCenter: '智能体中心',
       openAipV8TaskCenter: '任务中心',
-      openAipV8ProviderManager: '供应商管理',
+      openAipV8ProviderManager: '供应商管理中心',
       openAipV8IntegrationCenter: '集成中心',
       openAipV8LocalAppsCenter: '本地应用中心',
       openAipV8MemoryKnowledgeCenter: '记忆与知识中心',
@@ -124,8 +124,8 @@ export const translations = {
     },
     // Dashboard
     dashboard: {
-      title: '天枢驾驶舱',
-      subtitle: '天枢智治平台（OpenAIP Community Edition）总览',
+      title: 'OpenAIP 控制台',
+      subtitle: 'OpenAIP 社区版 · 控制台',
       factoryStatus: '工厂状态',
       runningTasks: '运行中任务',
       activeWorkflows: '活跃工作流',
@@ -296,8 +296,8 @@ export const translations = {
     },
     // Dashboard
     dashboard: {
-      title: 'OpenAIP Flight Deck',
-      subtitle: 'OpenAIP (AIP Community Edition) Overview',
+      title: 'OpenAIP Console',
+      subtitle: 'OpenAIP Community Edition · Console',
       factoryStatus: 'Factory Status',
       runningTasks: 'Running Tasks',
       activeWorkflows: 'Active Workflows',

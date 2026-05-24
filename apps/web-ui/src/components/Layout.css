@@ -95,17 +95,37 @@ html, body, #root {
   text-decoration: none !important;
 }
 .topbar-logo {
-  width: 28px;
-  height: 28px;
-  background: var(--primary);
-  border-radius: var(--radius-md);
+  width: 32px;
+  height: 32px;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.18), transparent 32%),
+    linear-gradient(145deg, rgba(13, 148, 136, 0.95), rgba(37, 99, 235, 0.88));
+  border: 1px solid rgba(125, 211, 252, 0.42);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
   flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.18), 0 10px 24px rgba(8, 47, 73, 0.28);
+}
+.openAip-node-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+.openAip-node-link {
+  fill: none;
+  stroke: rgba(224, 242, 254, 0.82);
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.openAip-node-core {
+  fill: #ecfeff;
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.65));
+}
+.openAip-node-dot {
+  fill: #99f6e4;
 }
 .topbar-title {
   font-size: 14px;

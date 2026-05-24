@@ -4,7 +4,6 @@ import './Layout.css';
 import { type Lang, translations, getStoredLang, setStoredLang, syncTranslationsFromServer } from '../i18n';
 import { APP_VERSION, BUILD_DATE } from '../constants/appVersion';
 import { APP_META } from '../constants/appMeta';
-import { getAipTrackLabel, getAipStageCStatusLabel, getAipFeatureFlagLabel } from '../registry/product-metadata-registry';
 import { loadSidebarWidth, saveSidebarWidth } from '../layout/layoutStorage';
 import { useAuth } from '../hooks/useAuth';
 
@@ -56,6 +55,18 @@ function NavItem({ to, icon, label }: { to: string; icon: string; label: string 
       <span className="nav-icon"><Icon name={icon} /></span>
       <span className="nav-label">{label}</span>
     </NavLink>
+  );
+}
+
+function OpenAipNodeIcon() {
+  return (
+    <svg className="openAip-node-icon" viewBox="0 0 32 32" role="img" aria-label="OpenAIP control plane">
+      <path className="openAip-node-link" d="M16 9.5 8.5 14v8M16 9.5 23.5 14v8M8.5 14 16 18.5 23.5 14M16 18.5v6" />
+      <circle className="openAip-node-core" cx="16" cy="9.5" r="3" />
+      <circle className="openAip-node-dot" cx="8.5" cy="14" r="2.4" />
+      <circle className="openAip-node-dot" cx="23.5" cy="14" r="2.4" />
+      <circle className="openAip-node-dot" cx="16" cy="24.5" r="2.4" />
+    </svg>
   );
 }
 
@@ -201,7 +212,9 @@ function AppShell() {
             <span className="hamburger-line" /><span className="hamburger-line" /><span className="hamburger-line" />
           </button>
           <div className="topbar-brand">
-            <div className="topbar-logo">AG</div>
+            <div className="topbar-logo">
+              <OpenAipNodeIcon />
+            </div>
             <div>
             <div className="topbar-title">{APP_META.appName}</div>
             <div className="topbar-subtitle">{text.subtitle}</div>
@@ -275,6 +288,7 @@ function AppShell() {
                 <NavItem to="/openaip-v8-integration-center-preview" icon="route" label={t.nav.openAipV8IntegrationCenter} />
                 <NavItem to="/openaip-v8-local-apps-center-preview" icon="route" label={t.nav.openAipV8LocalAppsCenter} />
                 <NavItem to="/openaip-v8-memory-knowledge-center-preview" icon="route" label={t.nav.openAipV8MemoryKnowledgeCenter} />
+                <NavItem to="/connector-center-readonly" icon="route" label={t.nav.connectorCenterReadonly} />
               </>)}
             </div>
 
@@ -333,7 +347,6 @@ function AppShell() {
                 <NavItem to="/cost-routing" icon="route" label={t.nav.costRouting} />
                 <NavItem to="/openaxiom-readonly" icon="label" label={t.nav.openAxiomReadonly} />
                 <NavItem to="/memory-hub" icon="label" label={t.nav.memoryHubReadonly} />
-                <NavItem to="/connector-center-readonly" icon="route" label={t.nav.connectorCenterReadonly} />
               </>)}
             </div>
 
@@ -386,9 +399,9 @@ function AppShell() {
             </div>
           </div>
           <div className="sidebar-footer">
-            <div className="sidebar-footer-text">AIP {APP_VERSION}</div>
-            <div className="sidebar-footer-build">Build {BUILD_DATE}</div>
-            <div className="sidebar-footer-status">{getAipTrackLabel()} · {getAipStageCStatusLabel()} · {getAipFeatureFlagLabel()}</div>
+            <div className="sidebar-footer-text">OpenAIP v8 Readonly MVP</div>
+            <div className="sidebar-footer-build">Core {APP_VERSION} · Build {BUILD_DATE}</div>
+            <div className="sidebar-footer-status">Gate CLOSED · Stage C disabled</div>
           </div>
         </nav>
         <div className={`sidebar-backdrop${sidebarOpen ? ' visible' : ''}`} onClick={() => setSidebarOpen(false)} />

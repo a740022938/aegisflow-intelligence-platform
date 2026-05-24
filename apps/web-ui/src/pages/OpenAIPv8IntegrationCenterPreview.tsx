@@ -11,6 +11,7 @@ const s = getV8IntegrationSummary();
 const ms = getV8ConnectorMigrationSummary();
 
 const config = {
+  centerKey: 'integration' as const,
   title: 'OpenAIP v8 Integration Center Preview',
   subtitle: 'Readonly Preview · Gate CLOSED · Stage C disabled',
   purpose: 'Registry-backed integration center with Integration ↔ Provider handshake matrix and migration bridge, without connector actions.',

@@ -8,6 +8,8 @@ const APP_TSX = 'E:\\AIP\\apps\\web-ui\\src\\App.tsx';
 const LAYOUT_TSX = 'E:\\AIP\\apps\\web-ui\\src\\components\\Layout.tsx';
 const REGISTRY_FILE = 'E:\\AIP\\apps\\web-ui\\src\\registry\\openAipv8CenterData.ts';
 const CLI_V8_FILE = 'E:\\AIP\\apps\\aip-cli\\src\\commands\\v8.ts';
+const I18N_FILE = 'E:\\AIP\\apps\\web-ui\\src\\i18n.ts';
+const SHARED_V8_COPY_FILE = 'E:\\AIP\\apps\\web-ui\\src\\pages\\openAipv8Copy.ts';
 
 const V8_ROUTES = [
   '/openaip-v8-command-center-preview',
@@ -103,7 +105,7 @@ const V8_SIDEBAR_ITEMS = [
   {
     route: '/openaip-v8-provider-manager-preview',
     id: 'openaip-v8-provider-manager-preview',
-    zhLabel: '供应商管理',
+    zhLabel: '供应商管理中心',
     enLabel: 'Provider Manager',
     labelKey: 'openAipV8ProviderManager',
   },
@@ -140,11 +142,11 @@ test('all 10 v8 routes are exposed in sidebar Layout.tsx', () => {
 });
 
 test('all 10 v8 sidebar labels and shadow menu registry entries exist', () => {
-  const i18nContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/i18n.ts'), 'utf8');
+  const i18nContent = fs.readFileSync(I18N_FILE, 'utf8');
   const snapshotContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/layout-menu-snapshot.ts'), 'utf8');
   const menuContent = fs.readFileSync(path.join(process.cwd(), 'apps/web-ui/src/registry/menu-registry.ts'), 'utf8');
 
-  assert.ok(i18nContent.includes("openAipV8: 'OpenAIP v8 指挥中心'"), 'Chinese OpenAIP v8 sidebar group label missing');
+  assert.ok(i18nContent.includes("openAipV8: 'OpenAIP v8 控制平面'"), 'Chinese OpenAIP v8 sidebar group label missing');
   assert.ok(i18nContent.includes("openAipV8: 'OpenAIP v8 Control Plane'"), 'English OpenAIP v8 sidebar group label missing');
   for (const item of V8_SIDEBAR_ITEMS) {
     assert.ok(i18nContent.includes(`${item.labelKey}: '${item.zhLabel}'`), `Chinese label missing for ${item.route}`);
@@ -156,21 +158,88 @@ test('all 10 v8 sidebar labels and shadow menu registry entries exist', () => {
   }
 });
 
+test('topbar brand subtitle and logo use OpenAIP wording and no AG initials', () => {
+  const layoutContent = fs.readFileSync(LAYOUT_TSX, 'utf8');
+  const i18nContent = fs.readFileSync(I18N_FILE, 'utf8');
+
+  assert.ok(i18nContent.includes("subtitle: 'OpenAIP 社区版 · 控制台'"), 'Chinese top brand subtitle is not canonical');
+  assert.ok(i18nContent.includes("subtitle: 'OpenAIP Community Edition · Console'"), 'English top brand subtitle is not canonical');
+  assert.equal(layoutContent.includes('<div className="topbar-logo">AG</div>'), false, 'topbar still renders AG initials');
+  assert.ok(layoutContent.includes('aria-label="OpenAIP control plane"'), 'topbar icon missing accessible OpenAIP label');
+  assert.ok(layoutContent.includes('openAip-node-icon'), 'topbar icon should use abstract OpenAIP node icon markup');
+});
+
+test('sidebar footer uses OpenAIP v8 readonly MVP display wording', () => {
+  const layoutContent = fs.readFileSync(LAYOUT_TSX, 'utf8');
+  assert.ok(layoutContent.includes('OpenAIP v8 Readonly MVP'), 'footer missing OpenAIP v8 Readonly MVP');
+  assert.ok(layoutContent.includes('Core {APP_VERSION} · Build {BUILD_DATE}'), 'footer missing Core/Build wording');
+  assert.ok(layoutContent.includes('Gate CLOSED · Stage C disabled'), 'footer missing Gate/Stage C status');
+  assert.equal(layoutContent.includes('AIP {APP_VERSION}'), false, 'footer still uses old AIP version wording');
+});
+
+test('v8 product copy has canonical localized titles and safety badges', () => {
+  const copyContent = fs.readFileSync(SHARED_V8_COPY_FILE, 'utf8');
+  const titles = [
+    'OpenAIP v8 指挥中心', 'OpenAIP v8 智能体中心', 'OpenAIP v8 任务中心', 'OpenAIP v8 审计中心',
+    'OpenAIP v8 策略与能力中心', 'OpenAIP v8 执行网关', 'OpenAIP v8 供应商管理中心',
+    'OpenAIP v8 集成中心', 'OpenAIP v8 本地应用中心', 'OpenAIP v8 记忆与知识中心',
+    'OpenAIP v8 Command Center', 'OpenAIP v8 Agent Center', 'OpenAIP v8 Task Center', 'OpenAIP v8 Audit Center',
+    'OpenAIP v8 Policy + Capability Center', 'OpenAIP v8 Execution Gateway', 'OpenAIP v8 Provider Manager',
+    'OpenAIP v8 Integration Center', 'OpenAIP v8 Local Apps Center', 'OpenAIP v8 Memory + Knowledge Center',
+  ];
+  for (const title of titles) assert.ok(copyContent.includes(title), `canonical title missing: ${title}`);
+
+  const safety = [
+    '只读预览', '无运行时突变', '大门关闭', 'C 阶段已禁用', '注册表支持的数据', '不执行',
+    'Readonly Preview', 'No runtime mutation', 'Gate CLOSED', 'Stage C disabled', 'Registry-backed data', 'No execution',
+    '不调度智能体', '不执行任务', '无审计写入', '无策略变更', '无执行控制', '无供应商切换',
+    '无连接器动作', '无本地应用启动', '无记忆写入', '无索引任务',
+    'No agent dispatch', 'No task execution', 'No audit write', 'No policy mutation', 'No execution controls',
+    'No provider switching', 'No connector actions', 'No local app launch', 'No memory write', 'No indexing job',
+  ];
+  for (const item of safety) assert.ok(copyContent.includes(item), `canonical safety copy missing: ${item}`);
+});
+
+test('old Chinese v8 title variants are absent from visible product shell files', () => {
+  const visibleFiles = [
+    LAYOUT_TSX,
+    I18N_FILE,
+    SHARED_V8_COPY_FILE,
+    path.join(PAGES_DIR, 'OpenAIPv8CommandCenterPreview.tsx'),
+    path.join(PAGES_DIR, 'OpenAIPv8AgentCenterPreview.tsx'),
+    path.join(PAGES_DIR, 'OpenAIPv8AuditCenterPreview.tsx'),
+    path.join(PAGES_DIR, 'OpenAIPv8PolicyCapabilityCenterPreview.tsx'),
+    path.join(PAGES_DIR, 'OpenAIPv8ProviderManagerPreview.tsx'),
+  ];
+  const forbidden = ['代理中心', '审核中心', '策略 + 功能中心', '提供商管理器', 'OpenAIP v8 指挥中心 Preview'];
+  for (const file of visibleFiles) {
+    const content = fs.readFileSync(file, 'utf8');
+    for (const bad of forbidden) {
+      assert.equal(content.includes(bad), false, `${path.basename(file)} contains old visible v8 copy "${bad}"`);
+    }
+  }
+});
+
 test('command center links to all 9 center pages', () => {
   const ccContent = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8CommandCenterPreview.tsx'), 'utf8');
+  const copyContent = fs.readFileSync(SHARED_V8_COPY_FILE, 'utf8');
   const linkedRoutes = V8_ROUTES.filter(r => r !== '/openaip-v8-command-center-preview');
   for (const route of linkedRoutes) {
     assert.ok(ccContent.includes(route), `Command Center missing link to ${route}`);
   }
-  assert.ok(ccContent.includes('Readonly Agent Control Plane MVP'), 'Command Center missing Wave 1 readonly MVP context');
+  assert.ok(
+    ccContent.includes('Readonly control plane for all v8 centers') || copyContent.includes('Readonly control plane for all v8 centers'),
+    'Command Center missing readonly control plane context'
+  );
   assert.ok(ccContent.includes('all 10 readonly centers are visible in the sidebar'), 'Command Center missing Wave 2 sidebar visibility context');
 });
 
 test('safety strings exist in shared component', () => {
   const sharedContent = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8ReadonlyCenterPreview.tsx'), 'utf8');
+  const copyContent = fs.readFileSync(SHARED_V8_COPY_FILE, 'utf8');
   const safetyStrings = ['Readonly', 'No runtime mutation', 'Gate CLOSED', 'Stage C disabled'];
   for (const s of safetyStrings) {
-    assert.ok(sharedContent.includes(s), `Shared component missing safety string "${s}"`);
+    assert.ok(sharedContent.includes(s) || copyContent.includes(s), `Shared component missing safety string "${s}"`);
   }
 });
 
@@ -277,7 +346,7 @@ test('shared component has related centers section and standard back text', () =
   const sharedContent = fs.readFileSync(path.join(PAGES_DIR, 'OpenAIPv8ReadonlyCenterPreview.tsx'), 'utf8');
   assert.ok(sharedContent.includes('relatedCenters'), 'Shared component missing relatedCenters');
   assert.ok(sharedContent.includes('Related Centers'), 'Shared component missing Related Centers heading');
-  assert.ok(sharedContent.includes('← Back to OpenAIP v8 Command Center'), 'Shared component missing default back text');
+  assert.ok(sharedContent.includes('copy.backToCommand'), 'Shared component missing localized default back text');
 });
 
 test('registry data entries have V8BaseEntry data quality fields', () => {

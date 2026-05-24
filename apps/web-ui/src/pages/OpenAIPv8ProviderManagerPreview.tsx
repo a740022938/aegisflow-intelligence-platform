@@ -4,6 +4,7 @@ import { V8_PROVIDERS, getV8ProviderSummary } from '../registry/openAipv8CenterD
 const s = getV8ProviderSummary();
 
 const config = {
+  centerKey: 'provider' as const,
   title: 'OpenAIP v8 Provider Manager Preview',
   subtitle: 'Readonly Preview · Gate CLOSED · Stage C disabled',
   purpose: 'Registry-backed provider ecosystem center for profiles, safety, and routing concepts without runtime mutation.',

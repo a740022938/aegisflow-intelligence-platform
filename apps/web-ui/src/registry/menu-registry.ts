@@ -90,7 +90,7 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
   // ── OpenAIP v8 / Wave 2 ──
   {
     id: 'openaip-v8',
-    label: 'OpenAIP v8 指挥中心',
+    label: 'OpenAIP v8 控制平面',
     labelKey: 'nav.openAipV8',
     items: [
       {
@@ -173,7 +173,7 @@ export const MENU_REGISTRY: MenuRegistrySection[] = [
       },
       {
         id: 'openaip-v8-provider-manager-preview',
-        label: '供应商管理',
+        label: '供应商管理中心',
         labelKey: 'nav.openAipV8ProviderManager',
         path: '/openaip-v8-provider-manager-preview',
         icon: 'route',

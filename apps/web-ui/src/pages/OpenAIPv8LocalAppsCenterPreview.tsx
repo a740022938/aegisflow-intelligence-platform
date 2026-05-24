@@ -2,6 +2,7 @@ import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
 import { V8_LOCAL_APPS, V8_LOCAL_APP_RELATION_MATRIX, getV8LocalAppSummary } from '../registry/openAipv8CenterData';
 const s = getV8LocalAppSummary();
 const config = {
+  centerKey: 'localApps' as const,
   title: 'OpenAIP v8 Local Apps Center Preview',
   subtitle: 'Readonly Preview · Gate CLOSED · Stage C disabled',
   purpose: 'Registry-backed local apps inventory and relationship matrix without launch/control.',

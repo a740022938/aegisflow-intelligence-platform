@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { getV8RegistryCounts, getV8ConnectorMigrationSummary, getV8ExecutionBoundarySummary } from '../registry/openAipv8CenterData';
+import { getOpenAipv8Copy, type OpenAipv8CenterKey } from './openAipv8Copy';
 
 const shellStyle: React.CSSProperties = {
   minHeight: '100vh',
@@ -59,6 +60,7 @@ const counts = getV8RegistryCounts();
 const ms = getV8ConnectorMigrationSummary();
 
 interface CenterDef {
+  key: OpenAipv8CenterKey;
   title: string;
   route: string;
   tag: string;
@@ -70,6 +72,7 @@ interface CenterDef {
 
 const centers: CenterDef[] = [
   {
+    key: 'agent',
     title: 'Agent Center',
     route: '/openaip-v8-agent-center-preview',
     tag: 'readonly',
@@ -79,6 +82,7 @@ const centers: CenterDef[] = [
     count: counts.agents
   },
   {
+    key: 'task',
     title: 'Task Center',
     route: '/openaip-v8-task-center-preview',
     tag: 'draft',
@@ -88,6 +92,7 @@ const centers: CenterDef[] = [
     count: counts.tasks
   },
   {
+    key: 'provider',
     title: 'Provider Manager',
     route: '/openaip-v8-provider-manager-preview',
     tag: 'readonly',
@@ -97,6 +102,7 @@ const centers: CenterDef[] = [
     count: counts.providers
   },
   {
+    key: 'integration',
     title: 'Integration Center',
     route: '/openaip-v8-integration-center-preview',
     tag: 'readonly',
@@ -106,6 +112,7 @@ const centers: CenterDef[] = [
     count: counts.integrations
   },
   {
+    key: 'localApps',
     title: 'Local Apps Center',
     route: '/openaip-v8-local-apps-center-preview',
     tag: 'readonly',
@@ -115,6 +122,7 @@ const centers: CenterDef[] = [
     count: counts.localApps
   },
   {
+    key: 'memory',
     title: 'Memory + Knowledge Center',
     route: '/openaip-v8-memory-knowledge-center-preview',
     tag: 'readonly',
@@ -124,6 +132,7 @@ const centers: CenterDef[] = [
     count: counts.memoryKnowledge
   },
   {
+    key: 'policy',
     title: 'Policy Router + Capability Center',
     route: '/openaip-v8-policy-capability-center-preview',
     tag: 'readonly',
@@ -133,6 +142,7 @@ const centers: CenterDef[] = [
     count: `${counts.policies} policies, ${counts.capabilities} caps`
   },
   {
+    key: 'audit',
     title: 'Audit Center',
     route: '/openaip-v8-audit-center-preview',
     tag: 'readonly',
@@ -142,6 +152,7 @@ const centers: CenterDef[] = [
     count: counts.audits
   },
   {
+    key: 'execution',
     title: 'Execution Gateway',
     route: '/openaip-v8-execution-gateway-preview',
     tag: 'closed',
@@ -158,29 +169,28 @@ function SafetyBadge({ text }: { text: string }) {
 }
 
 export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
+  const copy = getOpenAipv8Copy('command');
   return (
     <div style={shellStyle}>
       <div style={panelStyle}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 28 }}>OpenAIP v8 Command Center</h1>
-            <p style={{ marginTop: 8, color: '#93c5fd', fontSize: 14 }}>Readonly Agent Control Plane MVP · 各路 AI 工具都是英雄，OpenAIP 是指挥中心。</p>
+            <h1 style={{ margin: 0, fontSize: 28 }}>{copy.title}</h1>
+            <p style={{ marginTop: 8, color: '#93c5fd', fontSize: 14 }}>{copy.subtitle} · 各路 AI 工具都是英雄，OpenAIP 是指挥中心。</p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ ...badgeStyle, background: '#dc2626', color: '#fff' }}>GATE CLOSED</span>
-            <span style={{ ...badgeStyle, background: '#7c3aed', color: '#fff' }}>STAGE C DISABLED</span>
+            <span style={{ ...badgeStyle, background: '#dc2626', color: '#fff' }}>{copy.globalSafetyBadges[2]}</span>
+            <span style={{ ...badgeStyle, background: '#7c3aed', color: '#fff' }}>{copy.globalSafetyBadges[3]}</span>
           </div>
         </div>
 
         {/* Global Status Strip */}
         <div style={{ ...cardStyle, marginTop: 12, borderLeft: '3px solid #f59e0b' }}>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 6 }}>
-            <span style={{ ...badgeStyle, background: '#3b82f6', color: '#fff' }}>Readonly Foundation</span>
-            <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #fbbf24' }}>Gate CLOSED</span>
-            <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #fbbf24' }}>Stage C disabled</span>
-            <span style={{ ...badgeStyle, background: '#1e293b', color: '#22c55e', border: '1px solid #22c55e' }}>No runtime mutation</span>
-            <span style={{ ...badgeStyle, background: '#1e293b', color: '#93c5fd', border: '1px solid #93c5fd' }}>Registry-backed</span>
+            {copy.globalSafetyBadges.map((badge) => (
+              <span key={badge} style={{ ...badgeStyle, background: '#1e293b', color: '#9ca3af', border: '1px solid #374151' }}>{badge}</span>
+            ))}
             {safetyItems.slice(5).map((item) => (
               <span key={item} style={{ ...badgeStyle, background: '#1e293b', color: '#9ca3af', border: '1px solid #374151' }}>{item}</span>
             ))}
@@ -234,7 +244,7 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
               <section style={cardStyle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                   <SafetyBadge text={center.tag} />
-                  <h2 style={{ margin: 0, fontSize: 15 }}>{center.title}</h2>
+                  <h2 style={{ margin: 0, fontSize: 15 }}>{getOpenAipv8Copy(center.key, copy.lang).title}</h2>
                 </div>
                 <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8 }}>{center.role}</div>
                 <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: '#cbd5e1', lineHeight: 1.8 }}>
@@ -243,7 +253,7 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
                   ))}
                 </ul>
                 <p style={{ margin: '10px 0 0', fontSize: 11, color: '#6b7280', fontStyle: 'italic' }}>
-                  {center.safetyNote}
+                  {getOpenAipv8Copy(center.key, copy.lang).noActionBadges.join(' · ')}
                 </p>
                 <div style={{ marginTop: 6, fontSize: 18, fontWeight: 700, color: '#93c5fd', textAlign: 'right' }}>
                   {center.count}
@@ -265,7 +275,7 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
         {/* Footer */}
         <div style={{ marginTop: 20, padding: 12, border: '1px solid #374151', borderRadius: 8, background: 'rgba(0,0,0,0.3)' }}>
           <p style={{ margin: 0, fontSize: 12, color: '#9ca3af', textAlign: 'center' }}>
-            OpenAIP v8 Command Center Preview · Read-only · No execution · Gate remains CLOSED · Stage C disabled · Registry-backed data
+            OpenAIP v8 · {copy.title} · {copy.globalSafetyBadges.join(' · ')}
           </p>
         </div>
       </div>

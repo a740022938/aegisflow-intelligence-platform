@@ -2,6 +2,7 @@ import OpenAIPv8ReadonlyCenterPreview from './OpenAIPv8ReadonlyCenterPreview';
 import { V8_MEMORY_KNOWLEDGE, V8_MEMORY_KNOWLEDGE_RELATIONS, getV8MemoryKnowledgeSummary } from '../registry/openAipv8CenterData';
 const s = getV8MemoryKnowledgeSummary();
 const config = {
+  centerKey: 'memory' as const,
   title: 'OpenAIP v8 Memory + Knowledge Center Preview',
   subtitle: 'Readonly Preview · Gate CLOSED · Stage C disabled',
   purpose: 'Long-term project intelligence registry with readonly memory/knowledge relations.',

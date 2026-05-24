@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { V8_AGENTS, getV8AgentCenterSummary } from '../registry/openAipv8CenterData';
+import { getOpenAipv8Copy } from './openAipv8Copy';
 
 const s = getV8AgentCenterSummary();
 
@@ -214,22 +215,22 @@ function SafetyBoundary() {
 }
 
 export default function OpenAIPv8AgentCenterPreview(): React.JSX.Element {
+  const copy = getOpenAipv8Copy('agent');
   return (
     <div style={shellStyle}>
       <div style={panelStyle}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 26 }}>OpenAIP v8 Agent Center Preview</h1>
-            <p style={{ marginTop: 4, color: '#93c5fd', fontSize: 14 }}>AI Agent 生命周期管理</p>
+            <h1 style={{ margin: 0, fontSize: 26 }}>{copy.title}</h1>
+            <p style={{ marginTop: 4, color: '#93c5fd', fontSize: 14 }}>{copy.subtitle}</p>
             <p style={{ margin: '6px 0 0', fontSize: 13, color: '#9ca3af' }}>管理 AI Agent 的注册、生命周期和权限等级，是 OpenAIP v8 的主线中心。</p>
           </div>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-            <span style={{ ...badgeStyle, background: '#3b82f6', color: '#fff' }}>Readonly Preview</span>
-            <span style={{ ...badgeStyle, background: '#059669', color: '#fff' }}>No runtime mutation</span>
-            <span style={{ ...badgeStyle, background: '#dc2626', color: '#fff' }}>Gate CLOSED</span>
-            <span style={{ ...badgeStyle, background: '#7c3aed', color: '#fff' }}>Stage C disabled</span>
-            <span style={{ ...badgeStyle, background: '#6b7280', color: '#fff' }}>Registry-backed</span>
+            {copy.globalSafetyBadges.slice(0, 5).map((badge, index) => (
+              <span key={badge} style={{ ...badgeStyle, background: ['#3b82f6', '#059669', '#dc2626', '#7c3aed', '#6b7280'][index], color: '#fff' }}>{badge}</span>
+            ))}
+            <span style={{ ...badgeStyle, background: '#ef4444', color: '#fff' }}>{copy.noActionBadges[0]}</span>
           </div>
         </div>
 
@@ -273,12 +274,12 @@ export default function OpenAIPv8AgentCenterPreview(): React.JSX.Element {
 
         {/* Footer */}
         <div style={{ marginTop: 16, padding: 10, border: '1px solid #374151', borderRadius: 8, background: 'rgba(0,0,0,0.3)', fontSize: 11, color: '#6b7280', textAlign: 'center' }}>
-          OpenAIP v8 · Agent Center · Readonly preview · No execution · No config writes · Gate remains CLOSED · Stage C disabled
+          OpenAIP v8 · {copy.title} · {copy.globalSafetyBadges.join(' · ')} · {copy.noActionBadges.join(' · ')}
         </div>
 
         <div style={{ marginTop: 12, textAlign: 'center' }}>
           <Link to="/openaip-v8-command-center-preview" style={{ color: '#93c5fd', fontSize: 13, textDecoration: 'underline' }}>
-            ← Back to OpenAIP v8 Command Center
+            ← {copy.backToCommand}
           </Link>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { getOpenAipv8Copy, type OpenAipv8CenterKey } from './openAipv8Copy';
 
 const shellStyle: React.CSSProperties = {
   minHeight: '100vh',
@@ -65,6 +66,7 @@ export interface RegistryTable {
 }
 
 export interface CenterConfig {
+  centerKey: OpenAipv8CenterKey;
   title: string;
   subtitle: string;
   purpose: string;
@@ -87,35 +89,36 @@ function formatCellValue(v: string | number | boolean | undefined): string {
 }
 
 export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: CenterConfig }): React.JSX.Element {
+  const copy = getOpenAipv8Copy(config.centerKey);
   return (
     <div style={shellStyle}>
       <div style={panelStyle}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 26 }}>{config.title}</h1>
-            <p style={{ marginTop: 4, color: '#93c5fd', fontSize: 14 }}>{config.subtitle}</p>
+            <h1 style={{ margin: 0, fontSize: 26 }}>{copy.title}</h1>
+            <p style={{ marginTop: 4, color: '#93c5fd', fontSize: 14 }}>{copy.subtitle}</p>
             {config.role && <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6b7280' }}>{config.role}</p>}
             <p style={{ margin: '6px 0 0', fontSize: 13, color: '#9ca3af' }}>{config.purpose}</p>
           </div>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-            <span style={{ ...badgeStyle, background: '#3b82f6', color: '#fff' }}>Readonly Preview</span>
-            <span style={{ ...badgeStyle, background: '#059669', color: '#fff' }}>No runtime mutation</span>
-            <span style={{ ...badgeStyle, background: '#dc2626', color: '#fff' }}>Gate CLOSED</span>
-            <span style={{ ...badgeStyle, background: '#7c3aed', color: '#fff' }}>Stage C disabled</span>
-            <span style={{ ...badgeStyle, background: '#6b7280', color: '#fff' }}>Registry-backed</span>
+            {copy.globalSafetyBadges.slice(0, 5).map((badge, index) => (
+              <span key={badge} style={{ ...badgeStyle, background: ['#3b82f6', '#059669', '#dc2626', '#7c3aed', '#6b7280'][index], color: '#fff' }}>{badge}</span>
+            ))}
+            {copy.noActionBadges.map((badge) => (
+              <span key={badge} style={{ ...badgeStyle, background: '#ef4444', color: '#fff' }}>{badge}</span>
+            ))}
           </div>
         </div>
 
         {/* Global Status Badge Strip */}
         <div style={{ ...cardStyle, display: 'flex', gap: 4, flexWrap: 'wrap', borderLeft: '3px solid #f59e0b' }}>
-          <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #fbbf24' }}>Preview only</span>
-          <span style={{ ...badgeStyle, background: '#1e293b', color: '#22c55e', border: '1px solid #22c55e' }}>No runtime mutation</span>
-          <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #fbbf24' }}>Gate CLOSED</span>
-          <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #fbbf24' }}>Stage C disabled</span>
-          <span style={{ ...badgeStyle, background: '#1e293b', color: '#93c5fd', border: '1px solid #93c5fd' }}>Registry-backed data</span>
-          <span style={{ ...badgeStyle, background: '#1e293b', color: '#9ca3af', border: '1px solid #374151' }}>No config writes</span>
-          <span style={{ ...badgeStyle, background: '#1e293b', color: '#9ca3af', border: '1px solid #374151' }}>No execution</span>
+          {copy.globalSafetyBadges.map((badge) => (
+            <span key={badge} style={{ ...badgeStyle, background: '#1e293b', color: badge.includes('CLOSED') || badge.includes('关闭') || badge.includes('禁用') ? '#fbbf24' : '#9ca3af', border: '1px solid #374151' }}>{badge}</span>
+          ))}
+          {copy.noActionBadges.map((badge) => (
+            <span key={badge} style={{ ...badgeStyle, background: '#1e293b', color: '#ef4444', border: '1px solid #ef4444' }}>{badge}</span>
+          ))}
         </div>
 
         {config.sections.map((section) => (
@@ -163,7 +166,7 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
         )}
 
         <div style={{ ...cardStyle, borderLeft: '3px solid #ef4444' }}>
-          <h2 style={{ margin: 0, fontSize: 14, color: '#ef4444' }}>Safety Rules</h2>
+          <h2 style={{ margin: 0, fontSize: 14, color: '#ef4444' }}>{copy.safetyRules}</h2>
           <ul style={{ margin: '8px 0 0', paddingLeft: 16, fontSize: 13, color: '#fca5a5', lineHeight: 1.8 }}>
             {config.keyRules.map((r) => (
               <li key={r}>{r}</li>
@@ -172,7 +175,7 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
         </div>
 
         <div style={{ ...cardStyle, borderLeft: '3px solid #f59e0b' }}>
-          <h2 style={{ margin: 0, fontSize: 14, color: '#f59e0b' }}>Not Allowed in This Preview</h2>
+          <h2 style={{ margin: 0, fontSize: 14, color: '#f59e0b' }}>{copy.notAllowed}</h2>
           <ul style={{ margin: '8px 0 0', paddingLeft: 16, fontSize: 13, color: '#fde68a', lineHeight: 1.8 }}>
             {config.notAllowed.map((item) => (
               <li key={item}>{item}</li>
@@ -181,7 +184,7 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
         </div>
 
         <div style={{ ...cardStyle, borderLeft: '3px solid #3b82f6' }}>
-          <h2 style={{ margin: 0, fontSize: 14, color: '#3b82f6' }}>Future Phases</h2>
+          <h2 style={{ margin: 0, fontSize: 14, color: '#3b82f6' }}>{copy.futurePhases}</h2>
           <ul style={{ margin: '8px 0 0', paddingLeft: 16, fontSize: 13, color: '#bfdbfe', lineHeight: 1.8 }}>
             {config.futurePhases.map((p) => (
               <li key={p}>{p}</li>
@@ -192,7 +195,7 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
         {/* Related Centers */}
         {config.relatedCenters && config.relatedCenters.length > 0 && (
           <div style={{ ...cardStyle, borderLeft: '3px solid #93c5fd' }}>
-            <h2 style={{ margin: 0, fontSize: 13, color: '#93c5fd', marginBottom: 6 }}>Related Centers</h2>
+            <h2 style={{ margin: 0, fontSize: 13, color: '#93c5fd', marginBottom: 6 }}>{copy.relatedCenters}</h2>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {config.relatedCenters.map((rc) => (
                 <Link key={rc.route} to={rc.route} style={{ fontSize: 12, color: '#93c5fd', textDecoration: 'underline', padding: '2px 6px', border: '1px solid #334155', borderRadius: 4 }}>{rc.title}</Link>
@@ -203,13 +206,13 @@ export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: Cen
 
         {/* Footer */}
         <div style={{ marginTop: 16, padding: 10, border: '1px solid #374151', borderRadius: 8, background: 'rgba(0,0,0,0.3)', fontSize: 11, color: '#6b7280', textAlign: 'center' }}>
-          OpenAIP v8 · {config.title} · Readonly preview · No execution · No config writes · Gate remains CLOSED · Stage C disabled
+          OpenAIP v8 · {copy.title} · {copy.globalSafetyBadges.join(' · ')}
         </div>
 
         {config.backLink && (
           <div style={{ marginTop: 12, textAlign: 'center' }}>
             <Link to={config.backLink} style={{ color: '#93c5fd', fontSize: 13, textDecoration: 'underline' }}>
-              {config.backLabel || '← Back to OpenAIP v8 Command Center'}
+              {config.backLabel || `← ${copy.backToCommand}`}
             </Link>
           </div>
         )}
