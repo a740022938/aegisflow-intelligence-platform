@@ -193,11 +193,11 @@ function printCommandCenter() {
   console.log(helpCmd('aip config set <key> <val>', '设置配置项', 'warn'));
   console.log('');
 
-  console.log(sectionDivider('[04] 网关与模型 / Gateway & ML', 'OpenClaw / 本地模型 / Claude 代理相关'));
-  console.log(helpCmd('aip gateway status', '查看 Gateway 状态', 'safe'));
-  console.log(helpCmd('aip gateway start', '启动 Gateway', 'warn'));
-  console.log(helpCmd('aip gateway stop', '停止 Gateway', 'warn'));
-  console.log(helpCmd('aip gateway restart', '重启 Gateway，需要人工确认，不自动 taskkill', 'warn'));
+  console.log(sectionDivider('[04] 网关与模型 / Gateway & ML', 'OpenClaw / 本地模型 / Claude 代理相关 [DEPRECATED]'));
+  console.log(helpCmd('aip gateway status', '[DEPRECATED] 查看 Gateway 状态', 'safe'));
+  console.log(helpCmd('aip gateway start', '[DEPRECATED] 启动 Gateway', 'warn'));
+  console.log(helpCmd('aip gateway stop', '[DEPRECATED] 停止 Gateway', 'warn'));
+  console.log(helpCmd('aip gateway restart', '[DEPRECATED] 重启 Gateway，需要人工确认，不自动 taskkill', 'warn'));
   console.log(helpCmd('aip ml', '本机模型命令大全', 'safe'));
   console.log('');
 

@@ -53,6 +53,14 @@ interface StatusData {
   gpu_available: boolean;
 }
 
+interface LlamaStatus {
+  ok: boolean;
+  running: boolean;
+  model: string | null;
+  endpoint: string;
+  hint?: string;
+}
+
 function formatUptime(s: number): string {
   const d = Math.floor(s / 86400);
   const h = Math.floor((s % 86400) / 3600);
@@ -108,6 +116,7 @@ const SECT_TITLE_STYLE: React.CSSProperties = {
 
 export default function SystemStatus() {
   const [data, setData] = useState<StatusData | null>(null);
+  const [llamaStatus, setLlamaStatus] = useState<LlamaStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -126,11 +135,21 @@ export default function SystemStatus() {
     }
   }, []);
 
+  const fetchLlamaStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/system/llama-status');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const d = await res.json();
+      setLlamaStatus(d);
+    } catch { /* silent */ }
+  }, []);
+
   useEffect(() => {
     fetchData();
-    timerRef.current = setInterval(fetchData, 5000);
+    fetchLlamaStatus();
+    timerRef.current = setInterval(() => { fetchData(); fetchLlamaStatus(); }, 5000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [fetchData]);
+  }, [fetchData, fetchLlamaStatus]);
 
   return (
     <PageShell title="System Status" subtitle="Real-time CPU / GPU / RAM / Disk monitoring" maturity="preview">
@@ -232,6 +251,39 @@ export default function SystemStatus() {
             ) : (
               <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: 20, textAlign: 'center' }}>
                 No NVIDIA GPU detected. Install nvidia-smi or connect a GPU to see stats.
+              </div>
+            )}
+          </div>
+
+          {/* llama.cpp */}
+          <div style={{ ...SECT_STYLE, marginTop: 16 }}>
+            <div style={SECT_TITLE_STYLE}>
+              <span style={{ color: 'var(--success)' }}>&#9632;</span> llama.cpp
+            </div>
+            {llamaStatus ? (
+              <div style={{ padding: 12, background: 'var(--bg-app)', borderRadius: 6, border: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <span style={{
+                    width: 10, height: 10, borderRadius: '50%', display: 'inline-block',
+                    background: llamaStatus.running ? 'var(--success)' : 'var(--danger)',
+                  }} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {llamaStatus.running ? 'Running' : 'Not Running'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <MetricCard label="Endpoint" value={llamaStatus.endpoint} />
+                  <MetricCard label="Model" value={llamaStatus.model || '—'} color={llamaStatus.running ? 'var(--success)' : 'var(--text-muted)'} />
+                </div>
+                {!llamaStatus.running && llamaStatus.hint && (
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>
+                    {llamaStatus.hint}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: 20, textAlign: 'center' }}>
+                Checking llama.cpp status...
               </div>
             )}
           </div>

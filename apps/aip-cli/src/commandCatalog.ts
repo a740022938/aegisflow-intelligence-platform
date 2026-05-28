@@ -29,7 +29,7 @@ export const COMMAND_CATALOG: CommandCatalogItem[] = [
   { id: 'where', command: 'aip where', category: 'Diagnostics', risk: 'SAFE', summary: 'Show resolved project root and Git state.', example: 'aip where' },
 
   { id: 'config', command: 'aip config get', category: 'Config', risk: 'ASK', summary: 'Read or update CLI configuration. Also supports init and set.', example: 'aip config get' },
-  { id: 'gateway', command: 'aip gateway status', category: 'Gateway & ML', risk: 'ASK', summary: 'Inspect or control OpenClaw gateway wrapper. Start/stop/restart require care.', example: 'aip gateway status' },
+  { id: 'gateway', command: 'aip gateway status', category: 'Gateway & ML', risk: 'ASK', summary: '[DEPRECATED] Inspect or control OpenClaw gateway wrapper. Start/stop/restart require care.', example: 'aip gateway status' },
   { id: 'execution-gateway', command: 'aip execution-gateway status', category: 'Gateway & ML', risk: 'READ', summary: 'Show v8 execution gateway boundary summary.', example: 'aip execution-gateway status' },
   { id: 'ml', command: 'aip ml', category: 'Gateway & ML', risk: 'SAFE', summary: 'Print the machine-local command manual.', example: 'aip ml', aliases: ['manual'] },
 

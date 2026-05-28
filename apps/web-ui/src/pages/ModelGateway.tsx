@@ -21,6 +21,14 @@ type EndpointStatus = {
   keyConfiguredForAipGateway?: boolean;
 };
 
+type LlamaCppStatus = {
+  ok: boolean;
+  running: boolean;
+  model: string | null;
+  endpoint: string;
+  hint?: string;
+};
+
 type GatewayStatus = {
   ok: boolean;
   mode: string;
@@ -114,6 +122,7 @@ function EndpointCard({ item }: { item: EndpointStatus }) {
 
 export default function ModelGateway() {
   const [data, setData] = useState<GatewayStatus | null>(null);
+  const [llamaStatus, setLlamaStatus] = useState<LlamaCppStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -129,11 +138,22 @@ export default function ModelGateway() {
     }
   }, []);
 
+  const loadLlama = useCallback(async () => {
+    try {
+      const res = await fetch('/api/system/llama-status');
+      if (res.ok) {
+        const d = await res.json();
+        setLlamaStatus(d);
+      }
+    } catch { /* silent */ }
+  }, []);
+
   useEffect(() => {
     load();
-    const timer = window.setInterval(load, 30000);
+    loadLlama();
+    const timer = window.setInterval(() => { load(); loadLlama(); }, 30000);
     return () => window.clearInterval(timer);
-  }, [load]);
+  }, [load, loadLlama]);
 
   const endpoints = useMemo(() => Object.values(data?.endpoints || {}), [data]);
 
@@ -179,6 +199,25 @@ export default function ModelGateway() {
           </tbody>
         </table>
       </SectionCard>
+
+      {llamaStatus && (
+        <SectionCard title="llama.cpp">
+          <div className="model-gateway-card">
+            <div className="model-gateway-card-head">
+              <h3 className="model-gateway-card-title">llama.cpp Server</h3>
+              {badgeStatus(llamaStatus.running ? 'online' : 'offline')}
+            </div>
+            <div className="model-gateway-meta">
+              <span>Endpoint</span><strong>{llamaStatus.endpoint}</strong>
+              <span>Model</span><strong>{llamaStatus.model || '—'}</strong>
+              <span>Status</span><strong>{llamaStatus.running ? 'Running' : 'Not Running'}</strong>
+            </div>
+            {!llamaStatus.running && llamaStatus.hint && (
+              <p className="model-gateway-path">{llamaStatus.hint}</p>
+            )}
+          </div>
+        </SectionCard>
+      )}
 
       <SectionCard title="安全边界" subtitle={`auth=${data?.authRequired ? 'required' : 'unknown'} · publicSafe=${data?.publicSafe ? 'yes' : 'no'}`}>
         <ul className="model-gateway-note-list">

@@ -149,7 +149,11 @@ function restoreOpenClawTokens() {
     console.error('[openclaw] Failed to restore tokens from DB:', err);
   }
 }
-restoreOpenClawTokens();
+if (process.env.AIP_OPENCLAW_ENABLED === 'true') {
+  restoreOpenClawTokens();
+} else {
+  console.log('[openclaw] Token restore disabled (set AIP_OPENCLAW_ENABLED=true to enable)');
+}
 
 // Ensure token source is stable across restarts:
 // - env token is persisted to DB
@@ -347,7 +351,12 @@ metrics.middleware(app);
 registerMetricsRoute(app);
 
 // 注册 OpenClaw 双向通信桥接路由
-registerOpenClawBridgeRoutes(app);
+if (process.env.AIP_OPENCLAW_ENABLED === 'true') {
+  registerOpenClawBridgeRoutes(app);
+  app.log.info('[openclaw] Bridge enabled via AIP_OPENCLAW_ENABLED env var');
+} else {
+  app.log.info('[openclaw] Bridge disabled (set AIP_OPENCLAW_ENABLED=true to enable)');
+}
 
 // 注册数字员工路由
 registerDigitalEmployeeRoutes(app);
@@ -423,15 +432,27 @@ registerAuthorizationRoutes(app);
 
 // OpenClaw 旧路径显式兼容（防止客户端命中 /openclaw/* 返回 404）
 app.get('/openclaw/master-switch', async (_request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   return reply.redirect('/api/openclaw/master-switch', 307);
 });
 app.post('/openclaw/master-switch', async (_request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   return reply.redirect('/api/openclaw/master-switch', 307);
 });
 app.post('/openclaw/heartbeat', async (_request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   return reply.redirect('/api/openclaw/heartbeat', 307);
 });
 app.post('/openclaw/circuit/recover', async (_request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   return reply.redirect('/api/openclaw/circuit/recover', 307);
 });
 
@@ -614,6 +635,9 @@ function buildOpenClawStatus(row: any) {
 }
 
 app.get('/api/openclaw/master-switch', async (request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   reply.header('Cache-Control', 'no-store, no-cache, must-revalidate');
   const row = getOpenClawControlRow();
   const state = serializeOpenClawState(row);
@@ -645,6 +669,9 @@ app.get('/api/openclaw/master-switch', async (request: any, reply: any) => {
 
 // master-switch is blocked under Stage C disabled. Only GET status is allowed.
 app.post('/api/openclaw/master-switch', async (_request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   return reply.code(403).send({
     ok: false,
     error: 'master-switch POST is disabled. Stage C is not enabled.',
@@ -653,6 +680,9 @@ app.post('/api/openclaw/master-switch', async (_request: any, reply: any) => {
 });
 
 app.post('/api/openclaw/heartbeat', async (request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   const expectedToken = String(process.env.OPENCLAW_HEARTBEAT_TOKEN || '').trim();
   const token = String(request.headers['x-openclaw-token'] || '').trim();
   if (expectedToken && (!token || token !== expectedToken)) {
@@ -686,6 +716,9 @@ app.post('/api/openclaw/heartbeat', async (request: any, reply: any) => {
 // P0-C: Set and persist heartbeat token (survives restart).
 // Bootstrap bypass is removed — requires configured admin token or fails closed.
 app.post('/api/openclaw/token', async (request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   const body = request.body || {};
   const token = String(body.heartbeat_token || '').trim();
   const adminToken = String(body.admin_token || '').trim();
@@ -730,6 +763,9 @@ app.post('/api/openclaw/token', async (request: any, reply: any) => {
 });
 
 app.post('/api/openclaw/auth/check', async (request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   const body = request.body || {};
   const token = String(body.heartbeat_token || body.token || '').trim();
   if (!token) {
@@ -753,6 +789,9 @@ app.post('/api/openclaw/auth/check', async (request: any, reply: any) => {
 });
 
 app.post('/api/openclaw/circuit/recover', async (request: any, reply: any) => {
+  if (process.env.AIP_OPENCLAW_ENABLED !== 'true') {
+    return reply.code(503).send({ ok: false, error: 'OpenClaw integration disabled', hint: 'Set AIP_OPENCLAW_ENABLED=true to enable' });
+  }
   const expectedToken = String(process.env.OPENCLAW_ADMIN_TOKEN || '').trim();
   const token = String(request.headers['x-openclaw-admin-token'] || '').trim();
   if (!expectedToken || token !== expectedToken) {
@@ -3150,7 +3189,12 @@ const start = async () => {
     
     // 初始化数据库连接（延迟加载，不立即连接）
     app.log.info('Database connection will be initialized on first request...');
-    bootstrapOpenClawTokenPersistence();
+    if (process.env.AIP_OPENCLAW_ENABLED === 'true') {
+      bootstrapOpenClawTokenPersistence();
+      app.log.info('[openclaw] Token persistence enabled via AIP_OPENCLAW_ENABLED env var');
+    } else {
+      app.log.info('[openclaw] Token persistence disabled (set AIP_OPENCLAW_ENABLED=true to enable)');
+    }
 
     // 初始化 Worker 池
     try {
@@ -3175,45 +3219,47 @@ const start = async () => {
     await app.listen({ port: PORT, host: HOST });
     
     // ── Internal OpenClaw heartbeat ─────────────────────────────────
-    if (process.env.OPENCLAW_HEARTBEAT_TOKEN) {
-      const HEARTBEAT_INTERVAL = parseInt(process.env.OPENCLAW_HEARTBEAT_INTERVAL || '15', 10) * 1000;
-      const ocBase = process.env.OPENCLAW_BASE_URL || 'http://127.0.0.1:18789';
-      const hbToken = process.env.OPENCLAW_HEARTBEAT_TOKEN;
-      let hbCount = 0;
+    if (process.env.AIP_OPENCLAW_ENABLED === 'true') {
+      if (process.env.OPENCLAW_HEARTBEAT_TOKEN) {
+        const HEARTBEAT_INTERVAL = parseInt(process.env.OPENCLAW_HEARTBEAT_INTERVAL || '15', 10) * 1000;
+        const ocBase = process.env.OPENCLAW_BASE_URL || 'http://127.0.0.1:18789';
+        const hbToken = process.env.OPENCLAW_HEARTBEAT_TOKEN;
+        let hbCount = 0;
 
-      const sendHeartbeat = async () => {
-        try {
-          // Update local heartbeat timestamp (keeps AIP showing 'online')
-          const hbDb = db.getDatabase();
-          const now = new Date().toISOString();
-          hbDb.prepare(`UPDATE openclaw_control SET last_heartbeat_at = ?, updated_at = ? WHERE id = 1`).run(now, now);
+        const sendHeartbeat = async () => {
+          try {
+            // Update local heartbeat timestamp (keeps AIP showing 'online')
+            const hbDb = db.getDatabase();
+            const now = new Date().toISOString();
+            hbDb.prepare(`UPDATE openclaw_control SET last_heartbeat_at = ?, updated_at = ? WHERE id = 1`).run(now, now);
 
-          // Push event to OpenClaw gateway (if reachable)
-          await fetch(`${ocBase}/api/aip/event`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-openclaw-token': hbToken },
-            body: JSON.stringify({
-              event_type: 'heartbeat_status',
-              source: 'aip',
-              payload: {
-                uptime: process.uptime(),
-                version: APP_VERSION,
-                workerPool: getWorkerPool().getStats(),
-                taskQueue: getTaskQueue().getStats(),
-              },
-              timestamp: now,
-            }),
-            signal: AbortSignal.timeout(3000),
-          }).catch(() => {});
+            // Push event to OpenClaw gateway (if reachable)
+            await fetch(`${ocBase}/api/aip/event`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-openclaw-token': hbToken },
+              body: JSON.stringify({
+                event_type: 'heartbeat_status',
+                source: 'aip',
+                payload: {
+                  uptime: process.uptime(),
+                  version: APP_VERSION,
+                  workerPool: getWorkerPool().getStats(),
+                  taskQueue: getTaskQueue().getStats(),
+                },
+                timestamp: now,
+              }),
+              signal: AbortSignal.timeout(3000),
+            }).catch(() => {});
 
-          hbCount++;
-        } catch { /* safe */ }
-      };
+            hbCount++;
+          } catch { /* safe */ }
+        };
 
-      // Send immediately on startup + repeat every interval
-      sendHeartbeat();
-      setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
-      app.log.info(`[heartbeat] Internal heartbeat active (every ${HEARTBEAT_INTERVAL/1000}s)`);
+        // Send immediately on startup + repeat every interval
+        sendHeartbeat();
+        setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
+        app.log.info(`[heartbeat] Internal heartbeat active (every ${HEARTBEAT_INTERVAL/1000}s)`);
+      }
     }
 
     app.log.info(`✅ Server started successfully`);

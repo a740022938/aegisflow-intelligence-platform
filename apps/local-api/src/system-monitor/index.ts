@@ -80,6 +80,17 @@ function getGpuInfo(): GpuInfo[] {
 }
 
 export function registerSystemMonitorRoutes(app: FastifyInstance) {
+  app.get('/api/system/llama-status', async (_request, reply) => {
+    const llamaUrl = process.env.AIP_LLAMA_URL || 'http://127.0.0.1:8080';
+    try {
+      const res = await fetch(`${llamaUrl}/health`, { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      return { ok: true, running: true, model: data?.model || data?.models?.[0] || 'unknown', endpoint: llamaUrl };
+    } catch {
+      return { ok: true, running: false, model: null, endpoint: llamaUrl, hint: 'Start llama.cpp server to enable local AI features' };
+    }
+  });
+
   app.get('/api/system/status', async (_request, reply) => {
     const totalMem = os.totalmem();
     const freeMem = os.freemem();
