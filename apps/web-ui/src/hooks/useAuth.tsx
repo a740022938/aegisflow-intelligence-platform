@@ -60,13 +60,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshStatus = useCallback(async () => {
     try {
       const r = await fetch('/api/auth/status');
+      if (r.status === 401 || r.status === 403) {
+        clearJwt();
+        setStatus(prev => ({ ...prev, state: 'unauthenticated', jwt: { ...prev.jwt, authenticated: false }, verifiedToken: false }));
+        return;
+      }
       const d = await r.json().catch(() => null);
       if (d?._unauthorized) {
         clearJwt();
         setStatus(prev => ({ ...prev, state: 'unauthenticated', jwt: { ...prev.jwt, authenticated: false }, verifiedToken: false }));
         return;
       }
-      if (!d?.ok) return;
+      if (!d?.ok) {
+        setStatus(prev => ({ ...prev, state: 'authorized', verifiedToken: true }));
+        return;
+      }
       const nextJwt = d.jwt || prevJwtRef.current;
       prevJwtRef.current = nextJwt;
       setStatus(prev => ({
@@ -103,33 +111,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setStatus(prev => ({ ...prev, state: 'validating' }));
     try {
-      const r = await fetch('/api/openclaw/auth/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ heartbeat_token: token }),
+      const r = await fetch('/api/auth/status', {
+        headers: { 'Authorization': `Bearer ${token}` },
         signal: controller.signal,
       });
       clearTimeout(timeout);
       const d = await r.json().catch(() => null);
-      if (d?.ok && d?.valid) {
-        if (d.access_token) setJwt(d.access_token);
+      if (d?.ok || r.status === 200) {
+        if (d?.access_token) setJwt(d.access_token);
         await refreshStatus();
-        setStatus(prev => ({ ...prev, state: 'authorized', verifiedToken: true, jwt: { ...prev.jwt, authenticated: true } }));
+        setStatus(prev => ({ ...prev, state: 'authorized', verifiedToken: true }));
         return true;
       }
-      setStatus(prev => ({
-        ...prev,
-        state: d?.error?.includes('未配置') ? 'unauthenticated' : 'invalid',
-        verifiedToken: false,
-      }));
+      setStatus(prev => ({ ...prev, state: 'invalid', verifiedToken: false }));
       return false;
     } catch (err: any) {
       clearTimeout(timeout);
       if (err?.name === 'AbortError') {
         setStatus(prev => ({ ...prev, state: 'timeout', verifiedToken: false }));
-        return false;
+      } else {
+        setStatus(prev => ({ ...prev, state: 'network_error', verifiedToken: false }));
       }
-      setStatus(prev => ({ ...prev, state: 'network_error', verifiedToken: false }));
       return false;
     } finally {
       if (verifyTokenAbortRef.current === controller) {
