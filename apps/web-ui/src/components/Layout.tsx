@@ -162,9 +162,7 @@ function AppShell() {
   const displayVersion = apiVersion && apiVersion !== '…' ? apiVersion : APP_VERSION;
   const auth = useAuth();
   const authState = auth.status.state;
-  const openclawStatus = systemData?.openclaw?.status || {};
-  const openclawOnlineStatus = systemData?.openclaw?.online_status ?? openclawStatus.online_status;
-  const openclawCircuitState = systemData?.openclaw?.circuit_state ?? openclawStatus.circuit_status;
+
   const openExternal = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -204,12 +202,12 @@ function AppShell() {
 
   const openSystemPanel = async () => {
     try {
-      const [health, summary, openclaw] = await Promise.all([
+      const [health, summary] = await Promise.all([
         fetch('/api/health').then((r) => r.json()).catch(() => null),
         fetch('/api/dashboard/summary').then((r) => r.json()).catch(() => null),
-        fetch('/api/openclaw/master-switch').then((r) => r.json()).catch(() => null),
       ]);
-      setSystemData({ health, summary, openclaw });
+      // OpenClaw master-switch fetch removed (deprecated in v8.0)
+      setSystemData({ health, summary });
     } catch {
       setSystemData(null);
     }
@@ -261,7 +259,7 @@ function AppShell() {
           </div>
           <div className="topbar-status" style={{ marginLeft: 8, cursor: 'pointer' }} title="授权状态" onClick={() => { const el = document.getElementById('auth-status-panel'); if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none'; }}>
             <span className={`topbar-status-dot ${authState === 'authorized' ? 'ok' : authState === 'invalid' || authState === 'unauthenticated' ? 'err' : 'warn'}`} />
-            {authState === 'authorized' ? '已授权' : authState === 'validating' ? '验证中' : authState === 'invalid' ? '无效' : authState === 'openclaw_unreachable' ? '未连接' : '未授权'}
+            {authState === 'authorized' ? '已授权' : authState === 'validating' ? '验证中' : authState === 'invalid' ? '无效' : '未授权'}
           </div>
         </div>
       </header>
@@ -426,9 +424,7 @@ function AppShell() {
               {panel === 'system' && (
                 <div className="topbar-modal-grid">
                   <div className="topbar-kv"><span>API</span><strong>{systemData?.health?.ok ? (lang === 'zh' ? '健康' : 'Healthy') : (lang === 'zh' ? '异常' : 'Error')}</strong></div>
-                  <div className="topbar-kv"><span>OpenClaw</span><strong>{systemData?.openclaw?.enabled ? (lang === 'zh' ? '已开启' : 'Enabled') : (lang === 'zh' ? '已关闭' : 'Disabled')}</strong></div>
-                  <div className="topbar-kv"><span>{lang === 'zh' ? '在线状态' : 'Online Status'}</span><strong>{String(openclawOnlineStatus ?? '—')}</strong></div>
-                  <div className="topbar-kv"><span>{lang === 'zh' ? '熔断状态' : 'Circuit'}</span><strong>{String(openclawCircuitState ?? '—')}</strong></div>
+                  <div className="topbar-kv"><span>OpenClaw</span><strong>{lang === 'zh' ? '已弃用(v8.0)' : 'Deprecated(v8.0)'}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? '运行任务' : 'Running Tasks'}</span><strong>{String(systemData?.summary?.running_tasks ?? '—')}</strong></div>
                   <div className="topbar-kv"><span>{lang === 'zh' ? '运行实验' : 'Running Experiments'}</span><strong>{String(systemData?.summary?.running_experiments ?? '—')}</strong></div>
                 </div>

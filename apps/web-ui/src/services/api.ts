@@ -492,7 +492,7 @@ export interface CreateEvaluationFromArtifactResponse {
 // ── Runs ────────────────────────────────────────────────────────────────────
 export type RunStatus = 'queued' | 'running' | 'success' | 'failed' | 'cancelled' | 'paused';
 export type SourceType = 'manual' | 'task' | 'training' | 'evaluation' | 'deployment' | 'template' | 'dataset';
-export type ExecutorType = 'mock' | 'local' | 'script' | 'openclaw';
+export type ExecutorType = 'mock' | 'local' | 'script' | 'openclaw_deprecated';
 
 export interface Run {
   id: string;

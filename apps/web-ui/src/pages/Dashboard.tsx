@@ -23,49 +23,14 @@ interface Plugin {
   last_error?: string;
 }
 
-type OpenClawSwitchResponse = {
-  ok: boolean;
-  token_configured?: boolean;
-  message?: string;
-  gateOpen?: boolean;
-  stageCEnabled?: boolean;
-  switch?: {
-    enabled: boolean;
-    status_text: string;
-    updated_at: string;
-    updated_by: string;
-  };
-  status?: {
-    online_status: 'online' | 'offline';
-    execution_status: 'idle' | 'executing';
-    running_count: number;
-    queued_count: number;
-    last_action: null | {
-      run_id: string;
-      run_code: string;
-      run_name: string;
-      status: string;
-      at: string;
-    };
-    last_error: null | {
-      run_id: string;
-      run_code: string;
-      run_name: string;
-      message: string;
-      at: string;
-    };
-    circuit_status: string;
-  };
-};
+
 
 const LAYOUT_KEY = 'dashboard';
 
 // 优化后的默认布局 - 解决挤压/出界问题
 const DEFAULT_LAYOUTS: LayoutConfig = {
   lg: [
-    // 第一行：OpenClaw 总览（全宽）
-    { i: 'openclaw', x: 0, y: 0, w: 12, h: 5, minW: 6, minH: 4 },
-    // 第二行：工厂状态 + 运行任务 + 活跃工作流 + 等待审批（4列等分）
+    // 第一行：工厂状态 + 运行任务 + 活跃工作流 + 等待审批（4列等分）
     { i: 'factory_status', x: 0, y: 5, w: 3, h: 4, minW: 2, minH: 3 },
     { i: 'running_tasks', x: 3, y: 5, w: 3, h: 4, minW: 2, minH: 3 },
     { i: 'active_workflow', x: 6, y: 5, w: 3, h: 4, minW: 2, minH: 3 },
@@ -80,7 +45,6 @@ const DEFAULT_LAYOUTS: LayoutConfig = {
     { i: 'quick_access', x: 0, y: 22, w: 12, h: 10, minW: 6, minH: 6 },
   ],
   md: [
-    { i: 'openclaw', x: 0, y: 0, w: 8, h: 5, minW: 6, minH: 4 },
     { i: 'factory_status', x: 0, y: 5, w: 2, h: 4, minW: 2, minH: 3 },
     { i: 'running_tasks', x: 2, y: 5, w: 2, h: 4, minW: 2, minH: 3 },
     { i: 'active_workflow', x: 4, y: 5, w: 2, h: 4, minW: 2, minH: 3 },
@@ -93,7 +57,6 @@ const DEFAULT_LAYOUTS: LayoutConfig = {
   ],
   sm: [
     // 移动端：单列堆叠
-    { i: 'openclaw', x: 0, y: 0, w: 1, h: 6, minW: 1, minH: 5 },
     { i: 'factory_status', x: 0, y: 6, w: 1, h: 4, minW: 1, minH: 3 },
     { i: 'running_tasks', x: 0, y: 10, w: 1, h: 4, minW: 1, minH: 3 },
     { i: 'active_workflow', x: 0, y: 14, w: 1, h: 4, minW: 1, minH: 3 },
@@ -125,9 +88,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [apiVersion, setApiVersion] = useState<string>('');
   const [lang, setLang] = useState<Lang>(() => getStoredLang());
-  const [openclaw, setOpenclaw] = useState<OpenClawSwitchResponse | null>(null);
-  const [switchBusy, setSwitchBusy] = useState(false);
-  
+
   // 布局状态
   const { contentRef, contentWidth, canUseLayoutEditor, shouldUseLayoutEditor, layoutEdit, setLayoutEdit, toggleEdit, layoutMode } = useResponsiveLayoutMode();
   const [layouts, setLayouts] = useState<LayoutConfig>(DEFAULT_LAYOUTS);
@@ -166,8 +127,6 @@ export default function Dashboard() {
       if (act?.ok) setActivities(act.activities || []);
       if (plug?.ok) setPlugins(plug.plugins || []);
       if (health?.version) setApiVersion(String(health.version));
-      const oc = await fetch('/api/openclaw/master-switch').then((r) => r.json()).catch(() => null);
-      if (oc?.ok) setOpenclaw(oc);
     } catch (e) {
       console.error(e);
     } finally {
@@ -182,40 +141,8 @@ export default function Dashboard() {
   }, []);
 
   const s = summary || {};
-  const ocSwitch = openclaw?.switch;
-  const ocStatus = openclaw?.status;
-  const legacyEnabled = !!(openclaw as any)?.enabled || !!ocSwitch?.enabled;
-  const gateOpen = !!(openclaw as any)?.gateOpen;
-  const stageCEnabled = !!(openclaw as any)?.stageCEnabled;
-  const openclawEnabled = legacyEnabled && gateOpen;
   const displayVersion = apiVersion || APP_VERSION;
 
-  const toggleOpenClawSwitch = async () => {
-    if (!gateOpen || !ocSwitch || switchBusy) {
-      if (!gateOpen) window.alert('Gate CLOSED — Stage C disabled, master-switch POST is blocked.');
-      return;
-    }
-    const nextEnabled = !ocSwitch.enabled;
-    setSwitchBusy(true);
-    try {
-      const reason = nextEnabled ? '首页总闸手动开启' : '首页总闸手动关闭';
-      const res = await fetch('/api/openclaw/master-switch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enabled: nextEnabled, reason, actor: 'dashboard_user' }),
-      }).then((r) => r.json());
-      if (res?.ok) {
-        const refresh = await fetch('/api/openclaw/master-switch').then((r) => r.json()).catch(() => null);
-        if (refresh?.ok) setOpenclaw(refresh);
-      } else {
-        window.alert(res?.error || 'OpenClaw 总闸更新失败');
-      }
-    } catch (e: any) {
-      window.alert(e?.message || 'OpenClaw 总闸更新失败');
-    } finally {
-      setSwitchBusy(false);
-    }
-  };
 
   // Plugin 统计
   const pluginStats = {
@@ -247,40 +174,9 @@ export default function Dashboard() {
       {
         id: 'openclaw',
         content: (
-          <div className={`dash-openclaw-card role-card ${roleClass('risk')} ${gateOpen ? (openclawEnabled ? 'enabled' : 'disabled') : 'disabled'}`}>
-            <div className="dash-openclaw-header">
-              <div>
-                <div className="dash-openclaw-title role-title">OpenClaw 总闸</div>
-                <div className="dash-openclaw-subtitle">
-                  {gateOpen ? (openclawEnabled ? '开启' : '关闭') : 'Gate CLOSED'} · 已授权 ≠ Gate opened · Stage C disabled
-                </div>
-              </div>
-              <button
-                type="button"
-                className={`dash-openclaw-switch ${gateOpen && openclawEnabled ? 'on' : 'off'} ${switchBusy ? 'busy' : ''}`}
-                onClick={toggleOpenClawSwitch}
-                disabled={!gateOpen || switchBusy}
-                aria-label="OpenClaw 总闸"
-              >
-                <span className="dash-openclaw-switch-knob" />
-              </button>
-            </div>
-            {!gateOpen && (
-              <div className="dash-openclaw-banner">Gate CLOSED — Stage C disabled, execution disabled, master-switch POST blocked</div>
-            )}
-            {gateOpen && !openclawEnabled && (
-              <div className="dash-openclaw-banner">OpenClaw 执行层已关闭</div>
-            )}
-            {openclaw && openclaw.token_configured === false && (
-              <div className="dash-openclaw-banner">OpenClaw 心跳令牌未配置（已兼容运行，建议尽快配置）</div>
-            )}
-        <div className="dash-openclaw-metrics">
-          <div className="dash-openclaw-metric"><span>{t.dashboard.online}</span><strong>{openclaw?.status?.online_status === 'online' ? t.dashboard.online : t.dashboard.offline}</strong></div>
-          <div className="dash-openclaw-metric"><span>{t.dashboard.execution}</span><strong>{ocStatus?.execution_status === 'executing' ? (lang === 'zh' ? '执行中' : 'Executing') : (lang === 'zh' ? '空闲' : 'Idle')}</strong></div>
-          <div className="dash-openclaw-metric"><span>{t.dashboard.lastAction}</span><strong>{(openclaw as any)?.last_action ? `${(openclaw as any).last_action.run_name || (openclaw as any).last_action.run_code}` : (ocStatus?.last_action ? `${ocStatus.last_action.run_name || ocStatus.last_action.run_code}` : '—')}</strong></div>
-          <div className="dash-openclaw-metric"><span>{t.dashboard.lastError}</span><strong>{(openclaw as any)?.last_error?.message || ocStatus?.last_error?.message || '—'}</strong></div>
-          <div className="dash-openclaw-metric"><span>{t.dashboard.circuitState || (lang === 'zh' ? '熔断状态' : 'Circuit State')}</span><strong>{(((openclaw as any)?.circuit_state) === 'triggered') ? (lang === 'zh' ? '已触发' : 'Triggered') : (ocStatus?.circuit_status || (lang === 'zh' ? '正常' : 'Normal'))}</strong></div>
-        </div>
+          <div className="dash-openclaw-deprecated" style={{ padding: '12px 16px', fontSize: '12px', color: 'var(--text-muted)', background: 'var(--bg-subtle)', borderRadius: '6px', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ opacity: 0.5 }}>⏳</span>
+            <span>{lang === 'zh' ? 'OpenClaw 集成已于 v8.0 弃用' : 'OpenClaw integration has been deprecated in v8.0'}</span>
           </div>
         ),
       },
@@ -635,7 +531,7 @@ export default function Dashboard() {
       },
     ];
     return cardList;
-  }, [s, activities, plugins, lang, t, td, openclaw, openclawEnabled, gateOpen, stageCEnabled, ocStatus, switchBusy, toggleOpenClawSwitch, navigate, isActive, pluginStats]);
+  }, [s, activities, plugins, lang, t, td, navigate, isActive, pluginStats]);
 
   return (
     <PageShell

@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { setJwt, clearJwt } from '../services/authStore';
 
-export type AuthState = 'unknown' | 'unauthenticated' | 'validating' | 'authorized' | 'invalid' | 'expired' | 'timeout' | 'network_error' | 'openclaw_unreachable';
+export type AuthState = 'unknown' | 'unauthenticated' | 'validating' | 'authorized' | 'invalid' | 'expired' | 'timeout' | 'network_error';
 
+/** @deprecated OpenClaw integration was deprecated in v8.0 */
 export interface OpenClawStatus {
   tokenConfigured: boolean;
   online: boolean | null;
@@ -71,18 +72,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setStatus(prev => ({
         ...prev,
         jwt: nextJwt,
-        openclaw: d.openclaw || prev.openclaw,
+        openclaw: prev.openclaw,
         lastVerified: Date.now(),
         ...(nextJwt.authenticated ? { state: 'authorized' as const, verifiedToken: true } : {}),
       }));
-      if (d.openclaw) {
-        setStatus(prev => {
-          if (!d.openclaw.online && d.openclaw.online !== null) {
-            if (prev.state === 'authorized') return { ...prev, state: 'openclaw_unreachable' };
-          }
-          return prev;
-        });
-      }
     } catch { /* ignore */ }
   }, []);
 

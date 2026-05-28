@@ -79,7 +79,7 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
       case 'validating': return '⏳';
       case 'timeout': return '⏰';
       case 'network_error': return '🌐';
-      case 'openclaw_unreachable': return '⚠️';
+
       default: return '🔒';
     }
   };
@@ -92,7 +92,7 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
       case 'validating':
         return '正在验证 Token…';
       case 'authorized':
-        return '授权有效，会话凭证已就绪。执行总闸仍保持关闭，不影响插件数据加载。';
+        return '授权有效，会话凭证已就绪。';
       case 'invalid':
       case 'expired':
         return 'Token 无效或已过期，请重新输入。';
@@ -100,8 +100,7 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
         return '验证超时，请检查 AIP API / OpenClaw 状态后重试。';
       case 'network_error':
         return '无法连接认证服务，请检查网络连接后重试。';
-      case 'openclaw_unreachable':
-        return '授权有效，但 OpenClaw 未连接。需确认 OpenClaw 服务状态。';
+
     }
   };
 
@@ -169,7 +168,7 @@ export default function TokenInput({ onVerifiedChange, compact = false }: TokenI
         </div>
       )}
       <div style={{ marginTop: 4, fontSize: 11, color: 'var(--text-muted)' }}>
-        Token 只用于当前会话验证，不会自动打开执行总闸。如页面状态与预期不符，请尝试 Ctrl+F5 硬刷新。
+        Token 只用于当前会话验证。如页面状态与预期不符，请尝试 Ctrl+F5 硬刷新。
       </div>
     </div>
   );
