@@ -278,12 +278,12 @@ function AppShell() {
                 <span className="nav-section-arrow">{collapsed.has('openAip') ? '▸' : '▾'}</span>
               </div>
               {!collapsed.has('openAip') && (<>
-                <NavItem to="/openaip-v8-command-center-preview" icon="command" label={t.nav.openAipV8CommandCenter} />
-                <NavItem to="/openaip-v8-agent-center-preview" icon="bot" label={t.nav.openAipV8AgentCenter} />
-                <NavItem to="/openaip-v8-task-center-preview" icon="tasks" label={t.nav.openAipV8TaskCenter} />
-                <NavItem to="/openaip-v8-audit-center-preview" icon="shield" label={t.nav.openAipV8AuditCenter} />
-                <NavItem to="/openaip-v8-policy-capability-center-preview" icon="lock" label={t.nav.openAipV8PolicyCapabilityCenter} />
-                <NavItem to="/openaip-v8-execution-gateway-preview" icon="power" label={t.nav.openAipV8ExecutionGateway} />
+                <NavItem to="/openaip-v8-command-center" icon="command" label={t.nav.openAipV8CommandCenter} />
+                <NavItem to="/openaip-v8-agent-center" icon="bot" label={t.nav.openAipV8AgentCenter} />
+                <NavItem to="/openaip-v8-task-center" icon="tasks" label={t.nav.openAipV8TaskCenter} />
+                <NavItem to="/openaip-v8-audit-center" icon="shield" label={t.nav.openAipV8AuditCenter} />
+                <NavItem to="/openaip-v8-policy-capability-center" icon="lock" label={t.nav.openAipV8PolicyCapabilityCenter} />
+                <NavItem to="/openaip-v8-execution-gateway" icon="power" label={t.nav.openAipV8ExecutionGateway} />
               </>)}
             </div>
 
@@ -294,10 +294,10 @@ function AppShell() {
                 <span className="nav-section-arrow">{collapsed.has('resources') ? '▸' : '▾'}</span>
               </div>
               {!collapsed.has('resources') && (<>
-                <NavItem to="/openaip-v8-provider-manager-preview" icon="server" label={t.nav.openAipV8ProviderManager} />
-                <NavItem to="/openaip-v8-integration-center-preview" icon="plug" label={t.nav.openAipV8IntegrationCenter} />
-                <NavItem to="/openaip-v8-local-apps-center-preview" icon="monitor" label={t.nav.openAipV8LocalAppsCenter} />
-                <NavItem to="/openaip-v8-memory-knowledge-center-preview" icon="database" label={t.nav.openAipV8MemoryKnowledgeCenter} />
+                <NavItem to="/openaip-v8-provider-manager" icon="server" label={t.nav.openAipV8ProviderManager} />
+                <NavItem to="/openaip-v8-integration-center" icon="plug" label={t.nav.openAipV8IntegrationCenter} />
+                <NavItem to="/openaip-v8-local-apps-center" icon="monitor" label={t.nav.openAipV8LocalAppsCenter} />
+                <NavItem to="/openaip-v8-memory-knowledge-center" icon="database" label={t.nav.openAipV8MemoryKnowledgeCenter} />
                 <NavItem to="/connector-center-readonly" icon="zap" label={t.nav.connectorCenterReadonly} />
               </>)}
             </div>
@@ -314,7 +314,7 @@ function AppShell() {
                 <NavItem to="/runs" icon="run" label={t.nav.runCenter} />
                 <NavItem to="/templates" icon="template" label={t.nav.templates} />
                 <NavItem to="/models" icon="artifact" label={t.nav.modelMgmt} />
-                {MODEL_GATEWAY_NAV_VISIBLE && <NavItem to="/model-gateway" icon="route" label="模型网关" />}
+                {MODEL_GATEWAY_NAV_VISIBLE && <NavItem to="/model-gateway" icon="route" label={t.nav.modelGateway || 'Model Gateway'} />}
                 <NavItem to="/artifacts" icon="artifact" label={t.nav.artifacts} />
                 <NavItem to="/evaluations" icon="eval" label={t.nav.evalCenter} />
                 <NavItem to="/deployments" icon="deploy" label={t.nav.deployCenter} />
@@ -359,18 +359,15 @@ function AppShell() {
                 <NavItem to="/memory-hub" icon="database" label={t.nav.memoryHubReadonly} />
                 <NavItem to="/vision-lab/mahjong-debug" icon="template" label={t.nav.mahjongDebug} />
                 <NavItem to="/digital-employee" icon="brain" label={t.nav.digitalEmployee} />
-                <NavItem to="/training-v2" icon="training" label={t.nav.trainingV2} />
                 <NavItem to="/hpo" icon="run" label={t.nav.hpo} />
                 <NavItem to="/distill" icon="eval" label={t.nav.distill} />
                 <NavItem to="/model-merge" icon="merge" label={t.nav.modelMerge} />
                 <NavItem to="/inference" icon="run" label={t.nav.inference} />
                 <NavItem to="/annotation" icon="label" label={t.nav.annotation} />
                 <NavItem to="/huggingface" icon="api" label={t.nav.huggingface} />
-                <NavItem to="/backflow-v2" icon="feedback" label={t.nav.backflowV2} />
                 <NavItem to="/scheduler" icon="clock" label={t.nav.scheduler} />
                 <NavItem to="/alerting" icon="bell" label={t.nav.alerting} />
                 <NavItem to="/model-monitor" icon="eval" label={t.nav.modelMonitor} />
-                <NavItem to="/deploy-v2" icon="deploy" label={t.nav.deployV2} />
               </>)}
             </div>
           </div>

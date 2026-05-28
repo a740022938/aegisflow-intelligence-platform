@@ -167,15 +167,13 @@ const STEP_REQUIRED_INPUTS: Record<string, string[]> = {
   deploy_validate: ['model_id'],
   hardcase_feedback: ['dataset_id'],
   retrain_trigger: ['experiment_id', 'dataset_id'],
+  yolo_detect: ['experiment_id', 'dataset_id'],
   frame_extract: ['source_path'],
   video_source: ['source_path'],
   dataset_register: [],  // dataset_id auto-generated if empty (pipelineContext or auto-gen)
   dataset_split: [],  // dataset_id provided via pipelineContext at runtime
   dataset_loader: ['dataset_id'],
   train_config_builder: [],  // dataset_id from pipelineContext
-  // v4.2.0: Vision Pipeline — inputs come from previous step output (pipeline injection)
-  // Only yolo_detect needs initial inputs; subsequent steps get their deps via step output
-  yolo_detect: ['experiment_id', 'dataset_id'],
   feedback_backflow: [],  // model_id from pipelineContext
 };
 
@@ -206,14 +204,22 @@ function normalizeWorkflowSteps(raw: any): { ok: boolean; steps: WorkflowStepInp
     const step = parsed[i] || {};
     const stepKey = typeof step.step_key === 'string' ? step.step_key.trim() : '';
     if (!stepKey) return { ok: false, steps: [], error: `step ${i + 1} missing step_key` };
+    let stepParams: Record<string, any> = {};
+    if (step.params && typeof step.params === 'object' && !Array.isArray(step.params)) {
+      stepParams = step.params;
+    } else if (typeof step.input_json === 'string') {
+      try { stepParams = JSON.parse(step.input_json); } catch (_) {}
+    } else if (step.input_json && typeof step.input_json === 'object') {
+      stepParams = step.input_json;
+    }
+
     normalized.push({
       step_key: stepKey,
       step_name: typeof step.step_name === 'string' && step.step_name.trim() ? step.step_name.trim() : stepKey,
       step_order: Number.isFinite(Number(step.step_order)) ? Number(step.step_order) : i + 1,
       require_approval: Boolean(step.require_approval),
       approval_policy: typeof step.approval_policy === 'string' ? step.approval_policy.trim() : '',
-      approval_timeout: Number.isFinite(Number(step.approval_timeout)) ? Number(step.approval_timeout) : 0,
-      params: step.params && typeof step.params === 'object' ? step.params : {},
+      params: stepParams,
     });
   }
 
@@ -1328,6 +1334,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
         loss = +(0.5 + Math.random() * 0.4).toFixed(4);
         mockCheckpoint = {
           mockCheckpoint: true,
+          simulation_label: 'SIMULATED',
           simulated: true,
           path: `/mock/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`,
           reason: 'dataset_yaml not found',
@@ -1439,6 +1446,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
       loss = +(0.5 + Math.random() * 0.4).toFixed(4);
       mockCheckpoint = {
         mockCheckpoint: true,
+        simulation_label: 'SIMULATED',
         simulated: true,
         path: `/mock/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`,
         reason: e.message,
@@ -1457,6 +1465,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
     loss = +(0.5 + Math.random() * 0.4).toFixed(4);
     mockCheckpoint = {
       mockCheckpoint: true,
+      simulation_label: 'SIMULATED',
       simulated: true,
       path: `/mock/checkpoints/exp_${experiment_id}/epoch_${epochCount}.pt`,
       reason: 'non-yolo training requested in explicit mock mode',
@@ -1477,6 +1486,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
     execution_mode: executionMode,
     artifact_index: artifactIndex,
     simulated,
+    simulation_label: simulated ? 'SIMULATED' : null,
     mockCheckpoint,
   };
 
@@ -1563,9 +1573,10 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
     final_device: finalDevice,
     artifact_index: artifactIndex,
     simulated,
+    simulation_label: simulated ? 'SIMULATED' : null,
     status: simulated ? 'simulated' : 'completed',
     mockCheckpoint,
-    mockArtifact: simulated ? { mockArtifact: true, simulated: true, path: '', reason: mockCheckpoint?.reason || 'explicit mock simulation' } : null,
+    mockArtifact: simulated ? { mockArtifact: true, simulation_label: 'SIMULATED', simulated: true, path: '', reason: mockCheckpoint?.reason || 'explicit mock simulation' } : null,
   };
 
   try {
@@ -1589,6 +1600,7 @@ async function executeTrainModel(step: StepRecord): Promise<{ ok: boolean; outpu
         config_snapshot: configSnapshot,
         env_snapshot: envSnapshot,
         simulated,
+        simulation_label: simulated ? 'SIMULATED' : null,
         mockCheckpoint,
       }), now());
   } catch (_) {}
@@ -1975,6 +1987,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
       evaluation_type,
       execution_mode: evalExecutionMode,
       simulated: evalSimulated,
+      simulation_label: evalSimulated ? 'SIMULATED' : null,
       total_samples: realEvalMetrics?.images || Math.floor(500 + Math.random() * 1500),
       total_instances: realEvalMetrics?.instances || 0,
       total_duration_ms: STEP_DEFINITIONS.reduce((s, s2) => s + s2.duration, 0),
@@ -2084,7 +2097,7 @@ async function executeEvaluateModel(step: StepRecord): Promise<{ ok: boolean; ou
           evalSimulated ? 'evaluation_simulated' : 'evaluation_completed',
           experiment_id,
           evalSimulated ? 'simulated' : 'success',
-          JSON.stringify({ job_id: step.job_id, step_id: step.id, experiment_id, model_id, dataset_id, evaluation_id: evaluationId, simulated: evalSimulated }),
+          JSON.stringify({ job_id: step.job_id, step_id: step.id, experiment_id, model_id, dataset_id, evaluation_id: evaluationId, simulated: evalSimulated, simulation_label: evalSimulated ? 'SIMULATED' : null }),
           now(),
         );
     } catch (_) {}
@@ -2154,10 +2167,11 @@ const output = {
   eval_status: evalSimulated ? 'simulated' : 'completed',
   execution_mode: evalExecutionMode,
   simulated: evalSimulated,
+  simulation_label: evalSimulated ? 'SIMULATED' : null,
   metrics: metricValues,
   artifact_id: artId || '',
   eval_run_dir: realEvalDir || '',
-  mockArtifact: evalSimulated ? { mockArtifact: true, simulated: true, path: '', reason: 'explicit mock evaluation simulation' } : null,
+  mockArtifact: evalSimulated ? { mockArtifact: true, simulation_label: 'SIMULATED', simulated: true, path: '', reason: 'explicit mock evaluation simulation' } : null,
 };
 
 // ── v8D-5: 产物校验 ────────────────────────────────────────────────────
@@ -4757,7 +4771,7 @@ async function executeTrainConfigBuilder(_step: StepRecord): Promise<{ ok: boole
 async function executeYoloDetect(step: StepRecord): Promise<{ ok: boolean; output: any; error?: string }> {
   const db = getDatabase();
   const rawInput = parseJsonField(step.input_json, 'input_json') || {};
-  const { experiment_id, dataset_id } = rawInput;
+  const { experiment_id, dataset_id, model_name, conf_threshold, iou_threshold, max_det, device, source_path } = rawInput;
 
   if (!isLegacyYoloEnabled()) {
     const err = legacyYoloFrozenError('vision_pipeline_e2e.yolo_detect step');
@@ -4769,22 +4783,112 @@ async function executeYoloDetect(step: StepRecord): Promise<{ ok: boolean; outpu
     return { ok: false, output: null, error: err };
   }
 
-  if (!experiment_id || !dataset_id) {
-    return { ok: false, output: null, error: '[yolo_detect] Missing experiment_id or dataset_id' };
+  await logJob(db, step.job_id, step.id, 'info', `[yolo_detect] Starting: exp=${experiment_id || 'none'}, ds=${dataset_id || 'none'}`);
+
+  const { execSync } = require('child_process');
+  const { mkdirSync, existsSync } = require('fs');
+  const pathMod = require('path');
+
+  // Resolve model weights
+  const ASSETS_MODEL = 'E:\\_AIP_ASSETS\\models\\Model\\best.pt';
+  const DEFAULT_SOURCE = 'E:\\数据集\\tupian';
+  let weightsPath = model_name ? pathMod.resolve(String(model_name)) : ASSETS_MODEL;
+  if (!existsSync(weightsPath) && existsSync(ASSETS_MODEL)) {
+    weightsPath = ASSETS_MODEL;
+  }
+  if (!existsSync(weightsPath)) {
+    return { ok: false, output: null, error: `[yolo_detect] Model weights not found: ${weightsPath}` };
   }
 
-  await logJob(db, step.job_id, step.id, 'info', `[yolo_detect] Starting: exp=${experiment_id}, ds=${dataset_id}`);
+  // Resolve source path
+  let srcPath = source_path ? String(source_path) : DEFAULT_SOURCE;
+  if (!existsSync(srcPath)) {
+    return { ok: false, output: null, error: `[yolo_detect] Source path not found: ${srcPath}` };
+  }
 
-  // Simulate YOLO detect execution (real YOLO in production)
+  // Create output directory
   const runId = `run-${Date.now()}-detect`;
   const outputDir = `${resolveDataRoot()}\\runs\\detect_${runId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  mkdirSync(outputDir, { recursive: true });
+  const outputJson = pathMod.join(outputDir, 'results.json');
 
-  db.prepare(`INSERT INTO runs (id, run_code, name, source_type, source_id, status, workspace_path, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-    .run(runId, 'yolo_detect', 'yolo_detect', 'experiment', experiment_id, 'success', outputDir, now(), now());
+  const pythonScript = resolvePythonWorkerPath(pathMod, require('fs'), 'yolo_detect_runner.py');
 
-  await logJob(db, step.job_id, step.id, 'info', `[yolo_detect] Completed: run_id=${runId}, output_dir=${outputDir}`);
+  // Build python command
+  const pythonCmd = [
+    'python',
+    pythonScript,
+    '--weights', weightsPath,
+    '--source', srcPath,
+    '--output-json', outputJson,
+    '--conf', String(conf_threshold ?? 0.25),
+    '--iou', String(iou_threshold ?? 0.45),
+    '--max-det', String(max_det ?? 300),
+    '--device', device || 'auto',
+  ];
 
-  return { ok: true, output: { run_id: runId, experiment_id, dataset_id, status: 'success', output_dir: outputDir, detections: 0 } };
+  await logJob(db, step.job_id, step.id, 'info', `[yolo_detect] Running: ${pythonCmd.slice(0, 6).join(' ')} ...`);
+
+  try {
+    const stdout = execSync(pythonCmd.join(' '), {
+      encoding: 'utf-8',
+      timeout: 300000,
+      cwd: pathMod.dirname(pythonScript),
+    });
+
+    let resultJson: any;
+    try {
+      resultJson = JSON.parse(stdout);
+    } catch {
+      resultJson = { ok: false, error: 'Failed to parse Python output', raw: stdout.slice(0, 500) };
+    }
+
+    if (!resultJson.ok) {
+      await logJob(db, step.job_id, step.id, 'error', `[yolo_detect] Failed: ${resultJson.error || 'unknown error'}`);
+      return { ok: false, output: null, error: `[yolo_detect] ${resultJson.error || 'inference failed'}` };
+    }
+
+    const detections = resultJson.detections || [];
+    const totalDetections = resultJson.total_detections || detections.length;
+
+    // Log to runs table
+    const dbOutputDir = outputDir;
+    db.prepare(`INSERT INTO runs (id, run_code, name, source_type, source_id, status, workspace_path, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(runId, 'yolo_detect', 'yolo_detect', experiment_id ? 'experiment' : 'direct', experiment_id || 'none', 'success', dbOutputDir, now(), now());
+
+    // Log detections summary
+    const classSummary: Record<string, number> = {};
+    for (const d of detections) {
+      const cls = d.class_name || 'unknown';
+      classSummary[cls] = (classSummary[cls] || 0) + 1;
+    }
+
+    await logJob(db, step.job_id, step.id, 'info',
+      `[yolo_detect] Completed: ${totalDetections} detections across ${resultJson.total_images || 0} images in ${resultJson.duration_ms || 0}ms`);
+
+    return {
+      ok: true,
+      output: {
+        run_id: runId,
+        experiment_id,
+        dataset_id,
+        source: srcPath,
+        weights: weightsPath,
+        status: 'success',
+        output_dir: dbOutputDir,
+        detections: totalDetections,
+        total_images: resultJson.total_images || 0,
+        duration_ms: resultJson.duration_ms || 0,
+        device: resultJson.device || 'unknown',
+        class_summary: classSummary,
+        per_image: resultJson.per_image || [],
+        result_json: outputJson,
+      },
+    };
+  } catch (e: any) {
+    await logJob(db, step.job_id, step.id, 'error', `[yolo_detect] Python execution failed: ${e.message}`);
+    return { ok: false, output: null, error: `[yolo_detect] ${e.message}` };
+  }
 }
 
 // ── Step 2: sam_handoff ──────────────────────────────────────────────────────

@@ -28,6 +28,8 @@ import { runTask } from './commands/task.js';
 import { runAudit } from './commands/audit.js';
 import { runPolicy } from './commands/policy.js';
 import { runV8 } from './commands/v8.js';
+import { runCommands } from './commands/commands.js';
+import { commandIds, getCommandHelp, suggestCommands } from './commandCatalog.js';
 import { getCliVersion } from './version.js';
 import { renderBanner, renderStatusLines } from './banner.js';
 
@@ -212,7 +214,7 @@ function printCommandCenter() {
   console.log(helpCmd('aip receipt template', '生成回执模板', 'safe'));
   console.log('');
 
-  console.log(sectionDivider('[07] OpenAIP v8 / 新功能 (预览)', 'Stub commands — 正式实现在 v8'));
+  console.log(sectionDivider('[07] OpenAIP v8 / 新功能 (预览)', 'Preview commands'));
   console.log(helpCmd('aip agents', 'Agent Center — 代理生命周期管理', 'dim'));
   console.log(helpCmd('aip integrations', 'Integration Center — 外部服务绑定', 'dim'));
   console.log(helpCmd('aip providers', 'Provider Manager — 模型提供商路由', 'dim'));
@@ -237,6 +239,12 @@ function printCommandCenter() {
 }
 
 function printHelpFor(cmd: string) {
+  const catalogHelp = getCommandHelp(cmd);
+  if (catalogHelp) {
+    console.log(catalogHelp);
+    return;
+  }
+
   const tips: Record<string, string> = {
     start: 'aip start\n  启动 AIP 服务（API + Web）',
     stop: 'aip stop\n  停止 AIP 服务',
@@ -255,11 +263,11 @@ function printHelpFor(cmd: string) {
     ml: 'aip ml\n  本机模型命令大全',
     repair: 'aip repair [check|plan|command-pack|restore-point|source]\n  修复系统（plan-only）',
     receipt: 'aip receipt template\n  生成回执模板',
-    runtime: 'aip runtime\n  OpenAIP v8 Runtime Kernel 只读基础命令（not implemented）',
-    agents: 'aip agents\n  OpenAIP v8 Agent Center 只读基础命令（not implemented）',
-    integrations: 'aip integrations\n  OpenAIP v8 Integration Center 只读基础命令（not implemented）',
-    providers: 'aip providers\n  OpenAIP v8 Provider Manager 只读基础命令（not implemented）',
-    apps: 'aip apps\n  OpenAIP v8 Local Apps Center 只读基础命令（not implemented）',
+    runtime: 'aip runtime\n  OpenAIP v8 Runtime Kernel 只读基础命令（preview）',
+    agents: 'aip agents\n  OpenAIP v8 Agent Center 只读基础命令（preview）',
+    integrations: 'aip integrations\n  OpenAIP v8 Integration Center 只读基础命令（preview）',
+    providers: 'aip providers\n  OpenAIP v8 Provider Manager 只读基础命令（preview）',
+    apps: 'aip apps\n  OpenAIP v8 Local Apps Center 只读基础命令（preview）',
     task: 'aip task [list|status]\n  OpenAIP v8 Task Center 只读基础命令',
     audit: 'aip audit [list|status]\n  OpenAIP v8 Audit Center 只读基础命令',
     policy: 'aip policy [list|status]\n  OpenAIP v8 Policy Router + Capability Center 只读基础命令',
@@ -270,8 +278,32 @@ function printHelpFor(cmd: string) {
   console.log(text);
 }
 
+function positionalArgs(args: string[]) {
+  const out: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (['--plain', '--no-color', '--ascii', '--no-banner'].includes(arg)) continue;
+    if (arg === '--lang') {
+      i += 1;
+      continue;
+    }
+    out.push(arg);
+  }
+  return out;
+}
+
+function printUnknownCommand(cmd: string) {
+  console.error(`Unknown command: ${cmd}`);
+  const suggestions = suggestCommands(cmd);
+  if (suggestions.length > 0) {
+    console.error(`Did you mean: ${suggestions.join(', ')}`);
+  }
+  console.error('Run "aip commands" to see the command catalog, or "aip help <command>" for details.');
+}
+
 async function main() {
   const allArgs = process.argv.slice(2);
+  const args = positionalArgs(allArgs);
 
   noColor = process.env.NO_COLOR === '1' || allArgs.includes('--no-color');
   plainMode = allArgs.includes('--plain') || allArgs.includes('--no-color');
@@ -279,11 +311,11 @@ async function main() {
   noBanner = process.env.AIP_NO_BANNER === '1' || allArgs.includes('--no-banner');
   const langZh = allArgs.includes('--lang') && allArgs[allArgs.indexOf('--lang') + 1] === 'zh';
   const langEn = allArgs.includes('--lang') && allArgs[allArgs.indexOf('--lang') + 1] === 'en';
-  const helpIndex = allArgs.indexOf('help');
+  const helpIndex = args.indexOf('help');
 
-  const cmd = helpIndex >= 0 ? 'help' : allArgs[0];
-  const sub = helpIndex >= 0 ? allArgs[helpIndex + 1] : allArgs[1];
-  const rest = helpIndex >= 0 ? allArgs.slice(helpIndex + 2) : allArgs.slice(1);
+  const cmd = helpIndex >= 0 ? 'help' : args[0];
+  const sub = helpIndex >= 0 ? args[helpIndex + 1] : args[1];
+  const rest = helpIndex >= 0 ? args.slice(helpIndex + 2) : args.slice(1);
 
   if (cmd === 'help' && sub) {
     printHelpFor(sub);
@@ -291,6 +323,11 @@ async function main() {
   }
 
   if (cmd === 'help') {
+    printCommandCenter();
+    return;
+  }
+
+  if (!cmd) {
     printCommandCenter();
     return;
   }
@@ -305,7 +342,7 @@ async function main() {
     case 'open': await runOpen(); break;
     case 'version': await runVersion(); break;
     case 'doctor': await runDoctor(sub); break;
-    case 'config': await runConfig(sub, allArgs.filter(a => !a.startsWith('--')).slice(2)); break;
+    case 'config': await runConfig(sub, args.slice(2)); break;
     case 'repair': await runRepair(sub, rest); break;
     case 'gateway': await runGateway(sub); break;
     case 'execution-gateway': await runExecutionGateway(sub); break;
@@ -323,11 +360,16 @@ async function main() {
     case 'audit': await runAudit(sub); break;
     case 'policy': await runPolicy(sub); break;
     case 'v8': await runV8(sub); break;
+    case 'commands': await runCommands(rest.join(' ')); break;
     case 'ml':
     case 'manual':
-    case 'commands':
       await runMl(); break;
     default:
+      if (!commandIds().has(cmd)) {
+        printUnknownCommand(cmd);
+        process.exitCode = 1;
+        return;
+      }
       printCommandCenter();
       break;
   }

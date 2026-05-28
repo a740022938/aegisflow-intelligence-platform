@@ -168,7 +168,7 @@ const MODULES: Record<string, ModuleInfo> = {
   },
   'api-docs': {
     titleZh: 'API 文档', titleEn: 'API Docs',
-    redirect: '/docs',
+    redirect: '/docs', // kept for compatibility
     descZh: 'Swagger/OpenAPI 交互式文档，在线调试',
     descEn: 'Swagger/OpenAPI interactive docs, online debugging',
     capabilities: ['交互式文档', '在线调试', 'Schema 查看'],
@@ -179,7 +179,7 @@ const MODULES: Record<string, ModuleInfo> = {
 const STATUS_CFG: Record<ModuleStatus, { zh: string; en: string; color: string; bg: string }> = {
   online: { zh: '在线', en: 'Online', color: 'var(--primary)', bg: 'rgba(34,197,94,0.1)' },
   offline: { zh: '离线', en: 'Offline', color: 'var(--danger)', bg: 'var(--danger-light)' },
-  degraded: { zh: '降级', en: 'Degraded', color: '#eab308', bg: 'rgba(234,179,8,0.1)' },
+  degraded: { zh: '降级', en: 'Degraded', color: 'var(--warning)', bg: 'var(--warning-light)' },
   unknown: { zh: '未知', en: 'Unknown', color: 'var(--text-muted)', bg: 'transparent' },
 };
 
@@ -509,7 +509,7 @@ export default function ModulePage() {
         </div>
         <div style={SECT_STYLE}>
           <div style={SECT_TITLE_STYLE}>
-            <span style={{ color: '#eab308' }}>{isZh ? '边界' : 'Limits'}</span>
+            <span style={{ color: 'var(--warning)' }}>{isZh ? '边界' : 'Limits'}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {info.limits.length === 0 ? (

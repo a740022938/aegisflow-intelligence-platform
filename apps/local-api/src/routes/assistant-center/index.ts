@@ -10,11 +10,13 @@ const execFileAsync = promisify(execFile);
 
 type RiskLevel = 'low' | 'medium' | 'high' | 'critical' | 'unknown';
 type CheckStatus = 'pass' | 'warn' | 'fail' | 'unknown';
+type ProbeMode = 'live' | 'contract';
 
 const HTTP_TIMEOUT_MS = 3500;
 const COMMAND_TIMEOUT_MS = 5000;
 const DEFAULT_LIMIT = 30;
 const MAX_LIMIT = 80;
+const CONTRACT_MODE_LIVE_SERVICE_IDS = new Set(['aip-api', 'aip-web', 'openclaw']);
 
 const REPORT_ROOTS = [
   { root: 'E:\\_AIP_REPORTS', project: 'AIP' },
@@ -218,6 +220,11 @@ function summarizeFullCheck(checks: ReturnType<typeof buildChecks>, warnings: st
     overallStatus: hasHighFailure ? 'degraded' : hasMediumFailure || hasWarn || hasLowFailure ? 'warning' : 'healthy',
     riskLevel: hasHighFailure ? 'high' : hasMediumFailure || hasWarn ? 'medium' : hasLowFailure ? 'low' : 'low',
   };
+}
+
+function resolveProbeMode(body: any): ProbeMode {
+  if (body?.probeMode === 'contract' || body?.liveRequired === false) return 'contract';
+  return 'live';
 }
 
 async function powershellJson(script: string): Promise<any[]> {
@@ -601,18 +608,23 @@ async function collectStatus() {
   return { ok: true, checkedAt, lastCheckedAt: checkedAt, items, warnings, readonly: true, autoFixAllowed: false };
 }
 
-function buildChecks(statusPayload: Awaited<ReturnType<typeof collectStatus>>) {
+function buildChecks(statusPayload: Awaited<ReturnType<typeof collectStatus>>, probeMode: ProbeMode = 'live') {
   return statusPayload.items.map((item: any) => {
     let status: CheckStatus = 'unknown';
+    const contractRuntimeProbe = probeMode === 'contract' && CONTRACT_MODE_LIVE_SERVICE_IDS.has(item.id);
+    const riskLevel = contractRuntimeProbe && item.riskLevel === 'high' ? 'medium' : item.riskLevel;
+    const detail = contractRuntimeProbe && item.status === 'offline'
+      ? `contract mode: live runtime not required; ${item.detail || item.version || item.status}`
+      : item.detail || item.version || '';
     if (item.status === 'online') status = item.riskLevel === 'medium' ? 'warn' : 'pass';
-    if (item.status === 'offline') status = 'fail';
+    if (item.status === 'offline') status = contractRuntimeProbe ? 'warn' : 'fail';
     if (item.type === 'tool' && item.riskLevel === 'low' && item.status === 'offline') status = 'warn';
     return {
       id: item.id,
       label: item.name,
       status,
-      detail: item.detail || item.version || '',
-      riskLevel: item.riskLevel,
+      detail,
+      riskLevel,
       readonly: true,
       autoFixAllowed: false,
     };
@@ -691,17 +703,22 @@ export function registerAssistantCenterRoutes(app: FastifyInstance) {
     };
   });
 
-  app.post('/api/assistant-center/full-check', async (_request, reply) => {
+  app.post('/api/assistant-center/full-check', async (request: any, reply) => {
     try {
+      const probeMode = resolveProbeMode(request.body || {});
       const statusPayload = await collectStatus();
-      const checks = buildChecks(statusPayload);
+      const checks = buildChecks(statusPayload, probeMode);
       const warnings = [
+        ...(probeMode === 'contract'
+          ? ['contract mode: live runtime readiness is reported as warning; use probeMode=live for blocking runtime checks']
+          : []),
         ...statusPayload.warnings,
         ...checks.filter(item => item.riskLevel === 'medium').map(item => `${item.label}: ${item.detail}`),
       ];
       const summary = summarizeFullCheck(checks, warnings);
       return {
         ok: true,
+        probeMode,
         overallStatus: summary.overallStatus,
         riskLevel: summary.riskLevel,
         checks,

@@ -47,7 +47,7 @@ function fmtTime(v?: string) {
 }
 
 async function api<T = any>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`http://127.0.0.1:8787${path}`, init);
+  const res = await fetch(path, init);
   return res.json();
 }
 

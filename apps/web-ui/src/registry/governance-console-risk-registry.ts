@@ -440,7 +440,7 @@ const RISK_ITEMS: GovernanceConsoleRiskItem[] = [
     linkedDocs: ['AIP_HUMAN_APPROVAL_WORKFLOW_SPEC.md'],
     gates: ['readonly_only', 'no_approval_queue'],
     blockedActions: ['approve', 'reject', 'archive'],
-    reason: '10 items require human approval. Approval queue is not implemented.',
+    reason: '10 items require human approval. Approval queue is design-only.',
     nextAction: 'Keep approval requirements as design reference. Do not implement approval queue.',
   },
   {
@@ -463,7 +463,7 @@ const RISK_ITEMS: GovernanceConsoleRiskItem[] = [
     linkedDocs: ['AIP_EVIDENCE_SCHEMA_PREVIEW.md'],
     gates: ['readonly_only', 'no_evidence_capture'],
     blockedActions: ['capture_evidence', 'store_evidence'],
-    reason: '10 items across registries require evidence. Evidence store is not implemented.',
+    reason: '10 items across registries require evidence. Evidence store is design-only.',
     nextAction: 'Keep evidence requirements as design reference. Do not implement evidence store.',
   },
   {
@@ -486,7 +486,7 @@ const RISK_ITEMS: GovernanceConsoleRiskItem[] = [
     linkedDocs: ['AIP_ROLLBACK_PREVIEW.md'],
     gates: ['readonly_only', 'no_rollback_execution'],
     blockedActions: ['execute_rollback', 'restore_file', 'git_reset'],
-    reason: '10 items require rollback readiness. Rollback executor is not implemented.',
+    reason: '10 items require rollback readiness. Rollback executor is design-only.',
     nextAction: 'Keep rollback requirements as design reference. Do not implement rollback executor.',
   },
   {

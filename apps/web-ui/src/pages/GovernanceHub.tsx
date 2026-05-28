@@ -904,7 +904,7 @@ export default function GovernanceHub() {
                 <div className="gh-kv"><span>backflow impact</span><span className="gh-cell-wrap">pattern:{assistantRequests[0]?.pattern_backflow_id || '—'} / rule:{assistantRequests[0]?.rule_backflow_id || '—'} / playbook:{assistantRequests[0]?.playbook_backflow_id || '—'}</span></div>
                 <div className="gh-kv"><span>gate policy hint snapshot</span><span className="gh-cell-wrap">{compactJson((assistantRequests[0]?.gate_policy_hint_json || []).slice?.(0, 3) || assistantRequests[0]?.gate_policy_hint_json || {})}</span></div>
                 <div className="gh-ref-actions">
-                  <label className="gh-muted"><input type="checkbox" checked={assistantForceFail} onChange={(e) => setAssistantForceFail(e.target.checked)} /> force_fail(测试)</label>
+                  <label className="gh-muted"><input type="checkbox" checked={assistantForceFail} onChange={(e) => setAssistantForceFail(e.target.checked)} /> force_fail(Dev)</label>
                   <button className="ui-btn ui-btn-xs ui-btn-outline" onClick={requestAssistantDiagnostic}>请求 OpenClaw 诊断</button>
                   <button className="ui-btn ui-btn-xs ui-btn-ghost" onClick={requestAssistantDiagnostic}>重新请求</button>
                   <button className="ui-btn ui-btn-xs ui-btn-primary" disabled={assistantRequests.length === 0 || assistantRequests[0]?.manual_confirmation_status !== 'pending'} onClick={() => submitAssistantManualDecision('confirm_request')}>confirm_request</button>

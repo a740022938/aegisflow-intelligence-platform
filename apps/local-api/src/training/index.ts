@@ -211,7 +211,7 @@ export function createTrainingRun(body: any) {
     momentum: parseJson(configStr)?.momentum || 0.937,
     weight_decay: parseJson(configStr)?.weight_decay || 0.0005,
     simulation: false,
-  } : explicitMock ? { simulation: true, execution_mode: 'mock' } : {};
+  } : explicitMock ? { simulation: true, simulation_label: 'SIMULATED', execution_mode: 'mock' } : {};
 
   // 1. Create run (source_type='training')
   (db.prepare(`
@@ -501,6 +501,7 @@ async function _executeMockYoloTraining(runId: string, configStr: string, modelN
     model_type: modelName || 'yolov8n',
     dataset_version_id: datasetVersionId || '',
     execution_mode: 'mock_yolo',
+    simulation_label: 'SIMULATED',
     simulated: true,
     mockArtifact: true,
   });
@@ -529,10 +530,11 @@ async function _executeMockYoloTraining(runId: string, configStr: string, modelN
       dataset_version_id: datasetVersionId,
       execution_mode: 'mock_yolo',
       executionMode: 'mock',
+      simulation_label: 'SIMULATED',
       simulated: true,
       status: 'simulated',
-      mockArtifact: { mockArtifact: true, simulated: true, path: artifactPath },
-      mockCheckpoint: { mockCheckpoint: true, simulated: true, path: artifactPath },
+      mockArtifact: { mockArtifact: true, simulation_label: 'SIMULATED', simulated: true, path: artifactPath },
+      mockCheckpoint: { mockCheckpoint: true, simulation_label: 'SIMULATED', simulated: true, path: artifactPath },
     }), now(), runId);
   
   return { exit_code: 0, artifact_id: artifactId };
@@ -615,6 +617,7 @@ async function _executeMockTraining(runId: string, configStr: string, modelName:
     total_epochs: epochs,
     total_steps: totalSteps,
     execution_mode: 'mock',
+    simulation_label: 'SIMULATED',
     simulated: true,
     mockArtifact: true,
   });
@@ -641,10 +644,11 @@ async function _executeMockTraining(runId: string, configStr: string, modelName:
       artifact_name: artifactName,
       execution_mode: 'mock',
       executionMode: 'mock',
+      simulation_label: 'SIMULATED',
       simulated: true,
       status: 'simulated',
-      mockArtifact: { mockArtifact: true, simulated: true, path: artifactPath },
-      mockCheckpoint: { mockCheckpoint: true, simulated: true, path: `/mock/checkpoints/${runId}` },
+      mockArtifact: { mockArtifact: true, simulation_label: 'SIMULATED', simulated: true, path: artifactPath },
+      mockCheckpoint: { mockCheckpoint: true, simulation_label: 'SIMULATED', simulated: true, path: `/mock/checkpoints/${runId}` },
     }), now(), runId);
 }
 

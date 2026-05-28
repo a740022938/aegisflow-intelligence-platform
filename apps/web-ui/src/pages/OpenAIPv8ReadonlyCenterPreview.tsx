@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { getOpenAipv8Copy, type OpenAipv8CenterKey } from './openAipv8Copy';
 
-const shellStyle: React.CSSProperties = {
+const pageStyle: React.CSSProperties = {
   minHeight: '100vh',
   background: 'linear-gradient(135deg, #0b1220 0%, #111827 50%, #0f172a 100%)',
   color: '#e5e7eb',
@@ -91,12 +91,16 @@ function formatCellValue(v: string | number | boolean | undefined): string {
 export default function OpenAIPv8ReadonlyCenterPreview({ config }: { config: CenterConfig }): React.JSX.Element {
   const copy = getOpenAipv8Copy(config.centerKey);
   return (
-    <div style={shellStyle}>
+    <div style={pageStyle}>
       <div style={panelStyle}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
           <div>
             <h1 style={{ margin: 0, fontSize: 26 }}>{copy.title}</h1>
+            <span style={{ ...badgeStyle, background: '#1e293b', color: '#93c5fd', border: '1px solid #334155' }}></span>
+            <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #374151' }}>Gate CLOSED</span>
+            <span style={{ ...badgeStyle, background: '#1e293b', color: '#fbbf24', border: '1px solid #374151' }}>Stage C disabled</span>
+            <span style={{ ...badgeStyle, background: '#1e293b', color: '#fca5a5', border: '1px solid #7f1d1d' }}>No runtime mutation</span>
             <p style={{ marginTop: 4, color: '#93c5fd', fontSize: 14 }}>{copy.subtitle}</p>
             {config.role && <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6b7280' }}>{config.role}</p>}
             <p style={{ margin: '6px 0 0', fontSize: 13, color: '#9ca3af' }}>{config.purpose}</p>

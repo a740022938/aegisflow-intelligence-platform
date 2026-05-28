@@ -24,7 +24,7 @@ const RISK_COLORS: Record<string, string> = {
 };
 
 const RETENTION_LABELS: Record<string, string> = {
-  ephemeral_preview: '临时预览',
+  ephemeral_preview: 'Preview',
   report_only: '仅报告',
   future_db_audit: '未来 DB 审计',
   blocked_no_write: '阻断不写',
@@ -185,7 +185,7 @@ export default function AuditLogPreview() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8, fontSize: 10 }}>
           <div style={{ padding: 8, borderRadius: 6, background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}>
             <div style={{ fontWeight: 600, marginBottom: 4, color: 'var(--success)' }}>低风险 ({getAuditLogPreviewByRisk('low').length})</div>
-            <div style={{ color: 'var(--text-muted)' }}>低风险事件，临时预览即可。</div>
+            <div style={{ color: 'var(--text-muted)' }}>Low-risk event; for reference.</div>
           </div>
           <div style={{ padding: 8, borderRadius: 6, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}>
             <div style={{ fontWeight: 600, marginBottom: 4, color: 'var(--warning)' }}>中风险 ({getAuditLogPreviewByRisk('medium').length})</div>

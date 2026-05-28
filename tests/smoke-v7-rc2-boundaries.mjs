@@ -85,7 +85,7 @@ function assertSourceContains(file, checks) {
 }
 
 async function main() {
-  console.log('=== AIP v7.3.0 Boundary Smoke ===\n');
+  console.log('=== AIP v7.62.0 Boundary Smoke ===\n');
 
   const assistant = await makeAssistantApp();
 
@@ -97,10 +97,11 @@ async function main() {
   });
 
   await check('assistant-center full-check', async () => {
-    const r = await assistant.inject({ method: 'POST', url: '/api/assistant-center/full-check', payload: {} });
+    const r = await assistant.inject({ method: 'POST', url: '/api/assistant-center/full-check', payload: { probeMode: 'contract' } });
     if (r.statusCode !== 200) throw new Error(`HTTP ${r.statusCode}`);
     const data = r.json();
     if (!data.ok) throw new Error(`full-check not ok`);
+    if (data.probeMode !== 'contract') throw new Error('full-check did not use contract probe mode');
     // Check if high risk source is ONLY claude-proxy → known external dependency, not release blocker
     const highChecks = (data.checks || []).filter(c => c.riskLevel === 'high');
     const coreHigh = highChecks.filter(c => c.id !== 'claude-proxy');

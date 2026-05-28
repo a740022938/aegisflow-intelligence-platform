@@ -386,6 +386,7 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
     allowedNow: true,
     source: 'layout',
   },
+  // NOTE: Sidebar migration completed in v7.63
   // ── DEFERRED: Sidebar exposure cleanup ──
   // The 17 entries below have currentExposure: 'primary_nav' but their
   // recommendedExposure differs (advanced_mode, governance_center, etc.).
@@ -456,7 +457,7 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
   {
     id: 'training-v2',
     path: '/training-v2',
-    label: 'Training V2',
+    label: 'Training',
     component: 'ModulePage',
     currentExposure: 'primary_nav',
     recommendedExposure: 'advanced_mode',
@@ -556,7 +557,7 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
   {
     id: 'backflow-v2',
     path: '/backflow-v2',
-    label: 'Backflow V2',
+    label: 'Iterative Flywheel',
     component: 'ModulePage',
     currentExposure: 'primary_nav',
     recommendedExposure: 'advanced_mode',
@@ -612,7 +613,7 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
   {
     id: 'deploy-v2',
     path: '/deploy-v2',
-    label: 'Deploy V2',
+    label: 'Deploy',
     component: 'ModulePage',
     currentExposure: 'primary_nav',
     recommendedExposure: 'advanced_mode',
@@ -1110,7 +1111,7 @@ export const NAVIGATION_EXPOSURE_REGISTRY: NavigationExposureEntry[] = [
   {
     id: 'storage-v2',
     path: '/storage-v2',
-    label: 'Storage V2',
+    label: 'Storage',
     component: 'ModulePage',
     currentExposure: 'hidden_internal',
     recommendedExposure: 'hidden_internal',

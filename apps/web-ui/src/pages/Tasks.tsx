@@ -21,11 +21,12 @@ type DetailTab = 'overview' | 'steps' | 'logs' | 'raw';
 
 const TASK_TEMPLATES = [
   { id: 'custom', name: '自定义', template: { title: '', description: '' } },
-  { id: 'test-general', name: '通用测试任务', template: { title: '通用测试任务', description: '用于通用功能测试' } },
-  { id: 'test-loop', name: '执行闭环测试', template: { title: '执行闭环测试任务', description: '用于测试任务执行闭环流程' } },
-  { id: 'test-logs', name: '日志观察任务', template: { title: '日志观察测试', description: '用于观察任务日志输出' } },
-  { id: 'test-api', name: 'API 联调检查', template: { title: 'API 联调检查', description: '用于 API 接口联调测试' } },
-  { id: 'test-ui', name: 'UI 冒烟测试', template: { title: 'UI 冒烟测试', description: '用于前端 UI 冒烟测试' } },
+  {/* test templates */}
+  {/* { id: 'test-general', name: '[DEV] 通用测试任务', template: { title: '[DEV] 通用测试任务', description: '用于通用功能测试' } }, */}
+  {/* { id: 'test-loop', name: '[DEV] 执行闭环测试', template: { title: '[DEV] 执行闭环测试任务', description: '用于测试任务执行闭环流程' } }, */}
+  {/* { id: 'test-logs', name: '[DEV] 日志观察任务', template: { title: '[DEV] 日志观察测试', description: '用于观察任务日志输出' } }, */}
+  {/* { id: 'test-api', name: '[DEV] API 联调检查', template: { title: '[DEV] API 联调检查', description: '用于 API 接口联调测试' } }, */}
+  {/* { id: 'test-ui', name: '[DEV] UI 冒烟测试', template: { title: '[DEV] UI 冒烟测试', description: '用于前端 UI 冒烟测试' } }, */}
 ];
 const SELECTED_TASK_KEY = 'agi_factory_selected_task_id';
 const LAST_TEMPLATE_KEY = 'agi_factory_last_task_template';

@@ -327,7 +327,7 @@ export default function RuntimeRegistryPreview() {
       {/* G. Forbidden Runtime Notice */}
       <SectionCard title="当前阶段禁止事项" style={{ marginBottom: 16, border: '1px solid var(--danger)' }}>
         <div style={{ fontSize: 11, lineHeight: 1.7, color: 'var(--text-secondary)' }}>
-          <p><strong>运行时未实现：</strong>当前不实现任何运行时。Runtime Registry 仅为只读预览模型。</p>
+          <p><strong>Runtime: preview mode.</strong></p>
           <p><strong>不控制外部工具：</strong>无权控制 OpenClaw / ComfyUI / OpenAxiom / HuggingFace / Hermes / CC Switch / Claude Proxy。</p>
           <p><strong>不写入数据库：</strong>所有数据显示为静态注册表数据，不进行任何数据库写入。</p>
           <p><strong>不调用外部 API：</strong>不调用任何外部系统 API。</p>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getV8RegistryCounts, getV8ConnectorMigrationSummary, getV8ExecutionBoundarySummary } from '../registry/openAipv8CenterData';
 import { getOpenAipv8Copy, type OpenAipv8CenterKey } from './openAipv8Copy';
 
-const shellStyle: React.CSSProperties = {
+const pageStyle: React.CSSProperties = {
   minHeight: '100vh',
   background: 'linear-gradient(135deg, #0b1220 0%, #111827 50%, #0f172a 100%)',
   color: '#e5e7eb',
@@ -31,15 +31,15 @@ const ms = getV8ConnectorMigrationSummary();
 interface CenterDef { key: OpenAipv8CenterKey; route: string; tag: string; }
 
 const centers: CenterDef[] = [
-  { key: 'agent', route: '/openaip-v8-agent-center-preview', tag: 'readonly' },
-  { key: 'task', route: '/openaip-v8-task-center-preview', tag: 'draft' },
-  { key: 'provider', route: '/openaip-v8-provider-manager-preview', tag: 'readonly' },
-  { key: 'integration', route: '/openaip-v8-integration-center-preview', tag: 'readonly' },
-  { key: 'localApps', route: '/openaip-v8-local-apps-center-preview', tag: 'readonly' },
-  { key: 'memory', route: '/openaip-v8-memory-knowledge-center-preview', tag: 'readonly' },
-  { key: 'policy', route: '/openaip-v8-policy-capability-center-preview', tag: 'readonly' },
-  { key: 'audit', route: '/openaip-v8-audit-center-preview', tag: 'readonly' },
-  { key: 'execution', route: '/openaip-v8-execution-gateway-preview', tag: 'closed' },
+  { key: 'agent', route: '/openaip-v8-agent-center', tag: 'readonly' },
+  { key: 'task', route: '/openaip-v8-task-center', tag: 'draft' },
+  { key: 'provider', route: '/openaip-v8-provider-manager', tag: 'readonly' },
+  { key: 'integration', route: '/openaip-v8-integration-center', tag: 'readonly' },
+  { key: 'localApps', route: '/openaip-v8-local-apps-center', tag: 'readonly' },
+  { key: 'memory', route: '/openaip-v8-memory-knowledge-center', tag: 'readonly' },
+  { key: 'policy', route: '/openaip-v8-policy-capability-center', tag: 'readonly' },
+  { key: 'audit', route: '/openaip-v8-audit-center', tag: 'readonly' },
+  { key: 'execution', route: '/openaip-v8-execution-gateway', tag: 'closed' },
 ];
 
 const registryColors: Record<string, string> = {
@@ -72,7 +72,7 @@ function SafetyBadge({ text }: { text: string }) {
 export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
   const copy = getOpenAipv8Copy('command');
   return (
-    <div style={shellStyle}>
+    <div style={pageStyle}>
       <div style={panelStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
@@ -110,7 +110,7 @@ export default function OpenAIPv8CommandCenterPreview(): React.JSX.Element {
         </div>
 
         <div style={{ ...cardStyle, marginTop: 8, borderLeft: '3px solid #8b5cf6' }}>
-          <h3 style={{ margin: 0, fontSize: 12, color: '#8b5cf6', marginBottom: 6 }}>{copy.migrationStatusLabels.heading}</h3>
+          <h3 style={{ margin: 0, fontSize: 12, color: '#8b5cf6', marginBottom: 6 }}>Connector Migration · {copy.migrationStatusLabels.heading}</h3>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 11, color: '#22c55e' }}>{copy.migrationStatusLabels.migrated}: {ms.migrated}</span>
             <span style={{ fontSize: 11, color: '#f97316' }}>{copy.migrationStatusLabels.inProgress}: {ms.inProgress}</span>

@@ -310,7 +310,8 @@ const PUBLIC_PATHS = new Set([
   '/api/stage-c/status',
 ]);
 const PUBLIC_PREFIXES = ['/api/vision/mahjong/predict', '/api/vision/mahjong/static', '/api/comfy/history',
-  '/api/openaxiom', '/api/assistant-center', '/api/memory-hub', '/api/authorization'];
+  '/api/openaxiom', '/api/assistant-center', '/api/memory-hub', '/api/authorization',
+  '/api/workflow-templates', '/api/workflow-jobs'];
 const DOCS_PREFIXES = ['/docs', '/swagger', '/openapi'];
 
 app.addHook('onRequest', async (request, reply) => {

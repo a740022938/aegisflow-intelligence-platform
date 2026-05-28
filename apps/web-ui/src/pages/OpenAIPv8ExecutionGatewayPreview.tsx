@@ -237,6 +237,7 @@ export default function OpenAIPv8ExecutionGatewayPreview(): React.JSX.Element {
 
         {/* Global Status Strip */}
         <div style={{ ...cardStyle, display: 'flex', gap: 4, flexWrap: 'wrap', borderLeft: '3px solid #f59e0b' }}>
+          <span style={{ ...badgeStyle, background: '#1e293b', color: '#93c5fd', border: '1px solid #93c5fd' }}>Readonly Preview</span>
           {copy.globalSafetyBadges.map((badge) => (
             <span key={badge} style={{ ...badgeStyle, background: '#1e293b', color: '#9ca3af', border: '1px solid #374151' }}>{badge}</span>
           ))}

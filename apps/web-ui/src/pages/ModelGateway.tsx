@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PageShell from '../components/ui/PageShell';
 import SectionCard from '../components/ui/SectionCard';
 import StatusBadge from '../components/ui/StatusBadge';
+import { clearJwt, getJwt } from '../services/authStore';
 import './ModelGateway.css';
 
 type EndpointStatus = {
@@ -34,53 +35,25 @@ type GatewayStatus = {
   safety: { notes: string[]; legacyProxyUntouched: boolean; readonlyApi: boolean; secretRedaction: boolean };
 };
 
-const MODEL_GATEWAY_AUTH_TOKEN_KEY = 'aip_auth_token';
-
-function getStoredAuthToken(): string {
-  try {
-    return localStorage.getItem(MODEL_GATEWAY_AUTH_TOKEN_KEY) || '';
-  } catch {
-    return '';
+function requireJwt(): string {
+  const token = getJwt();
+  if (!token) {
+    throw new Error('请先通过顶部授权入口验证令牌。不会再使用默认管理员账号自动登录。');
   }
+  return token;
 }
 
-function setStoredAuthToken(token: string) {
-  try {
-    localStorage.setItem(MODEL_GATEWAY_AUTH_TOKEN_KEY, token);
-  } catch {
-    // The token can still be used for the current request.
-  }
-}
-
-async function loginForModelGateway(): Promise<string> {
-  const res = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'admin', password: 'aip-admin' }),
-  });
-  const data = await res.json();
-  if (!res.ok || !data?.ok || !data?.token) {
-    throw new Error(data?.error || data?.message || 'ModelGateway authentication failed');
-  }
-  setStoredAuthToken(data.token);
-  return data.token;
-}
-
-async function fetchModelGatewayStatus(retried = false): Promise<GatewayStatus> {
-  let token = getStoredAuthToken();
-  if (!token) token = await loginForModelGateway();
+async function fetchModelGatewayStatus(): Promise<GatewayStatus> {
+  const token = requireJwt();
 
   const response = await fetch('/api/model-gateway/status', {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();
 
-  if ((data?._unauthorized || response.status === 401) && !retried) {
-    token = await loginForModelGateway();
-    const retry = await fetch('/api/model-gateway/status', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return retry.json();
+  if (data?._unauthorized || response.status === 401) {
+    clearJwt();
+    throw new Error('授权已过期，请重新验证令牌。');
   }
 
   if (!response.ok || data?.ok === false) throw new Error(data?.error || `HTTP ${response.status}`);

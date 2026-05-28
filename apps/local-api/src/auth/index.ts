@@ -24,6 +24,8 @@ const AUTH_TABLE = `
 `;
 
 const ROLES = { admin: 100, operator: 50, developer: 30, viewer: 10 } as const;
+const LEGACY_DEFAULT_ADMIN_PASSWORD = ['aip', 'admin'].join('-');
+const MIN_BOOTSTRAP_ADMIN_PASSWORD_LENGTH = 16;
 
 function hashPassword(pw: string): string {
   return createHash('sha256').update(pw + 'aip-salt-v1').digest('hex');
@@ -31,16 +33,42 @@ function hashPassword(pw: string): string {
 
 function nowIso() { return new Date().toISOString(); }
 
+function getBootstrapAdminConfig() {
+  const password = String(process.env.AIP_BOOTSTRAP_ADMIN_PASSWORD || '').trim();
+  if (!password) return null;
+  if (password === LEGACY_DEFAULT_ADMIN_PASSWORD || password.length < MIN_BOOTSTRAP_ADMIN_PASSWORD_LENGTH) {
+    console.warn('[auth] Ignoring insecure bootstrap admin password. Use a non-default value with at least 16 characters.');
+    return null;
+  }
+
+  const username = String(process.env.AIP_BOOTSTRAP_ADMIN_USERNAME || 'admin').trim() || 'admin';
+  const displayName = String(process.env.AIP_BOOTSTRAP_ADMIN_DISPLAY_NAME || 'Bootstrap Administrator').trim() || 'Bootstrap Administrator';
+  return { username, password, displayName };
+}
+
+function neutralizeLegacyDefaultAdmin(db: ReturnType<typeof getDatabase>) {
+  const legacy = db.prepare("SELECT id, password_hash FROM aip_users WHERE username = 'admin'").get() as any;
+  if (!legacy || legacy.password_hash !== hashPassword(LEGACY_DEFAULT_ADMIN_PASSWORD)) return;
+
+  db.prepare('UPDATE aip_users SET password_hash = ?, role = ?, display_name = ? WHERE id = ?')
+    .run(hashPassword(`legacy-disabled-${randomUUID()}`), 'viewer', 'Legacy default admin disabled', legacy.id);
+  console.warn('[auth] Disabled legacy admin/aip-admin credentials. Set AIP_BOOTSTRAP_ADMIN_PASSWORD to create an explicit bootstrap admin.');
+}
+
 export function registerAuthRoutes(app: FastifyInstance) {
   const db = getDatabase();
   db.exec(AUTH_TABLE);
 
-  // Seed default admin if not exists
-  const adminExists = db.prepare("SELECT id FROM aip_users WHERE username = 'admin'").get();
-  if (!adminExists) {
-    db.prepare("INSERT INTO aip_users (id, username, password_hash, role, display_name, created_at) VALUES (?, 'admin', ?, 'admin', 'Administrator', ?)")
-      .run(randomUUID(), hashPassword('aip-admin'), nowIso());
-    console.log('[auth] Seeded default admin/admin account');
+  neutralizeLegacyDefaultAdmin(db);
+
+  const bootstrapAdmin = getBootstrapAdminConfig();
+  if (bootstrapAdmin) {
+    const adminExists = db.prepare('SELECT id FROM aip_users WHERE username = ?').get(bootstrapAdmin.username);
+    if (!adminExists) {
+      db.prepare('INSERT INTO aip_users (id, username, password_hash, role, display_name, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+        .run(randomUUID(), bootstrapAdmin.username, hashPassword(bootstrapAdmin.password), 'admin', bootstrapAdmin.displayName, nowIso());
+      console.log(`[auth] Seeded bootstrap admin account "${bootstrapAdmin.username}" from explicit environment configuration`);
+    }
   }
 
   app.post('/api/auth/login', async (request: any, reply: any) => {

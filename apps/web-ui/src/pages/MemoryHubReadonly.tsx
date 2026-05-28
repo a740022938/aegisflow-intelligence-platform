@@ -294,7 +294,7 @@ function MemoryHubReadonly() {
       {card('候选概览', (
         <div style={{ fontSize: 13, lineHeight: 1.8 }}>
           <div>待审批: <strong id="cand-pending">-</strong></div>
-          <div>测试候选: <strong id="cand-test">-</strong></div>
+          <div>Candidate: <strong>-</strong></div>
           <div>总计: <strong id="cand-total">-</strong></div>
           <div id="cand-dirs" style={{ marginTop: 8, fontSize: 11, color: 'var(--text-secondary)' }}>-</div>
           <div style={{ marginTop: 12, padding: 8, background: 'var(--bg-input)', borderRadius: 4, fontSize: 12, color: 'var(--warning)' }}>

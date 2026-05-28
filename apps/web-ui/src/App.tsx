@@ -167,24 +167,34 @@ const App: React.FC = () => {
             <Route path="plugin-canvas" element={<PluginCanvas />} />
             <Route path="workflow-composer" element={<WorkflowComposer />} />
             <Route path="audit" element={<Audit />} />
-            {/* ── 新模块占位页 ── */}
+            {/* ── 模块页 ── */}
+            {/* 实验室 */}
             <Route path="digital-employee" element={<ModulePage />} />
-            <Route path="training-v2" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="hpo" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="distill" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="model-merge" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="inference" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="annotation" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="huggingface" element={<ModulePage />} />
-            <Route path="backflow-v2" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="scheduler" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="alerting" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="model-monitor" element={<ModulePage />} />
-            <Route path="deploy-v2" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="workspace" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="cost-tracker" element={<ModulePage />} />
-            <Route path="storage-v2" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="system-status" element={<ModulePage />} />
+            {/* 实验室 */}
             <Route path="api-docs" element={<ModulePage />} />
             <Route path="vision-lab/mahjong-debug" element={<MahjongDebug />} />
             <Route path="openaxiom-readonly" element={<OpenAxiomReadonly />} />
@@ -240,16 +250,16 @@ const App: React.FC = () => {
             <Route path="operator-usability-drill-preview" element={<OperatorUsabilityDrillPreview />} />
             <Route path="restore-point-pack-preview" element={<RestorePointPackPreview />} />
             <Route path="handoff-pack-preview" element={<HandoffPackPreview />} />
-            <Route path="openaip-v8-command-center-preview" element={<OpenAIPv8CommandCenterPreview />} />
-            <Route path="openaip-v8-agent-center-preview" element={<OpenAIPv8AgentCenterPreview />} />
-            <Route path="openaip-v8-task-center-preview" element={<OpenAIPv8TaskCenterPreview />} />
-            <Route path="openaip-v8-provider-manager-preview" element={<OpenAIPv8ProviderManagerPreview />} />
-            <Route path="openaip-v8-integration-center-preview" element={<OpenAIPv8IntegrationCenterPreview />} />
-            <Route path="openaip-v8-local-apps-center-preview" element={<OpenAIPv8LocalAppsCenterPreview />} />
-            <Route path="openaip-v8-memory-knowledge-center-preview" element={<OpenAIPv8MemoryKnowledgeCenterPreview />} />
-            <Route path="openaip-v8-policy-capability-center-preview" element={<OpenAIPv8PolicyCapabilityCenterPreview />} />
-            <Route path="openaip-v8-audit-center-preview" element={<OpenAIPv8AuditCenterPreview />} />
-            <Route path="openaip-v8-execution-gateway-preview" element={<OpenAIPv8ExecutionGatewayPreview />} />
+            <Route path="openaip-v8-command-center" element={<OpenAIPv8CommandCenterPreview />} />
+            <Route path="openaip-v8-agent-center" element={<OpenAIPv8AgentCenterPreview />} />
+            <Route path="openaip-v8-task-center" element={<OpenAIPv8TaskCenterPreview />} />
+            <Route path="openaip-v8-provider-manager" element={<OpenAIPv8ProviderManagerPreview />} />
+            <Route path="openaip-v8-integration-center" element={<OpenAIPv8IntegrationCenterPreview />} />
+            <Route path="openaip-v8-local-apps-center" element={<OpenAIPv8LocalAppsCenterPreview />} />
+            <Route path="openaip-v8-memory-knowledge-center" element={<OpenAIPv8MemoryKnowledgeCenterPreview />} />
+            <Route path="openaip-v8-policy-capability-center" element={<OpenAIPv8PolicyCapabilityCenterPreview />} />
+            <Route path="openaip-v8-audit-center" element={<OpenAIPv8AuditCenterPreview />} />
+            <Route path="openaip-v8-execution-gateway" element={<OpenAIPv8ExecutionGatewayPreview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

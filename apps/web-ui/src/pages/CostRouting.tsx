@@ -4,6 +4,7 @@ import PageShell from '../components/ui/PageShell';
 import '../components/ui/shared.css';
 import './CostRouting.css';
 import { roleClass } from '../theme/colorRoles';
+import { clearJwt, getJwt } from '../services/authStore';
 
 type RouteType =
   | 'local_low_cost'
@@ -580,53 +581,25 @@ function fmt(v?: string) {
   }
 }
 
-const COST_ROUTING_AUTH_TOKEN_KEY = 'aip_auth_token';
-
-function getStoredAuthToken(): string {
-  try {
-    return localStorage.getItem(COST_ROUTING_AUTH_TOKEN_KEY) || '';
-  } catch {
-    return '';
+function requireJwt(): string {
+  const token = getJwt();
+  if (!token) {
+    throw new Error('请先通过顶部授权入口验证令牌。不会再使用默认管理员账号自动登录。');
   }
+  return token;
 }
 
-function setStoredAuthToken(token: string) {
-  try {
-    localStorage.setItem(COST_ROUTING_AUTH_TOKEN_KEY, token);
-  } catch {
-    // Ignore storage failures; the token can still be used for the current request.
-  }
-}
-
-async function loginForCostRouting(): Promise<string> {
-  const res = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'admin', password: 'aip-admin' }),
-  });
-  const data = await res.json();
-  if (!res.ok || !data?.ok || !data?.token) {
-    throw new Error(data?.error || data?.message || '成本路由认证失败');
-  }
-  setStoredAuthToken(data.token);
-  return data.token;
-}
-
-async function api(path: string, init?: RequestInit, retried = false): Promise<any> {
-  let token = getStoredAuthToken();
-  if (!token) token = await loginForCostRouting();
+async function api(path: string, init?: RequestInit): Promise<any> {
+  const token = requireJwt();
 
   const headers = new Headers(init?.headers || {});
   headers.set('Authorization', `Bearer ${token}`);
   const res = await fetch(path, { ...init, headers });
   const data = await res.json();
 
-  if (data?._unauthorized && !retried) {
-    token = await loginForCostRouting();
-    const retryHeaders = new Headers(init?.headers || {});
-    retryHeaders.set('Authorization', `Bearer ${token}`);
-    const retryRes = await fetch(path, { ...init, headers: retryHeaders });
-    return retryRes.json();
+  if (data?._unauthorized || res.status === 401) {
+    clearJwt();
+    throw new Error('授权已过期，请重新验证令牌。');
   }
 
   return data;
@@ -1920,9 +1893,9 @@ export default function CostRoutingPage() {
             ) : null}
             {practicalDecision.auditPreview ? (
               <>
-                <div className="cr-subtitle">审计预览 Audit Schema Preview v2</div>
+                <div className="cr-subtitle">审计预览 Audit Schema Preview</div>
                 <div className="cr-audit-preview">
-                  <div><span>auditSchemaVersion</span><b>{practicalDecision.auditPreview.auditSchemaVersion || 'preview-v2'}</b></div>
+                  <div><span>auditSchemaVersion</span><b>{practicalDecision.auditPreview.auditSchemaVersion || 'preview'}</b></div>
                   <div><span>auditMode</span><b>{practicalDecision.auditPreview.auditMode || practicalDecision.auditPreview.mode}</b></div>
                   <div><span>auditIdPreview</span><b>{practicalDecision.auditPreview.auditIdPreview || 'N/A'}</b></div>
                   <div><span>persistenceMode</span><b>{practicalDecision.auditPreview.persistenceMode || 'preview_only'}</b></div>
@@ -1946,7 +1919,7 @@ export default function CostRoutingPage() {
                   <div><span>nextSafeStep</span><b>{practicalDecision.auditPreview.nextSafeStep || practicalDecision.nextAction}</b></div>
                   <div><span>taskSummary</span><b>{practicalDecision.auditPreview.taskSummary || 'N/A'}</b></div>
                 </div>
-                <div className="cr-template-desc">当前为 Audit Schema Preview v2，不写入数据库、不写入文件、不写入 Memory Hub、不写入 LAN_SHARE。</div>
+                <div className="cr-template-desc">当前为 Audit Schema Preview，不写入数据库、不写入文件、不写入 Memory Hub、不写入 LAN_SHARE。</div>
                 <ul className="cr-note-list">
                   {practicalDecision.auditPreview.rollbackPlan.map((item) => <li key={item}>{item}</li>)}
                 </ul>

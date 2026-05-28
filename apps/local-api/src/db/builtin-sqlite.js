@@ -4,12 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDatabase = getDatabase;
+exports.getDatabasePath = getDatabasePath;
 exports.testConnection = testConnection;
 exports.query = query;
 exports.run = run;
 exports.closeDatabase = closeDatabase;
 const node_sqlite_1 = require("node:sqlite");
 const fs_1 = __importDefault(require("fs"));
+const os_1 = __importDefault(require("os"));
 const path_1 = __importDefault(require("path"));
 const url_1 = require("url");
 // 获取数据库文件路径
@@ -21,10 +23,17 @@ function getDbPath() {
     if (process.env.SQLITE_DB_PATH) {
         return path_1.default.resolve(process.env.SQLITE_DB_PATH);
     }
+    if (process.env.NODE_ENV === 'test' || process.env.VITEST === 'true') {
+        const workerId = process.env.VITEST_WORKER_ID || '0';
+        return path_1.default.join(os_1.default.tmpdir(), 'aip-local-api-tests', `agi_factory_${process.pid}_${workerId}.db`);
+    }
     // 从 apps/local-api/src/db 到 repo/packages/db
     return path_1.default.resolve(__dirname, '../../../../packages/db/agi_factory.db');
 }
 const dbPath = getDbPath();
+function getDatabasePath() {
+    return dbPath;
+}
 // 数据库实例
 let dbInstance = null;
 /**

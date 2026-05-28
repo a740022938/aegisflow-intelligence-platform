@@ -204,7 +204,7 @@ export default function ConnectorCenterReadonly() {
       {/* Future Connectors — Detailed Cards */}
       <SectionCard title={`Future Connectors (${futureItems.length})`}>
         <div className="ui-tag ui-tag-warning" style={{ marginBottom: 8 }}>
-          These connectors are not yet integrated. Displayed for planning and review.
+          Connectors displayed for review.
         </div>
         {futureItems.length > 0
           ? futureItems.map(c => <ConnectorCard key={c.id} conn={c} />)

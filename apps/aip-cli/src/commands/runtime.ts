@@ -12,7 +12,7 @@ function printList(title: string, arr: any[]) {
   console.log('');
   console.log('OpenAIP v8 Foundation Command');
   console.log(`Command: ${title}`);
-  console.log('Status: readonly foundation stub');
+  console.log('Status: read only (preview)');
   console.log('Safety: no mutation, no runtime action, Gate CLOSED, Stage C disabled');
   console.log('Source: example/static readonly registry');
   const allEntries = load('agents.example.json').concat(load('providers.example.json')).concat(load('integrations.example.json')).concat(load('local-apps.example.json'));
@@ -31,7 +31,7 @@ export async function runRuntime(sub?: string) {
     console.log('OpenAIP v8 Foundation Command');
     console.log('Command: aip runtime status');
     console.log('Center: Runtime Kernel');
-    console.log('Status: readonly foundation stub');
+    console.log('Status: read only (preview)');
     console.log('Safety: no mutation, no runtime action, Gate CLOSED, Stage C disabled');
     console.log('Source: example/static readonly registry');
     console.log(`- runtimeTruth=unknown | gateOpen=${p.gateOpen} | stageCEnabled=${p.stageCEnabled}`);

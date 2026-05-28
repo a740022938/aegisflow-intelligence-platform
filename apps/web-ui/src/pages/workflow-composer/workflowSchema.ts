@@ -526,7 +526,8 @@ execution: { stepKey: 'dataset_split', enabled: true, dryRunSupported: true, run
     inputs: ['dataset', 'image', 'detections'],
     outputs: ['detections'],
     params: [
-      { key: 'model_name', label: 'Model Name', labelZh: '模型名称', type: 'string', required: true, default: 'yolov8n.pt', placeholder: 'e.g. yolov8n.pt', description: 'YOLO 模型文件路径或名称' },
+      { key: 'model_name', label: 'Model Name', labelZh: '模型名称', type: 'string', required: false, default: '', placeholder: '留空使用默认模型', description: 'YOLO 模型文件路径，留空使用系统默认模型' },
+      { key: 'source_path', label: 'Source Path', labelZh: '图片路径', type: 'string', required: false, default: '', placeholder: '留空使用默认目录', description: '输入图片文件或目录路径，留空使用系统默认目录' },
       { key: 'conf_threshold', label: 'Confidence Threshold', labelZh: '置信度阈值', type: 'number', required: false, default: 0.25, description: '检测结果最低置信度' },
       { key: 'iou_threshold', label: 'IoU Threshold', labelZh: 'IoU 阈值', type: 'number', required: false, default: 0.45, description: 'NMS IoU 阈值' },
       { key: 'max_det', label: 'Max Detections', labelZh: '最大检测数', type: 'number', required: false, default: 300, description: '单图最大检测框数' },

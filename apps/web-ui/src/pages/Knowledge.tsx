@@ -16,10 +16,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   general_note: '通用笔记',
 };
 const CATEGORY_COLORS: Record<string, string> = {
-  failure_postmortem: '#ef4444',
-  model_conclusion: '#3b82f6',
-  task_experience: '#10b981',
-  general_note: '#6b7280',
+  failure_postmortem: 'var(--danger)',
+  model_conclusion: 'var(--primary)',
+  task_experience: 'var(--success)',
+  general_note: 'var(--text-muted)',
 };
 
 const LAYOUT_KEY = 'knowledge';

@@ -1,5 +1,6 @@
 import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { collectDbDiagnostics, runDbGovernance } from './governance.js';
 import type { DbGovernanceReport } from './governance.js';
@@ -19,6 +20,10 @@ const DB_MMAP_SIZE = parseInt(process.env.SQLITE_MMAP_SIZE || '0', 10);
 function getDbPath(): string {
   if (process.env.SQLITE_DB_PATH) {
     return path.resolve(process.env.SQLITE_DB_PATH);
+  }
+  if (process.env.NODE_ENV === 'test' || process.env.VITEST === 'true') {
+    const workerId = process.env.VITEST_WORKER_ID || '0';
+    return path.join(os.tmpdir(), 'aip-local-api-tests', `agi_factory_${process.pid}_${workerId}.db`);
   }
   return path.resolve(__dirname, '../../../../packages/db/agi_factory.db');
 }

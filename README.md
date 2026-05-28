@@ -202,18 +202,16 @@ pnpm run db:migrate:new <name> # Create new migration
 
 ## Reading Order
 
-### Current baseline (v7.55)
+### Current baseline (v7.62.0 release)
 
 | Step | Document | Purpose |
 |------|----------|---------|
 | 1 | `START_HERE.md` | **Start here** — install, configure, and run |
 | 2 | `README.md` | Project overview and CLI reference |
-| 3 | `docs/product/AIP_V7_55_D1_ROADMAP.md` | v7.55 phase roadmap |
-| 4 | `docs/product/AIP_V7_55_P1_FRESH_INSTALL_DOCS_CONSISTENCY_RESULT.md` | Fresh install hardening result |
-| 5 | `docs/product/AIP_V7_55_P2_RESTORE_RESULT.md` | Restore artifact dry pack result |
-| 6 | `docs/product/AIP_V7_55_D1_FRESH_INSTALL_HARDENING_PLAN.md` | Install hardening plan |
-| 7 | `docs/product/AIP_V7_55_D1_RESTORE_HARDENING_PLAN.md` | Restore hardening plan |
-| 8 | `docs/product/AIP_V7_55_D1_RELEASE_GATE_HARDENING_PLAN.md` | Release gate hardening plan |
+| 3 | `docs/product/AIP_V7_62_P5_FINAL_RELEASE_SEAL.md` | Final release seal |
+| 4 | `docs/product/AIP_V7_62_P5_POST_RELEASE_VERIFICATION.md` | Post-release verification |
+| 5 | `docs/product/AIP_V7_62_P5_NEXT_MAINTENANCE_RECOMMENDATION.md` | Maintenance hardening direction |
+| 6 | `docs/product/AIP_V7_62_P4_RELEASE_NOTES_FINAL.md` | Release notes |
 
 ### Design-system reference (v7.51–v7.54, Datasets pilot)
 
@@ -224,7 +222,7 @@ pnpm run db:migrate:new <name> # Create new migration
 
 ### Historical operator guides (v7.45 series)
 
-These remain valid as design-system and operator references but are superseded by v7.55 docs for install/restore/release gate workflows:
+These remain valid as design-system and operator references but are superseded by the v7.62.0 release baseline for release status and acceptance work:
 
 | Document | Purpose |
 |----------|---------|
