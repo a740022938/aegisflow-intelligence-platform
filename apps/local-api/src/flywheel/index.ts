@@ -1,5 +1,7 @@
 import { z } from 'zod';
+import type { FastifyInstance } from 'fastify';
 import { getDatabase } from '../db/builtin-sqlite.js';
+import { randomUUID } from 'node:crypto';
 
 function generateId() {
   return crypto.randomUUID();
@@ -426,4 +428,84 @@ export async function generateReleaseNote(modelId: string) {
     ok: true,
     release_note: releaseNote,
   };
+}
+
+export function registerFlywheelIterationRoutes(app: FastifyInstance) {
+  const db = getDatabase();
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS flywheel_iterations (
+      id TEXT PRIMARY KEY, name TEXT NOT NULL, dataset_id TEXT, model_id TEXT,
+      status TEXT DEFAULT 'pending', params_json TEXT DEFAULT '{}',
+      metrics_json TEXT DEFAULT '{}', log_output TEXT DEFAULT '',
+      created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS flywheel_feedback (
+      id TEXT PRIMARY KEY, iteration_id TEXT NOT NULL,
+      type TEXT DEFAULT 'comment', comment TEXT,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  const ITER_COLS = ['id', 'name', 'dataset_id', 'model_id', 'status', 'params_json', 'metrics_json', 'log_output', 'created_at', 'updated_at'] as const;
+  function rowToIter(row: any) {
+    const out: any = {};
+    for (const k of ITER_COLS) out[k] = row[k];
+    try { out.params = JSON.parse(row.params_json || '{}'); } catch { out.params = {}; }
+    try { out.metrics = JSON.parse(row.metrics_json || '{}'); } catch { out.metrics = {}; }
+    return out;
+  }
+
+  app.get('/api/flywheel/iterations', async (_req, reply) => {
+    const rows = db.prepare('SELECT * FROM flywheel_iterations ORDER BY created_at DESC').all();
+    return { ok: true, iterations: rows.map(rowToIter), count: rows.length };
+  });
+
+  app.post('/api/flywheel/iterations', async (request: any, reply: any) => {
+    const body = request.body || {};
+    if (!body.name) return reply.code(400).send({ ok: false, error: 'name is required' });
+    const id = randomUUID();
+    const now = now();
+    db.prepare(`INSERT INTO flywheel_iterations (id, name, dataset_id, model_id, status, params_json, created_at, updated_at)
+      VALUES (?, ?, ?, ?, 'running', ?, ?, ?)`)
+      .run(id, body.name, body.dataset_id || '', body.model_id || '', JSON.stringify(body.params || {}), now, now);
+    const row = db.prepare('SELECT * FROM flywheel_iterations WHERE id = ?').get(id);
+    return { ok: true, iteration: rowToIter(row) };
+  });
+
+  app.get('/api/flywheel/iterations/:id', async (request: any, reply: any) => {
+    const row = db.prepare('SELECT * FROM flywheel_iterations WHERE id = ?').get(request.params.id) as any;
+    if (!row) return reply.code(404).send({ ok: false, error: 'iteration not found' });
+    const feedback = db.prepare('SELECT * FROM flywheel_feedback WHERE iteration_id = ? ORDER BY created_at DESC').all(request.params.id);
+    return { ok: true, iteration: rowToIter(row), feedback, feedback_count: feedback.length };
+  });
+
+  app.post('/api/flywheel/iterations/:id/feedback', async (request: any, reply: any) => {
+    const { id } = request.params;
+    const iter = db.prepare('SELECT id FROM flywheel_iterations WHERE id = ?').get(id) as any;
+    if (!iter) return reply.code(404).send({ ok: false, error: 'iteration not found' });
+    const body = request.body || {};
+    const fId = randomUUID();
+    db.prepare(`INSERT INTO flywheel_feedback (id, iteration_id, type, comment, created_at) VALUES (?, ?, ?, ?, ?)`)
+      .run(fId, id, body.type || 'comment', body.comment || '', now());
+    return { ok: true, feedback: { id: fId, iteration_id: id, type: body.type || 'comment', comment: body.comment || '', created_at: now() } };
+  });
+
+  app.put('/api/flywheel/iterations/:id', async (request: any, reply: any) => {
+    const { id } = request.params;
+    const iter = db.prepare('SELECT id FROM flywheel_iterations WHERE id = ?').get(id) as any;
+    if (!iter) return reply.code(404).send({ ok: false, error: 'iteration not found' });
+    const body = request.body || {};
+    const nowStr = now();
+    if (body.status) {
+      db.prepare('UPDATE flywheel_iterations SET status = ?, updated_at = ? WHERE id = ?').run(body.status, nowStr, id);
+    }
+    if (body.metrics) {
+      db.prepare('UPDATE flywheel_iterations SET metrics_json = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(body.metrics), nowStr, id);
+    }
+    if (body.log_output) {
+      db.prepare('UPDATE flywheel_iterations SET log_output = ?, updated_at = ? WHERE id = ?').run(body.log_output, nowStr, id);
+    }
+    const row = db.prepare('SELECT * FROM flywheel_iterations WHERE id = ?').get(id);
+    return { ok: true, iteration: rowToIter(row) };
+  });
 }

@@ -1,0 +1,41 @@
+/* ============================================================
+   light-theme.css — Light Mode Theme Overrides (v7.63)
+   ============================================================
+   Apply .theme-light class to <html> or <body> to activate.
+   Overrides only color-related tokens; keeps all structure.
+   ============================================================ */
+
+.theme-light {
+  /* ── 核心背景层级 ── */
+  --bg-base: #f8f9fa;
+  --bg-app: #ffffff;
+  --bg-surface: #f0f1f3;
+  --bg-elevated: #e4e5e7;
+  --bg-secondary: var(--bg-elevated);
+  --bg-hover: #dcdde0;
+  --bg-active: #cfd1d4;
+  --bg-sidebar: #f2f3f5;
+  --bg-topbar: #ffffff;
+
+  /* ── 边框 ── */
+  --border: #d1d3d6;
+  --border-light: #bcbec2;
+  --border-subtle: #e0e1e4;
+
+  /* ── 文字层级 ── */
+  --text-primary: #1a1a2e;
+  --text-main: #2d2d40;
+  --text-secondary: #4a4a5a;
+  --text-muted: #8a8a9a;
+  --text-disabled: #b0b0be;
+  --text-sidebar: #4a4a5a;
+  --text-sidebar-active: #1a1a2e;
+  --text-sidebar-muted: #8a8a9a;
+
+  /* ── 阴影（浅色模式下更轻）─ */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-glow-primary: 0 0 24px rgba(16, 163, 127, 0.12);
+  --shadow-glow-danger: 0 0 24px rgba(239, 68, 68, 0.12);
+}

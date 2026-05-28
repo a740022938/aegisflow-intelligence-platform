@@ -94,4 +94,31 @@ export function registerModelMonitorRoutes(app: FastifyInstance) {
       .run(logId, depId, reason, body.trigger_type || 'manual', body.job_id || `train_${randomUUID().slice(0, 8)}`, 'triggered', now);
     return { ok: true, retrain_id: logId, message: 'Retrain triggered', reason };
   });
+
+  // ── /api/model-monitor routes ──────────────────────────────────
+  app.get('/api/model-monitor/models', async (_req, reply) => {
+    const models = db.prepare('SELECT id as model_id, name, architecture, status, metrics_snapshot_json, created_at FROM models ORDER BY created_at DESC').all();
+    return { ok: true, models: models.map((m: any) => {
+      let metrics = {};
+      try { metrics = JSON.parse(m.metrics_snapshot_json || '{}'); } catch {/* */}
+      delete m.metrics_snapshot_json;
+      return { ...m, metrics };
+    }), count: models.length };
+  });
+
+  app.get('/api/model-monitor/models/:id/metrics', async (request: any, reply: any) => {
+    const { id } = request.params;
+    const limit = Math.min(Number(request.query?.limit || 100), 500);
+    const rows = db.prepare('SELECT * FROM monitor_metrics WHERE deployment_id = ? ORDER BY recorded_at DESC LIMIT ?').all(id, limit);
+    return { ok: true, model_id: id, metrics: rows, count: rows.length };
+  });
+
+  app.post('/api/model-monitor/models/:id/refresh', async (request: any, reply: any) => {
+    const { id } = request.params;
+    const model = db.prepare('SELECT id FROM models WHERE id = ?').get(id) as any;
+    if (!model) return reply.code(404).send({ ok: false, error: 'model not found' });
+    const now = nowIso();
+    db.prepare('UPDATE models SET updated_at = ? WHERE id = ?').run(now, id);
+    return { ok: true, model_id: id, refreshed_at: now, message: 'metrics refresh triggered' };
+  });
 }

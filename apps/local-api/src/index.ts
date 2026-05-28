@@ -82,6 +82,15 @@ import { registerAuthorizationRoutes } from './routes/authorization/index.js';
 import { registerReadonlyStatusRoutes } from './runtime/readonly-status.js';
 import { registerStageCStatusRoutes } from './stage-c/status.js';
 import { registerModelGatewayRoutes } from './model-gateway/index.js';
+import { registerFlywheelIterationRoutes } from './flywheel/index.js';
+import { registerHPORoutes } from './hpo/index.js';
+import { registerDistillationRoutes } from './distillation/index.js';
+import { registerModelMergeRoutes } from './model-merge/index.js';
+import { registerObjectStorageRoutes } from './object-storage/index.js';
+import { registerSystemMonitorRoutes } from './system-monitor/index.js';
+import { registerAlertingCenterRoutes } from './alerting-center/index.js';
+import { registerSchedulerCenterRoutes } from './scheduler-center/index.js';
+import { registerWorkspaceMgrRoutes } from './workspace-mgr/index.js';
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -3563,6 +3572,25 @@ registerReadonlyStatusRoutes(app);
 // ── Stage C First Slice Status (v7.39) ──────────────────────────────────────
 registerStageCStatusRoutes(app);
 registerModelGatewayRoutes(app);
+
+// ══ v7.63: Flywheel iterations, HPO, Distillation, Model Merge, Object Storage ═══
+registerFlywheelIterationRoutes(app);
+registerHPORoutes(app);
+registerDistillationRoutes(app);
+registerModelMergeRoutes(app);
+registerObjectStorageRoutes(app);
+
+// ── System Monitor (CPU/GPU/RAM/Disk) ────────────────────────────────────────
+registerSystemMonitorRoutes(app);
+
+// ── Alerting Center (Rules CRUD + History) ────────────────────────────────────
+registerAlertingCenterRoutes(app);
+
+// ── Scheduler Center (Schedule Management + Manual Trigger) ───────────────────
+registerSchedulerCenterRoutes(app);
+
+// ── Workspace Manager (File Browser + Shortcuts) ──────────────────────────────
+registerWorkspaceMgrRoutes(app);
 
 // ══ v6.0.0: Plugin System ════════════════════════════════════════════════════
 // M6: 插件系统默认启用，不再依赖环境变量

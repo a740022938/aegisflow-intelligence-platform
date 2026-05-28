@@ -70,4 +70,41 @@ export function registerCostTrackerRoutes(app: FastifyInstance) {
   app.get('/api/cost/gpu-rates', async (_request, reply) => {
     return { ok: true, rates: GPU_COST_PER_HOUR };
   });
+
+  // ── /api/costs routes (cost_records table) ─────────────────────────
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS cost_records (
+      id TEXT PRIMARY KEY, type TEXT NOT NULL, description TEXT,
+      amount REAL NOT NULL, currency TEXT DEFAULT 'CNY',
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  app.get('/api/costs', async (request: any, reply: any) => {
+    const rows = db.prepare('SELECT * FROM cost_records ORDER BY created_at DESC').all();
+    return { ok: true, records: rows, count: rows.length };
+  });
+
+  app.post('/api/costs', async (request: any, reply: any) => {
+    const body = request.body || {};
+    if (body.amount === undefined && body.amount !== 0) return reply.code(400).send({ ok: false, error: 'amount is required' });
+    const id = randomUUID();
+    db.prepare(`INSERT INTO cost_records (id, type, description, amount, currency, created_at) VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(id, String(body.type || 'other'), String(body.description || ''), Number(body.amount), String(body.currency || 'CNY'), nowIso());
+    const row = db.prepare('SELECT * FROM cost_records WHERE id = ?').get(id);
+    return { ok: true, record: row };
+  });
+
+  app.get('/api/costs/summary', async (request: any, reply: any) => {
+    const period = String(request.query?.period || 'month');
+    let where = '';
+    if (period === 'today') where = "WHERE created_at >= datetime('now', '-1 day')";
+    else if (period === 'week') where = "WHERE created_at >= datetime('now', '-7 days')";
+    else if (period === 'month') where = "WHERE created_at >= datetime('now', '-30 days')";
+
+    const total = (db.prepare(`SELECT SUM(amount) as t FROM cost_records ${where}`).get() as any)?.t || 0;
+    const byType = db.prepare(`SELECT type, SUM(amount) as total, COUNT(*) as count FROM cost_records ${where} GROUP BY type ORDER BY total DESC`).all();
+    const monthly = db.prepare(`SELECT strftime('%Y-%m', created_at) as month, type, SUM(amount) as total FROM cost_records GROUP BY month, type ORDER BY month, type`).all();
+    return { ok: true, total: Math.round(total * 100) / 100, period, by_type: byType, monthly };
+  });
 }

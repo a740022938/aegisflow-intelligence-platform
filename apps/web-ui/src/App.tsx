@@ -93,6 +93,17 @@ const OpenAIPv8MemoryKnowledgeCenterPreview = lazy(() => import('./pages/OpenAIP
 const OpenAIPv8PolicyCapabilityCenterPreview = lazy(() => import('./pages/OpenAIPv8PolicyCapabilityCenterPreview'));
 const OpenAIPv8AuditCenterPreview = lazy(() => import('./pages/OpenAIPv8AuditCenterPreview'));
 const OpenAIPv8ExecutionGatewayPreview = lazy(() => import('./pages/OpenAIPv8ExecutionGatewayPreview'));
+const IterativeFlywheel = lazy(() => import('./pages/IterativeFlywheel'));
+const ModelMonitor = lazy(() => import('./pages/ModelMonitor'));
+const CostTracker = lazy(() => import('./pages/CostTracker'));
+const HPO = lazy(() => import('./pages/HPO'));
+const Distillation = lazy(() => import('./pages/Distillation'));
+const ModelMerge = lazy(() => import('./pages/ModelMerge'));
+const ObjectStorage = lazy(() => import('./pages/ObjectStorage'));
+const SystemStatus = lazy(() => import('./pages/SystemStatus'));
+const AlertCenter = lazy(() => import('./pages/AlertCenter'));
+const Scheduler = lazy(() => import('./pages/Scheduler'));
+const Workspace = lazy(() => import('./pages/Workspace'));
 
 function RouteFallback() {
   return (
@@ -171,11 +182,11 @@ const App: React.FC = () => {
             {/* 实验室 */}
             <Route path="digital-employee" element={<ModulePage />} />
             {/* 实验室 */}
-            <Route path="hpo" element={<ModulePage />} />
+            <Route path="hpo" element={<HPO />} />
             {/* 实验室 */}
-            <Route path="distill" element={<ModulePage />} />
+            <Route path="distill" element={<Distillation />} />
             {/* 实验室 */}
-            <Route path="model-merge" element={<ModulePage />} />
+            <Route path="model-merge" element={<ModelMerge />} />
             {/* 实验室 */}
             <Route path="inference" element={<ModulePage />} />
             {/* 实验室 */}
@@ -183,17 +194,21 @@ const App: React.FC = () => {
             {/* 实验室 */}
             <Route path="huggingface" element={<ModulePage />} />
             {/* 实验室 */}
-            <Route path="scheduler" element={<ModulePage />} />
+            <Route path="scheduler" element={<Scheduler />} />
             {/* 实验室 */}
-            <Route path="alerting" element={<ModulePage />} />
+            <Route path="alerting" element={<AlertCenter />} />
             {/* 实验室 */}
-            <Route path="model-monitor" element={<ModulePage />} />
+            <Route path="model-monitor" element={<ModelMonitor />} />
             {/* 实验室 */}
-            <Route path="workspace" element={<ModulePage />} />
+            <Route path="workspace" element={<Workspace />} />
             {/* 实验室 */}
-            <Route path="cost-tracker" element={<ModulePage />} />
+            <Route path="cost-tracker" element={<CostTracker />} />
             {/* 实验室 */}
-            <Route path="system-status" element={<ModulePage />} />
+            <Route path="system-status" element={<SystemStatus />} />
+            {/* 实验室 */}
+            <Route path="backflow" element={<IterativeFlywheel />} />
+            {/* 实验室 */}
+            <Route path="storage" element={<ObjectStorage />} />
             {/* 实验室 */}
             <Route path="api-docs" element={<ModulePage />} />
             <Route path="vision-lab/mahjong-debug" element={<MahjongDebug />} />

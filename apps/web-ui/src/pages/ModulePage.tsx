@@ -676,15 +676,15 @@ function buildActions(
       return [a('查看任务列表', 'View Tasks', () => nav('/tasks'), true)];
     case 'training-v2':
       return [
-        a('新建训练任务', 'New Training', () => nav('/training-v2/new'), true),
-        a('查看全部任务', 'View All Jobs', () => nav('/training-v2')),
+        a('新建训练任务', 'New Training', () => nav('/training/new'), true),
+        a('查看全部任务', 'View All Jobs', () => nav('/training')),
       ];
     case 'hpo':
-      return [a('新建搜索', 'New HPO Job', () => nav('/training-v2/hpo'), true)];
+      return [a('新建搜索', 'New HPO Job', () => nav('/hpo'), true)];
     case 'distill':
-      return [a('新建蒸馏', 'New Distill', () => nav('/training-v2/distill'), true)];
+      return [a('新建蒸馏', 'New Distill', () => nav('/distill'), true)];
     case 'model-merge':
-      return [a('新建合并', 'New Merge', () => nav('/training-v2/merge'), true)];
+      return [a('新建合并', 'New Merge', () => nav('/model-merge'), true)];
     case 'inference':
       return [a('查看模型列表', 'View Models', () => nav('/models'), true)];
     case 'annotation':
@@ -704,7 +704,7 @@ function buildActions(
     case 'workspace':
       return [a('管理工作空间', 'Manage Workspace', () => nav('/workspace'), true)];
     case 'cost-tracker':
-      return [a('查看成本明细', 'View Cost Details', () => nav('/cost'), true)];
+      return [a('查看成本明细', 'View Cost Details', () => nav('/cost-tracker'), true)];
     case 'storage-v2':
       return [a('管理数据集', 'Manage Datasets', () => nav('/datasets'), true)];
     case 'system-status':

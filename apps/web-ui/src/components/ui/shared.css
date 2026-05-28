@@ -6,6 +6,7 @@
    基础: 石墨黑背景 + 层级灰面板 + 青绿强调色
    ============================================================ */
 
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; }
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
