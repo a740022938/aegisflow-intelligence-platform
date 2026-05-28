@@ -1091,7 +1091,7 @@ export default function CostRoutingPage() {
     <PageShell
       title="AI Router Console / 成本路由中心"
       subtitle="AI Router Console — 只读/预览模式，不执行真实路由，不写入数据库，不调用外部系统"
-      versionLabel="AIP v7.62.0 · Cost Routing"
+      versionLabel="AIP v8.0.0 · Cost Routing"
       maturity="preview"
       safetyBoundary="preview"
       safetyText="预览模式 · 不写入配置 · 需要人工确认"
@@ -1110,7 +1110,7 @@ export default function CostRoutingPage() {
         <div className="cr-dashboard-grid">
           <div className="cr-dashboard-item">
             <span className="cr-dashboard-key">当前阶段</span>
-          <b>OpenAIP / AIP v7.62.0 Release Baseline</b>
+          <b>OpenAIP / AIP v8.0.0 Release Baseline</b>
         </div>
         <div className="cr-dashboard-item">
           <span className="cr-dashboard-key">当前模式</span>

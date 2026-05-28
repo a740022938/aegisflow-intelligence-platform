@@ -1,6 +1,6 @@
-# AIP v7.62-P2 Pre-Tag Command Results
+# AIP v8.0-P2 Pre-Tag Command Results
 
-**Phase:** v7.62-P2
+**Phase:** v8.0-P2
 **Date:** 2026-05-21
 
 ---

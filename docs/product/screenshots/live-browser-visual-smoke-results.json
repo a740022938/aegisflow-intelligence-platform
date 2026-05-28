@@ -322,7 +322,7 @@
         }
       ],
       "riskyControls": [],
-      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off AIP v7.62.0 · Connector Center Preview · Legacy v7 Readonly View Preview Legacy Connector Center v7 readonly connector view — migrating to OpenAIP v8 Integration, Local Apps, and Provider surfaces Read Only Readonly · No external writes · No connector control · No API calls TOTAL CONNECTORS 8 ACTIVE 3 FUTURE 5 SIDEBAR READY 3 AVAILABLE ROUTES 2"
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v8.0.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off AIP v8.0.0 · Connector Center Preview · Legacy v7 Readonly View Preview Legacy Connector Center v7 readonly connector view — migrating to OpenAIP v8 Integration, Local Apps, and Provider surfaces Read Only Readonly · No external writes · No connector control · No API calls TOTAL CONNECTORS 8 ACTIVE 3 FUTURE 5 SIDEBAR READY 3 AVAILABLE ROUTES 2"
     },
     {
       "route": "/openaip-v8-integration-center-preview",
@@ -612,7 +612,7 @@
         }
       ],
       "riskyControls": [],
-      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Integration Center Preview Readonly Preview · Gate CLOSED · Stage C disabled External integration governance, bridge classification, and readonly handshake planning Registry-backed integration center with Integration ↔ Provider handshake matrix and migration bridge, without connector actions. Readonly Preview No runtime mutation "
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v8.0.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Integration Center Preview Readonly Preview · Gate CLOSED · Stage C disabled External integration governance, bridge classification, and readonly handshake planning Registry-backed integration center with Integration ↔ Provider handshake matrix and migration bridge, without connector actions. Readonly Preview No runtime mutation "
     },
     {
       "route": "/openaip-v8-local-apps-center-preview",
@@ -890,7 +890,7 @@
         }
       ],
       "riskyControls": [],
-      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Local Apps Center Preview Readonly Preview · Gate CLOSED · Stage C disabled Local app classification, safety boundary, and center relations Registry-backed local apps inventory and relationship matrix without launch/control. Readonly Preview No runtime mutation Gate CLOSED Stage C disabled Registry-backed Preview only No runtime "
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v8.0.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Local Apps Center Preview Readonly Preview · Gate CLOSED · Stage C disabled Local app classification, safety boundary, and center relations Registry-backed local apps inventory and relationship matrix without launch/control. Readonly Preview No runtime mutation Gate CLOSED Stage C disabled Registry-backed Preview only No runtime "
     },
     {
       "route": "/openaip-v8-provider-manager-preview",
@@ -1162,7 +1162,7 @@
         }
       ],
       "riskyControls": [],
-      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Provider Manager Preview Readonly Preview · Gate CLOSED · Stage C disabled Provider profile matrix + safety boundary + conceptual routing preview Registry-backed provider ecosystem center for profiles, safety, and routing concepts without runtime mutation. Readonly Preview No runtime mutation Gate CLOSED Stage C disabled Registry"
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v8.0.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Provider Manager Preview Readonly Preview · Gate CLOSED · Stage C disabled Provider profile matrix + safety boundary + conceptual routing preview Registry-backed provider ecosystem center for profiles, safety, and routing concepts without runtime mutation. Readonly Preview No runtime mutation Gate CLOSED Stage C disabled Registry"
     },
     {
       "route": "/openaip-v8-command-center-preview",
@@ -1471,7 +1471,7 @@
           "role": ""
         }
       ],
-      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v7.62.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Command Center Preview 各路 AI 工具都是英雄，OpenAIP 是指挥中心。 GATE CLOSED STAGE C DISABLED Readonly Foundation Gate CLOSED Stage C disabled No runtime mutation Registry-backed Config != permission Enabled != execution Authorized != gateOpen Capability != permission UI switch != backend truth All safety boundaries are enforced. This preview d"
+      "bodySample": "AG OpenAIP 天枢智治平台（OpenAIP Community Edition）总览 首页 关于 系统 帮助 EN 切换主题 API 正常 未授权 概览 ▾ 仪表板 工厂状态 助手中心 数据与训练 ▾ 数据集 训练中心 运行中心 模板中心 模型与发布 ▾ 模型管理 模型产物 评估中心 部署中心 流程与编排 ▾ 工作流 工作流编排器 流程运行画布 能力与模块 ▾ 模块中心 插件池 任务编排 成本路由 OpenAxiom 只读检查 Memory Hub 只读查看 连接器中心（旧） 视觉实验室 ▾ 麻将视觉调试台 治理与回流 ▸ 知识 ▸ 输出 ▸ AIP v8.0.0 Build 2026.05.22 Stable · Stage C disabled · Feature flag: off OpenAIP v8 Command Center Preview 各路 AI 工具都是英雄，OpenAIP 是指挥中心。 GATE CLOSED STAGE C DISABLED Readonly Foundation Gate CLOSED Stage C disabled No runtime mutation Registry-backed Config != permission Enabled != execution Authorized != gateOpen Capability != permission UI switch != backend truth All safety boundaries are enforced. This preview d"
     }
   ]
 }

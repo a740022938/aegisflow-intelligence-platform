@@ -32,10 +32,10 @@ Authorized startup:
 - No process was stopped or killed.
 
 After startup:
-- `aip start`: API online at `http://127.0.0.1:8787`, Web online at `http://127.0.0.1:5173`, DB ok, version 7.62.0.
+- `aip start`: API online at `http://127.0.0.1:8787`, Web online at `http://127.0.0.1:5173`, DB ok, version 8.0.0.
 - `aip status`: Health online, DB ok, API/Web ports in use.
-- `aip health`: healthy, DB ok, version 7.62.0.
-- `/api/health`: `ok: true`, `service: local-api`, version 7.62.0.
+- `aip health`: healthy, DB ok, version 8.0.0.
+- `/api/health`: `ok: true`, `service: local-api`, version 8.0.0.
 
 Runtime changed: yes, due only to authorized standard `aip start`.
 
@@ -121,7 +121,7 @@ Words such as `launch`, `Gate`, `Stage C`, `release`, `restore`, `DB write`, and
 - `npm run build`: PASS, with existing Vite chunk-size warning only
 - `npm test --silent`: PASS, 9/9 smoke tests
 - `aip status`: PASS, Health online, DB ok, API/Web ports in use
-- `aip health`: PASS, healthy, DB ok, version 7.62.0
+- `aip health`: PASS, healthy, DB ok, version 8.0.0
 
 ## Safety Grep Result
 

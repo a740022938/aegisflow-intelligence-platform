@@ -19,7 +19,7 @@ Final verdict:
 | `origin/main` before D1 docs | `57e9722` |
 | Branch sync | `main [origin/main]` |
 | Working tree clean | NO |
-| Live API health | `version: 7.62.0` |
+| Live API health | `version: 8.0.0` |
 
 Recent history:
 
@@ -32,10 +32,10 @@ f3a205f docs(product): record p5 runtime freshness diagnosis
 d81fbfc fix(ui): polish residual product copy
 c0e6130 fix(web-ui): remove legacy topbar contact label
 5e6e1ec fix(ui): remove empty sidebar stub sections (intelligence, automation)
-48ddbcc chore(v7.63): refresh version baseline and brand to v7.62.0
-451f8d0 docs(product): seal v7.62 release verification
-e294c96 docs(product): add reconciliation docs for v7.62.0 github release
-e97b469 docs(product): record github release and release notes for v7.62.0
+48ddbcc chore(v7.63): refresh version baseline and brand to v8.0.0
+451f8d0 docs(product): seal v8.0 release verification
+e294c96 docs(product): add reconciliation docs for v8.0.0 github release
+e97b469 docs(product): record github release and release notes for v8.0.0
 ```
 
 ## Relevant Files

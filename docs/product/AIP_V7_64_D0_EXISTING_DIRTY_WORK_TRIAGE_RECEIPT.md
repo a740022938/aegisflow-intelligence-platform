@@ -59,7 +59,7 @@
 | `npm run lint` | PASS |
 | `node tests/v763-p3-ui-polish-sweep.test.mjs` | PASS |
 | `git diff --check` | PASS with CRLF working-copy warnings only |
-| `/api/health` | PASS, `version: 7.62.0` |
+| `/api/health` | PASS, `version: 8.0.0` |
 
 ## Final Verdict
 

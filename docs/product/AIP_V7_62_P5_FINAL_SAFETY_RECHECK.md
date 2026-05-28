@@ -1,6 +1,6 @@
-# AIP v7.62-P5 Final Safety Recheck
+# AIP v8.0-P5 Final Safety Recheck
 
-**Phase:** v7.62-P5
+**Phase:** v8.0-P5
 **Status:** ALL SAFETY GATES GREEN
 
 ---
@@ -33,4 +33,4 @@
 
 ## Working Tree
 
-Pre-existing dirty files remain (ModelGateway, superpowers, receipt artifacts). These are documented as concurrent work, not from the v7.62 release pipeline.
+Pre-existing dirty files remain (ModelGateway, superpowers, receipt artifacts). These are documented as concurrent work, not from the v8.0 release pipeline.

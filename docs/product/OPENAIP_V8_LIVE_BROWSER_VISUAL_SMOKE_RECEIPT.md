@@ -51,7 +51,7 @@ Final verdict: OPENAIP_V8_LIVE_BROWSER_VISUAL_SMOKE_PASS_WITH_GATE_CLOSED
 - `npm run build`: PASS
 - `npm test --silent`: PASS, 9/9 smoke tests
 - `aip status`: PASS, Health online, DB ok
-- `aip health`: PASS, healthy, DB ok, version 7.62.0
+- `aip health`: PASS, healthy, DB ok, version 8.0.0
 
 ## Human Authorization Needed
 

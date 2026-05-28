@@ -1,13 +1,13 @@
-# AIP v7.62-P5 Release Link and Notes Verification
+# AIP v8.0-P5 Release Link and Notes Verification
 
-**Phase:** v7.62-P5
+**Phase:** v8.0-P5
 **Status:** VERIFIED
 
 ---
 
 ## Release Link
 
-https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v7.62.0
+https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v8.0.0
 
 ## Release Notes Verification
 

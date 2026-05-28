@@ -35,7 +35,7 @@
 
 | 测试 | 端点 | 耗时 | 结果 |
 |---|---|---|---|
-| Health | `GET /api/health` | <100ms | `{"ok":true,"version":"7.62.0"}` |
+| Health | `GET /api/health` | <100ms | `{"ok":true,"version":"8.0.0"}` |
 | Auth status | `GET /api/auth/status` | <100ms | `{"ok":true,"jwt":{...},"openclaw":{...}}` |
 | Fake token check | `POST /api/openclaw/auth/check` | 270ms | `{"ok":true,"valid":false,"configured":true,"error":"Token 验证失败"}` |
 | Master-switch POST | `POST /api/openclaw/master-switch` | <100ms | `{"ok":false,"error":"unauthorized"}` |

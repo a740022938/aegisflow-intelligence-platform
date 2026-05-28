@@ -13,21 +13,21 @@ export interface MemoryBridgeItem {
 
 export const OPERATOR_MEMORY_BRIDGE_REGISTRY: MemoryBridgeItem[] = [
   {
-    id: 'mem-v7.62-release',
-    title: 'OpenAIP v7.62.0 Released',
+    id: 'mem-v8.0-release',
+    title: 'OpenAIP v8.0.0 Released',
     confidenceLevel: 'verified',
-    versionRange: 'v7.62',
+    versionRange: 'v8.0',
     readonly: true,
-    summary: 'OpenAIP v7.62.0 released as GitHub Release at tag v7.62.0 (commit e6be163). Final HEAD 451f8d0. Stage C disabled. Feature flag off. P1→P5 pipeline complete.',
+    summary: 'OpenAIP v8.0.0 released as GitHub Release at tag v8.0.0 (commit e6be163). Final HEAD 451f8d0. Stage C disabled. Feature flag off. P1→P5 pipeline complete.',
     operatorNote: 'This is the first formal GitHub Release after the v7.5x–v7.6x hardening cycle. Next step: v7.63 maintenance/cleanup.',
   },
   {
     id: 'mem-current-baseline',
     title: 'Current Verified Baseline',
     confidenceLevel: 'verified',
-    versionRange: 'v7.62',
+    versionRange: 'v8.0',
     readonly: true,
-    summary: 'OpenAIP v7.62.0 released at tag v7.62.0 (commit e6be163). HEAD 451f8d0. Stage C disabled. Feature flag off.',
+    summary: 'OpenAIP v8.0.0 released at tag v8.0.0 (commit e6be163). HEAD 451f8d0. Stage C disabled. Feature flag off.',
     operatorNote: 'Use git log, git status, and gh release view to verify current baseline before any phase.',
   },
   {

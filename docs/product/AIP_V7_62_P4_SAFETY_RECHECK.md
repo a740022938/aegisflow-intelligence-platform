@@ -1,6 +1,6 @@
-# AIP v7.62-P4 Safety Recheck
+# AIP v8.0-P4 Safety Recheck
 
-**Phase:** v7.62-P4
+**Phase:** v8.0-P4
 **Status:** RECHECKED — All safety gates green
 
 ---
@@ -9,7 +9,7 @@
 
 | Gate | Check | Result |
 |---|---|---|
-| S1 | New Git tag created? | ❌ NO — used existing v7.62.0 |
+| S1 | New Git tag created? | ❌ NO — used existing v8.0.0 |
 | S2 | Tag retargeted? | ❌ NO |
 | S3 | Restore executed? | ❌ NO |
 | S4 | DB write/restore? | ❌ NO |

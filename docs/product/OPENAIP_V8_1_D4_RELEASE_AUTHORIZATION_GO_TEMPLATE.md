@@ -12,7 +12,7 @@
 | **Release version** | `v8.1.0` |
 | **Git tag** | `v8.1.0` |
 | **GitHub Release title** | `OpenAIP v8.1 Readonly Control Plane` |
-| **Core baseline** | Core v7.62.0 |
+| **Core baseline** | Core v8.0.0 |
 | **D4 HEAD** | `0f90f22` |
 | **Authorized by (human owner)** | _________________________ |
 | **Date of authorization** | _________________________ |
@@ -27,7 +27,7 @@ The human product owner confirms the following:
 I authorize OpenAIP v8.1.0 release.
 Tag: v8.1.0
 Release title: OpenAIP v8.1 Readonly Control Plane
-Core baseline: v7.62.0
+Core baseline: v8.0.0
 I authorize creating and pushing the git tag.
 I authorize creating the GitHub Release.
 Gate remains CLOSED.

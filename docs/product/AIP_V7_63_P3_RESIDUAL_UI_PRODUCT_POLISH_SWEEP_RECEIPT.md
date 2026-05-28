@@ -5,7 +5,7 @@ Date: 2026-05-22
 | Item | Result |
 | --- | --- |
 | Scope | Residual UI product polish only |
-| Current product baseline | OpenAIP / AIP v7.62.0 |
+| Current product baseline | OpenAIP / AIP v8.0.0 |
 | Source changes | Frontend UI pages/components plus one regression test |
 | Business logic changed | No |
 | Auth bypassed | No |

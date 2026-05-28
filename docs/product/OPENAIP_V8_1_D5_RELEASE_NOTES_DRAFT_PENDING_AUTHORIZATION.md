@@ -137,7 +137,7 @@ npm run dev
 |-------|-------|
 | Release tag | `v8.1.0` |
 | Product line | OpenAIP v8 |
-| Core baseline | `agi-model-factory` v7.62.0 |
+| Core baseline | `agi-model-factory` v8.0.0 |
 | Release title | OpenAIP v8.1 Readonly Control Plane |
 
 ---

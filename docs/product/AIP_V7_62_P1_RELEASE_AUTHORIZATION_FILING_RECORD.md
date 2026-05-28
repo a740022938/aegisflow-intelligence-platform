@@ -1,6 +1,6 @@
-# AIP v7.62-P1 Release Authorization Filing Record
+# AIP v8.0-P1 Release Authorization Filing Record
 
-**Phase:** v7.62-P1
+**Phase:** v8.0-P1
 **Status:** FILED
 
 ---
@@ -10,8 +10,8 @@
 | Field | Value |
 |---|---|
 | Approved release candidate commit | e6be163 |
-| Approved tag name | v7.62.0 |
-| Approved release title | OpenAIP v7.62.0 |
+| Approved tag name | v8.0.0 |
+| Approved release title | OpenAIP v8.0.0 |
 | Stage C must remain disabled | YES |
 | Feature flag must remain off | YES |
 | No restore authorized | YES |
@@ -24,6 +24,6 @@
 ## Notes
 
 - The Release Authorization Decision Form (D1) was previously BLANK — NOT FILED.
-- The human owner explicitly filled the required fields via chat during v7.62-P1+P2 execution.
+- The human owner explicitly filled the required fields via chat during v8.0-P1+P2 execution.
 - All required fields for pre-tag verification authorization are present.
-- Tag and release creation are explicitly excluded from this task and must be a separate follow-up (v7.62-P3).
+- Tag and release creation are explicitly excluded from this task and must be a separate follow-up (v8.0-P3).

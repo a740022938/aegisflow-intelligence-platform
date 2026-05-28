@@ -12,7 +12,7 @@
 | **Release version** | `v8.1.0` |
 | **Git tag** | `v8.1.0` |
 | **GitHub Release title** | `OpenAIP v8.1 Readonly Control Plane` |
-| **Core baseline** | Core v7.62.0 |
+| **Core baseline** | Core v8.0.0 |
 | **D5 HEAD** | `29f6ca1` |
 | **Authorized by (human owner)** | **APPROVED BY OWNER** |
 | **Date of authorization** | **2026-05-24** |
@@ -25,7 +25,7 @@
 I authorize OpenAIP v8.1.0 release.
 Tag: v8.1.0
 Release title: OpenAIP v8.1 Readonly Control Plane
-Core baseline: v7.62.0
+Core baseline: v8.0.0
 
 I authorize creating the git tag v8.1.0.
 I authorize pushing the git tag to origin.

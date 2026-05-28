@@ -6,7 +6,7 @@ Date: 2026-05-22
 
 Confirmed: `STALE_RUNTIME_CONFIRMED_NO_RESTART_EXECUTED`.
 
-The committed source and package metadata are aligned to OpenAIP / AIP v7.62.0, but the already-running local API process still returns `version: 7.55.0` from `/api/health`.
+The committed source and package metadata are aligned to OpenAIP / AIP v8.0.0, but the already-running local API process still returns `version: 7.55.0` from `/api/health`.
 
 ## 2. Repo State
 
@@ -39,9 +39,9 @@ Result: no current source hit in the checked app/package/version paths.
 Current metadata evidence:
 
 ```text
-package.json version: 7.62.0
-apps/web-ui/src/constants/appVersion.ts: APP_VERSION = 'v7.62.0'
-apps/web-ui/src/registry/product-metadata-registry.ts: productVersion = 'v7.62.0'
+package.json version: 8.0.0
+apps/web-ui/src/constants/appVersion.ts: APP_VERSION = 'v8.0.0'
+apps/web-ui/src/registry/product-metadata-registry.ts: productVersion = 'v8.0.0'
 apps/local-api/src/version.ts: reads nearest root package.json named agi-model-factory
 ```
 

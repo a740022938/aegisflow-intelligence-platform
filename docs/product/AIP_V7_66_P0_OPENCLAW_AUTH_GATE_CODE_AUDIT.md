@@ -34,7 +34,7 @@
 | 7 | `apps/web-ui/src/components/Layout.tsx` | Topbar auth 指示器 + 系统面板 | 455 |
 | 8 | `apps/web-ui/src/index.tsx` | 全局 fetch 拦截器（401→`_unauthorized`） | 46 |
 | 9 | `apps/web-ui/src/services/api.ts` | axios 拦截器（同 _unauthorized） | 1339 |
-| 10 | `apps/web-ui/src/constants/appVersion.ts` | APP_VERSION = v7.62.0（硬编码常量） | 2 |
+| 10 | `apps/web-ui/src/constants/appVersion.ts` | APP_VERSION = v8.0.0（硬编码常量） | 2 |
 | 11 | `apps/local-api/src/index.ts` | 后端 Fastify 路由 | 4411 |
 | 12 | `apps/local-api/src/auth/index.ts` | 后端 auth 路由 + JWT 验证 | 143 |
 
@@ -255,7 +255,7 @@ refreshStatus 检测到 openclaw offline + auth.state === 'authorized'
 ### 6.1 当前检测机制
 
 - **无任何 stale frontend 检测**
-- `APP_VERSION` 是编译时常量 `'v7.62.0'`（`appVersion.ts`），不存在运行时版本对比
+- `APP_VERSION` 是编译时常量 `'v8.0.0'`（`appVersion.ts`），不存在运行时版本对比
 - Vite 构建产物默认包含 content hash，浏览器可能因缓存加载旧文件
 - 没有 Service Worker、版本检查端点、或 bundle hash 对比机制
 - 用户必须手动 Ctrl+F5 强制刷新才能确保最新代码

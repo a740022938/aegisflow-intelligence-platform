@@ -1,6 +1,6 @@
-# AIP v7.62-P1 Release Authorization Gate
+# AIP v8.0-P1 Release Authorization Gate
 
-**Phase:** v7.62-P1
+**Phase:** v8.0-P1
 **Status:** GATE REVIEWED — Authorization FILED
 
 ---
@@ -31,7 +31,7 @@
 All criteria for state C are met:
 - Human owner explicitly authorizes moving to Authorized Pre-Tag Verification: **YES**
 - Approved release candidate commit: **e6be163**
-- Approved tag name: **v7.62.0**
+- Approved tag name: **v8.0.0**
 - Stage C must remain disabled: **YES**
 - Feature flag must remain off: **YES**
 - No restore authorized: **YES**
@@ -39,4 +39,4 @@ All criteria for state C are met:
 
 ## 4. Next Action
 
-Proceed to v7.62-P2 Authorized Pre-Tag Verification.
+Proceed to v8.0-P2 Authorized Pre-Tag Verification.

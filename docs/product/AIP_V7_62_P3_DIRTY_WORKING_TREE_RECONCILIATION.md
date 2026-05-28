@@ -1,6 +1,6 @@
-# AIP v7.62-P3 Dirty Working Tree Reconciliation
+# AIP v8.0-P3 Dirty Working Tree Reconciliation
 
-**Phase:** v7.62-P3
+**Phase:** v8.0-P3
 **Status:** DECISION DOCUMENTED
 
 ---
@@ -47,6 +47,6 @@
 2. All pre-tag verification checks from P2 passed against the approved commit:
    - typecheck ✅ build ✅ lint ✅ diff-check ✅ smoke tests 9/9 ✅
 3. The dirty files are pre-existing concurrent work, not changes introduced by this or any release task pack.
-4. RECOMMENDATION: Before creating a GitHub Release, the working tree should be cleaned. Until then, the tag v7.62.0 at e6be163 is valid.
+4. RECOMMENDATION: Before creating a GitHub Release, the working tree should be cleaned. Until then, the tag v8.0.0 at e6be163 is valid.
 
-**Note:** The conservative default (block tag on dirty tree) was considered. The decision to proceed was based on the tag being an immutable pointer to a verified commit, independent of working tree state. The dirty tree finding is carried forward as a condition for v7.62-P4 GitHub Release readiness.
+**Note:** The conservative default (block tag on dirty tree) was considered. The decision to proceed was based on the tag being an immutable pointer to a verified commit, independent of working tree state. The dirty tree finding is carried forward as a condition for v8.0-P4 GitHub Release readiness.

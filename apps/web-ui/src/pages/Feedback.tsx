@@ -195,7 +195,7 @@ export default function FeedbackPage() {
   return (
     <PageShell
       title="自动回流"
-      subtitle="OpenAIP / AIP v7.62.0 回流池：列表、详情、source/trigger 过滤、导出 manifest"
+      subtitle="OpenAIP / AIP v8.0.0 回流池：列表、详情、source/trigger 过滤、导出 manifest"
     >
       <StatusStrip items={[
         { label: '总批次数', value: String(summary.total) },

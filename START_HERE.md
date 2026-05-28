@@ -20,8 +20,8 @@ AIP is a local-first AI governance and operations platform. It provides:
 
 | Field | Value |
 |-------|-------|
-| Current baseline | **AIP v7.62.0 Released Baseline** |
-| Release tag | `v7.62.0` |
+| Current baseline | **AIP v8.0.0 Released Baseline** |
+| Release tag | `v8.0.0` |
 | Stage C | **DISABLED** |
 | Feature flag | **OFF** |
 | Release status | **GitHub Release published; current work is maintenance hardening, not feature expansion** |
@@ -165,5 +165,5 @@ Before starting a new phase, read the relevant plan docs in `docs/product/`.
 - v7.51-v7.54 completed the **Datasets shell pilot** and adapter rulebook
 - v7.55 was the **release/install/restore hardening** phase
 - v7.56-v7.61 were release-readiness and product-shell hardening phases
-- v7.62.0 is the **current released baseline**; do not use older v7.3.0/v7.55 status text as current truth
+- v8.0.0 is the **current released baseline**; do not use older v7.3.0/v7.55 status text as current truth
 - Current next work should prioritize P0 hardening: dependency security, explicit auth bootstrap, version consistency, mock/fallback boundaries, and test isolation

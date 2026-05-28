@@ -1,6 +1,6 @@
-# AIP v7.62-P1+P2 回执
+# AIP v8.0-P1+P2 回执
 
-**Phase:** v7.62-P1 + v7.62-P2
+**Phase:** v8.0-P1 + v8.0-P2
 **Final Verdict:** V7_62_P1_P2_AUTHORIZED_PRE_TAG_VERIFICATION_PASS_READY_FOR_TAG_TASK
 
 ---
@@ -13,14 +13,14 @@
 | 4 | Post-HEAD | e6be163 (no change) |
 | 5 | Commit hash | e6be1636bf16a758bebddf7d70e3f6483f8990ff |
 | 6 | Push status | PENDING (Phase 5) |
-| 7 | Desktop task pack saved path | C:\Users\74002\Desktop\AIP_TASK_PACKS\AIP_v7.62_P1_P2_Release_Authorization_Gate_PreTag_Verification_Task_Pack.txt |
+| 7 | Desktop task pack saved path | C:\Users\74002\Desktop\AIP_TASK_PACKS\AIP_v8.0_P1_P2_Release_Authorization_Gate_PreTag_Verification_Task_Pack.txt |
 | 8 | Files created/modified | 10 docs (4 P1 + 5 P2 + 1 receipt) + 2 external artifacts |
 | 9 | Source code modified | NO — pre-existing modifications NOT from this pack |
 | 10 | Build config modified | NO |
 | 11 | Release authorization state | C — FILED AND VALID |
 | 12 | Approved release candidate commit | e6be163 |
 | 13 | Current HEAD matches approved commit | ✅ YES |
-| 14 | Approved tag name | v7.62.0 |
+| 14 | Approved tag name | v8.0.0 |
 | 15 | Pre-tag verification executed | ✅ YES |
 | 16 | Pre-tag verification verdict | PRE_TAG_VERIFICATION_PASS_READY_FOR_SEPARATE_TAG_TASK |
 | 17 | Human release authorization filed | ✅ YES |
@@ -41,11 +41,11 @@
 | 32 | git diff --check | ✅ PASS (CRLF warnings only) |
 | 33 | tests | ✅ PASS (9/9 smoke tests) |
 | 34 | Working tree clean after push | ⚠️ Pre-existing dirty files remain unstaged |
-| 35 | Recommended next step | v7.62-P3 Authorized Tag Creation (separate task) |
+| 35 | Recommended next step | v8.0-P3 Authorized Tag Creation (separate task) |
 
 ## Notes
 
 - Release authorization was filed by human owner during this task pack execution.
 - All pre-tag verification checks passed including 9/9 smoke tests.
 - Pre-existing concurrent work (ModelGateway, superpowers) is present in working tree but NOT from this pack.
-- Tag/release creation is excluded from this task — requires separate v7.62-P3.
+- Tag/release creation is excluded from this task — requires separate v8.0-P3.

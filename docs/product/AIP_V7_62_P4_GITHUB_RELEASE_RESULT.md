@@ -1,6 +1,6 @@
-# AIP v7.62-P4 GitHub Release Result
+# AIP v8.0-P4 GitHub Release Result
 
-**Phase:** v7.62-P4
+**Phase:** v8.0-P4
 **Status:** RELEASE CREATED
 
 ---
@@ -9,29 +9,29 @@
 
 | Field | Value |
 |---|---|
-| Command | `gh release create v7.62.0 --title "OpenAIP v7.62.0" --notes <body>` |
-| Tag | v7.62.0 |
+| Command | `gh release create v8.0.0 --title "OpenAIP v8.0.0" --notes <body>` |
+| Tag | v8.0.0 |
 | Target | e6be163 |
-| Release name | OpenAIP v7.62.0 |
+| Release name | OpenAIP v8.0.0 |
 | Prerelease | No |
 
 ## Release Verification
 
 ```text
-$ gh release view v7.62.0 --json name,tagName,url,createdAt,isPrerelease,publishedAt
+$ gh release view v8.0.0 --json name,tagName,url,createdAt,isPrerelease,publishedAt
 {
   "createdAt": "2026-05-21T17:40:38Z",
   "isPrerelease": false,
-  "name": "OpenAIP v7.62.0",
+  "name": "OpenAIP v8.0.0",
   "publishedAt": "2026-05-21T17:45:26Z",
-  "tagName": "v7.62.0",
-  "url": "https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v7.62.0"
+  "tagName": "v8.0.0",
+  "url": "https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v8.0.0"
 }
 ```
 
 ## Release URL
 
-https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v7.62.0
+https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v8.0.0
 
 ## Notes
 

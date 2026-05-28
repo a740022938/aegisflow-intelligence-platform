@@ -10,7 +10,7 @@
 | Restart method | `npm.cmd --prefix apps/local-api run dev` from `E:\AIP` |
 | New listener PID | `19452` |
 | Pre-restart `/api/health` version | `7.55.0` |
-| Post-restart `/api/health` version | `7.62.0` |
+| Post-restart `/api/health` version | `8.0.0` |
 | Stale runtime resolved | YES |
 | Dashboard stale version warning remained | NO |
 | Module Center stale version warning remained | NO |
@@ -45,8 +45,8 @@ Post-restart:
 
 - Launcher PID: `2864`.
 - Listener PID: `19452`.
-- Health: `version: 7.62.0`, database `ok`, worker pool `2`.
-- Later health confirmation remained `version: 7.62.0`.
+- Health: `version: 8.0.0`, database `ok`, worker pool `2`.
+- Later health confirmation remained `version: 8.0.0`.
 
 Validation:
 

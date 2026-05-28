@@ -1,4 +1,4 @@
-# AIP v7.62-D1 Authorized Pre-Tag Verification Plan
+# AIP v8.0-D1 Authorized Pre-Tag Verification Plan
 
 **Status:** PLAN READY — NOT AUTHORIZED TO EXECUTE
 
@@ -28,7 +28,7 @@ This plan must only be used AFTER the release authorization form is filed.
 
 ## Execution Restrictions
 
-- This plan must NOT be executed in v7.62-D1.
+- This plan must NOT be executed in v8.0-D1.
 - Execute only as a separate task after release authorization is filed.
 - Do not create tag/release until all checks pass.
 - If any check fails: STOP, report, fix, re-verify.

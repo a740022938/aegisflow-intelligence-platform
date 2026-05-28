@@ -1,6 +1,6 @@
 {
   "name": "local-api",
-  "version": "7.62.0",
+  "version": "8.0.0",
   "private": true,
   "scripts": {
     "dev": "tsx src/index.ts",

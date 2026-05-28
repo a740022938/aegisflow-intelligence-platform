@@ -1,4 +1,4 @@
-# AIP v7.62-D1 Release Authorization Decision Form
+# AIP v8.0-D1 Release Authorization Decision Form
 
 **Status:** BLANK — NOT FILED
 
@@ -27,8 +27,8 @@
 
 ## Instructions
 
-1. This form is **BLANK and NOT FILED** by v7.62-D1.
-2. v7.62-D1 does **NOT** authorize release.
+1. This form is **BLANK and NOT FILED** by v8.0-D1.
+2. v8.0-D1 does **NOT** authorize release.
 3. The human owner must explicitly fill and submit this form.
 4. Authorized Pre-Tag Verification must be a **separate task** after this form is filed.
 5. Until filed: **HOLD current main as local RC.**

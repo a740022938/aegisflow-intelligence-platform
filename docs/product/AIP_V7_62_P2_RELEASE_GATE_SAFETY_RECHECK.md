@@ -1,6 +1,6 @@
-# AIP v7.62-P2 Release Gate Safety Recheck
+# AIP v8.0-P2 Release Gate Safety Recheck
 
-**Phase:** v7.62-P2
+**Phase:** v8.0-P2
 **Status:** RECHECKED — All safety gates green
 
 ---
@@ -35,6 +35,6 @@ This verification was executed strictly within authorized bounds:
 
 | Risk | Level | Mitigation |
 |---|---|---|
-| Pre-existing dirty working tree | LOW | Files are from concurrent ModelGateway/superpowers work, unrelated to v7.62 release. Should be stashed or committed before tag creation. |
+| Pre-existing dirty working tree | LOW | Files are from concurrent ModelGateway/superpowers work, unrelated to v8.0 release. Should be stashed or committed before tag creation. |
 | GovernanceCenter 930.88 kB chunk | LOW | Non-blocking, pre-existing, documented in D1. |
 | Release notes not published | N/A | Out of scope — separate task. |

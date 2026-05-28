@@ -27,7 +27,7 @@ Date: 2026-05-22
 
 ## 2. Fixed Issues
 
-- Replaced current UI version labels for Cost Routing, Feedback, and Advanced Mode Readonly with OpenAIP / AIP v7.62.0 baseline wording.
+- Replaced current UI version labels for Cost Routing, Feedback, and Advanced Mode Readonly with OpenAIP / AIP v8.0.0 baseline wording.
 - Removed visible `layoutMode` / `contentWidth` debug output from migrated entity/workbench pages.
 - Replaced Plugin Pool escaped unicode warning icon string with a plain stable icon.
 - Added safe DB status formatting in Module Center so object payloads do not render as `[object Object]`.

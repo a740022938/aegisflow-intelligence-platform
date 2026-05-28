@@ -133,7 +133,7 @@ export default function ConnectorCenterReadonly() {
     <PageShell
       title="Legacy Connector Center"
       subtitle="v7 readonly connector view — migrating to OpenAIP v8 Integration, Local Apps, and Provider surfaces"
-      versionLabel="AIP v7.62.0 · Connector Center Preview · Legacy v7 Readonly View"
+      versionLabel="AIP v8.0.0 · Connector Center Preview · Legacy v7 Readonly View"
       maturity="preview"
       safetyBoundary="readonly"
       safetyText="Readonly · No external writes · No connector control · No API calls"

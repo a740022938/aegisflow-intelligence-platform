@@ -1,6 +1,6 @@
-# AIP v7.62-P4 回执
+# AIP v8.0-P4 回执
 
-**Phase:** v7.62-P4
+**Phase:** v8.0-P4
 **Status:** COMPLETE
 
 ---
@@ -9,17 +9,17 @@
 |---|---|---|
 | 1 | 是否完成 | ✅ COMPLETED |
 | 2 | Final Verdict | V7_62_P4_GITHUB_RELEASE_CREATED |
-| 3 | Approved tag | v7.62.0 |
-| 4 | Approved release title | OpenAIP v7.62.0 |
+| 3 | Approved tag | v8.0.0 |
+| 4 | Approved release title | OpenAIP v8.0.0 |
 | 5 | Tag target commit | e6be163 |
 | 6 | GitHub Release created | ✅ YES |
-| 7 | GitHub Release URL | https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v7.62.0 |
+| 7 | GitHub Release URL | https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v8.0.0 |
 | 8 | Release notes published | ✅ YES |
 | 9 | Current HEAD before P4 | efec78d |
 | 10 | Current HEAD after docs commit | e97b469 |
 | 11 | Commit hash | e97b469 |
 | 12 | Push status | ✅ Pushed to origin/main |
-| 13 | Desktop task pack saved path | C:\Users\74002\Desktop\AIP_TASK_PACKS\AIP_v7.62_P4_GitHub_Release_Release_Notes_Gate_Task_Pack.txt |
+| 13 | Desktop task pack saved path | C:\Users\74002\Desktop\AIP_TASK_PACKS\AIP_v8.0_P4_GitHub_Release_Release_Notes_Gate_Task_Pack.txt |
 | 14 | Dirty working tree before release | YES — ModelGateway/superpowers (pre-existing) |
 | 15 | Dirty working tree decision | PROCEED — no dirty file required for release artifacts |
 | 16 | Files created/modified | 8 P4 docs + 2 external artifacts |
@@ -52,5 +52,5 @@
 - AIP_V7_62_P4_RECEIPT.md
 
 ### External artifacts
-- E:\_AIP_REPORTS\AIP_v7.62_P4_github_release_gate_report_20260521.md
-- E:\_AIP_RECEIPTS\AIP_v7.62_P4_github_release_gate_receipt_20260521.md
+- E:\_AIP_REPORTS\AIP_v8.0_P4_github_release_gate_report_20260521.md
+- E:\_AIP_RECEIPTS\AIP_v8.0_P4_github_release_gate_receipt_20260521.md

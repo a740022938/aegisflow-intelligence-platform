@@ -43,11 +43,11 @@ f3a205f docs(product): record p5 runtime freshness diagnosis
 d81fbfc fix(ui): polish residual product copy
 c0e6130 fix(web-ui): remove legacy topbar contact label
 5e6e1ec fix(ui): remove empty sidebar stub sections (intelligence, automation)
-48ddbcc chore(v7.63): refresh version baseline and brand to v7.62.0
-451f8d0 docs(product): seal v7.62 release verification
-e294c96 docs(product): add reconciliation docs for v7.62.0 github release
-e97b469 docs(product): record github release and release notes for v7.62.0
-efec78d docs(product): add reconciliation docs for tag v7.62.0
+48ddbcc chore(v7.63): refresh version baseline and brand to v8.0.0
+451f8d0 docs(product): seal v8.0 release verification
+e294c96 docs(product): add reconciliation docs for v8.0.0 github release
+e97b469 docs(product): record github release and release notes for v8.0.0
+efec78d docs(product): add reconciliation docs for tag v8.0.0
 ```
 
 ## Uncommitted File Inventory
@@ -301,7 +301,7 @@ Commands run from `E:\AIP`:
 | `npm run lint` | PASS |
 | `node tests/v763-p3-ui-polish-sweep.test.mjs` | PASS |
 | `git diff --check` | PASS with CRLF working-copy warnings only |
-| `GET http://127.0.0.1:8787/api/health` | PASS, `version: 7.62.0` |
+| `GET http://127.0.0.1:8787/api/health` | PASS, `version: 8.0.0` |
 
 The existing dirty files did not break the requested validation suite.
 

@@ -9,11 +9,11 @@
 |---|---|---|
 | 1 | 完成状态 | ✅ COMPLETED |
 | 2 | Previous version | v7.55.0 |
-| 3 | Updated version | v7.62.0 |
+| 3 | Updated version | v8.0.0 |
 | 4 | Version metadata files updated | 6 canonical files |
 | 5 | UI version labels updated | 8 pages |
 | 6 | Brand references updated | AegisFlow → OpenAIP (3 files) |
-| 7 | Memory Hub registries updated | 2 registries with v7.62.0 release facts |
+| 7 | Memory Hub registries updated | 2 registries with v8.0.0 release facts |
 | 8 | README / .env.example updated | Baseline + version header |
 | 9 | Stage C | Disabled (unchanged) |
 | 10 | Feature flag | Off (unchanged) |
@@ -28,31 +28,31 @@
 ## Changes Made
 
 ### Version baseline (6 metadata files)
-- `package.json`: 7.55.0 → 7.62.0
-- `apps/aip-cli/package.json`: 7.55.0 → 7.62.0
-- `apps/local-api/package.json`: 7.55.0 → 7.62.0
-- `apps/web-ui/package.json`: 7.55.0 → 7.62.0
-- `apps/web-ui/src/constants/appVersion.ts`: v7.55.0 → v7.62.0
-- `apps/web-ui/src/registry/product-metadata-registry.ts`: v7.55.0 → v7.62.0, seal → released, track → stable
+- `package.json`: 7.55.0 → 8.0.0
+- `apps/aip-cli/package.json`: 7.55.0 → 8.0.0
+- `apps/local-api/package.json`: 7.55.0 → 8.0.0
+- `apps/web-ui/package.json`: 7.55.0 → 8.0.0
+- `apps/web-ui/src/constants/appVersion.ts`: v7.55.0 → v8.0.0
+- `apps/web-ui/src/registry/product-metadata-registry.ts`: v7.55.0 → v8.0.0, seal → released, track → stable
 
-### UI version labels (8 pages, v7.25.2 → v7.62.0)
+### UI version labels (8 pages, v7.25.2 → v8.0.0)
 - MemoryHubReadonly, GovernanceCenter, CostRouting, AdvancedModeReadonly
 - ConnectorCenterReadonly, NavigationPreviewReadonly, OpenAxiomReadonly, LabCenterReadonly
 
 ### Brand cleanup (AegisFlow → OpenAIP)
 - `apps/local-api/src/index.ts`: API title + root message
 - `apps/aip-cli/package.json`: description
-- `apps/web-ui/src/constants/appMeta.ts`: releaseUrl (v7.3.0 → v7.62.0)
-- `apps/aip-cli/src/commands/ml.ts`: version baseline (7.3.0 → 7.62.0)
-- `apps/web-ui/src/components/governance/RuntimeFoundationStatusCard.tsx`: v7.25 → v7.62
+- `apps/web-ui/src/constants/appMeta.ts`: releaseUrl (v7.3.0 → v8.0.0)
+- `apps/aip-cli/src/commands/ml.ts`: version baseline (7.3.0 → 8.0.0)
+- `apps/web-ui/src/components/governance/RuntimeFoundationStatusCard.tsx`: v7.25 → v8.0
 
 ### Memory Hub release facts
 - `apps/web-ui/src/registry/aip-memory-knowledge-registry.ts`: Added 6 new entries (releaseTag, releaseCommit, releaseFinalHead, releaseUrl, releaseStatus, postReleaseNext)
-- `apps/web-ui/src/registry/operator-memory-bridge-registry.ts`: Added v7.62 release entry, updated current baseline
+- `apps/web-ui/src/registry/operator-memory-bridge-registry.ts`: Added v8.0 release entry, updated current baseline
 
 ### Documentation
-- `README.md`: Updated baseline to v7.62.0 released, historical note updated
-- `.env.example`: Header v7.55 → v7.62
+- `README.md`: Updated baseline to v8.0.0 released, historical note updated
+- `.env.example`: Header v7.55 → v8.0
 
 ## What Was NOT Changed
 

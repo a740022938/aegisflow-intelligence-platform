@@ -1,6 +1,6 @@
-# AIP v7.62-P1 HOLD Decision
+# AIP v8.0-P1 HOLD Decision
 
-**Phase:** v7.62-P1
+**Phase:** v8.0-P1
 **Status:** HOLD NOT APPLIED — Authorization WAS filed
 
 ---
@@ -12,7 +12,7 @@ The release authorization form **was filed** by the human owner during this task
 ## Reason
 
 - Authorization state: C — FILED AND VALID
-- All required fields were provided: commit e6be163, tag v7.62.0, title OpenAIP v7.62.0
+- All required fields were provided: commit e6be163, tag v8.0.0, title OpenAIP v8.0.0
 - Stage C disabled, feature flag off confirmed
 - No tag/release/restore/DB/env changes authorized
 
@@ -24,4 +24,4 @@ Had the authorization form remained blank or incomplete:
 
 ## Outcome
 
-HOLD not applied. Proceeding to v7.62-P2 Authorized Pre-Tag Verification.
+HOLD not applied. Proceeding to v8.0-P2 Authorized Pre-Tag Verification.

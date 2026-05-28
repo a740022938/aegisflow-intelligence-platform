@@ -33,10 +33,10 @@ All prior phases passed with Gate CLOSED, Stage C disabled, execution disabled. 
 | Concern | Decision |
 |---------|----------|
 | Product line identity | OpenAIP v8 is the product shell / control-plane identity |
-| Core engine version | `agi-model-factory` / Core v7.62.0 |
+| Core engine version | `agi-model-factory` / Core v8.0.0 |
 | Recommended release tag | `v8.1.0` |
 | Release title | OpenAIP v8.1 Readonly Control Plane |
-| Core baseline | v7.62.0 |
+| Core baseline | v8.0.0 |
 | Gate state at release | CLOSED |
 | Stage C at release | disabled |
 | Execution at release | disabled |

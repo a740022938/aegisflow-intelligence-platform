@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-23
 **Author:** AI Agent (v8 center data upgrade task pack)
-**Release:** v7.62.0
+**Release:** v8.0.0
 
 ## Summary
 

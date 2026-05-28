@@ -61,7 +61,7 @@ The human owner must provide the following exact text (or equivalent unambiguous
 I authorize OpenAIP v8.1.0 release.
 Tag: v8.1.0
 Release title: OpenAIP v8.1 Readonly Control Plane
-Core baseline: v7.62.0
+Core baseline: v8.0.0
 
 I authorize creating the git tag v8.1.0.
 I authorize pushing the git tag to origin.

@@ -1,6 +1,6 @@
-# AIP v7.62-P2 Pre-Tag Verdict
+# AIP v8.0-P2 Pre-Tag Verdict
 
-**Phase:** v7.62-P2
+**Phase:** v8.0-P2
 **Status:** VERDICT REACHED
 
 ---
@@ -35,14 +35,14 @@ The working tree has pre-existing uncommitted modifications (ModelGateway integr
 
 ## Conditional Notes
 
-1. Before creating tag v7.62.0, the pre-existing dirty files should be stashed or committed to ensure a clean release point.
-2. Tag/release creation is NOT part of this task. A separate **v7.62-P3 Authorized Tag Creation** task is required.
+1. Before creating tag v8.0.0, the pre-existing dirty files should be stashed or committed to ensure a clean release point.
+2. Tag/release creation is NOT part of this task. A separate **v8.0-P3 Authorized Tag Creation** task is required.
 3. All validation commands pass despite the dirty tree.
 
 ## Recommended Next Step
 
-Execute v7.62-P3 as a separate task pack to:
+Execute v8.0-P3 as a separate task pack to:
 1. Stash or resolve pre-existing working tree modifications
-2. Create Git tag v7.62.0 at HEAD (e6be163)
+2. Create Git tag v8.0.0 at HEAD (e6be163)
 3. Push tag to remote
 4. (Optional) Create GitHub Release and publish release notes

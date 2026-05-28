@@ -12,7 +12,7 @@
     "hasNoRuntimeMutation": true,
     "hasWave1Note": true,
     "sidebar": {
-      "text": "概览▾仪表板工厂状态助手中心OpenAIP v8▾OpenAIP v8 指挥中心数据与训练▾数据集训练中心运行中心模板中心模型与发布▾模型管理模型产物评估中心部署中心流程与编排▾工作流工作流编排器流程运行画布能力与模块▾模块中心插件池任务编排成本路由OpenAxiom 只读检查Memory Hub 只读查看连接器中心（旧）视觉实验室▾麻将视觉调试台治理与回流▸知识▸输出▸AIP v7.62.0Build 2026.05.22Stable · Stage C disabled · Feature flag: off",
+      "text": "概览▾仪表板工厂状态助手中心OpenAIP v8▾OpenAIP v8 指挥中心数据与训练▾数据集训练中心运行中心模板中心模型与发布▾模型管理模型产物评估中心部署中心流程与编排▾工作流工作流编排器流程运行画布能力与模块▾模块中心插件池任务编排成本路由OpenAxiom 只读检查Memory Hub 只读查看连接器中心（旧）视觉实验室▾麻将视觉调试台治理与回流▸知识▸输出▸AIP v8.0.0Build 2026.05.22Stable · Stage C disabled · Feature flag: off",
       "anchors": [
         {
           "text": "仪表板",

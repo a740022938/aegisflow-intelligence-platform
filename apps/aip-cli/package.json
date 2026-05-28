@@ -1,6 +1,6 @@
 {
   "name": "@aip/cli",
-  "version": "7.62.0",
+  "version": "8.0.0",
   "description": "AIP (OpenAIP) official CLI",
   "type": "module",
   "bin": {

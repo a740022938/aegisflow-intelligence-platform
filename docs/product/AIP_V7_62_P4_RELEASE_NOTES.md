@@ -1,4 +1,4 @@
-## OpenAIP v7.62.0 — Release Readiness & Governance Hardening
+## OpenAIP v8.0.0 — Release Readiness & Governance Hardening
 
 This release consolidates the platform transition from UI migration through production readiness, concluding the v7.5x–v7.6x hardening cycle. No new runtime features are introduced.
 
@@ -38,7 +38,7 @@ This release consolidates the platform transition from UI migration through prod
 
 ### Important Notes
 
-- This tag (v7.62.0) is the authorized release candidate at commit `e6be163`
+- This tag (v8.0.0) is the authorized release candidate at commit `e6be163`
 - Tag/release follows explicit human authorization filing
 - All pre-tag verification checks passed before tagging
 - Working tree contains pre-existing concurrent development work (not part of this release)

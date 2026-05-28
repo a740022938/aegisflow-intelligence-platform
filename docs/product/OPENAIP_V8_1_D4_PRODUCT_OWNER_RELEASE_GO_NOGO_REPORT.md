@@ -35,7 +35,7 @@ All prior phases passed with Gate CLOSED, Stage C disabled, Execution disabled. 
 | Safety posture | Gate closed, Stage C off, execution disabled | **PASS** | Verified in source and D1-D3 docs; no changes |
 | Test validation | typecheck/lint/build/tests/smoke pass | **PASS** | All passing (see Section 3) |
 | Release process | D3 release gate/authorization/rollback ready | **PASS** | 6-gate checklist, auth template, rollback plan all defined |
-| Version clarity | v8.1 product shell vs Core v7.62.0 explained | **PASS** | D3 version strategy clear; recommended tag v8.1.0 |
+| Version clarity | v8.1 product shell vs Core v8.0.0 explained | **PASS** | D3 version strategy clear; recommended tag v8.1.0 |
 | User-facing maturity | No MVP/preview/experiment wording in primary UI | **PASS** | D1/D1A verified; menu-registry also cleaned |
 | Rollback readiness | Recovery path documented | **PASS** | D3 rollback plan exists; no DB migration involved |
 
@@ -116,7 +116,7 @@ The minimum authorization text required (see `OPENAIP_V8_1_D4_RELEASE_AUTHORIZAT
 I authorize OpenAIP v8.1.0 release.
 Tag: v8.1.0
 Release title: OpenAIP v8.1 Readonly Control Plane
-Core baseline: v7.62.0
+Core baseline: v8.0.0
 I authorize creating and pushing the git tag.
 I authorize creating the GitHub Release.
 Gate remains CLOSED.

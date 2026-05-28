@@ -10,16 +10,16 @@ No service restart, no DB write, no prediction run, no connector control, and no
 
 | Page | Result | Evidence |
 | --- | --- | --- |
-| Dashboard / 仪表板 | WARNING | P3 sidebar/footer baseline shows `AIP v7.62.0`, but dashboard content still shows `v7.55.0` and `VERSION v7.55.0`. |
+| Dashboard / 仪表板 | WARNING | P3 sidebar/footer baseline shows `AIP v8.0.0`, but dashboard content still shows `v7.55.0` and `VERSION v7.55.0`. |
 | Module Center / 模块中心 | WARNING | `layoutMode/contentWidth` and `DB [object Object]` are gone. Module API card still shows `v7.55.0 · DB ok`, sourced from live `/api/health`. |
 | Plugin Pool / 插件池 | PASS | No `\u26`, `A0\u`, or `FE0F` visible. Page remains authentication-gated and does not enable plugin operations. |
 | Governance Hub / 治理中枢 | WARNING | No naked `unauthorized`; it shows `当前未授权，仅显示只读健康摘要。` API Status still shows `Version: 7.55.0`. |
 | Cost Routing / 成本路由 | PASS | `Cost Routing v7.12.3 UX Sanity` no longer appears. Page remains preview/read-only and states no real routing/write. |
-| Feedback / 自动回流 | PASS | Title no longer treats `v6.3.0` as current. Page shows OpenAIP / AIP v7.62.0 baseline and no naked unauthorized. |
+| Feedback / 自动回流 | PASS | Title no longer treats `v6.3.0` as current. Page shows OpenAIP / AIP v8.0.0 baseline and no naked unauthorized. |
 | Standard Outputs / 标准输出 | PASS | No misleading `v6.10 知识中心收口` visible in default smoke. No output generation was performed. |
 | Factory Status / 工厂运行态 | PASS | No visible `UNKNOWN`; empty states render as `暂无数据` / `待检测` style labels. |
-| Topbar / Sidebar | PASS | Topbar/sidebar show `AIP v7.62.0`; no visible `微信: AGI_FACTORY`. Empty `智能增强/自动化` sidebar groups are not visible. Dashboard content still has normal category copy like `智能增强类`, which is not the removed empty sidebar group. |
-| Memory Hub | PASS | Shows `AIP v7.62.0 · Memory Hub`, read-only sqlite warning intact. No sqlite write was performed. |
+| Topbar / Sidebar | PASS | Topbar/sidebar show `AIP v8.0.0`; no visible `微信: AGI_FACTORY`. Empty `智能增强/自动化` sidebar groups are not visible. Dashboard content still has normal category copy like `智能增强类`, which is not the removed empty sidebar group. |
+| Memory Hub | PASS | Shows `AIP v8.0.0 · Memory Hub`, read-only sqlite warning intact. No sqlite write was performed. |
 
 ## 2. P3 Fix Verification
 

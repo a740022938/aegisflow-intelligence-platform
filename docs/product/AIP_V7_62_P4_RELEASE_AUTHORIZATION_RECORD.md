@@ -1,6 +1,6 @@
-# AIP v7.62-P4 Release Authorization Record
+# AIP v8.0-P4 Release Authorization Record
 
-**Phase:** v7.62-P4
+**Phase:** v8.0-P4
 **Status:** FILED — Recorded
 
 ---
@@ -9,9 +9,9 @@
 
 | Field | Value |
 |---|---|
-| Approved tag name | v7.62.0 |
+| Approved tag name | v8.0.0 |
 | Approved tag target commit | e6be163 |
-| Approved release title | OpenAIP v7.62.0 |
+| Approved release title | OpenAIP v8.0.0 |
 | Create GitHub Release | YES |
 | Publish release notes | YES |
 | Create new Git tag | NO |

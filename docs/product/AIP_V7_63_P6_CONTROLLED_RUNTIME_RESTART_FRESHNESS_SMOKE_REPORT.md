@@ -56,7 +56,7 @@ Pre-restart listener:
 - Created: `2026-05-22 01:00:19 +08:00`
 - Command line: `C:\nvm4w\nodejs\node.exe --require E:\AIP\node_modules\.pnpm\tsx@4.21.0\...\preflight.cjs --import file:///E:/AIP/node_modules/.pnpm/tsx@4.21.0/.../loader.mjs src/index.ts`
 
-Conclusion: the live API was stale because `/api/health` still returned `7.55.0` while the source/package baseline had already moved to `7.62.0`.
+Conclusion: the live API was stale because `/api/health` still returned `7.55.0` while the source/package baseline had already moved to `8.0.0`.
 
 ## Restart Method
 
@@ -98,7 +98,7 @@ Immediate post-restart health:
 {
   "ok": true,
   "service": "local-api",
-  "version": "7.62.0",
+  "version": "8.0.0",
   "uptime": 6,
   "database": {
     "status": "ok"
@@ -117,7 +117,7 @@ Later confirmation health:
 {
   "ok": true,
   "service": "local-api",
-  "version": "7.62.0",
+  "version": "8.0.0",
   "uptime": 173.1974657,
   "database": {
     "status": "ok"
@@ -130,15 +130,15 @@ Later confirmation health:
 }
 ```
 
-Result: stale runtime resolved. `/api/health` no longer returns `7.55.0`; it now reports `7.62.0`.
+Result: stale runtime resolved. `/api/health` no longer returns `7.55.0`; it now reports `8.0.0`.
 
 ## Visual Freshness Smoke
 
 Checked via browser smoke against the live dev UI:
 
-- Dashboard `/`: no `7.55.0`; page shows `v7.62.0`; no fatal overlay.
-- Module Center `/module-center`: no `7.55.0`; page shows `AIP v7.62.0`; no fatal overlay.
-- Governance Hub `/governance-hub`: no `7.55.0`; API status shows `Version: 7.62.0`; no fatal overlay.
+- Dashboard `/`: no `7.55.0`; page shows `v8.0.0`; no fatal overlay.
+- Module Center `/module-center`: no `7.55.0`; page shows `AIP v8.0.0`; no fatal overlay.
+- Governance Hub `/governance-hub`: no `7.55.0`; API status shows `Version: 8.0.0`; no fatal overlay.
 
 Observed dev-console caveat:
 
@@ -156,7 +156,7 @@ Commands run from `E:\AIP`:
 | `npm run lint` | PASS |
 | `node tests/v763-p3-ui-polish-sweep.test.mjs` | PASS |
 | `git diff --check` | PASS with existing line-ending warnings only |
-| `GET http://127.0.0.1:8787/api/health` | PASS, returns `version: 7.62.0` |
+| `GET http://127.0.0.1:8787/api/health` | PASS, returns `version: 8.0.0` |
 
 Build caveat:
 
@@ -170,4 +170,4 @@ Working tree caveat:
 
 `P6_RUNTIME_FRESHNESS_RESOLVED_WITH_AUTHORIZED_API_RESTART`
 
-The P5 stale runtime condition is resolved. The live AIP dev API is running from the refreshed baseline and reports `version: 7.62.0`.
+The P5 stale runtime condition is resolved. The live AIP dev API is running from the refreshed baseline and reports `version: 8.0.0`.

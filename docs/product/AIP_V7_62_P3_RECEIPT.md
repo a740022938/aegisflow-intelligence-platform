@@ -1,6 +1,6 @@
-# AIP v7.62-P3 回执
+# AIP v8.0-P3 回执
 
-**Phase:** v7.62-P3
+**Phase:** v8.0-P3
 **Status:** COMPLETE
 
 ---
@@ -12,14 +12,14 @@
 | 3 | Approved release candidate commit | e6be163 |
 | 4 | Current HEAD before tag | a0512d0 (P1+P2 docs) |
 | 5 | Current HEAD after docs commit | e71b116 |
-| 6 | Tag name | v7.62.0 |
+| 6 | Tag name | v8.0.0 |
 | 7 | Tag target commit | e6be163 |
 | 8 | Tag created | ✅ YES — annotated |
-| 9 | Tag pushed | ✅ YES — origin v7.62.0 |
-| 10 | Remote tag verified | ✅ YES — `git ls-remote --tags origin v7.62.0` confirmed |
+| 9 | Tag pushed | ✅ YES — origin v8.0.0 |
+| 10 | Remote tag verified | ✅ YES — `git ls-remote --tags origin v8.0.0` confirmed |
 | 11 | GitHub Release created | NO |
 | 12 | Release notes published | NO |
-| 13 | Desktop task pack saved path | C:\Users\74002\Desktop\AIP_TASK_PACKS\AIP_v7.62_P3_Authorized_Tag_Creation_Gate_Task_Pack.txt |
+| 13 | Desktop task pack saved path | C:\Users\74002\Desktop\AIP_TASK_PACKS\AIP_v8.0_P3_Authorized_Tag_Creation_Gate_Task_Pack.txt |
 | 14 | Dirty working tree before tag | YES — ModelGateway/superpowers/receipt artifacts (pre-existing) |
 | 15 | Dirty working tree decision | PROCEED — tag is immutable pointer to verified commit e6be163; dirty tree does not affect tag integrity |
 | 16 | Files created/modified | 7 P3 docs + 2 external artifacts |
@@ -37,7 +37,7 @@
 | 28 | typecheck/build/lint/diff-check rerun | Referenced from P2 — all PASS |
 | 29 | tests rerun | Referenced from P2 — 9/9 PASS |
 | 30 | Working tree clean or documented after push | Documented — pre-existing dirty tree remains |
-| 31 | Recommended next step | v7.62-P4 GitHub Release + Release Notes (requires separate authorization) |
+| 31 | Recommended next step | v8.0-P4 GitHub Release + Release Notes (requires separate authorization) |
 
 ## Files Created
 
@@ -51,8 +51,8 @@
 - AIP_V7_62_P3_RECEIPT.md
 
 ### External artifacts
-- E:\_AIP_REPORTS\AIP_v7.62_P3_authorized_tag_creation_gate_report_20260521.md
-- E:\_AIP_RECEIPTS\AIP_v7.62_P3_authorized_tag_creation_gate_receipt_20260521.md
+- E:\_AIP_REPORTS\AIP_v8.0_P3_authorized_tag_creation_gate_report_20260521.md
+- E:\_AIP_RECEIPTS\AIP_v8.0_P3_authorized_tag_creation_gate_receipt_20260521.md
 
 ## Verdict
 

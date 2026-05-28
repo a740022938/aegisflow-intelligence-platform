@@ -1,6 +1,6 @@
-# AIP v7.62-P5 Post-Release Verification
+# AIP v8.0-P5 Post-Release Verification
 
-**Phase:** v7.62-P5
+**Phase:** v8.0-P5
 **Status:** COMPLETE — All checks pass
 
 ---
@@ -12,9 +12,9 @@
 | Git status | ⚠️ Pre-existing dirty tree | ModelGateway/superpowers — concurrent work, not from this release |
 | Branch | ✅ main | Correct |
 | HEAD | ✅ e294c96 | P4 reconciliation commit |
-| Tag v7.62.0 local | ✅ exists | At e6be163 |
-| Tag v7.62.0 remote | ✅ exists | At origin |
-| GitHub Release | ✅ exists | OpenAIP v7.62.0 |
+| Tag v8.0.0 local | ✅ exists | At e6be163 |
+| Tag v8.0.0 remote | ✅ exists | At origin |
+| GitHub Release | ✅ exists | OpenAIP v8.0.0 |
 | Release notes | ✅ published | Full body with highlights, safety, validation |
 | Typecheck | ✅ PASS | Exit 0 |
 | Build | ✅ PASS | Completed in 15.36s |

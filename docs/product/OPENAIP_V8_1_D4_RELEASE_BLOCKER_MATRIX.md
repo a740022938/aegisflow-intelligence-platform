@@ -18,7 +18,7 @@
 | B8 | Hidden dangerous pages exposed | NOT EXPOSED | ❌ No | No new sidebar entries in Layout.tsx |
 | B9 | Release authorization undefined | DEFINED (D3) | ❌ No | Template exists; pending human signature |
 | B10 | Tag already exists | DOES NOT EXIST | ❌ No | `git tag -l v8.1.0` returns nothing |
-| B11 | Version unclear | CLEAR | ❌ No | v8.1.0 recommended; Core v7.62.0 documented |
+| B11 | Version unclear | CLEAR | ❌ No | v8.1.0 recommended; Core v8.0.0 documented |
 | B12 | Auth/Gate behavior changed | NOT CHANGED | ❌ No | |
 | B13 | DB/indexing/provider actions occurred | NOT OCCURRED | ❌ No | |
 | B14 | Primary UI shows MVP/preview/experiment | REMOVED | ❌ No | D1/D1A verified |

@@ -7,7 +7,7 @@ Date: 2026-05-22
 | Scope | Controlled runtime freshness diagnosis |
 | Stale runtime confirmed | YES |
 | `/api/health` before refresh | `version: 7.55.0` |
-| Source metadata | v7.62.0 |
+| Source metadata | v8.0.0 |
 | Restart executed | NO |
 | Restart authorization present | NO explicit authorization in task package |
 | Command used for restart | None |

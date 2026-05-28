@@ -142,11 +142,11 @@
       "id": "openaip-v8-1-release-workflow",
       "type": "release_process",
       "title": "OpenAIP v8.1 Release Workflow Readiness Planned",
-      "summary": "D3 established a 6-gate release checklist covering Source, Validation, Visual, Product, Safety, and Authorization gates. Includes rollback plan, release version strategy (v8.1.0 tag recommended), Core baseline v7.62.0, and release authorization template.",
+      "summary": "D3 established a 6-gate release checklist covering Source, Validation, Visual, Product, Safety, and Authorization gates. Includes rollback plan, release version strategy (v8.1.0 tag recommended), Core baseline v8.0.0, and release authorization template.",
       "details": [
         "6-gate checklist: Source, Validation, Visual, Product, Safety, Authorization",
         "Rollback plan documents pre/post-tag steps",
-        "Version strategy: v8.1.0 tag, Core v7.62.0 baseline"
+        "Version strategy: v8.1.0 tag, Core v8.0.0 baseline"
       ],
       "evidence": {
         "commits": ["0f90f22"],

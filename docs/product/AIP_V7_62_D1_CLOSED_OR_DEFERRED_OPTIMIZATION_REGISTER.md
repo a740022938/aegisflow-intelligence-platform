@@ -1,4 +1,4 @@
-# AIP v7.62-D1 Closed / Deferred Optimization Register
+# AIP v8.0-D1 Closed / Deferred Optimization Register
 
 **Status:** DEFINED
 

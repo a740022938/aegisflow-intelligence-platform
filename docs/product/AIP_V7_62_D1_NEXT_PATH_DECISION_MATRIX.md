@@ -1,4 +1,4 @@
-# AIP v7.62-D1 Next Path Decision Matrix
+# AIP v8.0-D1 Next Path Decision Matrix
 
 **Status:** DEFINED
 
@@ -10,7 +10,7 @@
 |---|---|---|---|---|
 | **A. HOLD** current main as local RC | Do nothing; keep current state | None | None | ✅ Default if no authorization |
 | **B. File release authorization + Pre-Tag Verification** | Fill form, then run pre-tag checklist | Low | Low | ✅ Recommended to finish cycle |
-| **C. Continue v7.62-P1 docs polish** | Final documentation/release notes refresh | None | Low | Optional |
+| **C. Continue v8.0-P1 docs polish** | Final documentation/release notes refresh | None | Low | Optional |
 | **D. Physical touch-device QA** | Run physical-device sidebar test | Low | Medium | Optional, conditional |
 | **E. v7.63 broader component split planning** | Plan larger GovernanceCenter split | Low | Medium | Not recommended now |
 | **F. Stop engineering** | End current engineering cycle | None | None | Possible if all goals met |
@@ -27,6 +27,6 @@
 
 | Field | Value |
 |---|---|
-| Decision by v7.62-D1 | Does NOT authorize release |
+| Decision by v8.0-D1 | Does NOT authorize release |
 | Recommended next action | File release authorization (Option B) when user is ready |
 | Fallback | Hold local RC (Option A) |

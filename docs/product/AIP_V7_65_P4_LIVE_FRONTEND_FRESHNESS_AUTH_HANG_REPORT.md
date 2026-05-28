@@ -32,7 +32,7 @@ HEAD = `71df9a9`, tracking `origin/main`. P3 fix (`8950dd3`) is in history.
 
 | Test | Endpoint | Response | Time |
 |---|---|---|---|
-| Health | `GET /api/health` | `{"ok":true,"version":"7.62.0"}` | instant |
+| Health | `GET /api/health` | `{"ok":true,"version":"8.0.0"}` | instant |
 | Auth status | `GET /api/auth/status` | `{"ok":true,"jwt":{...},"openclaw":{...}}` | instant |
 | Fake token check | `POST /api/openclaw/auth/check` | `{"ok":true,"valid":false,"configured":true,"error":"Token 验证失败"}` | **270ms** |
 | Master-switch POST | `POST /api/openclaw/master-switch` | `{"ok":false,"error":"unauthorized"}` | instant |

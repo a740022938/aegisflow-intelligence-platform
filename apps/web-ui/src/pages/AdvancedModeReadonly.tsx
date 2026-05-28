@@ -432,10 +432,10 @@ export default function AdvancedModeReadonly() {
     <PageShell
       title="高级模式入口总控"
       subtitle="Readonly Center Launchpad — governance-navigation baseline. Does not change Layout, sidebar, or enable Stage C."
-      versionLabel="AIP v7.62.0 · Release Baseline"
+      versionLabel="AIP v8.0.0 · Release Baseline"
       maturity="preview"
       safetyBoundary="readonly"
-      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · v7.62.0 release baseline · Safe tables · Deny-by-default evaluator · Synthetic dry-run fixtures · API rejection gates · No production side effects"
+      safetyText="Readonly · No sidebar change · Stage C deferred · No executable controls · v8.0.0 release baseline · Safe tables · Deny-by-default evaluator · Synthetic dry-run fixtures · API rejection gates · No production side effects"
     >
       {/* KPI Overview */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: 10, marginBottom: 20 }}>

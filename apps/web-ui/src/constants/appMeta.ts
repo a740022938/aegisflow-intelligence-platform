@@ -13,8 +13,8 @@ export const APP_META = {
   consoleLabelEn: 'Console',
   wechatId: 'AGI_FACTORY',
   githubRepoUrl: 'https://github.com/a740022938/aegisflow-intelligence-platform',
-  // Points to latest GitHub Release (v7.62.0). Update after each real release.
-  releaseUrl: 'https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v7.62.0',
+  // Points to latest GitHub Release (v8.0.0). Update after each real release.
+  releaseUrl: 'https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v8.0.0',
   onboardingDocUrl: 'https://github.com/a740022938/aegisflow-intelligence-platform/blob/main/docs/public-release/F0_NEW_USER_ONBOARDING.md',
   version: APP_VERSION,
 } as const;

@@ -1,13 +1,13 @@
-# AIP v7.62-P3 Report
+# AIP v8.0-P3 Report
 
-**Phase:** v7.62-P3
+**Phase:** v8.0-P3
 **Status:** COMPLETE
 
 ---
 
 ## Summary
 
-Authorized tag creation executed. Tag v7.62.0 was created at commit e6be163 and pushed to origin.
+Authorized tag creation executed. Tag v8.0.0 was created at commit e6be163 and pushed to origin.
 
 ## Verification
 
@@ -26,4 +26,4 @@ Authorized tag creation executed. Tag v7.62.0 was created at commit e6be163 and 
 
 ## Next Step
 
-v7.62-P4 GitHub Release + Release Notes (authorization required).
+v8.0-P4 GitHub Release + Release Notes (authorization required).

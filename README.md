@@ -2,11 +2,11 @@
 
 天枢智治平台 — 面向数据-训练-评估-发布全流程的本地化智能治理平台。
 
-**Current baseline: AIP v7.62.0 (Released)** | Stage C DISABLED | Feature Flag OFF | [GitHub Release](https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v7.62.0)
+**Current baseline: AIP v8.0.0 (Released)** | Stage C DISABLED | Feature Flag OFF | [GitHub Release](https://github.com/a740022938/aegisflow-intelligence-platform/releases/tag/v8.0.0)
 
-> OpenAIP v7.62.0 is the latest GitHub Release, tagged at commit `e6be163`. The platform was historically named **AegisFlow Intelligence Platform** and **AGI Model Factory**; these names appear only in legacy context and GitHub URLs. Current maintenance track: v7.63-dev.
+> OpenAIP v8.0.0 is the latest GitHub Release, tagged at commit `e6be163`. The platform was historically named **AegisFlow Intelligence Platform** and **AGI Model Factory**; these names appear only in legacy context and GitHub URLs. Current maintenance track: v7.63-dev.
 
-AIP v7.62.0 is the first formal GitHub Release after the v7.5x–v7.6x hardening cycle. Stage C remains disabled throughout. Current track: v7.63-dev maintenance/cleanup.
+AIP v8.0.0 is the first formal GitHub Release after the v7.5x–v7.6x hardening cycle. Stage C remains disabled throughout. Current track: v7.63-dev maintenance/cleanup.
 
 **Start here:** [`START_HERE.md`](START_HERE.md)
 
@@ -202,7 +202,7 @@ pnpm run db:migrate:new <name> # Create new migration
 
 ## Reading Order
 
-### Current baseline (v7.62.0 release)
+### Current baseline (v8.0.0 release)
 
 | Step | Document | Purpose |
 |------|----------|---------|
@@ -222,7 +222,7 @@ pnpm run db:migrate:new <name> # Create new migration
 
 ### Historical operator guides (v7.45 series)
 
-These remain valid as design-system and operator references but are superseded by the v7.62.0 release baseline for release status and acceptance work:
+These remain valid as design-system and operator references but are superseded by the v8.0.0 release baseline for release status and acceptance work:
 
 | Document | Purpose |
 |----------|---------|

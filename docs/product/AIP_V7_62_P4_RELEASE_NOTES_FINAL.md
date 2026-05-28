@@ -1,11 +1,11 @@
-# AIP v7.62-P4 Release Notes (Final)
+# AIP v8.0-P4 Release Notes (Final)
 
-**Phase:** v7.62-P4
+**Phase:** v8.0-P4
 **Status:** FINAL — Published to GitHub Release
 
 ---
 
-## OpenAIP v7.62.0 — Release Readiness & Governance Hardening
+## OpenAIP v8.0.0 — Release Readiness & Governance Hardening
 
 This release consolidates the platform transition from UI migration through production readiness, concluding the v7.5x–v7.6x hardening cycle. No new runtime features are introduced.
 
@@ -31,7 +31,7 @@ This release consolidates the platform transition from UI migration through prod
 | Build (742 modules) | ✅ PASS |
 | Lint (0 warnings) | ✅ PASS |
 | git diff --check | ✅ PASS |
-| Smoke tests (v7.62-P2) | ✅ 9/9 PASS |
+| Smoke tests (v8.0-P2) | ✅ 9/9 PASS |
 
 ### Safety
 
@@ -56,6 +56,6 @@ This release consolidates the platform transition from UI migration through prod
 
 ### Release Candidate
 
-- Tag: `v7.62.0`
+- Tag: `v8.0.0`
 - Target commit: `e6be163`
 - Working tree: Pre-existing concurrent development work present (ModelGateway, superpowers)

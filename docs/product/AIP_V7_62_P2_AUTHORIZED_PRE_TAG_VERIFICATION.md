@@ -1,6 +1,6 @@
-# AIP v7.62-P2 Authorized Pre-Tag Verification
+# AIP v8.0-P2 Authorized Pre-Tag Verification
 
-**Phase:** v7.62-P2
+**Phase:** v8.0-P2
 **Status:** COMPLETE — All checks executed
 
 ---

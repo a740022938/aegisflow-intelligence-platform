@@ -1,6 +1,6 @@
-# AIP v7.62-P3 Release Not Created Confirmation
+# AIP v8.0-P3 Release Not Created Confirmation
 
-**Phase:** v7.62-P3
+**Phase:** v8.0-P3
 **Status:** CONFIRMED — No GitHub Release created
 
 ---
@@ -23,4 +23,4 @@ These restrictions were strictly honored.
 
 ## Next Step
 
-GitHub Release + Release Notes would require v7.62-P4 with separate authorization.
+GitHub Release + Release Notes would require v8.0-P4 with separate authorization.
