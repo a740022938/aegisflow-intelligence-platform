@@ -300,74 +300,50 @@ function AppShell() {
               </>)}
             </div>
 
-            {/* ── Workbench ── */}
+            {/* ── 工作区 ── */}
             <div className="nav-section">
               <div className="nav-section-label" onClick={() => toggleSection('workbench')}>
                 {t.nav.workbench}
                 <span className="nav-section-arrow">{collapsed.has('workbench') ? '▸' : '▾'}</span>
               </div>
               {!collapsed.has('workbench') && (<>
-                <NavItem to="/datasets" icon="dataset" label={t.nav.datasets} />
-                <NavItem to="/training" icon="training" label={t.nav.trainingCenter} />
-                <NavItem to="/runs" icon="run" label={t.nav.runCenter} />
-                <NavItem to="/templates" icon="template" label={t.nav.templates} />
-                <NavItem to="/models" icon="artifact" label={t.nav.modelMgmt} />
-                {MODEL_GATEWAY_NAV_VISIBLE && <NavItem to="/model-gateway" icon="route" label={t.nav.modelGateway || 'Model Gateway'} />}
-                <NavItem to="/artifacts" icon="artifact" label={t.nav.artifacts} />
-                <NavItem to="/evaluations" icon="eval" label={t.nav.evalCenter} />
-                <NavItem to="/deployments" icon="deploy" label={t.nav.deployCenter} />
-                <NavItem to="/workflow-jobs" icon="workflow" label={t.nav.workflow} />
-                <NavItem to="/workflow-composer" icon="composer" label={t.nav.workflowComposer} />
-                <NavItem to="/workflow-canvas" icon="workflow" label={t.nav.workflowCanvas} />
-              </>)}
-            </div>
-
-            {/* ── System ── */}
-            <div className="nav-section">
-              <div className="nav-section-label" onClick={() => toggleSection('system')}>
-                {t.nav.system}
-                <span className="nav-section-arrow">{collapsed.has('system') ? '▸' : '▾'}</span>
-              </div>
-              {!collapsed.has('system') && (<>
                 <NavItem to="/" icon="dashboard" label={t.nav.dashboard} />
                 <NavItem to="/factory-status" icon="factory" label={t.nav.factoryStatus} />
-                <NavItem to="/assistant-center" icon="modules" label={t.nav.assistantCenter} />
-                <NavItem to="/module-center" icon="modules" label={t.nav.moduleCenter} />
-                <NavItem to="/plugin-pool" icon="api" label={t.nav.pluginPool} />
+                <NavItem to="/datasets" icon="dataset" label={t.nav.datasets} />
+                <NavItem to="/training" icon="training" label={t.nav.trainingCenter} />
+                <NavItem to="/models" icon="artifact" label={t.nav.modelMgmt} />
+                <NavItem to="/evaluations" icon="eval" label={t.nav.evalCenter} />
+                <NavItem to="/deployments" icon="deploy" label={t.nav.deployCenter} />
                 <NavItem to="/tasks" icon="tasks" label={t.nav.taskOrchestration} />
-                <NavItem to="/cost-routing" icon="route" label={t.nav.costRouting} />
-                <NavItem to="/approvals" icon="approval" label={t.nav.approvals} />
-                <NavItem to="/governance-hub" icon="audit" label={t.nav.governanceHub} />
-                <NavItem to="/audit" icon="audit" label={t.nav.audit} />
+                <NavItem to="/workflow-composer" icon="composer" label={t.nav.workflowComposer} />
                 <NavItem to="/feedback" icon="feedback" label={t.nav.feedback} />
-                <NavItem to="/advanced-mode-readonly" icon="audit" label={t.nav.advancedModeReadonly} />
-                <NavItem to="/knowledge" icon="knowledge" label={t.nav.knowledgeCenter} />
-                <NavItem to="/outputs" icon="output" label={t.nav.standardOutput} />
+                <NavItem to="/approvals" icon="approval" label={t.nav.approvals} />
+                <NavItem to="/audit" icon="audit" label={t.nav.audit} />
               </>)}
             </div>
 
-            {/* ── Advanced Tools ── */}
+            {/* ── 工具 & 实验室 ── */}
             <div className="nav-section nav-section-subtle">
               <div className="nav-section-label" onClick={() => toggleSection('advancedTools')}>
                 {t.nav.advancedTools}
                 <span className="nav-section-arrow">{collapsed.has('advancedTools') ? '▸' : '▾'}</span>
               </div>
               {!collapsed.has('advancedTools') && (<>
+                <NavItem to="/runs" icon="run" label={t.nav.runCenter} />
+                <NavItem to="/templates" icon="template" label={t.nav.templates} />
+                <NavItem to="/artifacts" icon="artifact" label={t.nav.artifacts} />
+                {MODEL_GATEWAY_NAV_VISIBLE && <NavItem to="/model-gateway" icon="route" label={t.nav.modelGateway || 'Model Gateway'} />}
+                <NavItem to="/backflow" icon="flywheel" label={t.nav.flywheel} />
+                <NavItem to="/system-status" icon="status" label="System Status" />
                 <NavItem to="/openaxiom-readonly" icon="label" label={t.nav.openAxiomReadonly} />
-                <NavItem to="/memory-hub" icon="database" label={t.nav.memoryHubReadonly} />
-                <NavItem to="/vision-lab/mahjong-debug" icon="template" label={t.nav.mahjongDebug} />
-                <NavItem to="/digital-employee" icon="brain" label={t.nav.digitalEmployee} />
+                <NavItem to="/scheduler" icon="clock" label={t.nav.scheduler} />
                 <NavItem to="/hpo" icon="run" label={t.nav.hpo} />
                 <NavItem to="/distill" icon="eval" label={t.nav.distill} />
                 <NavItem to="/model-merge" icon="merge" label={t.nav.modelMerge} />
-                <NavItem to="/inference" icon="run" label={t.nav.inference} />
-                <NavItem to="/annotation" icon="label" label={t.nav.annotation} />
-                <NavItem to="/huggingface" icon="api" label={t.nav.huggingface} />
-                <NavItem to="/scheduler" icon="clock" label={t.nav.scheduler} />
-                <NavItem to="/alerting" icon="bell" label={t.nav.alerting} />
-                <NavItem to="/model-monitor" icon="eval" label={t.nav.modelMonitor} />
+                <NavItem to="/storage" icon="storage" label={t.nav.storage} />
               </>)}
             </div>
+
           </div>
           <div className="sidebar-footer">
             <div className="sidebar-footer-text">{text.footerTitle}</div>
