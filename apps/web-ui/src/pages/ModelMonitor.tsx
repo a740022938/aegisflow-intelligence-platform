@@ -26,9 +26,9 @@ export default function ModelMonitorPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await get<{ ok: boolean; models: MonitoredModel[] }>('/api/model-monitor/models');
+      const res = await get<{ ok: boolean; models: MonitoredModel[]; error?: string }>('/api/model-monitor/models');
       if (res.ok) { setModels(res.models || []); if (!selectedModel && res.models?.length) setSelectedModel(res.models[0].model_id); }
-      else setError(res.error || 'Failed');
+      else setError((res as any).error || 'Failed');
     } catch (e: any) { setError(e.message); }
     finally { setLoading(false); }
   }, []);

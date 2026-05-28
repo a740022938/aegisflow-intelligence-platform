@@ -14,6 +14,7 @@ export type MenuPageType =
   | 'connector'
   | 'lab'
   | 'placeholder'
+  | 'preview'
   | 'system';
 
 export interface MenuRegistryItem {

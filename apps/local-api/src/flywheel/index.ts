@@ -464,10 +464,10 @@ export function registerFlywheelIterationRoutes(app: FastifyInstance) {
     const body = request.body || {};
     if (!body.name) return reply.code(400).send({ ok: false, error: 'name is required' });
     const id = randomUUID();
-    const now = now();
+    const ts = now();
     db.prepare(`INSERT INTO flywheel_iterations (id, name, dataset_id, model_id, status, params_json, created_at, updated_at)
       VALUES (?, ?, ?, ?, 'running', ?, ?, ?)`)
-      .run(id, body.name, body.dataset_id || '', body.model_id || '', JSON.stringify(body.params || {}), now, now);
+      .run(id, body.name, body.dataset_id || '', body.model_id || '', JSON.stringify(body.params || {}), ts, ts);
     const row = db.prepare('SELECT * FROM flywheel_iterations WHERE id = ?').get(id);
     return { ok: true, iteration: rowToIter(row) };
   });
