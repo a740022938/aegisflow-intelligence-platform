@@ -799,7 +799,8 @@ export async function syncTranslationsFromServer(lang: Lang): Promise<boolean> {
       }
     });
     return true;
-  } catch {
+  } catch (e) {
+    console.warn('[i18n] sync failed:', e);
     return false;
   }
 }

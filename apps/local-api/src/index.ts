@@ -3298,6 +3298,9 @@ start();
 
 
 // ── Models ───────────────────────────────────────────────────────────────────
+// v7.63: Model routes registered via registerModelsRoutes() at bottom of file.
+// These inline routes are kept for reference during migration but are no longer active.
+/*
 app.get('/api/models', async (request: any, reply: any) => {
   const result = await models.listModels(request.query || {});
   return result;
@@ -3333,7 +3336,8 @@ app.get('/api/models/:id/artifacts', async (request: any, reply: any) => {
   const result = await models.getModelArtifacts(request.params.id);
   return result;
 });
-
+*/
+/*
 app.get('/api/models/:id/deployments', async (request: any, reply: any) => {
   const result = await models.getModelDeployments(request.params.id);
   return result;
@@ -3343,6 +3347,7 @@ app.get('/api/models/:id/evaluations', async (request: any, reply: any) => {
   const result = await models.getModelEvaluations(request.params.id);
   return result;
 });
+*/
 
 
 // ── Packages ────────────────────────────────────────────────────────────────

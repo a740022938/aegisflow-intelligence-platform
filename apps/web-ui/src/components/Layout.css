@@ -121,11 +121,11 @@ html, body, #root {
   stroke-linejoin: round;
 }
 .openAip-node-core {
-  fill: #ecfeff;
+  fill: var(--text-primary);
   filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.65));
 }
 .openAip-node-dot {
-  fill: #99f6e4;
+  fill: var(--primary);
 }
 .topbar-title {
   font-size: 14px;
@@ -244,7 +244,7 @@ body.layout-resizing * {
   padding-top: 10px;
 }
 .nav-section-primary > .nav-section-label {
-  color: #5eead4;
+  color: var(--primary);
   font-size: 13px;
   letter-spacing: 0.05em;
 }
@@ -261,7 +261,7 @@ body.layout-resizing * {
   margin-bottom: 6px;
   font-size: 12px;
   font-weight: 700;
-  color: #6ee7d0;
+  color: var(--primary);
   letter-spacing: 0.07em;
   text-transform: uppercase;
   cursor: pointer;
@@ -332,7 +332,7 @@ body.layout-resizing * {
 }
 
 .nav-item.active {
-  color: #ffffff;
+  color: var(--text-primary);
   background: linear-gradient(120deg, rgba(16, 163, 127, 0.18), rgba(59, 130, 246, 0.15), rgba(236, 72, 153, 0.10));
   border-radius: 8px;
 }
@@ -714,7 +714,7 @@ body.layout-resizing * {
 
 .topbar-modal {
   width: min(760px, calc(100vw - 24px));
-  background: #0f1724;
+  background: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: 14px;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
@@ -789,7 +789,7 @@ body.layout-resizing * {
 .topbar-help-btn {
   border: 1px solid var(--border-light);
   background: linear-gradient(120deg, rgba(16, 163, 127, 0.2), rgba(59, 130, 246, 0.2));
-  color: #e6fbff;
+  color: var(--text-primary);
   border-radius: 9px;
   padding: 8px 12px;
   font-size: 13px;

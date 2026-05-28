@@ -68,7 +68,7 @@ interface KnowledgeEntry {
   links?: any[];
 }
 
-const API = import.meta.env.VITE_API_URL || '';
+const API = import.meta.env.VITE_API_URL || '/';
 
 async function fetchAPI(path: string, options?: any) {
   const res = await fetch(`${API}${path}`, options);

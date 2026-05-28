@@ -17,6 +17,10 @@ const COMMAND_TIMEOUT_MS = 5000;
 const DEFAULT_LIMIT = 30;
 const MAX_LIMIT = 80;
 const CONTRACT_MODE_LIVE_SERVICE_IDS = new Set(['aip-api', 'aip-web', 'openclaw']);
+const AIP_API_BASE = process.env.AIP_API_URL || 'http://127.0.0.1:8787';
+const AIP_WEB_BASE = process.env.AIP_WEB_URL || 'http://127.0.0.1:5173';
+const OPENCLAW_HEALTH_URL = process.env.OPENCLAW_BASE_URL ? `${process.env.OPENCLAW_BASE_URL}/health` : 'http://127.0.0.1:18789/health';
+const PROXY_HEALTH_URL = process.env.AIP_CLAUDE_PROXY_URL ? `${process.env.AIP_CLAUDE_PROXY_URL}/health` : 'http://127.0.0.1:15721/health';
 
 const REPORT_ROOTS = [
   { root: 'E:\\_AIP_REPORTS', project: 'AIP' },
@@ -427,11 +431,11 @@ async function collectStatus() {
   ]);
 
   const [aipHealth, webHealth, openAxiom, openClawHealth, proxyHealth, nodeVersion, npmVersion, pnpmVersion, pythonVersion] = await Promise.all([
-    httpJson('http://127.0.0.1:8787/api/health'),
-    httpJson('http://127.0.0.1:5173'),
-    httpJson('http://127.0.0.1:8787/api/openaxiom/status'),
-    httpJson('http://127.0.0.1:18789/health'),
-    httpJson('http://127.0.0.1:15721/health'),
+    httpJson(`${AIP_API_BASE}/api/health`),
+    httpJson(AIP_WEB_BASE),
+    httpJson(`${AIP_API_BASE}/api/openaxiom/status`),
+    httpJson(OPENCLAW_HEALTH_URL),
+    httpJson(PROXY_HEALTH_URL),
     runVersion('node', ['-v']),
     runVersion('npm', ['-v']),
     runVersion('pnpm', ['-v']),

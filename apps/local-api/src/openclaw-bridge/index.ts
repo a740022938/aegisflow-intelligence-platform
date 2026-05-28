@@ -11,6 +11,8 @@ import fs from 'node:fs';
 
 const OPENCLAW_BASE = process.env.OPENCLAW_BASE_URL || 'http://127.0.0.1:18789';
 const OPENCLAW_TOKEN = process.env.OPENCLAW_HEARTBEAT_TOKEN || '';
+const AIP_API_BASE = process.env.AIP_API_URL || 'http://127.0.0.1:8787';
+const COMFY_PROMPT_URL = process.env.COMFY_PROMPT_URL || 'http://127.0.0.1:8000/prompt';
 
 interface OpenClawEvent {
   event_type: 'workflow_started' | 'workflow_completed' | 'workflow_failed' | 'task_created' | 'task_updated' | 'system_alert' | 'heartbeat_status';
@@ -282,13 +284,13 @@ async function handleRunScript(cmd: OpenClawCommand): Promise<Record<string, any
       output = execSync(`powershell -NoProfile -ExecutionPolicy Bypass -File "${scriptPath}"`, {
         encoding: 'utf-8',
         timeout: 60000,
-        env: { ...process.env, OPENCLAW_API_BASE: `http://127.0.0.1:8787` },
+        env: { ...process.env, OPENCLAW_API_BASE: AIP_API_BASE },
       });
     } else {
       output = execSync(`node "${scriptPath}"`, {
         encoding: 'utf-8',
         timeout: 60000,
-        env: { ...process.env, OPENCLAW_API_BASE: `http://127.0.0.1:8787` },
+        env: { ...process.env, OPENCLAW_API_BASE: AIP_API_BASE },
       });
     }
 
@@ -474,7 +476,7 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
         workflow_file: workflowPath,
         injected_prompt: prompt,
         final_payload_size: 0,
-        actualComfyUrl: 'http://127.0.0.1:8000/prompt',
+        actualComfyUrl: COMFY_PROMPT_URL,
         responseStatus: 500,
         responseText: String(e?.message || e),
         stack: e?.stack || ''
@@ -514,7 +516,7 @@ export function registerOpenClawBridgeRoutes(app: FastifyInstance) {
     }
     const bodyToSend = JSON.stringify({ prompt: workflowJson, client_id: 'aip-openclaw-bridge' });
     const finalPayloadSize = Buffer.byteLength(bodyToSend, 'utf8');
-    const url = 'http://127.0.0.1:8000/prompt';
+    const url = COMFY_PROMPT_URL;
     let promptId: string | undefined;
     let responseStatus: number | undefined;
     let responseText: string | undefined;

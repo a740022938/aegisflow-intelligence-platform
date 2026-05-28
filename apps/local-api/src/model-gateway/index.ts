@@ -7,12 +7,12 @@ const execFileAsync = promisify(execFile);
 
 const HTTP_TIMEOUT_MS = 2500;
 const COMMAND_TIMEOUT_MS = 4000;
-const CLAUDE_PROXY_URL = 'http://127.0.0.1:15721';
-const AIP_GATEWAY_URL = 'http://127.0.0.1:15722';
-const OLLAMA_URL = 'http://127.0.0.1:11434';
-const LEGACY_PROXY_SCRIPT = 'E:\\_AIP_TOOLS\\claude-deepseek-proxy\\cc-switch-proxy.js';
-const AIP_GATEWAY_SCRIPT = 'E:\\_AIP_TOOLS\\aip-model-gateway\\gateway.js';
-const AIP_GATEWAY_STARTER = 'E:\\_AIP_TOOLS\\aip-model-gateway\\StartAipModelGateway.bat';
+const CLAUDE_PROXY_URL = process.env.AIP_CLAUDE_PROXY_URL || 'http://127.0.0.1:15721';
+const AIP_GATEWAY_URL = process.env.AIP_GATEWAY_URL || 'http://127.0.0.1:15722';
+const OLLAMA_URL = process.env.AIP_OLLAMA_URL || 'http://127.0.0.1:11434';
+const LEGACY_PROXY_SCRIPT = process.env.AIP_LEGACY_PROXY_SCRIPT || '';
+const AIP_GATEWAY_SCRIPT = process.env.AIP_GATEWAY_SCRIPT || '';
+const AIP_GATEWAY_STARTER = process.env.AIP_GATEWAY_STARTER || '';
 
 type ProbeResult = {
   ok: boolean;
